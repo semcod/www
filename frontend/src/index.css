@@ -1,0 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; }
+body {
+  background: #05080f;
+  color: #e4eaf4;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: #00e5ff; text-decoration: none; }
+a:hover { color: #00e676; }
+code { user-select: all; }
+
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+::selection { background: rgba(0, 229, 255, 0.25); }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0c1220; }
+::-webkit-scrollbar-thumb { background: #1a2740; border-radius: 3px; }
