@@ -1,0 +1,26 @@
+{
+  "name": "Semcod Code Health",
+  "url": "https://semcod.dev",
+  "hook_attributes": {
+    "url": "https://api.semcod.dev/webhook/github",
+    "active": true
+  },
+  "redirect_url": "https://semcod.dev/auth/callback",
+  "callback_urls": [
+    "https://semcod.dev/auth/callback"
+  ],
+  "setup_url": "https://semcod.dev/setup",
+  "description": "Automated code health analysis — One-click Audit, PR comments, and health badges for your repos.",
+  "public": true,
+  "default_events": [
+    "pull_request",
+    "push"
+  ],
+  "default_permissions": {
+    "contents": "read",
+    "pull_requests": "write",
+    "statuses": "write",
+    "checks": "write",
+    "metadata": "read"
+  }
+}
