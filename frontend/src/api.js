@@ -132,6 +132,49 @@ export async function uninstallApp(repo, provider, sessionToken) {
   return res.json();
 }
 
+// ─── Trend ────────────────────────────────────────────────────────────────────
+
+export async function fetchTrend(owner, repo, days = 30) {
+  const res = await fetch(`${API}/api/trend/${owner}/${repo}?days=${days}`);
+  if (!res.ok) throw new Error("Failed to fetch trend");
+  return res.json();
+}
+
+// ─── Schedules ────────────────────────────────────────────────────────────────
+
+export async function fetchSchedules(sessionToken) {
+  const res = await fetch(`${API}/api/schedules`, { headers: authHeaders(sessionToken) });
+  if (!res.ok) throw new Error("Failed to fetch schedules");
+  return res.json();
+}
+
+export async function createSchedule(body, sessionToken) {
+  const res = await fetch(`${API}/api/schedules`, {
+    method: "POST",
+    headers: authHeaders(sessionToken),
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error("Failed to create schedule");
+  return res.json();
+}
+
+export async function deleteSchedule(owner, repo, sessionToken) {
+  const res = await fetch(`${API}/api/schedules/${owner}/${repo}`, {
+    method: "DELETE",
+    headers: authHeaders(sessionToken),
+  });
+  if (!res.ok) throw new Error("Failed to delete schedule");
+}
+
+export async function fetchBillingPortal(sessionToken) {
+  const res = await fetch(`${API}/api/billing/portal`, {
+    method: "POST",
+    headers: authHeaders(sessionToken),
+  });
+  if (!res.ok) throw new Error("Failed to open billing portal");
+  return res.json();
+}
+
 // ─── Marketplace Apps ─────────────────────────────────────────────────────────
 
 export async function getApps() {

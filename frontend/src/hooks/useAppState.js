@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { useHashBootstrap, useHashSync, createSelectedRepo } from "./useUrlState.js";
+import { useHashBootstrap, useHashSync } from "./useUrlState.js";
 import { useScanAnimation, useAuditPolling } from "./usePolling.js";
 import {
   useSessionCallbackBootstrap,
@@ -9,9 +9,10 @@ import {
   startDemoSession,
   logoutSession
 } from "./useAuth.js";
-import { fetchRepos, startAudit as startAuditRequest, analyzePublicRepo } from "../api.js";
+import { fetchRepos } from "../api.js";
 import { DEMO_REPOS } from "../constants.js";
 import { useBilling } from "./useBilling.js";
+import { useAuditActions } from "./useAuditActions.js";
 
 const SESSION_KEY = "semcod_session";
 
@@ -20,15 +21,11 @@ export function useAppState() {
   const [phase, setPhase] = useState("landing");
   const [repos, setRepos] = useState([]);
   const [selectedRepo, setSelectedRepo] = useState(null);
-  const [scanProgress, setScanProgress] = useState(0);
-  const [scanLabel, setScanLabel] = useState("");
-  const [audit, setAudit] = useState(null);
   const [badgeRepo, setBadgeRepo] = useState("acme/backend-api");
   const [sessionToken, setSessionToken] = useState(() => localStorage.getItem(SESSION_KEY) || null);
   const [user, setUser] = useState(null);
   const [repoUrl, setRepoUrl] = useState("");
   const [isSandbox, setIsSandbox] = useState(false);
-  const [auditId, setAuditId] = useState(null);
 
   const {
     billingStatus,
@@ -39,6 +36,16 @@ export function useAppState() {
     dismissPaywall,
     refreshBilling,
   } = useBilling(sessionToken);
+
+  const {
+    scanProgress, setScanProgress,
+    scanLabel, setScanLabel,
+    audit, setAudit,
+    auditId, setAuditId,
+    startAudit,
+    startSandbox,
+    resetAudit,
+  } = useAuditActions(sessionToken, repoUrl, checkScanAllowed, setSelectedRepo, setIsSandbox, setPhase);
 
   // Read session token from URL callback (OAuth redirect) on mount
   useSessionCallbackBootstrap(setSessionToken, SESSION_KEY);
@@ -87,11 +94,10 @@ export function useAppState() {
   const reset = useCallback(() => {
     setPhase("landing");
     setSelectedRepo(null);
-    setAudit(null);
     setIsSandbox(false);
     setRepoUrl("");
-    setAuditId(null);
-  }, [setPhase, setSelectedRepo, setAudit, setIsSandbox, setRepoUrl, setAuditId]);
+    resetAudit();
+  }, [setPhase, setSelectedRepo, setIsSandbox, setRepoUrl, resetAudit]);
 
   const startOAuth = useCallback(() => {
     window.location.href = getOAuthStartUrl();
@@ -100,58 +106,6 @@ export function useAppState() {
   const confirmAuth = useCallback(() => {
     confirmAuthFlow(sessionToken, setRepos, setPhase);
   }, [sessionToken, setRepos, setPhase]);
-
-  const startAudit = useCallback(async (repo) => {
-    if (!checkScanAllowed()) return;
-
-    setSelectedRepo(repo);
-    setPhase("scanning");
-    setIsSandbox(false);
-    setAudit(null);
-    setAuditId(null);
-
-    if (!sessionToken) {
-      return;
-    }
-
-    try {
-      const data = await startAuditRequest(repo.full_name, sessionToken);
-      if (data.audit_id) {
-        setAuditId(data.audit_id);
-      }
-    } catch (error) {
-    }
-  }, [checkScanAllowed, sessionToken, setSelectedRepo, setPhase, setIsSandbox, setAudit, setAuditId]);
-
-  const startSandbox = useCallback(async () => {
-    if (!checkScanAllowed()) return false;
-
-    const url = repoUrl.trim();
-    if (!url) {
-      return false;
-    }
-
-    const repoData = createSelectedRepo(url, url);
-    if (!repoData) {
-      return false;
-    }
-
-    setSelectedRepo(repoData);
-    setIsSandbox(true);
-    setPhase("scanning");
-    setAudit(null);
-    setAuditId(null);
-
-    try {
-      const data = await analyzePublicRepo(url);
-      if (data.audit_id) {
-        setAuditId(data.audit_id);
-      }
-    } catch (error) {
-    }
-
-    return true;
-  }, [checkScanAllowed, repoUrl, setSelectedRepo, setIsSandbox, setPhase, setAudit, setAuditId]);
 
   const startDemoLogin = useCallback(() => {
     startDemoSession(setSessionToken, setRepos, setPhase, SESSION_KEY);

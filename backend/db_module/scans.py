@@ -28,9 +28,10 @@ def save_scan(scan_data: Dict) -> int:
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("""
+    placeholder = "%s" if USE_POSTGRES else "?"
+    cursor.execute(f"""
         INSERT INTO scans (repo, health_score, grade, stats, completed, sandbox, badge_url)
-        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        VALUES ({placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder})
     """, (
         scan_data["repo"],
         scan_data["health_score"],
@@ -53,11 +54,12 @@ def get_recent_scans(limit: int = 100) -> List[Dict]:
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("""
+    placeholder = "%s" if USE_POSTGRES else "?"
+    cursor.execute(f"""
         SELECT repo, health_score, grade, stats, completed, sandbox, badge_url
         FROM scans
         ORDER BY created_at DESC
-        LIMIT %s
+        LIMIT {placeholder}
     """, (limit,))
 
     rows = cursor.fetchall()
@@ -83,12 +85,13 @@ def get_repo_scans(repo: str, limit: int = 100) -> List[Dict]:
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("""
+    placeholder = "%s" if USE_POSTGRES else "?"
+    cursor.execute(f"""
         SELECT repo, health_score, grade, stats, completed, sandbox, badge_url
         FROM scans
-        WHERE repo = %s
+        WHERE repo = {placeholder}
         ORDER BY created_at ASC
-        LIMIT %s
+        LIMIT {placeholder}
     """, (repo, limit))
 
     rows = cursor.fetchall()
@@ -154,9 +157,10 @@ def save_audit_result(audit_id: str, audit_data: Dict) -> None:
             audit_data.get("error"),
         ))
     else:
-        cursor.execute("""
+        placeholder = "%s" if USE_POSTGRES else "?"
+        cursor.execute(f"""
             INSERT OR REPLACE INTO audit_results (audit_id, repo, status, started, completed, health_score, grade, stats, metrics, recommendations, error)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES ({placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder}, {placeholder})
         """, (
             audit_id,
             audit_data.get("repo"),
@@ -180,10 +184,11 @@ def get_audit_result(audit_id: str) -> Dict | None:
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("""
+    placeholder = "%s" if USE_POSTGRES else "?"
+    cursor.execute(f"""
         SELECT audit_id, repo, status, started, completed, health_score, grade, stats, metrics, recommendations, error
         FROM audit_results
-        WHERE audit_id = %s
+        WHERE audit_id = {placeholder}
     """, (audit_id,))
 
     row = cursor.fetchone()

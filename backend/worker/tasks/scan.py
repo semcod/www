@@ -1,15 +1,17 @@
-"""Celery tasks for Semcod - async processing of audits and PR events."""
+"""Scan-related Celery tasks - audits and diff analysis."""
 import asyncio
-from typing import Dict, Any, Optional
-from celery import shared_task
-from celery.exceptions import MaxRetriesExceededError
+from typing import Dict, Any
+
+try:
+    from celery import shared_task
+    from celery.exceptions import MaxRetriesExceededError
+    _CELERY_AVAILABLE = True
+except ImportError:
+    _CELERY_AVAILABLE = False
+    from .._celery_stub import shared_task, MaxRetriesExceededError  # type: ignore[assignment]
 
 from events.models import Event, EventType, ProviderType
 from adapters import get_adapter_for_event
-from adapters.base import GitProvider
-from adapters.github import GitHubAdapter
-from adapters.gitlab import GitLabAdapter
-from adapters.gitea import GiteaAdapter
 
 
 @shared_task(bind=True, max_retries=3)
@@ -26,41 +28,47 @@ def run_audit(self, repo: str, commit_sha: str, config: Dict[str, Any]) -> Dict[
         Audit result with health score, issues, recommendations
     """
     try:
-        # Import here to avoid circular dependencies
-        try:
-            from services.scoring import calculate_health_score
-            from services.analyzer import analyze_repo
-        except ImportError:
-            # Fallback mocks for testing
-            def calculate_health_score(result):
-                return result.get("health_score", 70)
-
-            def analyze_repo(repo, commit_sha, config):
-                return {"health_score": 70, "issues": [], "recommendations": []}
-
-        # Run analysis
-        result = analyze_repo(repo, commit_sha, config)
-        score = calculate_health_score(result)
-
-        return {
-            "status": "completed",
-            "repo": repo,
-            "commit_sha": commit_sha,
-            "health_score": score,
-            "issues": result.get("issues", []),
-            "recommendations": result.get("recommendations", []),
-        }
-
-    except Exception as exc:
-        # Retry with exponential backoff
-        if self.request.retries < self.max_retries:
-            countdown = 60 * (2 ** self.request.retries)  # 1min, 2min, 4min
-            raise self.retry(exc=exc, countdown=countdown)
+        # Import analysis functions
+        from services.scoring import calculate_health_score
+        from services.analyzer import analyze_repo
+    except ImportError as e:
         return {
             "status": "failed",
             "repo": repo,
-            "error": str(exc),
+            "error": f"Analysis modules not available: {e}",
         }
+
+    # Run analysis
+    result = analyze_repo(repo, commit_sha, config)
+    score = result.get("health_score", 70)  # Use score from analyze_repo
+
+    # Record usage if tenant_id provided
+    tenant_id = config.get("tenant_id")
+    if tenant_id:
+        try:
+            from services.billing import get_usage_tracker, BillingEventType
+            usage = get_usage_tracker().record_usage(
+                tenant_id=tenant_id,
+                event_type=BillingEventType.PR_ANALYSIS,
+                quantity=1,
+                metadata={"repo": repo, "commit_sha": commit_sha},
+            )
+            result["billing"] = {
+                "usage_recorded": True,
+                "cost_cents": usage["cost_cents"],
+                "within_limit": usage["within_limit"],
+            }
+        except Exception as e:
+            print(f"[run_audit] Failed to record usage: {e}")
+
+    return {
+        "status": "completed",
+        "repo": repo,
+        "commit_sha": commit_sha,
+        "health_score": score,
+        "issues": result.get("issues", []),
+        "recommendations": result.get("recommendations", []),
+    }
 
 
 @shared_task(bind=True, max_retries=3)
@@ -172,21 +180,32 @@ def process_push_event(event_dict: Dict[str, Any]) -> Dict[str, Any]:
 @shared_task(bind=True, max_retries=2)
 def analyze_diff(self, repo: str, diff: str, config: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Analyze a diff asynchronously using AI/ML pipeline.
+    Analyze a diff asynchronously using actual analysis.
 
-    This is the heavy processing task that runs ML models
-    for code analysis.
+    This analyzes diff content for code quality issues.
     """
     try:
-        # Simulated analysis - replace with actual ML pipeline
         from services.scoring import calculate_health_score
+        import re
 
-        # Mock result for now
+        # Parse diff for actual issues
         issues = []
+        
+        # Check for TODO/FIXME comments
         if "TODO" in diff:
             issues.append({"type": "todo", "severity": "low"})
         if "FIXME" in diff:
             issues.append({"type": "fixme", "severity": "medium"})
+        
+        # Check for complexity indicators
+        if diff.count("if ") > 10:
+            issues.append({"type": "high_complexity", "severity": "medium"})
+        
+        # Check for long lines (>100 chars in diff)
+        for line in diff.split("\n"):
+            if line.startswith("+") and len(line) > 100:
+                issues.append({"type": "long_line", "severity": "low"})
+                break
 
         score = max(0, 100 - len(issues) * 10)
 
@@ -204,124 +223,8 @@ def analyze_diff(self, repo: str, diff: str, config: Dict[str, Any]) -> Dict[str
         raise
 
 
-@shared_task(bind=True, max_retries=2)
-def create_auto_pr(
-    self,
-    repo: str,
-    base_branch: str,
-    patches: list,
-    proposal_type: str,
-    llm_prompt: str,
-    token: str,
-    provider_type: str = "github",
-) -> Dict[str, Any]:
-    """
-    Create automated PR with fixes asynchronously.
-
-    Similar to autopr router but as async task.
-    """
-    try:
-        # Get adapter (imports at module level)
-        adapter_map = {
-            "github": GitHubAdapter,
-            "gitlab": GitLabAdapter,
-            "gitea": GiteaAdapter,
-        }
-        adapter_class = adapter_map.get(provider_type, GitHubAdapter)
-        adapter = adapter_class(token)
-
-        # Create branch and commit patches
-        default_branch = asyncio.run(adapter.get_default_branch(repo))
-        base_sha = asyncio.run(adapter.get_ref_sha(repo, default_branch))
-
-        import hashlib
-        from datetime import datetime, timezone
-
-        fix_id = hashlib.sha256(
-            f"{repo}-{proposal_type}-{datetime.now(timezone.utc).isoformat()}".encode()
-        ).hexdigest()[:8]
-        branch = f"semcod-fix-{fix_id}"
-
-        asyncio.run(adapter.create_branch(repo, branch, base_sha))
-
-        # Commit each patch
-        for patch in patches:
-            file_sha = asyncio.run(
-                adapter.get_file_sha(repo, patch["path"], branch)
-            )
-            asyncio.run(
-                adapter.commit_file(
-                    repo,
-                    patch["path"],
-                    patch["content"],
-                    branch,
-                    f"fix({proposal_type}): auto-fix via Semcod [{fix_id}]",
-                    file_sha,
-                )
-            )
-
-        # Create PR
-        pr_url = asyncio.run(
-            adapter.create_pr(
-                repo,
-                f"[Semcod] Auto-fix: {proposal_type.replace('_', ' ')} [{fix_id}]",
-                f"Auto-fix generated from: {llm_prompt}",
-                branch,
-                base_branch,
-            )
-        )
-
-        return {
-            "status": "created",
-            "repo": repo,
-            "pr_url": pr_url,
-            "branch": branch,
-        }
-
-    except Exception as exc:
-        if self.request.retries < self.max_retries:
-            raise self.retry(countdown=60)
-        return {
-            "status": "failed",
-            "error": str(exc),
-        }
-
-
-@shared_task
-def check_health_regression(
-    repo: str,
-    previous_score: Optional[int],
-    new_score: int,
-    threshold: int = -5,
-) -> Dict[str, Any]:
-    """
-    Check if health score regressed and create issue if needed.
-    """
-    if previous_score is None:
-        return {"status": "no_baseline"}
-
-    delta = new_score - previous_score
-
-    if delta < threshold:
-        return {
-            "status": "regression_detected",
-            "previous_score": previous_score,
-            "new_score": new_score,
-            "delta": delta,
-            "should_alert": True,
-        }
-
-    return {
-        "status": "ok",
-        "delta": delta,
-        "improvement": delta > 0,
-    }
-
-
-# ─── Helper Functions ─────────────────────────────────────────────────────────────
-
-
-def _get_token_for_provider(provider: ProviderType) -> Optional[str]:
+# Helper functions
+def _get_token_for_provider(provider: ProviderType) -> str:
     """Get API token for provider from config."""
     import os
 
@@ -330,7 +233,7 @@ def _get_token_for_provider(provider: ProviderType) -> Optional[str]:
         ProviderType.GITLAB: os.getenv("GITLAB_TOKEN", ""),
         ProviderType.GITEA: os.getenv("GITEA_TOKEN", ""),
     }
-    return token_map.get(provider)
+    return token_map.get(provider, "")
 
 
 async def _analyze_diff(diff: str, repo: str) -> Dict[str, Any]:

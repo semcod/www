@@ -5,7 +5,7 @@ from typing import Dict, List, Optional
 
 from fastapi import APIRouter, HTTPException
 
-from database import get_repo_scans
+from services.scan_service import get_repo_scans
 
 router = APIRouter()
 

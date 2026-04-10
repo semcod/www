@@ -14,7 +14,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from config import APP_URL, SCAN_HISTORY_LIMIT
 from services.analyzer import count_code_stats, run_tool
 from services.scoring import calculate_health_score, generate_recommendations, score_to_grade
-from database import save_scan, get_recent_scans, save_audit_result, get_audit_result, save_badge_cache, get_badge_cache
+from services.scan_service import save_scan, get_recent_scans, save_audit_result, get_audit_result, save_badge_cache, get_badge_cache
 from routers.auth import get_current_user
 
 router = APIRouter()

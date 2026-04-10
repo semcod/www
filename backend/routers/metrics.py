@@ -7,7 +7,7 @@ from typing import List, Dict, Optional
 from datetime import datetime, timezone
 from pathlib import Path
 
-from database import get_recent_scans, get_total_scan_count
+from services.scan_service import get_recent_scans, get_total_scan_count
 
 router = APIRouter()
 

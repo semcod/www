@@ -10,7 +10,7 @@ REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 celery = Celery(
     "semcod",
     broker=REDIS_URL,
-    backend=REDIS_URL,
+    backend=None,  # Disable result backend to avoid Redis connection issues
     include=["worker.tasks"],  # Tasks module
 )
 
@@ -22,7 +22,7 @@ celery.conf.update(
     timezone="UTC",
     enable_utc=True,
     # Task execution settings
-    task_track_started=True,
+    task_track_started=False,  # Disable tracking to avoid backend connection
     task_time_limit=300,  # 5 min timeout
     worker_prefetch_multiplier=1,  # Fair task distribution
     # Result backend settings

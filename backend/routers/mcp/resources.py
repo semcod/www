@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException
 
 from .models import MCPResource, MCPResourceResponse
-from database import get_recent_scans, get_total_scan_count
+from services.scan_service import get_recent_scans, get_total_scan_count
 from store import audit_results, badge_cache, scan_history
 
 router = APIRouter()

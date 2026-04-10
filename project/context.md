@@ -3,28 +3,27 @@
 ## Overview
 
 - **Project**: /home/tom/github/semcod/www
-- **Primary Language**: javascript
-- **Languages**: javascript: 67, python: 62, shell: 2
+- **Primary Language**: python
+- **Languages**: python: 85, javascript: 79, shell: 2
 - **Analysis Mode**: static
-- **Total Functions**: 664
-- **Total Classes**: 50
-- **Modules**: 131
-- **Entry Points**: 506
+- **Total Functions**: 809
+- **Total Classes**: 62
+- **Modules**: 166
+- **Entry Points**: 619
 
 ## Architecture by Module
+
+### frontend.src.api
+- **Functions**: 42
+- **File**: `api.js`
 
 ### e2e.specs.social-sharing.spec
 - **Functions**: 33
 - **File**: `social-sharing.spec.js`
 
-### frontend.src.api
-- **Functions**: 32
-- **File**: `api.js`
-
-### backend.adapters.gitea
-- **Functions**: 23
-- **Classes**: 1
-- **File**: `gitea.py`
+### backend.db_module.wrappers
+- **Functions**: 28
+- **File**: `wrappers.py`
 
 ### backend.adapters.github
 - **Functions**: 22
@@ -35,6 +34,11 @@
 - **Functions**: 21
 - **Classes**: 1
 - **File**: `gitlab.py`
+
+### backend.adapters.gitea
+- **Functions**: 21
+- **Classes**: 1
+- **File**: `gitea.py`
 
 ### frontend.src.hooks.useDownloads
 - **Functions**: 21
@@ -58,18 +62,14 @@
 - **Functions**: 14
 - **File**: `metrics.spec.js`
 
-### backend.worker.tasks
+### backend.services.analyzer
 - **Functions**: 13
-- **File**: `tasks.py`
+- **File**: `analyzer.py`
 
 ### backend.apps.base
 - **Functions**: 13
 - **Classes**: 3
 - **File**: `base.py`
-
-### frontend.src.hooks.useAppState
-- **Functions**: 13
-- **File**: `useAppState.js`
 
 ### frontend.e2e.metrics.spec
 - **Functions**: 13
@@ -96,28 +96,28 @@
 
 ### backend.services.mirror
 - **Functions**: 11
-- **Classes**: 3
+- **Classes**: 1
 - **File**: `mirror.py`
 
-### backend.routers.marketplace
+### backend.scheduler.cron
 - **Functions**: 11
-- **Classes**: 7
-- **File**: `marketplace.py`
+- **Classes**: 2
+- **File**: `cron.py`
 
 ## Key Entry Points
 
 Main execution flows into the system:
 
-### frontend.src.hooks.useAppState.useAppState
-- **Calls**: frontend.src.hooks.useAppState.useState, frontend.src.hooks.useAppState.getItem, frontend.src.hooks.useAppState.useBilling, frontend.src.hooks.useAppState.callback, frontend.src.hooks.useAppState.useSessionCallbackBootstrap, frontend.src.hooks.useAppState.useSessionProfile, frontend.src.hooks.useAppState.useHashBootstrap, frontend.src.hooks.useAppState.useHashSync
+### backend.alembic.versions.0001_initial_schema.upgrade
+- **Calls**: op.get_bind, sa.inspect, set, op.create_table, op.create_index, op.create_table, op.create_table, op.create_index
+
+### backend.db_module.scans_orm.save_audit_result
+> Save audit result to database.
+- **Calls**: None.first, db.commit, audit_data.get, audit_data.get, audit_data.get, audit_data.get, audit_data.get, audit_data.get
 
 ### backend.scripts.scan_samples.scan_sample_projects
 > Scan all sample projects and save to database.
 - **Calls**: backend.sample_projects.get_sample_projects, print, print, enumerate, print, print, print, sum
-
-### backend.routers.marketplace.trigger_auto_fix
-> Trigger auto-fix PR generation for a repository.
-- **Calls**: router.post, Depends, str, backend.db_module.tenants.get_or_create_tenant, backend.services.billing.get_usage_tracker, usage_tracker.check_can_execute, create_auto_fix_pr.delay, AutoFixResponse
 
 ### backend.routers.metrics.get_standard_metrics
 > Get standardized metrics for recent scans.
@@ -145,6 +145,9 @@ Flow:
 ### backend.quality_gate.main
 - **Calls**: backend.quality_gate._parse_args, print, backend.quality_gate.collect_results, backend.quality_gate.build_snapshot, print, print, print, print
 
+### frontend.src.hooks.useAppState.useAppState
+- **Calls**: frontend.src.hooks.useAppState.useState, frontend.src.hooks.useAppState.getItem, frontend.src.hooks.useAppState.useBilling, frontend.src.hooks.useAppState.useAuditActions, frontend.src.hooks.useAppState.callback, frontend.src.hooks.useAppState.useSessionCallbackBootstrap, frontend.src.hooks.useAppState.useSessionProfile, frontend.src.hooks.useAppState.useHashBootstrap
+
 ### backend.services.mirror.MirrorService.create_mirror
 > Create new mirror by cloning source repo to Gitea.
 
@@ -155,7 +158,7 @@ Flow:
 4. Se
 - **Calls**: config.source_repo.replace, tempfile.TemporaryDirectory, Path, self._get_source_adapter, GiteaAdapter, logger.info, subprocess.run, self._get_latest_commit
 
-### backend.worker.tasks.process_pr_event
+### backend.worker.tasks.scan.process_pr_event
 > Process pull request event asynchronously.
 
 Flow:
@@ -163,9 +166,9 @@ Flow:
 2. Get diff content
 3. Run analysis
 4. Comment results
-- **Calls**: backend.worker._celery_stub.shared_task, Event, backend.worker.tasks._get_token_for_provider, backend.adapters.get_adapter_for_event, asyncio.run, asyncio.run, backend.worker.tasks._format_pr_comment, asyncio.run
+- **Calls**: backend.worker._celery_stub.shared_task, Event, backend.worker.tasks.scan._get_token_for_provider, backend.services.webhook_service.get_adapter_for_event, asyncio.run, asyncio.run, backend.worker.tasks.scan._format_pr_comment, asyncio.run
 
-### backend.routers.marketplace.install_app
+### backend.routers.marketplace.publish.install_app
 > Install Semcod app on a repository.
 
 This:
@@ -173,9 +176,9 @@ This:
 2. Creates/gets repository
 3. Stores installation in DB
 4. Sets up webhook on the pr
-- **Calls**: router.post, Depends, str, backend.db_module.tenants.get_or_create_tenant, request.repo.split, backend.db_module.repositories.get_or_create_repository, backend.db_module.installations.create_installation, InstallResponse
+- **Calls**: router.post, Depends, str, backend.db_module.tenants_orm.get_or_create_tenant, request.repo.split, backend.db_module.repositories_orm.get_or_create_repository, backend.db_module.installations.create_installation, InstallResponse
 
-### backend.worker.tasks.create_auto_pr
+### backend.worker.tasks.autopr.create_auto_pr
 > Create automated PR with fixes asynchronously.
 
 Similar to autopr router but as async task.
@@ -214,22 +217,34 @@ Flow:
 > Step 2: Exchange code for token, fetch profile, create user, issue JWT.
 - **Calls**: router.get, token_data.get, profile_resp.json, profile.get, backend.db_module.users.upsert_user, backend.routers.auth.create_session_token, RedirectResponse, httpx.AsyncClient
 
+### backend.db_module.repositories.get_or_create_repository
+> Get existing repository or create new one for tenant.
+- **Calls**: backend.db_module.repositories.get_connection, conn.cursor, cursor.execute, cursor.fetchone, None.isoformat, None.join, cursor.execute, conn.commit
+
 ### backend.routers.webhook.github_webhook
 > Handle GitHub webhook events.
 - **Calls**: router.post, request.headers.get, request.headers.get, json.loads, request.body, payload.get, payload.get, None.hexdigest
-
-### backend.routers.marketplace.get_app_status
-> Get installation status and last scan results for a repo.
-- **Calls**: router.get, Depends, str, backend.db_module.tenants.get_or_create_tenant, backend.db_module.repositories.get_repository_by_full_name, backend.db_module.installations.get_installation, AppStatusResponse, AppStatusResponse
-
-### backend.routers.marketplace.get_billing_status
-> Get current billing status and usage.
-- **Calls**: router.get, Depends, str, backend.db_module.tenants.get_or_create_tenant, backend.services.billing.get_usage_tracker, datetime.now, usage_tracker.get_usage_report, tenant.get
 
 ### backend.routers.metrics.get_metrics_summary
 > Get summary statistics of all scans.
 Useful for dashboards and monitoring.
 - **Calls**: router.get, backend.db_module.scans.get_recent_scans, sum, sum, sum, len, HTTPException, grade_dist.get
+
+### backend.routers.marketplace.publish.get_app_status
+> Get installation status and last scan results for a repo.
+- **Calls**: router.get, Depends, str, backend.db_module.tenants_orm.get_or_create_tenant, backend.db_module.repositories_orm.get_repository_by_full_name, backend.db_module.installations.get_installation, AppStatusResponse, AppStatusResponse
+
+### backend.routers.marketplace.billing.get_billing_status
+> Get current billing status and usage.
+- **Calls**: router.get, Depends, str, backend.db_module.tenants_orm.get_or_create_tenant, backend.services.billing.get_usage_tracker, datetime.now, usage_tracker.get_usage_report, tenant.get
+
+### backend.db_module.tenants.get_or_create_tenant
+> Get existing tenant or create new one.
+- **Calls**: backend.db_module.tenants.get_connection, conn.cursor, cursor.execute, cursor.fetchone, None.isoformat, cursor.execute, conn.commit, cursor.execute
+
+### backend.routers.marketplace.deploy.trigger_auto_fix
+> Trigger auto-fix PR generation for a repository.
+- **Calls**: router.post, Depends, backend.routers.marketplace.deploy._get_user_token, backend.routers.marketplace.deploy._get_provider_user_id, backend.db_module.tenants_orm.get_or_create_tenant, create_auto_fix_pr.delay, AutoFixResponse, HTTPException
 
 ### frontend.src.hooks.useUrlState.useHashBootstrap
 - **Calls**: frontend.src.hooks.useUrlState.useEffect, frontend.src.hooks.useUrlState.slice, frontend.src.hooks.useUrlState.URLSearchParams, frontend.src.hooks.useUrlState.get, frontend.src.hooks.useUrlState.has, frontend.src.hooks.useUrlState.setTab, frontend.src.hooks.useUrlState.setPhase, frontend.src.hooks.useUrlState.setRepoUrl
@@ -240,58 +255,37 @@ Useful for dashboards and monitoring.
 Uses merge requests changes API and formats as unified diff.
 - **Calls**: self._get_project_path, resp.json, data.get, None.join, httpx.AsyncClient, HTTPException, HTTPException, change.get
 
-### backend.routers.marketplace.preview_pr_comment
+### backend.routers.marketplace.browse.preview_pr_comment
 > Generate preview of PR comment for a repository.
 
 This endpoint simulates analysis on a sample diff to show
 users what the bot would comment before th
-- **Calls**: router.post, Depends, backend.apps.registry.get_registry, Event, AppContext, registry.process_event, results.items, backend.routers.marketplace._format_preview_comment
+- **Calls**: router.post, Depends, backend.apps.registry.get_registry, Event, AppContext, registry.process_event, results.items, backend.routers.marketplace.browse._format_preview_comment
 
 ### frontend.src.components.phases.LandingPhase.LandingPhase
 - **Calls**: frontend.src.components.phases.LandingPhase.useState, frontend.src.components.phases.LandingPhase.useEffect, frontend.src.components.phases.LandingPhase.fetchRecentScans, frontend.src.components.phases.LandingPhase.fetch, frontend.src.components.phases.LandingPhase.json, frontend.src.components.phases.LandingPhase.setRecentScans, frontend.src.components.phases.LandingPhase.error, frontend.src.components.phases.LandingPhase.Date
 
-### backend.routers.mirror.create_mirror
-> Create new mirror from GitHub/GitLab to local Gitea.
-- **Calls**: router.post, Depends, user.get, user.get, MirrorConfig, MirrorService, MirrorResponse, user.get
-
-### backend.worker.tasks.analyze_diff
-> Analyze a diff asynchronously using actual analysis.
-
-This analyzes diff content for code quality issues.
-- **Calls**: backend.worker._celery_stub.shared_task, diff.split, max, issues.append, issues.append, diff.count, issues.append, diff.count
-
-### backend.routers.marketplace.list_installations
-> List all installations for the current user.
-- **Calls**: router.get, Depends, str, backend.db_module.tenants.get_or_create_tenant, backend.db_module.installations.get_tenant_installations, user.get, user.get, user.get
-
-### backend.routers.auth.list_repos
-> List user's repos for audit selection.
-- **Calls**: router.get, Depends, resp.json, user.get, httpx.AsyncClient, user.get, client.get, r.get
-
-### e2e.specs.audit.spec.skipInCI
-- **Calls**: e2e.specs.audit.spec.describe, e2e.specs.audit.spec.goto, e2e.specs.audit.spec.getByRole, e2e.specs.audit.spec.click, e2e.specs.audit.spec.expect, e2e.specs.audit.spec.getByText, e2e.specs.audit.spec.toBeVisible, e2e.specs.audit.spec.first
+### frontend.src.components.tabs.SettingsTab.SettingsTab
+- **Calls**: frontend.src.components.tabs.SettingsTab.useState, frontend.src.components.tabs.SettingsTab.setLoadingSchedules, frontend.src.components.tabs.SettingsTab.fetchSchedules, frontend.src.components.tabs.SettingsTab.then, frontend.src.components.tabs.SettingsTab.setSchedules, frontend.src.components.tabs.SettingsTab.finally, frontend.src.components.tabs.SettingsTab.useEffect, frontend.src.components.tabs.SettingsTab.loadSchedules
 
 ## Process Flows
 
 Key execution flows identified:
 
-### Flow 1: useAppState
+### Flow 1: upgrade
 ```
-useAppState [frontend.src.hooks.useAppState]
+upgrade [backend.alembic.versions.0001_initial_schema]
 ```
 
-### Flow 2: scan_sample_projects
+### Flow 2: save_audit_result
+```
+save_audit_result [backend.db_module.scans_orm]
+```
+
+### Flow 3: scan_sample_projects
 ```
 scan_sample_projects [backend.scripts.scan_samples]
   └─ →> get_sample_projects
-```
-
-### Flow 3: trigger_auto_fix
-```
-trigger_auto_fix [backend.routers.marketplace]
-  └─ →> get_or_create_tenant
-      └─> get_connection
-  └─ →> get_usage_tracker
 ```
 
 ### Flow 4: get_standard_metrics
@@ -324,24 +318,22 @@ main [backend.quality_gate]
       └─> analyze_file
 ```
 
-### Flow 8: create_mirror
+### Flow 8: useAppState
+```
+useAppState [frontend.src.hooks.useAppState]
+```
+
+### Flow 9: create_mirror
 ```
 create_mirror [backend.services.mirror.MirrorService]
 ```
 
-### Flow 9: process_pr_event
+### Flow 10: process_pr_event
 ```
-process_pr_event [backend.worker.tasks]
+process_pr_event [backend.worker.tasks.scan]
   └─> _get_token_for_provider
   └─ →> shared_task
   └─ →> get_adapter_for_event
-```
-
-### Flow 10: install_app
-```
-install_app [backend.routers.marketplace]
-  └─ →> get_or_create_tenant
-      └─> get_connection
 ```
 
 ## Key Classes
@@ -430,15 +422,15 @@ Detects:
 - **Methods**: 5
 - **Key Methods**: backend.services.autofix.PatchGenerator.__init__, backend.services.autofix.PatchGenerator.analyze_and_generate_patches, backend.services.autofix.PatchGenerator._parse_diff_original, backend.services.autofix.PatchGenerator._apply_fixes, backend.services.autofix.PatchGenerator.generate_fix_description
 
-### backend.worker._celery_stub._StubTask
-> Wraps a plain function so it behaves like a bound Celery task in tests.
-- **Methods**: 5
-- **Key Methods**: backend.worker._celery_stub._StubTask.__init__, backend.worker._celery_stub._StubTask.__call__, backend.worker._celery_stub._StubTask.run, backend.worker._celery_stub._StubTask.delay, backend.worker._celery_stub._StubTask.retry
-
 ### backend.services.billing.StripeBilling
 > Stripe integration for usage-based billing.
 - **Methods**: 5
 - **Key Methods**: backend.services.billing.StripeBilling.__init__, backend.services.billing.StripeBilling.create_customer, backend.services.billing.StripeBilling.create_subscription, backend.services.billing.StripeBilling.record_usage, backend.services.billing.StripeBilling.get_invoice_preview
+
+### backend.worker._celery_stub._StubTask
+> Wraps a plain function so it behaves like a bound Celery task in tests.
+- **Methods**: 5
+- **Key Methods**: backend.worker._celery_stub._StubTask.__init__, backend.worker._celery_stub._StubTask.__call__, backend.worker._celery_stub._StubTask.run, backend.worker._celery_stub._StubTask.delay, backend.worker._celery_stub._StubTask.retry
 
 ### backend.apps.security.pipeline.SecurityApp
 > Security vulnerability scanner.
@@ -476,41 +468,64 @@ This class normalizes events from GitHub, Gi
 - **Methods**: 1
 - **Key Methods**: backend.apps.base.AppContext.__post_init__
 
-### backend.services.autofix.Patch
-> Represents a single file patch.
+### backend.db_models.Base
 - **Methods**: 0
+- **Inherits**: DeclarativeBase
 
 ## Data Transformation Functions
 
 Key functions that process and transform data:
 
+### backend.services.webhook_service.process_pr_event
+> Process pull request event - audit repo and comment results.
+- **Output to**: provider.comment_on_pr
+
+### backend.services.webhook_service.process_push_event
+> Process push event - trigger analysis if main branch.
+- **Output to**: len
+
+### backend.services.webhook_service.parse_github_webhook
+> Parse GitHub webhook payload into Event.
+- **Output to**: backend.adapters.github.parse_github_event
+
+### backend.services.webhook_service.parse_gitlab_webhook
+> Parse GitLab webhook payload into Event.
+- **Output to**: backend.adapters.gitlab_events.parse_gitlab_event
+
+### backend.services.webhook_service.parse_gitea_webhook
+> Parse Gitea webhook payload into Event.
+- **Output to**: backend.adapters.gitea_events.parse_gitea_event
+
 ### backend.services.autofix.PatchGenerator._parse_diff_original
 > Extract original file content from diff.
 - **Output to**: diff_text.split, line.startswith, lines.append, line.startswith, line.startswith
 
-### backend.db_module.convert_params
-> Convert query parameters based on database type.
-
-SQLite uses ? placeholders, PostgreSQL uses %s pla
-- **Output to**: query.replace
-
 ### backend.quality_gate._parse_args
 - **Output to**: len, Path, len, Path, len
 
-### backend.worker.tasks.process_pr_event
+### backend.services.analyzer._process_file_for_duplication
+> Process a single file and update line occurrences. Returns total lines processed.
+- **Output to**: file_path.read_text, content.splitlines, backend.services.analyzer._should_skip_line, line.strip, line_occurrences.get
+
+### backend.db_module.users.convert_query
+> Convert query placeholders based on DB_TYPE.
+PostgreSQL uses %s, SQLite uses ?.
+- **Output to**: query.replace
+
+### backend.worker.tasks.scan.process_pr_event
 > Process pull request event asynchronously.
 
 Flow:
 1. Parse event from dict
 2. Get diff content
 3. Ru
-- **Output to**: backend.worker._celery_stub.shared_task, Event, backend.worker.tasks._get_token_for_provider, backend.adapters.get_adapter_for_event, asyncio.run
+- **Output to**: backend.worker._celery_stub.shared_task, Event, backend.worker.tasks.scan._get_token_for_provider, backend.services.webhook_service.get_adapter_for_event, asyncio.run
 
-### backend.worker.tasks.process_push_event
+### backend.worker.tasks.scan.process_push_event
 > Process push event - trigger analysis for default branch.
 - **Output to**: Event, run_audit.delay, EventType, ProviderType, event_dict.get
 
-### backend.worker.tasks._format_pr_comment
+### backend.worker.tasks.scan._format_pr_comment
 > Format PR comment with analysis results.
 - **Output to**: analysis.get, analysis.get, analysis.get
 
@@ -527,21 +542,17 @@ Args:
 Return
 - **Output to**: self.get_apps_for_event, AppContext, app.can_execute, AppResult, AppResult
 
+### backend.adapters.gitea_events.parse_gitea_event
+> Parse Gitea webhook payload into unified Event.
+- **Output to**: backend.adapters.gitea_events._detect_gitea_event_type, payload.get, repo_data.get, payload.get, pr_data.get
+
 ### backend.adapters.gitlab_events.parse_gitlab_event
 > Parse GitLab webhook payload into unified Event.
 - **Output to**: backend.adapters.gitlab_events._detect_gitlab_event_type, payload.get, project.get, payload.get, mr_data.get
 
-### backend.adapters.gitea.parse_gitea_event
-> Parse Gitea webhook payload into unified Event.
-- **Output to**: backend.adapters.gitea._detect_gitea_event_type, payload.get, repo_data.get, payload.get, pr_data.get
-
 ### backend.adapters.github.parse_github_event
 > Parse GitHub webhook payload into unified Event.
 - **Output to**: backend.adapters.github._detect_github_event_type, None.get, payload.get, pr_data.get, payload.get
-
-### backend.routers.marketplace._format_preview_comment
-> Format preview comment like GitHub PR comment.
-- **Output to**: issue.get, issue.get, issue.get
 
 ### backend.routers.auth.decode_session_token
 - **Output to**: jwt.decode, HTTPException, HTTPException
@@ -549,13 +560,12 @@ Return
 ### backend.routers.trend._parse_completed
 - **Output to**: datetime.fromisoformat, iso.replace, datetime.now
 
-### backend.routers.webhook_v2.process_pr_event
-> Process pull request event - audit repo and comment results.
-- **Output to**: provider.comment_on_pr
+### backend.routers.marketplace.browse._format_preview_comment
+> Format preview comment like GitHub PR comment.
+- **Output to**: issue.get, issue.get, issue.get
 
-### backend.routers.webhook_v2.process_push_event
-> Process push event - trigger analysis if main branch.
-- **Output to**: len
+### backend.routers.mcp.tools._parse_public_repo
+- **Output to**: re.search, re.search, re.search, match.group, match.group
 
 ### frontend.src.hooks.useUrlState.parseRepositoryReference
 - **Output to**: frontend.src.hooks.useUrlState.trim, frontend.src.hooks.useUrlState.replace, frontend.src.hooks.useUrlState.match, frontend.src.hooks.useUrlState.split, frontend.src.hooks.useUrlState.filter
@@ -568,56 +578,50 @@ Return
 ### frontend.src.components.phases.LandingPhase.formatDate
 - **Output to**: frontend.src.components.phases.LandingPhase.Date, frontend.src.components.phases.LandingPhase.toLocaleDateString
 
-### frontend.src.components.tabs.recentScansHelpers.formatRecentScanDate
-- **Output to**: frontend.src.components.tabs.recentScansHelpers.Date, frontend.src.components.tabs.recentScansHelpers.toLocaleDateString
-
-### backend.routers.mcp.tools._parse_public_repo
-- **Output to**: re.search, re.search, re.search, match.group, match.group
-
 ## Public API Surface
 
 Functions exposed as public API (no underscore prefix):
 
+- `backend.alembic.versions.0001_initial_schema.upgrade` - 148 calls
 - `backend.scheduler.scan_job.run_scheduled_scan` - 33 calls
-- `frontend.src.hooks.useAppState.useAppState` - 31 calls
+- `backend.db_module.scans.save_audit_result` - 32 calls
+- `backend.db_module.scans_orm.save_audit_result` - 32 calls
 - `backend.scripts.scan_samples.scan_sample_projects` - 30 calls
 - `backend.adapters.github.parse_github_event` - 29 calls
-- `backend.routers.marketplace.trigger_auto_fix` - 28 calls
 - `backend.routers.metrics.get_standard_metrics` - 28 calls
 - `backend.routers.autopr.create_auto_pr` - 28 calls
 - `backend.services.mirror.MirrorService.sync_mirror` - 26 calls
 - `backend.quality_gate.main` - 26 calls
+- `frontend.src.hooks.useAppState.useAppState` - 26 calls
 - `backend.services.mirror.MirrorService.create_mirror` - 25 calls
-- `backend.worker.tasks.process_pr_event` - 25 calls
+- `backend.worker.tasks.scan.process_pr_event` - 25 calls
 - `backend.adapters.gitlab_events.parse_gitlab_event` - 25 calls
-- `backend.adapters.gitea.parse_gitea_event` - 24 calls
-- `backend.routers.marketplace.install_app` - 24 calls
-- `backend.worker.tasks.create_auto_pr` - 23 calls
+- `backend.adapters.gitea_events.parse_gitea_event` - 24 calls
+- `backend.routers.marketplace.publish.install_app` - 24 calls
+- `backend.worker.tasks.autopr.create_auto_pr` - 23 calls
 - `backend.routers.trend.get_scan_diff` - 23 calls
 - `backend.services.autofix.AutoFixService.create_auto_fix_pr` - 22 calls
 - `backend.db_module.schema.init_db` - 21 calls
 - `backend.routers.audit.analyze_repo` - 20 calls
-- `backend.db_module.scans.save_audit_result` - 18 calls
 - `backend.adapters.gitlab.GitLabAdapter.get_pr_files` - 18 calls
 - `backend.routers.auth.github_oauth_callback` - 18 calls
+- `backend.db_module.repositories.get_or_create_repository` - 17 calls
 - `backend.routers.webhook.github_webhook` - 17 calls
-- `backend.routers.marketplace.get_app_status` - 17 calls
-- `backend.routers.marketplace.get_billing_status` - 17 calls
 - `backend.routers.metrics.get_metrics_summary` - 17 calls
+- `backend.routers.marketplace.publish.get_app_status` - 17 calls
+- `backend.routers.marketplace.billing.get_billing_status` - 17 calls
 - `backend.services.analyzer.analyze_complexity` - 16 calls
+- `backend.db_module.tenants.get_or_create_tenant` - 16 calls
+- `backend.routers.marketplace.deploy.trigger_auto_fix` - 16 calls
 - `frontend.src.hooks.useUrlState.useHashBootstrap` - 16 calls
 - `backend.adapters.gitlab.GitLabAdapter.get_pr_diff` - 15 calls
-- `backend.routers.marketplace.preview_pr_comment` - 15 calls
+- `backend.routers.marketplace.browse.preview_pr_comment` - 15 calls
 - `frontend.src.components.phases.LandingPhase.LandingPhase` - 15 calls
+- `frontend.src.components.tabs.SettingsTab.SettingsTab` - 15 calls
 - `backend.db_module.users.increment_scan_count` - 14 calls
-- `backend.db_module.tenants.get_or_create_tenant` - 14 calls
-- `backend.db_module.repositories.get_or_create_repository` - 14 calls
-- `backend.routers.mirror.create_mirror` - 14 calls
-- `backend.quality_gate.analyze_file` - 13 calls
-- `backend.worker.tasks.analyze_diff` - 13 calls
-- `backend.routers.marketplace.list_installations` - 13 calls
-- `backend.routers.auth.list_repos` - 13 calls
-- `e2e.specs.audit.spec.skipInCI` - 13 calls
+- `backend.db_module.installations.create_installation` - 14 calls
+- `backend.db_module.repositories_orm.get_or_create_repository` - 14 calls
+- `backend.db_module.scans.save_badge_cache` - 14 calls
 
 ## System Interactions
 
@@ -625,19 +629,17 @@ How components interact:
 
 ```mermaid
 graph TD
-    useAppState --> useState
-    useAppState --> getItem
-    useAppState --> useBilling
-    useAppState --> callback
-    useAppState --> useSessionCallbackBo
+    upgrade --> get_bind
+    upgrade --> inspect
+    upgrade --> set
+    upgrade --> create_table
+    upgrade --> create_index
+    save_audit_result --> first
+    save_audit_result --> commit
+    save_audit_result --> get
     scan_sample_projects --> get_sample_projects
     scan_sample_projects --> print
     scan_sample_projects --> enumerate
-    trigger_auto_fix --> post
-    trigger_auto_fix --> Depends
-    trigger_auto_fix --> str
-    trigger_auto_fix --> get_or_create_tenant
-    trigger_auto_fix --> get_usage_tracker
     get_standard_metrics --> get
     get_standard_metrics --> get_recent_scans
     get_standard_metrics --> get_total_scan_count
@@ -655,6 +657,8 @@ graph TD
     sync_mirror --> GiteaAdapter
     main --> _parse_args
     main --> print
+    main --> collect_results
+    main --> build_snapshot
 ```
 
 ## Reverse Engineering Guidelines

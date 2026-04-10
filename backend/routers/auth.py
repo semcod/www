@@ -109,12 +109,15 @@ async def demo_login():
     if not DEMO_MODE:
         raise HTTPException(403, "Demo mode not enabled")
 
+    import os
+    demo_token = os.getenv("GITHUB_TOKEN", os.getenv("GITHUB_CLIENT_SECRET", ""))
+
     user = upsert_user(
         github_id=0,
         login="demo-user",
         name="Demo User",
         avatar_url="https://avatars.githubusercontent.com/u/0?v=4",
-        github_token="",
+        github_token=demo_token,
     )
     session_token = create_session_token(user["id"])
     return {"session": session_token, "user": {"login": user["login"], "name": user["name"], "avatar_url": user["avatar_url"]}}

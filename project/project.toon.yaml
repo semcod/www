@@ -1,40 +1,40 @@
-# www | 664 func | 105f | 18047L | javascript | 2026-04-10
+# www | 809 func | 137f | 20686L | python | 2026-04-10
 
 HEALTH:
-  CC̄=2.9  critical=18 (limit:10)  dup=0  cycles=0
+  CC̄=2.7  critical=16 (limit:10)  dup=1  cycles=0
 
 ALERTS[20]:
-  !!! high_fan_out     useAppState = 31 (limit:10)
-  !!! cc_exceeded      ResultHeader = 29 (limit:15)
+  !!! cc_exceeded      TrendTab = 27 (limit:15)
+  !!! high_fan_out     useAppState = 26 (limit:10)
   !!! high_fan_out     create_auto_pr = 26 (limit:10)
   !!! high_fan_out     run_scheduled_scan = 23 (limit:10)
   !!  high_fan_out     _run_audit_pipeline = 19 (limit:10)
-  !!  high_fan_out     AutoFixService.create_auto_fix_pr = 18 (limit:10)
   !!  high_fan_out     MirrorService.create_mirror = 18 (limit:10)
+  !!  high_fan_out     AutoFixService.create_auto_fix_pr = 18 (limit:10)
   !!  high_fan_out     create_auto_pr = 18 (limit:10)
   !!  high_fan_out     process_pr_event = 16 (limit:10)
   !!  high_fan_out     _run_sandbox_analysis = 16 (limit:10)
 
-MODULES[132] (top by size):
-  M[backend/worker/tasks.py] 618L C:0 F:13 CC↑9 D:0 (python)
-  M[backend/routers/marketplace.py] 549L C:7 F:11 CC↑13 D:0 (python)
-  M[backend/services/mirror.py] 411L C:3 F:11 CC↑6 D:0 (python)
-  M[backend/adapters/gitea.py] 407L C:1 F:23 CC↑5 D:1 (python)
+MODULES[167] (top by size):
   M[backend/adapters/github.py] 392L C:1 F:22 CC↑6 D:1 (python)
+  M[backend/services/mirror.py] 387L C:1 F:11 CC↑6 D:0 (python)
   M[backend/adapters/gitlab.py] 379L C:1 F:21 CC↑5 D:0 (python)
-  M[backend/services/billing.py] 343L C:3 F:16 CC↑7 D:2 (python)
+  M[backend/adapters/gitea.py] 349L C:1 F:21 CC↑5 D:0 (python)
+  M[backend/services/billing.py] 343L C:3 F:16 CC↑7 D:3 (python)
   M[backend/routers/audit.py] 330L C:0 F:8 CC↑7 D:1 (python)
+  M[backend/services/analyzer.py] 320L C:0 F:13 CC↑13 D:3 (python)
   M[frontend/src/components/MarketplaceDashboard.jsx] 301L C:0 F:4 CC↑2 D:0 (javascript)
   M[backend/services/autofix.py] 299L C:4 F:8 CC↑7 D:0 (python)
   M[backend/routers/billing.py] 291L C:2 F:12 CC↑8 D:0 (python)
-  M[backend/services/analyzer.py] 289L C:0 F:6 CC↑17 D:3 (python)
   M[backend/routers/autopr.py] 287L C:3 F:12 CC↑10 D:0 (python)
+  M[backend/worker/tasks/scan.py] 287L C:0 F:7 CC↑9 D:0 (python)
+  M[backend/db_module/scans.py] 275L C:0 F:9 CC↑6 D:7 (python)
   M[backend/quality_gate.py] 272L C:3 F:12 CC↑8 D:0 (python)
-  M[backend/routers/metrics.py] 257L C:0 F:6 CC↑10 D:0 (python)
-  LANGS: javascript:67/python:63/shell:2
+  M[backend/db_module/wrappers.py] 272L C:0 F:28 CC↑1 D:0 (python)
+  LANGS: python:86/javascript:79/shell:2
 
 HOTSPOTS[10]:
-  ★ useAppState fan=31  // Orchestrates 31 calls
+  ★ useAppState fan=26  // Orchestrates 26 calls
   ★ create_auto_pr fan=26  // Apply LLM-generated patches to a repository and create a GitHub PR.
 
 Flow:
@@ -43,18 +43,17 @@ Flow:
 
 Returns 
   ★ _run_audit_pipeline fan=19  // Background pipeline: clone → code2llm → redup → pyqual → report.
-  ★ AutoFixService.create_auto_fix_pr fan=18  // Create automated PR with fixes.
+  ★ MirrorService.create_mirror fan=18  // Create new mirror by cloning source repo to Gitea.
 
 Flow:
-1. Generate patches from analysis
-2. Crea
+1. Clone source repo t
 
-REFACTOR[9]:
-  [1] H/L Split ResultHeader (CC=29 → target CC<10)
-  [2] H/H Split god module backend/routers/marketplace.py (549L, 7 classes)
-  [3] H/H Split god module backend/worker/tasks.py (618L, 0 classes)
-  [4] M/L Split analyze_quality (CC=17 → target CC<10)
-  [5] M/L Split useAppState (CC=18 → target CC<10)
+REFACTOR[5]:
+  [1] H/L Split TrendTab (CC=27 → target CC<10)
+  [2] M/L Split SettingsTab (CC=18 → target CC<10)
+  [3] M/M Reduce useAppState fan-out (currently 26)
+  [4] M/M Reduce create_auto_pr fan-out (currently 26)
+  [5] M/M Reduce run_scheduled_scan fan-out (currently 23)
 
 EVOLUTION:
-  2026-04-10 CC̄=2.9 crit=18 18047L // Automated analysis
+  2026-04-10 CC̄=2.7 crit=16 20686L // Automated analysis

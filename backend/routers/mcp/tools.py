@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException
 
 from .models import MCPTool, MCPToolRequest
-from database import get_recent_scans
+from services.scan_service import get_recent_scans
 from store import audit_results
 
 router = APIRouter()

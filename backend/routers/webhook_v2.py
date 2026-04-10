@@ -4,72 +4,22 @@ from typing import Dict, Optional
 
 from fastapi import APIRouter, HTTPException, Request
 
-from adapters import (
-    GitHubAdapter,
-    GitLabAdapter,
-    GiteaAdapter,
-    parse_github_event,
-    parse_gitlab_event,
-    parse_gitea_event,
+from services.webhook_service import (
+    get_adapter_for_event,
+    parse_github_webhook,
+    parse_gitlab_webhook,
+    parse_gitea_webhook,
+    process_pr_event,
+    process_push_event,
+    verify_github_signature,
+    verify_gitea_signature,
 )
-from adapters.base import GitProvider
 from events.models import Event, EventType, ProviderType
 
 router = APIRouter()
 
 # Keep references to background tasks to prevent garbage collection
 _background_tasks = set()
-
-
-def get_adapter_for_event(event: Event, token: str) -> GitProvider:
-    """Factory function - get appropriate adapter for event provider."""
-    if event.provider == ProviderType.GITHUB:
-        return GitHubAdapter(token)
-    elif event.provider == ProviderType.GITLAB:
-        return GitLabAdapter(token)
-    elif event.provider == ProviderType.GITEA:
-        # Try to get base URL from raw payload or use default
-        base_url = event.raw_payload.get("repository", {}).get("html_url", "").replace(f"/{event.repo}", "")
-        return GiteaAdapter(token, base_url or "http://localhost:3000")
-    raise ValueError(f"Unknown provider: {event.provider}")
-
-
-async def process_pr_event(event: Event, provider: GitProvider) -> Dict:
-    """Process pull request event - audit repo and comment results."""
-    # Run audit (simplified - in real implementation this calls analysis)
-    # For now just acknowledge with comment
-
-    comment = f"""👋 Thanks for the PR, @{event.author}!
-
-🔍 **Semcod** will analyze this PR for code health issues.
-
-Event: {event.action}
-Branch: `{event.branch}` → `{event.base_branch}`
-"""
-
-    if event.pr_id:
-        await provider.comment_on_pr(event.repo, event.pr_id, comment)
-
-    return {
-        "status": "processed",
-        "repo": event.repo,
-        "pr_id": event.pr_id,
-        "action": event.action,
-    }
-
-
-async def process_push_event(event: Event, provider: GitProvider) -> Dict:
-    """Process push event - trigger analysis if main branch."""
-    # Only process pushes to default branch
-    if event.branch in ("main", "master"):
-        return {
-            "status": "analysis_scheduled",
-            "repo": event.repo,
-            "branch": event.branch,
-            "commits": len(event.commits),
-        }
-
-    return {"status": "ignored", "reason": "not default branch"}
 
 
 # ─── Webhook Endpoints ──────────────────────────────────────────────────────────
@@ -85,12 +35,11 @@ async def github_webhook(request: Request):
     from config import GITHUB_WEBHOOK_SECRET
 
     if GITHUB_WEBHOOK_SECRET:
-        adapter = GitHubAdapter("")  # Dummy token for verification
-        if not adapter.verify_webhook_signature(body, signature, GITHUB_WEBHOOK_SECRET):
+        if not verify_github_signature(body, signature, GITHUB_WEBHOOK_SECRET):
             raise HTTPException(401, "Invalid signature")
 
     payload = await request.json()
-    event = parse_github_event(payload)
+    event = parse_github_webhook(payload)
 
     if not event:
         return {"status": "ignored", "reason": "could not parse event"}
@@ -109,7 +58,7 @@ async def gitlab_webhook(request: Request):
         raise HTTPException(401, "Invalid token")
 
     payload = await request.json()
-    event = parse_gitlab_event(payload)
+    event = parse_gitlab_webhook(payload)
 
     if not event:
         return {"status": "ignored", "reason": "could not parse event"}
@@ -126,12 +75,11 @@ async def gitea_webhook(request: Request):
     from config import GITEA_WEBHOOK_SECRET
 
     if GITEA_WEBHOOK_SECRET:
-        adapter = GiteaAdapter("")  # Dummy token for verification
-        if not adapter.verify_webhook_signature(body, signature, GITEA_WEBHOOK_SECRET):
+        if not verify_gitea_signature(body, signature, GITEA_WEBHOOK_SECRET):
             raise HTTPException(401, "Invalid signature")
 
     payload = await request.json()
-    event = parse_gitea_event(payload)
+    event = parse_gitea_webhook(payload)
 
     if not event:
         return {"status": "ignored", "reason": "could not parse event"}

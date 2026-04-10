@@ -12,7 +12,7 @@ import httpx
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
-from database import get_repo_scans
+from services.scan_service import get_repo_scans
 from routers.auth import get_current_user
 
 logger = logging.getLogger(__name__)

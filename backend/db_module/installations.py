@@ -3,6 +3,7 @@ from config import DB_PATH, DB_TYPE, DATABASE_URL
 # Try to use psycopg2 for PostgreSQL if available
 try:
     import psycopg2
+    from psycopg2.extras import RealDictCursor
     USE_POSTGRES = (DB_TYPE == "postgresql")
 except ImportError:
     USE_POSTGRES = False
@@ -15,6 +16,7 @@ def get_connection():
     else:
         import sqlite3
         conn = sqlite3.connect(DB_PATH, timeout=30.0)
+        conn.row_factory = sqlite3.Row  # Enable dict-like access for SQLite
         return conn
 
 """Installation database operations."""
@@ -31,51 +33,64 @@ def create_installation(tenant_id: int, repository_id: int, apps: List[str],
     """Create app installation for a repository."""
     conn = get_connection()
     cursor = conn.cursor()
+    placeholder = "%s" if USE_POSTGRES else "?"
 
     now = datetime.now(timezone.utc).isoformat()
 
-    cursor.execute("""
-        INSERT INTO installations (
-            tenant_id, repository_id, apps, webhook_id, webhook_secret,
-            installed_at, updated_at, status
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, 'active')
-        ON CONFLICT(tenant_id, repository_id) DO UPDATE SET
-            apps=excluded.apps,
-            webhook_id=excluded.webhook_id,
-            webhook_secret=excluded.webhook_secret,
-            updated_at=excluded.updated_at,
-            status='active'
-    """, (tenant_id, repository_id, json.dumps(apps), webhook_id, webhook_secret, now, now))
+    if USE_POSTGRES:
+        placeholders = ", ".join([placeholder] * 7)
+        cursor.execute(f"""
+            INSERT INTO installations (
+                tenant_id, repository_id, apps, webhook_id, webhook_secret,
+                installed_at, updated_at, status
+            ) VALUES ({placeholders}, 'active')
+            ON CONFLICT(tenant_id, repository_id) DO UPDATE SET
+                apps=excluded.apps,
+                webhook_id=excluded.webhook_id,
+                webhook_secret=excluded.webhook_secret,
+                updated_at=excluded.updated_at,
+                status='active'
+        """, (tenant_id, repository_id, json.dumps(apps), webhook_id, webhook_secret, now, now))
+    else:
+        # SQLite: use INSERT OR REPLACE
+        placeholders = ", ".join([placeholder] * 8)
+        cursor.execute(f"""
+            INSERT OR REPLACE INTO installations (
+                tenant_id, repository_id, apps, webhook_id, webhook_secret,
+                installed_at, updated_at, status
+            ) VALUES ({placeholders})
+        """, (tenant_id, repository_id, json.dumps(apps), webhook_id, webhook_secret, now, now, 'active'))
 
     conn.commit()
 
     # Get the installation
-    cursor.execute("""
-        SELECT * FROM installations WHERE tenant_id = %s AND repository_id = %s
+    cursor.execute(f"""
+        SELECT * FROM installations WHERE tenant_id = {placeholder} AND repository_id = {placeholder}
     """, (tenant_id, repository_id))
     row = cursor.fetchone()
     conn.close()
 
-    return dict(row) if row else {}
+    return row if row else {}
 
 
 def get_installation(tenant_id: int, repository_id: int) -> Optional[Dict]:
     """Get installation by tenant and repository."""
     conn = get_connection()
     cursor = conn.cursor()
+    placeholder = "%s" if USE_POSTGRES else "?"
 
-    cursor.execute("""
+    cursor.execute(f"""
         SELECT i.*, r.full_name as repo_full_name, r.provider as repo_provider
         FROM installations i
         JOIN repositories r ON i.repository_id = r.id
-        WHERE i.tenant_id = %s AND i.repository_id = %s
+        WHERE i.tenant_id = {placeholder} AND i.repository_id = {placeholder}
     """, (tenant_id, repository_id))
 
     row = cursor.fetchone()
     conn.close()
 
     if row:
-        result = dict(row)
+        result = row if isinstance(row, dict) else dict(row)
         result["apps"] = json.loads(result.get("apps", "[]"))
         return result
     return None
@@ -85,12 +100,13 @@ def get_tenant_installations(tenant_id: int) -> List[Dict]:
     """Get all installations for a tenant."""
     conn = get_connection()
     cursor = conn.cursor()
+    placeholder = "%s" if USE_POSTGRES else "?"
 
-    cursor.execute("""
+    cursor.execute(f"""
         SELECT i.*, r.full_name as repo_full_name, r.provider as repo_provider
         FROM installations i
         JOIN repositories r ON i.repository_id = r.id
-        WHERE i.tenant_id = %s
+        WHERE i.tenant_id = {placeholder}
     """, (tenant_id,))
 
     rows = cursor.fetchall()
@@ -98,7 +114,7 @@ def get_tenant_installations(tenant_id: int) -> List[Dict]:
 
     results = []
     for row in rows:
-        result = dict(row)
+        result = row if isinstance(row, dict) else dict(row)
         result["apps"] = json.loads(result.get("apps", "[]"))
         results.append(result)
     return results
@@ -108,10 +124,11 @@ def delete_installation(tenant_id: int, repository_id: int) -> bool:
     """Delete installation (soft delete - set inactive)."""
     conn = get_connection()
     cursor = conn.cursor()
+    placeholder = "%s" if USE_POSTGRES else "?"
 
-    cursor.execute("""
-        UPDATE installations SET status='inactive', updated_at=%s
-        WHERE tenant_id = %s AND repository_id = %s
+    cursor.execute(f"""
+        UPDATE installations SET status='inactive', updated_at={placeholder}
+        WHERE tenant_id = {placeholder} AND repository_id = {placeholder}
     """, (datetime.now(timezone.utc).isoformat(), tenant_id, repository_id))
 
     conn.commit()
@@ -123,10 +140,11 @@ def update_installation_scan(tenant_id: int, repository_id: int, score: int):
     """Update last scan info for installation."""
     conn = get_connection()
     cursor = conn.cursor()
+    placeholder = "%s" if USE_POSTGRES else "?"
 
-    cursor.execute("""
-        UPDATE installations SET last_scan_at=%s, last_scan_score=%s, updated_at=%s
-        WHERE tenant_id = %s AND repository_id = %s
+    cursor.execute(f"""
+        UPDATE installations SET last_scan_at={placeholder}, last_scan_score={placeholder}, updated_at={placeholder}
+        WHERE tenant_id = {placeholder} AND repository_id = {placeholder}
     """, (datetime.now(timezone.utc).isoformat(), score, datetime.now(timezone.utc).isoformat(),
           tenant_id, repository_id))
 
