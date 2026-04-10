@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Metrics API', () => {
-  const baseURL = 'http://localhost:8000';
+  const baseURL = 'http://localhost:9000';
 
   test('GET /api/metrics/standard returns standardized metrics', async ({ request }) => {
     const response = await request.get(`${baseURL}/api/metrics/standard?limit=5`);

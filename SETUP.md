@@ -52,7 +52,7 @@ GITHUB_APP_ID=123456
 GITHUB_CLIENT_ID=Iv1.abc123
 GITHUB_CLIENT_SECRET=secret123
 GITHUB_WEBHOOK_SECRET=whsec_123
-APP_URL=http://localhost:8000
+APP_URL=http://localhost:9000
 FRONTEND_URL=http://localhost:5173
 ```
 
@@ -61,7 +61,7 @@ FRONTEND_URL=http://localhost:5173
 ```bash
 cd backend/
 pip install -r requirements.txt
-uvicorn server:app --reload --port 8000
+uvicorn server:app --reload --port 9000
 ```
 
 ### 4. Uruchom frontend (React)

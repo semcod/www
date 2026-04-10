@@ -1,7 +1,7 @@
-# vallm batch | 168f | 51✓ 24⚠ 20✗ | 2026-04-10
+# vallm batch | 169f | 51✓ 24⚠ 20✗ | 2026-04-10
 
 SUMMARY:
-  scanned: 168  passed: 51 (30.4%)  warnings: 24  errors: 20  unsupported: 75
+  scanned: 169  passed: 51 (30.2%)  warnings: 24  errors: 20  unsupported: 76
 
 WARNINGS[24]{path,score}:
   frontend/src/App.jsx,0.78
@@ -174,10 +174,10 @@ ERRORS[20]{path,score}:
       python.import.resolvable,error,Module 'routers.auth' not found,19
   backend/routers/mcp.py,0.81
     issues[4]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'fastapi' not found,20
-      python.import.resolvable,error,Module 'store' not found,23
-      python.import.resolvable,error,Module 'database' not found,24
-      python.import.resolvable,error,Module 'services.scoring' not found,25
+      python.import.resolvable,error,Module 'fastapi' not found,21
+      python.import.resolvable,error,Module 'store' not found,24
+      python.import.resolvable,error,Module 'database' not found,25
+      python.import.resolvable,error,Module 'services.scoring' not found,26
   backend/routers/webhook.py,0.81
     issues[5]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'fastapi' not found,9
@@ -196,7 +196,7 @@ ERRORS[20]{path,score}:
       python.import.resolvable,error,Module 'config' not found,10
 
 UNSUPPORTED[5]{bucket,count}:
-  *.md,56
+  *.md,57
   Dockerfile*,2
   *.txt,2
   *.yml,3

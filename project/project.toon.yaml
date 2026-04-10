@@ -1,4 +1,4 @@
-# www | 244 func | 48f | 6635L | javascript | 2026-04-10
+# www | 245 func | 48f | 6638L | javascript | 2026-04-10
 
 HEALTH:
   CC̄=3.0  critical=10 (limit:10)  dup=0  cycles=0
@@ -9,7 +9,7 @@ ALERTS[20]:
   !!! high_fan_out     useAppState = 48 (limit:10)
   !!! high_fan_out     ResultPhase = 26 (limit:10)
   !!! high_fan_out     RecentScansTab = 23 (limit:10)
-  !!! high_fan_out     mcp_get_resource = 21 (limit:10)
+  !!! high_fan_out     mcp_get_resource = 20 (limit:10)
   !!  cc_exceeded      mcp_get_resource = 22 (limit:15)
   !!  high_fan_out     _run_audit_pipeline = 19 (limit:10)
   !!  high_fan_out     LandingPhase = 19 (limit:10)
@@ -17,7 +17,7 @@ ALERTS[20]:
 
 MODULES[73] (top by size):
   M[frontend/src/components/phases/ResultPhase.jsx] 544L C:0 F:15 CC↑54 D:0 (javascript)
-  M[backend/routers/mcp.py] 433L C:4 F:5 CC↑22 D:0 (python)
+  M[backend/routers/mcp.py] 436L C:4 F:6 CC↑22 D:0 (python)
   M[frontend/src/components/tabs/RecentScansTab.jsx] 320L C:0 F:10 CC↑13 D:0 (javascript)
   M[backend/routers/audit.py] 319L C:0 F:8 CC↑7 D:1 (python)
   M[frontend/src/hooks/useAppState.js] 308L C:0 F:30 CC↑51 D:0 (javascript)
@@ -37,7 +37,7 @@ HOTSPOTS[10]:
   ★ useAppState fan=48  // Orchestrates 48 calls
   ★ ResultPhase fan=26  // Orchestrates 26 calls
   ★ RecentScansTab fan=23  // Orchestrates 23 calls
-  ★ mcp_get_resource fan=21  // Get content of a specific MCP resource by URI.
+  ★ mcp_get_resource fan=20  // Get content of a specific MCP resource by URI.
   ★ _run_audit_pipeline fan=19  // Background pipeline: clone → code2llm → redup → pyqual → report.
 
 REFACTOR[8]:
@@ -48,4 +48,4 @@ REFACTOR[8]:
   [5] M/L Split mcp_invoke_tool (CC=17 → target CC<10)
 
 EVOLUTION:
-  2026-04-10 CC̄=3.0 crit=10 6635L // Automated analysis
+  2026-04-10 CC̄=3.0 crit=10 6638L // Automated analysis

@@ -1,8 +1,8 @@
-# www | 73f 5780L | shell:2,python:20,javascript:51 | 2026-04-10
-# stats: 244 func | 0 cls | 73 mod | CC̄=3.0 | critical:4 | cycles:0
+# www | 73f 5783L | shell:2,python:20,javascript:51 | 2026-04-10
+# stats: 245 func | 0 cls | 73 mod | CC̄=3.0 | critical:4 | cycles:0
 # alerts[5]: CC ResultPhase=54; CC useAppState=51; fan-out useAppState=48; fan-out ResultPhase=26; fan-out RecentScansTab=23
-# hotspots[5]: useAppState fan=48; ResultPhase fan=26; RecentScansTab fan=23; mcp_get_resource fan=21; _run_audit_pipeline fan=19
-# evolution: CC̄ 2.9→3.0 (regressed +0.1)
+# hotspots[5]: useAppState fan=48; ResultPhase fan=26; RecentScansTab fan=23; mcp_get_resource fan=20; _run_audit_pipeline fan=19
+# evolution: CC̄ 3.0→3.0 (flat 0.0)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
 M[73]:
   backend/config.py,15
@@ -11,7 +11,7 @@ M[73]:
   backend/routers/audit.py,319
   backend/routers/auth.py,163
   backend/routers/badge.py,139
-  backend/routers/mcp.py,433
+  backend/routers/mcp.py,436
   backend/routers/metrics.py,257
   backend/routers/report.py,14
   backend/routers/system.py,34
@@ -146,11 +146,12 @@ D:
     startDemoLogin()
     doLogout()
   backend/routers/mcp.py:
-    e: MCPResource,MCPTool,MCPResourceResponse,MCPToolRequest,mcp_list_resources,mcp_get_resource,mcp_list_tools,mcp_invoke_tool,mcp_server_info
+    e: MCPResource,MCPTool,MCPResourceResponse,MCPToolRequest,_utc_now_iso,mcp_list_resources,mcp_get_resource,mcp_list_tools,mcp_invoke_tool,mcp_server_info
     MCPResource(BaseModel):  # MCP Resource definition...
     MCPTool(BaseModel):  # MCP Tool definition...
     MCPResourceResponse(BaseModel):  # MCP resource content response...
     MCPToolRequest(BaseModel):  # MCP tool invocation request...
+    _utc_now_iso()
     mcp_list_resources()
     mcp_get_resource(uri)
     mcp_list_tools()
@@ -516,12 +517,11 @@ D:
     count()
   project.sh:
   traefik/generate-certs.sh:
-  backend/server.py:
   backend/server_new.py:
-  backend/config.py:
-  backend/services/__init__.py:
-  backend/routers/__init__.py:
   backend/store.py:
+  backend/services/__init__.py:
+  backend/server.py:
+  backend/routers/__init__.py:
   frontend/playwright.config.js:
     i: @playwright/test
   frontend/vite.config.js:
@@ -530,13 +530,14 @@ D:
     i: ./components/Header,./components/ProgressSteps,./components/phases,./components/tabs,./constants,./hooks/useAppState
   frontend/src/main.jsx:
     i: ./App.jsx,react,react-dom/client
-  frontend/src/components/PRCommentPreview.jsx:
+  backend/config.py:
   frontend/src/components/index.js:
+  frontend/src/components/PRCommentPreview.jsx:
   frontend/src/components/phases/index.js:
   frontend/src/components/ui/LanguageBar.jsx:
   frontend/src/components/ui/MetricCard.jsx:
-  frontend/src/components/ui/GradeCircle.jsx:
   frontend/src/components/ui/RecommendationCard.jsx:
+  frontend/src/components/ui/GradeCircle.jsx:
   frontend/src/components/ui/index.js:
   frontend/src/components/tabs/index.js:
   frontend/src/screens/index.js:

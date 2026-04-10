@@ -211,6 +211,12 @@ async def _run_audit_pipeline(audit_id: str, repo: str, token: str):
         if len(scan_history) > 100:
             scan_history.pop()
 
+        # Persist to database
+        try:
+            save_scan(scan_entry)
+        except Exception:
+            pass
+
     except Exception as e:
         audit_results[audit_id] = {
             "status": "error",
@@ -308,6 +314,12 @@ async def _run_sandbox_analysis(audit_id: str, repo_url: str, repo: str):
         scan_history.insert(0, scan_entry)
         if len(scan_history) > 100:
             scan_history.pop()
+
+        # Persist to database
+        try:
+            save_scan(scan_entry)
+        except Exception:
+            pass
 
     except Exception as e:
         audit_results[audit_id] = {

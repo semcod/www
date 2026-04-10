@@ -1,5 +1,5 @@
-# code2llm | 73f 5780L | javascript:51,python:20,shell:2 | 2026-04-10
-# CC̄=3.0 | critical:4/244 | dups:0 | cycles:0
+# code2llm | 73f 5783L | javascript:51,python:20,shell:2 | 2026-04-10
+# CC̄=3.0 | critical:4/245 | dups:0 | cycles:0
 
 HEALTH[4]:
   🟡 CC    useAppState CC=51 (limit:15)
@@ -17,14 +17,14 @@ PIPELINES[167]:
       PURITY: 100% pure
   [3] Src [get_user_by_github_id]: get_user_by_github_id
       PURITY: 100% pure
-  [4] Src [health_check]: health_check
+  [4] Src [scan_sample_projects]: scan_sample_projects → get_sample_projects
       PURITY: 100% pure
-  [5] Src [get_domain_config]: get_domain_config
+  [5] Src [health_check]: health_check
       PURITY: 100% pure
 
 LAYERS:
-  backend/                        CC̄=3.9    ←in:13  →out:0
-  │ !! mcp                        433L  4C    5m  CC=22     ←0
+  backend/                        CC̄=3.8    ←in:13  →out:0
+  │ !! mcp                        436L  4C    6m  CC=22     ←0
   │ audit                      319L  0C    8m  CC=7      ←1
   │ metrics                    257L  0C    6m  CC=10     ←0
   │ webhook                    255L  0C    5m  CC=14     ←0
@@ -83,8 +83,8 @@ LAYERS:
   │ index.js                     4L  0C    0m  CC=0.0    ←0
   │ LanguageBar.jsx              1L  0C    0m  CC=0.0    ←0
   │ MetricCard.jsx               1L  0C    0m  CC=0.0    ←0
-  │ GradeCircle.jsx              1L  0C    0m  CC=0.0    ←0
   │ RecommendationCard.jsx       1L  0C    0m  CC=0.0    ←0
+  │ GradeCircle.jsx              1L  0C    0m  CC=0.0    ←0
   │ PRCommentPreview.jsx         0L  0C    0m  CC=0.0    ←0
   │ index.js                     0L  0C    0m  CC=0.0    ←0
   │
@@ -120,8 +120,8 @@ COUPLING:
            backend               ←12                                  ──                ←1  hub
    backend.scripts                 1                                   1                ──
   CYCLES: none
-  HUB: backend.services/ (fan-in=21)
   HUB: backend/ (fan-in=13)
+  HUB: backend.services/ (fan-in=21)
   SMELL: backend.routers/ fan-out=33 → split needed
 
 EXTERNAL:

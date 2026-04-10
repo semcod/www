@@ -52,7 +52,7 @@ Semcod to narzędzie do automatycznej analizy zdrowia kodu (code health analysis
 
 #### Pobierz standardowe metryki
 ```bash
-curl http://localhost:8000/api/metrics/standard?limit=10
+curl http://localhost:9000/api/metrics/standard?limit=10
 ```
 
 Odpowiedź:
@@ -69,34 +69,34 @@ Odpowiedź:
 
 #### Pobierz podsumowanie
 ```bash
-curl http://localhost:8000/api/metrics/summary
+curl http://localhost:9000/api/metrics/summary
 ```
 
 #### Pobierz metryki repozytorium
 ```bash
-curl http://localhost:8000/api/metrics/repository/owner/repo
+curl http://localhost:9000/api/metrics/repository/owner/repo
 ```
 
 #### Pobierz ostatnie skany
 ```bash
-curl http://localhost:8000/api/scans/recent?limit=5
+curl http://localhost:9000/api/scans/recent?limit=5
 ```
 
 #### Pobierz prompt projektu (dla LLM)
 ```bash
-curl http://localhost:8000/api/metrics/prompt -o prompt.txt
+curl http://localhost:9000/api/metrics/prompt -o prompt.txt
 ```
 
 #### Pobierz prompt jako Markdown
 ```bash
-curl http://localhost:8000/api/metrics/prompt/markdown -o prompt.md
+curl http://localhost:9000/api/metrics/prompt/markdown -o prompt.md
 ```
 
 ### Endpoint'y Badge'ów
 
 #### Pobierz badge zdrowia kodu
 ```bash
-curl http://localhost:8000/badge/owner-repo.svg -o badge.svg
+curl http://localhost:9000/badge/owner-repo.svg -o badge.svg
 ```
 
 Markdown dla README:

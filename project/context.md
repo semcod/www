@@ -6,7 +6,7 @@
 - **Primary Language**: javascript
 - **Languages**: javascript: 51, python: 20, shell: 2
 - **Analysis Mode**: static
-- **Total Functions**: 244
+- **Total Functions**: 245
 - **Total Classes**: 4
 - **Modules**: 73
 - **Entry Points**: 199
@@ -37,13 +37,13 @@
 - **Functions**: 13
 - **File**: `metrics.spec.js`
 
-### frontend.e2e.social-sharing.spec
-- **Functions**: 10
-- **File**: `social-sharing.spec.js`
-
 ### frontend.src.components.tabs.RecentScansTab
 - **Functions**: 10
 - **File**: `RecentScansTab.jsx`
+
+### frontend.e2e.social-sharing.spec
+- **Functions**: 10
+- **File**: `social-sharing.spec.js`
 
 ### backend.routers.auth
 - **Functions**: 9
@@ -102,7 +102,7 @@ Main execution flows into the system:
 
 ### backend.routers.mcp.mcp_invoke_tool
 > Invoke an MCP tool with the provided arguments.
-- **Calls**: router.post, HTTPException, request.arguments.get, request.arguments.get, request.arguments.get, HTTPException, None.hexdigest, None.isoformat
+- **Calls**: router.post, HTTPException, request.arguments.get, request.arguments.get, request.arguments.get, HTTPException, None.hexdigest, backend.routers.mcp._utc_now_iso
 
 ### backend.routers.mcp.mcp_get_resource
 > Get content of a specific MCP resource by URI.
@@ -308,8 +308,8 @@ Key functions that process and transform data:
 Functions exposed as public API (no underscore prefix):
 
 - `frontend.src.hooks.useAppState.useAppState` - 48 calls
-- `backend.routers.mcp.mcp_invoke_tool` - 41 calls
-- `backend.routers.mcp.mcp_get_resource` - 36 calls
+- `backend.routers.mcp.mcp_invoke_tool` - 37 calls
+- `backend.routers.mcp.mcp_get_resource` - 35 calls
 - `backend.scripts.scan_samples.scan_sample_projects` - 30 calls
 - `backend.routers.metrics.get_standard_metrics` - 28 calls
 - `frontend.src.components.phases.ResultPhase.ResultPhase` - 26 calls

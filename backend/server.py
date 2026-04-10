@@ -3,7 +3,7 @@ Semcod GitHub App — Backend
 ===========================
 One-click Audit + PR Comment Bot + Code Health Badge
 
-Deploy: uvicorn server:app --host 0.0.0.0 --port 8000
+Deploy: uvicorn server:app --host 0.0.0.0 --port 9000
 """
 
 from fastapi import FastAPI

@@ -62,9 +62,9 @@ jobs:
       - name: Start backend (DEMO_MODE=1)
         run: |
           cd backend
-          DEMO_MODE=1 uvicorn server:app --host 127.0.0.1 --port 8000 &
+          DEMO_MODE=1 PORT=9000 uvicorn server:app --host 127.0.0.1 --port 9000 &
           sleep 3
-          curl -s http://127.0.0.1:8000/api/health || exit 1
+          curl -s http://127.0.0.1:9000/api/health || exit 1
       - name: Run E2E tests
         run: cd e2e && npm test
       - uses: actions/upload-artifact@v4

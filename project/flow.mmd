@@ -4,10 +4,10 @@ flowchart TD
     classDef entry fill:#4dabf7,stroke:#1971c2,color:#fff
 
     subgraph Core
-        backend__services__scoring__score_to_grade["score_to_grade"]
         backend__database__init_db["init_db"]
         backend__database__save_scan["save_scan"]
         backend__database__get_user_by_github_id["get_user_by_github_id"]
+        backend__services__scoring__score_to_grade["score_to_grade"]
         backend__services__github_client__get_installation_token["get_installation_token"]
         backend__routers__system__health_check["health_check"]
         backend__routers__system__get_domain_config["get_domain_config"]

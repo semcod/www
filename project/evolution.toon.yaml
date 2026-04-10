@@ -1,4 +1,4 @@
-# code2llm/evolution | 243 func | 47f | 2026-04-10
+# code2llm/evolution | 244 func | 47f | 2026-04-10
 
 NEXT[4] (ranked by impact):
   [1] !! SPLIT-FUNC      useAppState  CC=51  fan=48
@@ -9,13 +9,13 @@ NEXT[4] (ranked by impact):
       WHY: CC=54 exceeds 15
       EFFORT: ~1h  IMPACT: 1404
 
-  [3] !  SPLIT-FUNC      mcp_get_resource  CC=22  fan=21
+  [3] !  SPLIT-FUNC      mcp_get_resource  CC=22  fan=20
       WHY: CC=22 exceeds 15
-      EFFORT: ~1h  IMPACT: 462
+      EFFORT: ~1h  IMPACT: 440
 
-  [4] !  SPLIT-FUNC      mcp_invoke_tool  CC=17  fan=15
+  [4] !  SPLIT-FUNC      mcp_invoke_tool  CC=17  fan=14
       WHY: CC=17 exceeds 15
-      EFFORT: ~1h  IMPACT: 255
+      EFFORT: ~1h  IMPACT: 238
 
 
 RISKS[0]: none
@@ -52,4 +52,4 @@ PATTERNS (language parser shared logic):
     - Standardized FunctionInfo/ClassInfo models
 
 HISTORY:
-  prev CC̄=2.9 → now CC̄=3.0
+  prev CC̄=3.0 → now CC̄=3.0

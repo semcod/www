@@ -1,12 +1,12 @@
-# redup/duplication | 1 groups | 20f 2210L | 2026-04-10
+# redup/duplication | 1 groups | 20f 2213L | 2026-04-10
 
 SUMMARY:
   files_scanned: 20
-  total_lines:   2210
+  total_lines:   2213
   dup_groups:    1
   dup_fragments: 2
   saved_lines:   11
-  scan_ms:       6212
+  scan_ms:       6590
 
 DUPLICATES[1] (ranked by impact):
   [b442a69269fe00ae]   STRU  get_user_by_github_id  L=11 N=2 saved=11 sim=1.00

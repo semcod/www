@@ -94,24 +94,24 @@ Navigate to `http://localhost:3000`
 
 **Health Check:**
 ```bash
-curl http://localhost:8000/api/health
+curl http://localhost:9000/api/health
 ```
 
 **Start Audit:**
 ```bash
-curl -X POST http://localhost:8000/api/audit \
+curl -X POST http://localhost:9000/api/audit \
   -H "Content-Type: application/json" \
   -d '{"repo": "facebook/react", "token": "ghp_your_token"}'
 ```
 
 **Get Audit Status:**
 ```bash
-curl http://localhost:8000/api/audit/{audit_id}
+curl http://localhost:9000/api/audit/{audit_id}
 ```
 
 **Get Metrics:**
 ```bash
-curl http://localhost:8000/api/metrics/standard?limit=5
+curl http://localhost:9000/api/metrics/standard?limit=5
 ```
 
 ### Python Client
@@ -119,7 +119,7 @@ curl http://localhost:8000/api/metrics/standard?limit=5
 ```python
 import httpx
 
-client = httpx.Client(base_url="http://localhost:8000")
+client = httpx.Client(base_url="http://localhost:9000")
 
 # Start audit
 response = client.post("/api/audit", json={
