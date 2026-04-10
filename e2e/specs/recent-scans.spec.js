@@ -3,8 +3,10 @@ import { test, expect } from '@playwright/test';
 test.describe('Recent Scans', () => {
   test('recent scans tab displays correctly', async ({ page }) => {
     await page.goto('/#tab=recent');
-    
     await page.waitForLoadState('networkidle');
+    
+    // Wait for tab content to load
+    await page.waitForTimeout(500);
     
     // Verify heading
     await expect(page.getByText('Ostatnio skanowane projekty')).toBeVisible();
@@ -70,11 +72,13 @@ test.describe('Recent Scans', () => {
 
   test('badge info section displays on recent scans tab', async ({ page }) => {
     await page.goto('/#tab=recent');
-    
     await page.waitForLoadState('networkidle');
     
-    // Verify badge info section
-    await expect(page.getByText(/Dodaj badge do swojego projektu/i)).toBeVisible();
+    // Wait for tab content to load
+    await page.waitForTimeout(500);
+    
+    // Verify badge info section - emoji can cause issues, check container instead
+    await expect(page.getByRole('heading', { name: /Dodaj badge/i })).toBeVisible();
     await expect(page.locator('code').filter({ hasText: /Code Health/i })).toBeVisible();
   });
 });
