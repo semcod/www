@@ -1,3 +1,7 @@
+test-results
+playwright-report
+*.db
+scans.db
 .idea
 dist
 refactor_output

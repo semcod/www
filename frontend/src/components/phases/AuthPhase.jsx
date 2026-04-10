@@ -1,6 +1,10 @@
-import { C } from "../../lib/config";
+import { C, API } from "../../constants";
 
-export function AuthPhase({ confirmAuth }) {
+export function AuthPhase() {
+  const handleLogin = () => {
+    window.location.href = `${API}/auth/github`;
+  };
+
   return (
     <div style={{ maxWidth: 400, margin: "80px auto", textAlign: "center" }}>
       <div style={{
@@ -24,7 +28,7 @@ export function AuthPhase({ confirmAuth }) {
         </div>
       </div>
 
-      <button onClick={confirmAuth} style={{
+      <button onClick={handleLogin} style={{
         background: C.cyan, color: C.bg, border: "none", borderRadius: 10,
         padding: "14px 32px", fontSize: 15, fontWeight: 700, cursor: "pointer",
         fontFamily: "inherit", width: "100%",

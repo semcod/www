@@ -25,6 +25,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
+    environment:
+      - VITE_PUBLIC_URL=${PUBLIC_URL:-https://semcod.com}
     depends_on:
       - backend
     restart: unless-stopped

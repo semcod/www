@@ -1,6 +1,8 @@
 """Tests for scoring logic."""
 
 import pytest
+
+pytestmark = [pytest.mark.fast, pytest.mark.unit]
 from services.scoring import calculate_health_score, score_to_grade, generate_recommendations
 
 

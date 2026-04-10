@@ -1,70 +1,479 @@
-# www | 5f 1502L | shell:1,javascript:3,python:1 | 2026-04-09
-# stats: 45 func | 0 cls | 5 mod | CC̄=2.8 | critical:0 | cycles:0
-# alerts[5]: fan-out _run_audit_pipeline=14; fan-out github_webhook=13; fan-out _analyze_pr_files=12; fan-out _count_code_stats=11; fan-out _get_installation_token=10
-# hotspots[5]: _run_audit_pipeline fan=14; github_webhook fan=13; _analyze_pr_files fan=12; _count_code_stats fan=11; _get_installation_token fan=10
-# evolution: baseline
+# www | 68f 4962L | shell:1,python:18,javascript:49 | 2026-04-10
+# stats: 212 func | 0 cls | 68 mod | CC̄=2.8 | critical:3 | cycles:0
+# alerts[5]: CC useAppState=45; fan-out useAppState=40; fan-out RecentScansTab=23; fan-out ResultPhase=22; fan-out mcp_get_resource=21
+# hotspots[5]: useAppState fan=40; RecentScansTab fan=23; ResultPhase fan=22; mcp_get_resource fan=21; LandingPhase fan=19
+# evolution: CC̄ 2.8→2.8 (flat 0.0)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[5]:
-  backend/server.py,762
-  frontend/src/App.jsx,680
+M[68]:
+  backend/config.py,12
+  backend/database.py,105
+  backend/routers/__init__.py,0
+  backend/routers/audit.py,302
+  backend/routers/auth.py,70
+  backend/routers/badge.py,139
+  backend/routers/mcp.py,433
+  backend/routers/metrics.py,257
+  backend/routers/report.py,14
+  backend/routers/webhook.py,255
+  backend/sample_projects.py,72
+  backend/scripts/scan_samples.py,74
+  backend/server.py,63
+  backend/services/__init__.py,0
+  backend/services/analyzer.py,66
+  backend/services/github_client.py,37
+  backend/services/scoring.py,106
+  backend/store.py,3
+  e2e/playwright.config.js,29
+  e2e/specs/audit.spec.js,46
+  e2e/specs/badge.spec.js,26
+  e2e/specs/metrics.spec.js,125
+  e2e/specs/recent-scans.spec.js,80
+  e2e/specs/result-smoke.spec.js,17
+  e2e/specs/scan-workflow.spec.js,99
+  e2e/specs/smoke.spec.js,47
+  e2e/specs/social-sharing.spec.js,58
+  frontend/e2e/audit.spec.js,46
+  frontend/e2e/badge.spec.js,26
+  frontend/e2e/metrics.spec.js,125
+  frontend/e2e/recent-scans.spec.js,80
+  frontend/e2e/scan-workflow.spec.js,99
+  frontend/e2e/smoke.spec.js,47
+  frontend/e2e/social-sharing.spec.js,58
+  frontend/playwright.config.js,22
+  frontend/src/App.jsx,80
+  frontend/src/api.js,33
+  frontend/src/components/index.js,4
+  frontend/src/components/GradeCircle.jsx,33
+  frontend/src/components/Header.jsx,51
+  frontend/src/components/LanguageBar.jsx,26
+  frontend/src/components/MetricCard.jsx,14
+  frontend/src/components/ProgressSteps.jsx,47
+  frontend/src/components/RecommendationCard.jsx,48
+  frontend/src/components/phases/index.js,5
+  frontend/src/components/phases/AuthPhase.jsx,36
+  frontend/src/components/phases/LandingPhase.jsx,211
+  frontend/src/components/phases/ReposPhase.jsx,41
+  frontend/src/components/phases/ResultPhase.jsx,285
+  frontend/src/components/phases/ScanningPhase.jsx,28
+  frontend/src/components/tabs/index.js,4
+  frontend/src/components/tabs/BadgeTab.jsx,109
+  frontend/src/components/tabs/PRBotTab.jsx,71
+  frontend/src/components/tabs/RecentScansTab.jsx,320
+  frontend/src/components/tabs/RepoTab.jsx,49
+  frontend/src/components/ui/index.js,4
+  frontend/src/components/ui/GradeCircle.jsx,1
+  frontend/src/components/ui/LanguageBar.jsx,1
+  frontend/src/components/ui/MetricCard.jsx,1
+  frontend/src/components/ui/RecommendationCard.jsx,1
+  frontend/src/config.js,8
+  frontend/src/constants.js,71
+  frontend/src/hooks/useAppState.js,253
   frontend/src/main.jsx,10
+  frontend/src/screens/index.js,0
+  frontend/src/utils/share.js,29
   frontend/vite.config.js,15
   project.sh,35
 D:
-  backend/server.py:
-    e: github_oauth_start,github_oauth_callback,list_repos,run_audit,get_audit_result,_run_audit_pipeline,_count_code_stats,_run_tool,_calculate_health_score,_score_to_grade,_generate_recommendations,github_webhook,_handle_pr_event,_analyze_pr_files,_build_pr_comment,_get_installation_token,health_badge,_generate_badge_svg,health_check,report_page
-    github_oauth_start()
-    github_oauth_callback(code)
-    list_repos(token)
-    run_audit(request)
-    get_audit_result(audit_id)
-    _run_audit_pipeline(audit_id;repo;token)
-    _count_code_stats(repo_path)
-    _run_tool(name;args;fallback)
-    _calculate_health_score(stats;complexity;duplication;quality)
-    _score_to_grade(score)
-    _generate_recommendations(complexity;duplication;quality)
+  frontend/src/hooks/useAppState.js:
+    i: ../api,../constants,react
+    e: useAppState,hash,params,t,tabParam,phaseParam,repoParam,parts,owner,repo,auditParam,searchParams,params,timers,done,pollCount,maxPolls,poll,data,interval,shouldStop,reset,startOAuth,confirmAuth,startAudit,startSandbox,url,match,sshMatch
+    useAppState()
+    hash()
+    params()
+    t()
+    tabParam()
+    phaseParam()
+    repoParam()
+    parts()
+    owner()
+    repo()
+    auditParam()
+    searchParams()
+    params()
+    timers()
+    done()
+    pollCount()
+    maxPolls()
+    poll()
+    data()
+    interval()
+    shouldStop()
+    reset()
+    startOAuth()
+    confirmAuth()
+    startAudit()
+    startSandbox()
+    url()
+    match()
+    sshMatch()
+  backend/routers/mcp.py:
+    e: MCPResource,MCPTool,MCPResourceResponse,MCPToolRequest,mcp_list_resources,mcp_get_resource,mcp_list_tools,mcp_invoke_tool,mcp_server_info
+    MCPResource(BaseModel):  # MCP Resource definition...
+    MCPTool(BaseModel):  # MCP Tool definition...
+    MCPResourceResponse(BaseModel):  # MCP resource content response...
+    MCPToolRequest(BaseModel):  # MCP tool invocation request...
+    mcp_list_resources()
+    mcp_get_resource(uri)
+    mcp_list_tools()
+    mcp_invoke_tool(request)
+    mcp_server_info()
+  backend/routers/webhook.py:
+    e: github_webhook,_handle_pr_event,_analyze_pr_files,_build_pr_summary,_build_pr_comment
     github_webhook(request)
     _handle_pr_event(payload)
     _analyze_pr_files(files)
-    _build_pr_comment(analysis;repo;sha)
-    _get_installation_token(installation_id)
+    _build_pr_summary(analysis)
+    _build_pr_comment(analysis;repo;sha;report_url)
+  frontend/src/components/phases/ResultPhase.jsx:
+    i: ../../constants,../../utils/share,../ui
+    e: ResultPhase,data,repoName,shareUrls,handleShare,handleDownloadMetrics,blob,url,a,handleDownloadPrompt,blob,url,a,handleDownloadMarkdown,blob,url,a,handleDownloadToon,blob,url,a
+    ResultPhase()
+    data()
+    repoName()
+    shareUrls()
+    handleShare()
+    handleDownloadMetrics()
+    blob()
+    url()
+    a()
+    handleDownloadPrompt()
+    blob()
+    url()
+    a()
+    handleDownloadMarkdown()
+    blob()
+    url()
+    a()
+    handleDownloadToon()
+    blob()
+    url()
+    a()
+  frontend/src/components/ProgressSteps.jsx:
+    i: ../constants
+    e: ProgressSteps,currentIdx,stepIdx,done,active
+    ProgressSteps()
+    currentIdx()
+    stepIdx()
+    done()
+    active()
+  frontend/src/components/tabs/RecentScansTab.jsx:
+    i: ../../config,../../constants,../../utils/share,react
+    e: RecentScansTab,fetchRecentScans,response,data,formatDate,date,getLanguageBadge,topLang,handleShare,shareUrls
+    RecentScansTab()
+    fetchRecentScans()
+    response()
+    data()
+    formatDate()
+    date()
+    getLanguageBadge()
+    topLang()
+    handleShare()
+    shareUrls()
+  backend/routers/metrics.py:
+    e: _utc_now_iso,get_standard_metrics,get_metrics_summary,get_repository_metrics,download_project_prompt,download_project_prompt_markdown
+    _utc_now_iso()
+    get_standard_metrics(limit)
+    get_metrics_summary()
+    get_repository_metrics(repo_path)
+    download_project_prompt()
+    download_project_prompt_markdown()
+  backend/services/scoring.py:
+    e: calculate_health_score,score_to_grade,generate_recommendations
+    calculate_health_score(stats;complexity;duplication;quality)
+    score_to_grade(score)
+    generate_recommendations(complexity;duplication;quality)
+  backend/services/analyzer.py:
+    e: count_code_stats,run_tool
+    count_code_stats(repo_path)
+    run_tool(name;args;fallback)
+  backend/routers/audit.py:
+    e: _utc_now_iso,_schedule_background_task,run_audit,get_audit_result,get_recent_scans_api,analyze_repo,_run_audit_pipeline,_run_sandbox_analysis
+    _utc_now_iso()
+    _schedule_background_task(coroutine)
+    run_audit(request)
+    get_audit_result(audit_id)
+    get_recent_scans_api(limit)
+    analyze_repo(request)
+    _run_audit_pipeline(audit_id;repo;token)
+    _run_sandbox_analysis(audit_id;repo_url;repo)
+  frontend/src/components/tabs/BadgeTab.jsx:
+    i: ../../config,../../constants,react
+    e: BadgeSVG,color,labelW,valueText,valueW,BadgeTab,badgeUrl
+    BadgeSVG()
+    color()
+    labelW()
+    valueText()
+    valueW()
+    BadgeTab()
+    badgeUrl()
+  backend/scripts/scan_samples.py:
+    e: scan_sample_projects
+    scan_sample_projects()
+  backend/routers/badge.py:
+    e: health_badge,scan_count_badge,_generate_badge_svg,_generate_count_badge_svg
     health_badge(repo_slug;style)
-    _generate_badge_svg(grade;score;style)
-    health_check()
-    report_page(owner;repo)
-  frontend/src/App.jsx:
-    i: react
-    e: API,gradeColor,GradeCircle,color,r,circ,targetOffset,t,MetricCard,RecommendationCard,LanguageBar,total,entries,PRCommentPreview,BadgeSVG,color,labelW,valueText,valueW,params,t,timers,done,startOAuth,startAudit,reset,tabBtn
+    scan_count_badge()
+    _generate_badge_svg(grade;score;style;weekly_issues)
+    _generate_count_badge_svg(label;count)
+  frontend/src/components/RecommendationCard.jsx:
+    i: ../constants,react
+    e: RecommendationCard
+    RecommendationCard()
+  frontend/src/components/phases/LandingPhase.jsx:
+    i: ../../constants,../../utils/share,react
+    e: LandingPhase,fetchRecentScans,response,data,handleShare,shareUrls,formatDate,date
+    LandingPhase()
+    fetchRecentScans()
+    response()
+    data()
+    handleShare()
+    shareUrls()
+    formatDate()
+    date()
+  frontend/src/utils/share.js:
+    i: ../config
+    e: generateShareText,grade,score,files,lines,getShareUrls,text,url
+    generateShareText()
+    grade()
+    score()
+    files()
+    lines()
+    getShareUrls()
+    text()
+    url()
+  frontend/src/components/Header.jsx:
+    i: ../constants
+    e: Header,tabBtn
+    Header()
+    tabBtn()
+  frontend/src/components/phases/ReposPhase.jsx:
+    i: ../../constants
+    e: ReposPhase
+    ReposPhase()
+  frontend/e2e/social-sharing.spec.js:
+    i: @playwright/test
+    e: twitterButton,linkedinButton,blueskyButton,anyVisible,shareButtons,count,recentSection,isVisible,shareButtons,count
+    twitterButton()
+    linkedinButton()
+    blueskyButton()
+    anyVisible()
+    shareButtons()
+    count()
+    recentSection()
+    isVisible()
+    shareButtons()
+    count()
+  e2e/specs/social-sharing.spec.js:
+    i: @playwright/test
+    e: twitterButton,linkedinButton,blueskyButton,anyVisible,shareButtons,count,recentSection,isVisible,shareButtons,count
+    twitterButton()
+    linkedinButton()
+    blueskyButton()
+    anyVisible()
+    shareButtons()
+    count()
+    recentSection()
+    isVisible()
+    shareButtons()
+    count()
+  backend/routers/auth.py:
+    e: github_oauth_start,github_oauth_callback,list_repos
+    github_oauth_start()
+    github_oauth_callback(code)
+    list_repos(token)
+  frontend/src/constants.js:
+    e: API,gradeColor
     API()
     gradeColor()
+  frontend/src/components/phases/ScanningPhase.jsx:
+    i: ../../constants
+    e: ScanningPhase
+    ScanningPhase()
+  frontend/src/components/tabs/RepoTab.jsx:
+    i: ../../constants,react
+    e: RepoTab,handleAnalyze
+    RepoTab()
+    handleAnalyze()
+  frontend/e2e/recent-scans.spec.js:
+    i: @playwright/test
+    e: recentSection,isVisible,scanCards,count,scanCard,count,viewButton,count
+    recentSection()
+    isVisible()
+    scanCards()
+    count()
+    scanCard()
+    count()
+    viewButton()
+    count()
+  e2e/specs/recent-scans.spec.js:
+    i: @playwright/test
+    e: recentSection,isVisible,scanCards,count,scanCard,count,viewButton,count
+    recentSection()
+    isVisible()
+    scanCards()
+    count()
+    scanCard()
+    count()
+    viewButton()
+    count()
+  backend/services/github_client.py:
+    e: get_installation_token
+    get_installation_token(installation_id)
+  frontend/src/config.js:
+    e: PUBLIC_URL
+    PUBLIC_URL()
+  frontend/src/api.js:
+    i: ./constants
+    e: fetchRepos,res,startAudit,res,fetchAudit,res,analyzePublicRepo,res
+    fetchRepos()
+    res()
+    startAudit()
+    res()
+    fetchAudit()
+    res()
+    analyzePublicRepo()
+    res()
+  frontend/src/components/MetricCard.jsx:
+    i: ../constants
+    e: MetricCard
+    MetricCard()
+  frontend/src/components/GradeCircle.jsx:
+    i: ../constants,react
+    e: GradeCircle,color,r,circ,targetOffset,t
     GradeCircle()
     color()
     r()
     circ()
     targetOffset()
     t()
-    MetricCard()
-    RecommendationCard()
+  backend/database.py:
+    e: init_db,save_scan,get_recent_scans,get_total_scan_count
+    init_db()
+    save_scan(scan_data)
+    get_recent_scans(limit)
+    get_total_scan_count()
+  frontend/src/components/phases/AuthPhase.jsx:
+    i: ../../constants
+    e: AuthPhase
+    AuthPhase()
+  frontend/src/components/tabs/PRBotTab.jsx:
+    i: ../../constants
+    e: PRBotTab
+    PRBotTab()
+  frontend/e2e/metrics.spec.js:
+    i: @playwright/test
+    e: response,data,scan,response,data,listResponse,listData,repo,response,data,response,response,data
+    response()
+    data()
+    scan()
+    response()
+    data()
+    listResponse()
+    listData()
+    repo()
+    response()
+    data()
+    response()
+    response()
+    data()
+  frontend/e2e/scan-workflow.spec.js:
+    i: @playwright/test
+    e: currentUrl,recentScansSection,isVisible,twitterButton,linkedinButton,twitterVisible,linkedinVisible,recentTab,isTabVisible
+    currentUrl()
+    recentScansSection()
+    isVisible()
+    twitterButton()
+    linkedinButton()
+    twitterVisible()
+    linkedinVisible()
+    recentTab()
+    isTabVisible()
+  e2e/specs/metrics.spec.js:
+    i: @playwright/test
+    e: response,data,scan,response,data,listResponse,listData,repo,response,data,response,response,data
+    response()
+    data()
+    scan()
+    response()
+    data()
+    listResponse()
+    listData()
+    repo()
+    response()
+    data()
+    response()
+    response()
+    data()
+  e2e/specs/scan-workflow.spec.js:
+    i: @playwright/test
+    e: currentUrl,recentScansSection,isVisible,twitterButton,linkedinButton,twitterVisible,linkedinVisible,recentTab,isTabVisible
+    currentUrl()
+    recentScansSection()
+    isVisible()
+    twitterButton()
+    linkedinButton()
+    twitterVisible()
+    linkedinVisible()
+    recentTab()
+    isTabVisible()
+  backend/sample_projects.py:
+    e: get_sample_projects
+    get_sample_projects()
+  backend/server.py:
+    e: health_check
+    health_check()
+  backend/routers/report.py:
+    e: report_page
+    report_page(owner;repo)
+  frontend/src/components/LanguageBar.jsx:
+    i: ../constants
+    e: LanguageBar,total,entries
     LanguageBar()
     total()
     entries()
-    PRCommentPreview()
-    BadgeSVG()
-    color()
-    labelW()
-    valueText()
-    valueW()
-    params()
-    t()
-    timers()
-    done()
-    startOAuth()
-    startAudit()
-    reset()
-    tabBtn()
+  frontend/e2e/badge.spec.js:
+    i: @playwright/test
+    e: input
+    input()
+  frontend/e2e/smoke.spec.js:
+    i: @playwright/test
+    e: input
+    input()
+  e2e/specs/badge.spec.js:
+    i: @playwright/test
+    e: input
+    input()
+  e2e/specs/smoke.spec.js:
+    i: @playwright/test
+    e: input
+    input()
   project.sh:
+  backend/config.py:
+  backend/services/__init__.py:
+  backend/store.py:
+  backend/routers/__init__.py:
+  frontend/playwright.config.js:
+    i: @playwright/test
   frontend/vite.config.js:
     i: @vitejs/plugin-react,vite
+  frontend/src/App.jsx:
+    i: ./components/Header,./components/ProgressSteps,./components/phases,./components/tabs,./constants,./hooks/useAppState
   frontend/src/main.jsx:
     i: ./App.jsx,react,react-dom/client
+  frontend/src/components/index.js:
+  frontend/src/components/phases/index.js:
+  frontend/src/components/ui/MetricCard.jsx:
+  frontend/src/components/ui/RecommendationCard.jsx:
+  frontend/src/components/ui/LanguageBar.jsx:
+  frontend/src/components/ui/GradeCircle.jsx:
+  frontend/src/components/ui/index.js:
+  frontend/src/components/tabs/index.js:
+  frontend/src/screens/index.js:
+  frontend/e2e/audit.spec.js:
+    i: @playwright/test
+  e2e/playwright.config.js:
+    i: @playwright/test
+  e2e/specs/audit.spec.js:
+    i: @playwright/test
+  e2e/specs/result-smoke.spec.js:
+    i: @playwright/test
