@@ -17,6 +17,12 @@ EnvFile=/opt/semcod/.env
 Environment=PORT=8000
 Environment=APP_URL=https://api.semcod.com
 Environment=FRONTEND_URL=https://semcod.com
+Environment=DB_PATH=/app/data/scans.db
+Environment=SCAN_HISTORY_LIMIT=100
+Environment=REPOS_PER_PAGE=30
+Environment=CORS_ORIGINS=https://semcod.com,https://api.semcod.com
+Environment=LARGE_FILE_THRESHOLD=300
+Environment=GITHUB_OAUTH_SCOPE=repo,read:org
 
 # Persistent data
 Volume=semcod-data.volume:/app/data

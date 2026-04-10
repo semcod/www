@@ -203,6 +203,7 @@ Wszystkie ustawienia w `.env` — bez hardkodu w kodzie. Pełna lista w `.env.ex
 - [API Reference](./docs/api.md) - Dokumentacja API
 - [Architecture](./docs/architecture.md) - Architektura systemu
 - [Roadmap](./docs/roadmap.md) - Roadmapa walidacji wartości, automatyzacji i deploymentu
+- [Validation Benchmark](./docs/validation-benchmark.md) - Plan benchmarku, KPI i pilota wdrożeniowego
 - [MCP Integration](./docs/MCP.md) - Integracja z AI
 - [Quadlet Deployment](./quadlet/README.md) - VPS z Podman + systemd
 
