@@ -6,15 +6,15 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "8003:8000"
     environment:
       - GITHUB_APP_ID=${GITHUB_APP_ID}
       - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
       - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
       - GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET}
       - GITHUB_PRIVATE_KEY_PATH=/app/private-key.pem
-      - APP_URL=https://api.semcod.dev
-      - FRONTEND_URL=https://semcod.dev
+      - APP_URL=https://api.semcod.com
+      - FRONTEND_URL=https://semcod.com
     volumes:
       - ./private-key.pem:/app/private-key.pem:ro
     restart: unless-stopped

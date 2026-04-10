@@ -1,0 +1,70 @@
+# www | 5f 1502L | shell:1,javascript:3,python:1 | 2026-04-09
+# stats: 45 func | 0 cls | 5 mod | CC̄=2.8 | critical:0 | cycles:0
+# alerts[5]: fan-out _run_audit_pipeline=14; fan-out github_webhook=13; fan-out _analyze_pr_files=12; fan-out _count_code_stats=11; fan-out _get_installation_token=10
+# hotspots[5]: _run_audit_pipeline fan=14; github_webhook fan=13; _analyze_pr_files fan=12; _count_code_stats fan=11; _get_installation_token fan=10
+# evolution: baseline
+# Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
+M[5]:
+  backend/server.py,762
+  frontend/src/App.jsx,680
+  frontend/src/main.jsx,10
+  frontend/vite.config.js,15
+  project.sh,35
+D:
+  backend/server.py:
+    e: github_oauth_start,github_oauth_callback,list_repos,run_audit,get_audit_result,_run_audit_pipeline,_count_code_stats,_run_tool,_calculate_health_score,_score_to_grade,_generate_recommendations,github_webhook,_handle_pr_event,_analyze_pr_files,_build_pr_comment,_get_installation_token,health_badge,_generate_badge_svg,health_check,report_page
+    github_oauth_start()
+    github_oauth_callback(code)
+    list_repos(token)
+    run_audit(request)
+    get_audit_result(audit_id)
+    _run_audit_pipeline(audit_id;repo;token)
+    _count_code_stats(repo_path)
+    _run_tool(name;args;fallback)
+    _calculate_health_score(stats;complexity;duplication;quality)
+    _score_to_grade(score)
+    _generate_recommendations(complexity;duplication;quality)
+    github_webhook(request)
+    _handle_pr_event(payload)
+    _analyze_pr_files(files)
+    _build_pr_comment(analysis;repo;sha)
+    _get_installation_token(installation_id)
+    health_badge(repo_slug;style)
+    _generate_badge_svg(grade;score;style)
+    health_check()
+    report_page(owner;repo)
+  frontend/src/App.jsx:
+    i: react
+    e: API,gradeColor,GradeCircle,color,r,circ,targetOffset,t,MetricCard,RecommendationCard,LanguageBar,total,entries,PRCommentPreview,BadgeSVG,color,labelW,valueText,valueW,params,t,timers,done,startOAuth,startAudit,reset,tabBtn
+    API()
+    gradeColor()
+    GradeCircle()
+    color()
+    r()
+    circ()
+    targetOffset()
+    t()
+    MetricCard()
+    RecommendationCard()
+    LanguageBar()
+    total()
+    entries()
+    PRCommentPreview()
+    BadgeSVG()
+    color()
+    labelW()
+    valueText()
+    valueW()
+    params()
+    t()
+    timers()
+    done()
+    startOAuth()
+    startAudit()
+    reset()
+    tabBtn()
+  project.sh:
+  frontend/vite.config.js:
+    i: @vitejs/plugin-react,vite
+  frontend/src/main.jsx:
+    i: ./App.jsx,react,react-dom/client

@@ -1,0 +1,40 @@
+# www | 45 func | 2f | 1502L | javascript | 2026-04-09
+
+HEALTH:
+  CC̄=2.8  critical=1 (limit:10)  dup=0  cycles=0
+
+ALERTS[5]:
+  !   high_fan_out     _run_audit_pipeline = 14 (limit:10)
+  !   high_fan_out     github_webhook = 13 (limit:10)
+  !   high_fan_out     _analyze_pr_files = 12 (limit:10)
+  !   high_fan_out     _count_code_stats = 11 (limit:10)
+  !   high_fan_out     _get_installation_token = 10 (limit:10)
+
+MODULES[5] (top by size):
+  M[backend/server.py] 762L C:0 F:20 CC↑14 D:0 (python)
+  M[frontend/src/App.jsx] 680L C:0 F:25 CC↑5 D:0 (javascript)
+  M[project.sh] 35L C:0 F:0 CC↑0 D:0 (shell)
+  M[frontend/vite.config.js] 15L C:0 F:0 CC↑0 D:0 (javascript)
+  M[frontend/src/main.jsx] 10L C:0 F:0 CC↑0 D:0 (javascript)
+  LANGS: javascript:3/python:1/shell:1
+
+HOTSPOTS[5]:
+  ★ _run_audit_pipeline fan=14  // Background pipeline: clone → code2llm → redup → pyqual → regix → report.
+
+This i
+  ★ github_webhook fan=13  // Handle GitHub webhook events.
+
+Supported events:
+- pull_request (opened, synchro
+  ★ _analyze_pr_files fan=12  // Analysis pipeline, 12 stages
+  ★ _count_code_stats fan=11  // Count source files and lines.
+  ★ _get_installation_token fan=10  // Get GitHub App installation access token using JWT.
+
+In production, use PyJWT to
+
+REFACTOR[2]:
+  [1] H/H Split god module backend/server.py (762L, 0 classes)
+  [2] H/H Split god module frontend/src/App.jsx (680L, 0 classes)
+
+EVOLUTION:
+  2026-04-09 CC̄=2.8 crit=1 1502L // Automated analysis

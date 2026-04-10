@@ -1,0 +1,25 @@
+flowchart TD
+
+    %% Entry points (blue)
+    classDef entry fill:#4dabf7,stroke:#1971c2,color:#fff
+
+    subgraph Core
+        frontend__src__App__API["API"]
+        frontend__src__App__GradeCircle["GradeCircle"]
+        frontend__src__App__color["color"]
+        frontend__src__App__r["r"]
+        frontend__src__App__circ["circ"]
+        frontend__src__App__targetOffset["targetOffset"]
+        frontend__src__App__t["t"]
+        frontend__src__App__MetricCard["MetricCard"]
+        frontend__src__App__RecommendationCard["RecommendationCard"]
+        frontend__src__App__LanguageBar["LanguageBar"]
+        frontend__src__App__total["total"]
+        frontend__src__App__PRCommentPreview["PRCommentPreview"]
+        frontend__src__App__BadgeSVG["BadgeSVG"]
+        frontend__src__App__labelW["labelW"]
+        frontend__src__App__valueText["valueText"]
+        ...["+19 more"]
+    end
+
+    class frontend__src__App__API,frontend__src__App__GradeCircle,frontend__src__App__color,frontend__src__App__r,frontend__src__App__circ,frontend__src__App__targetOffset,frontend__src__App__t,frontend__src__App__MetricCard,frontend__src__App__RecommendationCard,frontend__src__App__LanguageBar entry

@@ -1,0 +1,39 @@
+flowchart LR
+    subgraph backend__server
+        backend__server___generate_badge_svg["_generate_badge_svg"]
+        backend__server___count_code_stats["_count_code_stats"]
+        backend__server___calculate_health_score["_calculate_health_score"]
+        backend__server___run_audit_pipeline["_run_audit_pipeline"]
+        backend__server__health_badge["health_badge"]
+        backend__server___score_to_grade["_score_to_grade"]
+        backend__server___get_installation_token["_get_installation_token"]
+        backend__server___handle_pr_event["_handle_pr_event"]
+        backend__server___generate_recommendations["_generate_recommendations"]
+        backend__server___build_pr_comment["_build_pr_comment"]
+        backend__server__run_audit["run_audit"]
+        backend__server___analyze_pr_files["_analyze_pr_files"]
+        backend__server___run_tool["_run_tool"]
+    end
+    subgraph frontend__src
+        frontend__src__App__tabBtn["tabBtn"]
+        frontend__src__App__gradeColor["gradeColor"]
+        frontend__src__App__GradeCircle["GradeCircle"]
+        frontend__src__App__LanguageBar["LanguageBar"]
+        frontend__src__App__BadgeSVG["BadgeSVG"]
+        frontend__src__App__entries["entries"]
+        frontend__src__App__reset["reset"]
+    end
+    frontend__src__App__GradeCircle --> frontend__src__App__gradeColor
+    frontend__src__App__LanguageBar --> frontend__src__App__entries
+    frontend__src__App__BadgeSVG --> frontend__src__App__gradeColor
+    frontend__src__App__tabBtn --> frontend__src__App__reset
+    backend__server__run_audit --> backend__server___run_audit_pipeline
+    backend__server___run_audit_pipeline --> backend__server___calculate_health_score
+    backend__server___run_audit_pipeline --> backend__server___generate_recommendations
+    backend__server___run_audit_pipeline --> backend__server___count_code_stats
+    backend__server___run_audit_pipeline --> backend__server___run_tool
+    backend__server___handle_pr_event --> backend__server___get_installation_token
+    backend__server___handle_pr_event --> backend__server___analyze_pr_files
+    backend__server___handle_pr_event --> backend__server___build_pr_comment
+    backend__server___analyze_pr_files --> backend__server___score_to_grade
+    backend__server__health_badge --> backend__server___generate_badge_svg
