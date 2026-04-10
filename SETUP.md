@@ -118,7 +118,7 @@ systemctl enable --now semcod
 # 4. Nginx reverse proxy
 cat > /etc/nginx/sites-available/semcod << 'EOF'
 server {
-    server_name api.semcod.dev;
+    server_name api.semcod.com;
     
     location / {
         proxy_pass http://127.0.0.1:8000;
@@ -129,7 +129,7 @@ server {
 EOF
 
 ln -s /etc/nginx/sites-available/semcod /etc/nginx/sites-enabled/
-certbot --nginx -d api.semcod.dev
+certbot --nginx -d api.semcod.com
 ```
 
 ## Endpointy API

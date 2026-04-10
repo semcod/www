@@ -1,0 +1,37 @@
+# code2llm | 5f 1502L | javascript:3,shell:1,python:1 | 2026-04-09
+# CC̄=2.8 | critical:0/45 | dups:0 | cycles:0
+
+HEALTH[0]: ok
+
+REFACTOR[0]: none needed
+
+PIPELINES[25]:
+  [1] Src [API]: API
+      PURITY: 100% pure
+  [2] Src [GradeCircle]: GradeCircle → gradeColor
+      PURITY: 100% pure
+  [3] Src [r]: r
+      PURITY: 100% pure
+  [4] Src [circ]: circ
+      PURITY: 100% pure
+  [5] Src [targetOffset]: targetOffset
+      PURITY: 100% pure
+
+LAYERS:
+  backend/                        CC̄=4.2    ←in:0  →out:0
+  │ !! server                     762L  0C   20m  CC=14     ←0
+  │
+  frontend/                       CC̄=1.7    ←in:0  →out:0
+  │ !! App.jsx                    680L  0C   25m  CC=5      ←0
+  │ vite.config.js              15L  0C    0m  CC=0.0    ←0
+  │ main.jsx                    10L  0C    0m  CC=0.0    ←0
+  │
+  ./                              CC̄=0.0    ←in:0  →out:0
+  │ project.sh                  35L  0C    0m  CC=0.0    ←0
+  │
+
+COUPLING: no cross-package imports detected
+
+EXTERNAL:
+  validation: run `vallm batch .` → validation.toon
+  duplication: run `redup scan .` → duplication.toon

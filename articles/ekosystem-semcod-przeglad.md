@@ -97,4 +97,4 @@ Cały proces jest asynchroniczny: formularz → wycena mailem → realizacja →
 
 ## Jak zacząć
 
-Odwiedź [semcod.dev](https://semcod.dev) lub przeglądaj repozytoria na [github.com/semcod](https://github.com/semcod).
+Odwiedź [semcod.com](https://semcod.com) lub przeglądaj repozytoria na [github.com/semcod](https://github.com/semcod).
