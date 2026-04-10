@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-04-10
+
+### Docs
+- Update README.md
+
+### Other
+- Update backend/scans.db
+- Update e2e/specs/metrics.spec.js
+- Update frontend/vite.config.js
+
 ## [0.1.4] - 2026-04-10
 
 ### Docs

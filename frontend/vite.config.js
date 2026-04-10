@@ -6,10 +6,10 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      '/api': 'http://localhost:8200',
-      '/auth': 'http://localhost:8200',
-      '/webhook': 'http://localhost:8200',
-      '/badge': 'http://localhost:8200',
+      '/api': 'http://localhost:9000',
+      '/auth': 'http://localhost:9000',
+      '/webhook': 'http://localhost:9000',
+      '/badge': 'http://localhost:9000',
     },
   },
 })
