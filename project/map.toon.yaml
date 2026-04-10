@@ -1,37 +1,40 @@
-# www | 68f 4962L | shell:1,python:18,javascript:49 | 2026-04-10
-# stats: 212 func | 0 cls | 68 mod | CC̄=2.8 | critical:3 | cycles:0
-# alerts[5]: CC useAppState=45; fan-out useAppState=40; fan-out RecentScansTab=23; fan-out ResultPhase=22; fan-out mcp_get_resource=21
-# hotspots[5]: useAppState fan=40; RecentScansTab fan=23; ResultPhase fan=22; mcp_get_resource fan=21; LandingPhase fan=19
-# evolution: CC̄ 2.8→2.8 (flat 0.0)
+# www | 73f 5780L | shell:2,python:20,javascript:51 | 2026-04-10
+# stats: 244 func | 0 cls | 73 mod | CC̄=3.0 | critical:4 | cycles:0
+# alerts[5]: CC ResultPhase=54; CC useAppState=51; fan-out useAppState=48; fan-out ResultPhase=26; fan-out RecentScansTab=23
+# hotspots[5]: useAppState fan=48; ResultPhase fan=26; RecentScansTab fan=23; mcp_get_resource fan=21; _run_audit_pipeline fan=19
+# evolution: CC̄ 2.9→3.0 (regressed +0.1)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[68]:
-  backend/config.py,12
-  backend/database.py,105
+M[73]:
+  backend/config.py,15
+  backend/database.py,172
   backend/routers/__init__.py,0
-  backend/routers/audit.py,302
-  backend/routers/auth.py,70
+  backend/routers/audit.py,319
+  backend/routers/auth.py,163
   backend/routers/badge.py,139
   backend/routers/mcp.py,433
   backend/routers/metrics.py,257
   backend/routers/report.py,14
+  backend/routers/system.py,34
   backend/routers/webhook.py,255
   backend/sample_projects.py,72
   backend/scripts/scan_samples.py,74
-  backend/server.py,63
+  backend/server.py,51
+  backend/server_new.py,0
   backend/services/__init__.py,0
   backend/services/analyzer.py,66
   backend/services/github_client.py,37
   backend/services/scoring.py,106
   backend/store.py,3
   e2e/playwright.config.js,29
-  e2e/specs/audit.spec.js,46
-  e2e/specs/badge.spec.js,26
-  e2e/specs/metrics.spec.js,125
-  e2e/specs/recent-scans.spec.js,80
-  e2e/specs/result-smoke.spec.js,17
+  e2e/specs/audit.spec.js,49
+  e2e/specs/badge.spec.js,28
+  e2e/specs/demo-login.spec.js,64
+  e2e/specs/demo-mode.spec.js,62
+  e2e/specs/metrics.spec.js,128
+  e2e/specs/recent-scans.spec.js,86
   e2e/specs/scan-workflow.spec.js,99
-  e2e/specs/smoke.spec.js,47
-  e2e/specs/social-sharing.spec.js,58
+  e2e/specs/smoke.spec.js,59
+  e2e/specs/social-sharing.spec.js,120
   frontend/e2e/audit.spec.js,46
   frontend/e2e/badge.spec.js,26
   frontend/e2e/metrics.spec.js,125
@@ -40,20 +43,21 @@ M[68]:
   frontend/e2e/smoke.spec.js,47
   frontend/e2e/social-sharing.spec.js,58
   frontend/playwright.config.js,22
-  frontend/src/App.jsx,80
-  frontend/src/api.js,33
+  frontend/src/App.jsx,82
+  frontend/src/api.js,67
   frontend/src/components/index.js,4
   frontend/src/components/GradeCircle.jsx,33
-  frontend/src/components/Header.jsx,51
+  frontend/src/components/Header.jsx,61
   frontend/src/components/LanguageBar.jsx,26
   frontend/src/components/MetricCard.jsx,14
+  frontend/src/components/PRCommentPreview.jsx,0
   frontend/src/components/ProgressSteps.jsx,47
   frontend/src/components/RecommendationCard.jsx,48
   frontend/src/components/phases/index.js,5
-  frontend/src/components/phases/AuthPhase.jsx,36
-  frontend/src/components/phases/LandingPhase.jsx,211
+  frontend/src/components/phases/AuthPhase.jsx,61
+  frontend/src/components/phases/LandingPhase.jsx,218
   frontend/src/components/phases/ReposPhase.jsx,41
-  frontend/src/components/phases/ResultPhase.jsx,285
+  frontend/src/components/phases/ResultPhase.jsx,544
   frontend/src/components/phases/ScanningPhase.jsx,28
   frontend/src/components/tabs/index.js,4
   frontend/src/components/tabs/BadgeTab.jsx,109
@@ -67,20 +71,54 @@ M[68]:
   frontend/src/components/ui/RecommendationCard.jsx,1
   frontend/src/config.js,8
   frontend/src/constants.js,71
-  frontend/src/hooks/useAppState.js,253
+  frontend/src/hooks/useAppState.js,308
   frontend/src/main.jsx,10
   frontend/src/screens/index.js,0
   frontend/src/utils/share.js,29
   frontend/vite.config.js,15
   project.sh,35
+  traefik/generate-certs.sh,27
 D:
+  frontend/src/components/phases/ResultPhase.jsx:
+    i: ../../constants,../../utils/share,../ui,react
+    e: ResultPhase,data,repoName,shareUrls,handleShare,handleDownloadMetrics,blob,url,a,handleDownloadPrompt,filesContent,blob,url,a,handleDownloadMarkdown,blob,url,a,handleDownloadToon,blob,url,a,getTabContent,filesContent,content,blob,url,a,content
+    ResultPhase()
+    data()
+    repoName()
+    shareUrls()
+    handleShare()
+    handleDownloadMetrics()
+    blob()
+    url()
+    a()
+    handleDownloadPrompt()
+    filesContent()
+    blob()
+    url()
+    a()
+    handleDownloadMarkdown()
+    blob()
+    url()
+    a()
+    handleDownloadToon()
+    blob()
+    url()
+    a()
+    getTabContent()
+    filesContent()
+    content()
+    blob()
+    url()
+    a()
+    content()
   frontend/src/hooks/useAppState.js:
     i: ../api,../constants,react
-    e: useAppState,hash,params,t,tabParam,phaseParam,repoParam,parts,owner,repo,auditParam,searchParams,params,timers,done,pollCount,maxPolls,poll,data,interval,shouldStop,reset,startOAuth,confirmAuth,startAudit,startSandbox,url,match,sshMatch
+    e: useAppState,searchParams,session,hash,params,tabParam,phaseParam,repoParam,parts,owner,repo,auditParam,params,timers,done,pollCount,maxPolls,poll,data,interval,shouldStop,reset,startOAuth,confirmAuth,startAudit,startSandbox,url,match,sshMatch,startDemoLogin,doLogout
     useAppState()
+    searchParams()
+    session()
     hash()
     params()
-    t()
     tabParam()
     phaseParam()
     repoParam()
@@ -88,7 +126,6 @@ D:
     owner()
     repo()
     auditParam()
-    searchParams()
     params()
     timers()
     done()
@@ -106,6 +143,8 @@ D:
     url()
     match()
     sshMatch()
+    startDemoLogin()
+    doLogout()
   backend/routers/mcp.py:
     e: MCPResource,MCPTool,MCPResourceResponse,MCPToolRequest,mcp_list_resources,mcp_get_resource,mcp_list_tools,mcp_invoke_tool,mcp_server_info
     MCPResource(BaseModel):  # MCP Resource definition...
@@ -124,30 +163,6 @@ D:
     _analyze_pr_files(files)
     _build_pr_summary(analysis)
     _build_pr_comment(analysis;repo;sha;report_url)
-  frontend/src/components/phases/ResultPhase.jsx:
-    i: ../../constants,../../utils/share,../ui
-    e: ResultPhase,data,repoName,shareUrls,handleShare,handleDownloadMetrics,blob,url,a,handleDownloadPrompt,blob,url,a,handleDownloadMarkdown,blob,url,a,handleDownloadToon,blob,url,a
-    ResultPhase()
-    data()
-    repoName()
-    shareUrls()
-    handleShare()
-    handleDownloadMetrics()
-    blob()
-    url()
-    a()
-    handleDownloadPrompt()
-    blob()
-    url()
-    a()
-    handleDownloadMarkdown()
-    blob()
-    url()
-    a()
-    handleDownloadToon()
-    blob()
-    url()
-    a()
   frontend/src/components/ProgressSteps.jsx:
     i: ../constants
     e: ProgressSteps,currentIdx,stepIdx,done,active
@@ -177,6 +192,40 @@ D:
     get_repository_metrics(repo_path)
     download_project_prompt()
     download_project_prompt_markdown()
+  e2e/specs/social-sharing.spec.js:
+    i: @playwright/test
+    e: noScansMessage,hasNoScans,scanCard,shareTab,twitterButton,linkedinButton,blueskyButton,twitterVisible,linkedinVisible,blueskyVisible,noScansMessage,hasNoScans,scanCard,shareTab,twitterButton,linkedinButton,blueskyButton,twitterVisible,linkedinVisible,blueskyVisible,recentSection,isVisible,scanCard,hasScan,shareTab,twitterButton,linkedinButton,blueskyButton,twitterVisible,linkedinVisible,blueskyVisible
+    noScansMessage()
+    hasNoScans()
+    scanCard()
+    shareTab()
+    twitterButton()
+    linkedinButton()
+    blueskyButton()
+    twitterVisible()
+    linkedinVisible()
+    blueskyVisible()
+    noScansMessage()
+    hasNoScans()
+    scanCard()
+    shareTab()
+    twitterButton()
+    linkedinButton()
+    blueskyButton()
+    twitterVisible()
+    linkedinVisible()
+    blueskyVisible()
+    recentSection()
+    isVisible()
+    scanCard()
+    hasScan()
+    shareTab()
+    twitterButton()
+    linkedinButton()
+    blueskyButton()
+    twitterVisible()
+    linkedinVisible()
+    blueskyVisible()
   backend/services/scoring.py:
     e: calculate_health_score,score_to_grade,generate_recommendations
     calculate_health_score(stats;complexity;duplication;quality)
@@ -190,7 +239,7 @@ D:
     e: _utc_now_iso,_schedule_background_task,run_audit,get_audit_result,get_recent_scans_api,analyze_repo,_run_audit_pipeline,_run_sandbox_analysis
     _utc_now_iso()
     _schedule_background_task(coroutine)
-    run_audit(request)
+    run_audit(request;user)
     get_audit_result(audit_id)
     get_recent_scans_api(limit)
     analyze_repo(request)
@@ -215,6 +264,11 @@ D:
     scan_count_badge()
     _generate_badge_svg(grade;score;style;weekly_issues)
     _generate_count_badge_svg(label;count)
+  frontend/src/components/Header.jsx:
+    i: ../constants
+    e: Header,tabBtn
+    Header()
+    tabBtn()
   frontend/src/components/RecommendationCard.jsx:
     i: ../constants,react
     e: RecommendationCard
@@ -241,11 +295,24 @@ D:
     getShareUrls()
     text()
     url()
-  frontend/src/components/Header.jsx:
-    i: ../constants
-    e: Header,tabBtn
-    Header()
-    tabBtn()
+  backend/routers/auth.py:
+    e: create_session_token,decode_session_token,get_current_user,github_oauth_start,github_oauth_callback,demo_login,get_me,logout,list_repos
+    create_session_token(user_id)
+    decode_session_token(token)
+    get_current_user(credentials)
+    github_oauth_start()
+    github_oauth_callback(code)
+    demo_login()
+    get_me(user)
+    logout()
+    list_repos(user)
+  frontend/src/components/phases/AuthPhase.jsx:
+    i: ../../api,../../constants
+    e: AuthPhase,handleLogin,handleDemoLogin,data
+    AuthPhase()
+    handleLogin()
+    handleDemoLogin()
+    data()
   frontend/src/components/phases/ReposPhase.jsx:
     i: ../../constants
     e: ReposPhase
@@ -263,24 +330,23 @@ D:
     isVisible()
     shareButtons()
     count()
-  e2e/specs/social-sharing.spec.js:
+  e2e/specs/metrics.spec.js:
     i: @playwright/test
-    e: twitterButton,linkedinButton,blueskyButton,anyVisible,shareButtons,count,recentSection,isVisible,shareButtons,count
-    twitterButton()
-    linkedinButton()
-    blueskyButton()
-    anyVisible()
-    shareButtons()
-    count()
-    recentSection()
-    isVisible()
-    shareButtons()
-    count()
-  backend/routers/auth.py:
-    e: github_oauth_start,github_oauth_callback,list_repos
-    github_oauth_start()
-    github_oauth_callback(code)
-    list_repos(token)
+    e: skipInCI,response,data,scan,response,data,listResponse,listData,repo,response,data,response,response,data
+    skipInCI()
+    response()
+    data()
+    scan()
+    response()
+    data()
+    listResponse()
+    listData()
+    repo()
+    response()
+    data()
+    response()
+    response()
+    data()
   frontend/src/constants.js:
     e: API,gradeColor
     API()
@@ -305,6 +371,10 @@ D:
     count()
     viewButton()
     count()
+  e2e/specs/audit.spec.js:
+    i: @playwright/test
+    e: skipInCI
+    skipInCI()
   e2e/specs/recent-scans.spec.js:
     i: @playwright/test
     e: recentSection,isVisible,scanCards,count,scanCard,count,viewButton,count
@@ -316,20 +386,40 @@ D:
     count()
     viewButton()
     count()
+  backend/database.py:
+    e: init_db,save_scan,get_recent_scans,get_total_scan_count,upsert_user,get_user_by_github_id,get_user_by_id
+    init_db()
+    save_scan(scan_data)
+    get_recent_scans(limit)
+    get_total_scan_count()
+    upsert_user(github_id;login;name;avatar_url;github_token)
+    get_user_by_github_id(github_id)
+    get_user_by_id(user_id)
   backend/services/github_client.py:
     e: get_installation_token
     get_installation_token(installation_id)
+  backend/routers/system.py:
+    e: health_check,get_domain_config
+    health_check()
+    get_domain_config()
   frontend/src/config.js:
     e: PUBLIC_URL
     PUBLIC_URL()
   frontend/src/api.js:
     i: ./constants
-    e: fetchRepos,res,startAudit,res,fetchAudit,res,analyzePublicRepo,res
+    e: authHeaders,fetchMe,res,logout,res,fetchRepos,res,startAudit,res,fetchAudit,res,demoLogin,res,analyzePublicRepo,res
+    authHeaders()
+    fetchMe()
+    res()
+    logout()
+    res()
     fetchRepos()
     res()
     startAudit()
     res()
     fetchAudit()
+    res()
+    demoLogin()
     res()
     analyzePublicRepo()
     res()
@@ -346,16 +436,6 @@ D:
     circ()
     targetOffset()
     t()
-  backend/database.py:
-    e: init_db,save_scan,get_recent_scans,get_total_scan_count
-    init_db()
-    save_scan(scan_data)
-    get_recent_scans(limit)
-    get_total_scan_count()
-  frontend/src/components/phases/AuthPhase.jsx:
-    i: ../../constants
-    e: AuthPhase
-    AuthPhase()
   frontend/src/components/tabs/PRBotTab.jsx:
     i: ../../constants
     e: PRBotTab
@@ -388,22 +468,11 @@ D:
     linkedinVisible()
     recentTab()
     isTabVisible()
-  e2e/specs/metrics.spec.js:
+  e2e/specs/smoke.spec.js:
     i: @playwright/test
-    e: response,data,scan,response,data,listResponse,listData,repo,response,data,response,response,data
-    response()
-    data()
-    scan()
-    response()
-    data()
-    listResponse()
-    listData()
-    repo()
-    response()
-    data()
-    response()
-    response()
-    data()
+    e: input,reportVisible
+    input()
+    reportVisible()
   e2e/specs/scan-workflow.spec.js:
     i: @playwright/test
     e: currentUrl,recentScansSection,isVisible,twitterButton,linkedinButton,twitterVisible,linkedinVisible,recentTab,isTabVisible
@@ -419,9 +488,6 @@ D:
   backend/sample_projects.py:
     e: get_sample_projects
     get_sample_projects()
-  backend/server.py:
-    e: health_check
-    health_check()
   backend/routers/report.py:
     e: report_page
     report_page(owner;repo)
@@ -443,15 +509,19 @@ D:
     i: @playwright/test
     e: input
     input()
-  e2e/specs/smoke.spec.js:
+  e2e/specs/demo-mode.spec.js:
     i: @playwright/test
-    e: input
-    input()
+    e: repoButtons,count
+    repoButtons()
+    count()
   project.sh:
+  traefik/generate-certs.sh:
+  backend/server.py:
+  backend/server_new.py:
   backend/config.py:
   backend/services/__init__.py:
-  backend/store.py:
   backend/routers/__init__.py:
+  backend/store.py:
   frontend/playwright.config.js:
     i: @playwright/test
   frontend/vite.config.js:
@@ -460,12 +530,13 @@ D:
     i: ./components/Header,./components/ProgressSteps,./components/phases,./components/tabs,./constants,./hooks/useAppState
   frontend/src/main.jsx:
     i: ./App.jsx,react,react-dom/client
+  frontend/src/components/PRCommentPreview.jsx:
   frontend/src/components/index.js:
   frontend/src/components/phases/index.js:
-  frontend/src/components/ui/MetricCard.jsx:
-  frontend/src/components/ui/RecommendationCard.jsx:
   frontend/src/components/ui/LanguageBar.jsx:
+  frontend/src/components/ui/MetricCard.jsx:
   frontend/src/components/ui/GradeCircle.jsx:
+  frontend/src/components/ui/RecommendationCard.jsx:
   frontend/src/components/ui/index.js:
   frontend/src/components/tabs/index.js:
   frontend/src/screens/index.js:
@@ -473,7 +544,5 @@ D:
     i: @playwright/test
   e2e/playwright.config.js:
     i: @playwright/test
-  e2e/specs/audit.spec.js:
-    i: @playwright/test
-  e2e/specs/result-smoke.spec.js:
+  e2e/specs/demo-login.spec.js:
     i: @playwright/test

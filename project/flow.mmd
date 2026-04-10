@@ -5,21 +5,21 @@ flowchart TD
 
     subgraph Core
         backend__services__scoring__score_to_grade["score_to_grade"]
+        backend__database__init_db["init_db"]
+        backend__database__save_scan["save_scan"]
+        backend__database__get_user_by_github_id["get_user_by_github_id"]
         backend__services__github_client__get_installation_token["get_installation_token"]
-        backend__server__health_check["health_check"]
+        backend__routers__system__health_check["health_check"]
+        backend__routers__system__get_domain_config["get_domain_config"]
+        backend__routers__auth__get_current_user["get_current_user"]
         backend__routers__auth__github_oauth_start["github_oauth_start"]
         backend__routers__auth__github_oauth_callback["github_oauth_callback"]
+        backend__routers__auth__demo_login["demo_login"]
+        backend__routers__auth__get_me["get_me"]
+        backend__routers__auth__logout["logout"]
         backend__routers__auth__list_repos["list_repos"]
         backend__routers__webhook__github_webhook["github_webhook"]
-        backend__routers__webhook___handle_pr_event["_handle_pr_event"]
-        backend__routers__webhook___analyze_pr_files("_analyze_pr_files CC=14")
-        backend__routers__badge__health_badge["health_badge"]
-        backend__routers__badge__scan_count_badge["scan_count_badge"]
-        backend__routers__metrics__get_standard_metrics["get_standard_metrics"]
-        backend__routers__metrics__get_metrics_summary["get_metrics_summary"]
-        backend__routers__metrics__get_repository_metrics["get_repository_metrics"]
-        backend__routers__metrics__download_project_prompt["download_project_prompt"]
-        ...["+162 more"]
+        ...["+187 more"]
     end
 
-    class backend__services__github_client__get_installation_token,backend__server__health_check,backend__routers__auth__github_oauth_start,backend__routers__auth__github_oauth_callback,backend__routers__auth__list_repos,backend__routers__webhook__github_webhook,backend__routers__badge__health_badge,backend__routers__badge__scan_count_badge,backend__routers__metrics__get_standard_metrics,backend__routers__metrics__get_metrics_summary entry
+    class backend__database__init_db,backend__database__save_scan,backend__database__get_user_by_github_id,backend__services__github_client__get_installation_token,backend__routers__system__health_check,backend__routers__system__get_domain_config,backend__routers__auth__get_current_user,backend__routers__auth__github_oauth_start,backend__routers__auth__github_oauth_callback,backend__routers__auth__demo_login entry
