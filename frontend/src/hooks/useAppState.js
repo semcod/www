@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { analyzePublicRepo, fetchAudit, fetchRepos, fetchMe, logout as logoutRequest, startAudit as startAuditRequest } from "../api";
+import { analyzePublicRepo, fetchAudit, fetchRepos, fetchMe, demoLogin, logout as logoutRequest, startAudit as startAuditRequest } from "../api";
 import { DEMO_REPOS, DEMO_AUDIT, API } from "../constants";
 
 const SESSION_KEY = "semcod_session";
@@ -262,6 +262,19 @@ export function useAppState() {
     }
   }, [repoUrl]);
 
+  const startDemoLogin = useCallback(() => {
+    demoLogin()
+      .then(data => {
+        if (data.session) {
+          setSessionToken(data.session);
+          localStorage.setItem(SESSION_KEY, data.session);
+          setRepos(DEMO_REPOS);
+          setPhase("repos");
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const doLogout = useCallback(() => {
     if (sessionToken) {
       logoutRequest(sessionToken).catch(() => {});
@@ -290,6 +303,6 @@ export function useAppState() {
     repoUrl, setRepoUrl,
     isSandbox, setIsSandbox,
     auditId, setAuditId,
-    reset, startOAuth, confirmAuth, startAudit, startSandbox, doLogout,
+    reset, startOAuth, confirmAuth, startAudit, startSandbox, startDemoLogin, doLogout,
   };
 }
