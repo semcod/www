@@ -1,9 +1,23 @@
-# redup/duplication | 0 groups | 18f 2008L | 2026-04-10
+# redup/duplication | 1 groups | 20f 2210L | 2026-04-10
 
 SUMMARY:
-  files_scanned: 18
-  total_lines:   2008
-  dup_groups:    0
-  dup_fragments: 0
-  saved_lines:   0
-  scan_ms:       7327
+  files_scanned: 20
+  total_lines:   2210
+  dup_groups:    1
+  dup_fragments: 2
+  saved_lines:   11
+  scan_ms:       6212
+
+DUPLICATES[1] (ranked by impact):
+  [b442a69269fe00ae]   STRU  get_user_by_github_id  L=11 N=2 saved=11 sim=1.00
+      backend/database.py:145-155  (get_user_by_github_id)
+      backend/database.py:158-168  (get_user_by_id)
+
+REFACTOR[1] (ranked by priority):
+  [1] ○ extract_function   → backend/utils/get_user_by_github_id.py
+      WHY: 2 occurrences of 11-line block across 1 files — saves 11 lines
+      FILES: backend/database.py
+
+METRICS-TARGET:
+  dup_groups:  1 → 0
+  saved_lines: 11 lines recoverable

@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-04-10
+
+### Docs
+- Update README.md
+- Update backend/code2llm_output/README.md
+- Update backend/code2llm_output/context.md
+- Update docs/README.md
+- Update e2e/README.md
+- Update project/README.md
+- Update project/context.md
+
+### Other
+- Update Makefile
+- Update backend/code2llm_output/analysis.json
+- Update backend/routers/mcp.py
+- Update backend/routers/system.py
+- Update backend/scans.db
+- Update backend/server.py
+- Update backend/server_new.py
+- Update e2e/playwright.config.js
+- Update e2e/specs/demo-login.spec.js
+- Update e2e/specs/demo-mode.spec.js
+- ... and 20 more files
+
 ## [0.1.3] - 2026-04-10
 
 ### Docs

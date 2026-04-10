@@ -1,9 +1,9 @@
-# vallm batch | 154f | 48✓ 23⚠ 19✗ | 2026-04-10
+# vallm batch | 168f | 51✓ 24⚠ 20✗ | 2026-04-10
 
 SUMMARY:
-  scanned: 154  passed: 48 (31.2%)  warnings: 23  errors: 19  unsupported: 66
+  scanned: 168  passed: 51 (30.4%)  warnings: 24  errors: 20  unsupported: 75
 
-WARNINGS[23]{path,score}:
+WARNINGS[24]{path,score}:
   frontend/src/App.jsx,0.78
     issues[1]{rule,severity,message,line}:
       syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
@@ -17,6 +17,9 @@ WARNINGS[23]{path,score}:
     issues[1]{rule,severity,message,line}:
       syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
   frontend/src/components/MetricCard.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/components/PRCommentPreview.jsx,0.78
     issues[1]{rule,severity,message,line}:
       syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
   frontend/src/components/ProgressSteps.jsx,0.78
@@ -74,7 +77,7 @@ WARNINGS[23]{path,score}:
     issues[1]{rule,severity,message,line}:
       js.import.resolvable,warning,Module 'react' not found,1
 
-ERRORS[19]{path,score}:
+ERRORS[20]{path,score}:
   backend/routers/report.py,0.57
     issues[3]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'fastapi' not found,3
@@ -92,9 +95,9 @@ ERRORS[19]{path,score}:
       python.import.resolvable,error,Module 'routers.report' not found,17
       python.import.resolvable,error,Module 'routers.metrics' not found,18
       python.import.resolvable,error,Module 'routers.mcp' not found,19
-      python.import.resolvable,error,Module 'store' not found,20
-      python.import.resolvable,error,Module 'uvicorn' not found,61
-      python.import.resolvable,error,Module 'config' not found,62
+      python.import.resolvable,error,Module 'routers.system' not found,20
+      python.import.resolvable,error,Module 'uvicorn' not found,49
+      python.import.resolvable,error,Module 'config' not found,50
   backend/tests/test_app.py,0.57
     issues[2]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'fastapi.testclient' not found,1
@@ -110,13 +113,13 @@ ERRORS[19]{path,score}:
       python.import.resolvable,error,Module 'server' not found,3
       python.import.resolvable,error,Module 'store' not found,4
   tests/backend/test_audit.py,0.57
-    issues[1]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'pytest' not found,3
-  tests/backend/test_mcp.py,0.57
     issues[3]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'pytest' not found,3
-      python.import.resolvable,error,Module 'fastapi.testclient' not found,6
-      python.import.resolvable,error,Module 'server' not found,7
+      python.import.resolvable,error,Module 'routers.auth' not found,20
+      python.import.resolvable,error,Module 'database' not found,21
+  tests/backend/test_mcp.py,0.57
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,3
   tests/backend/test_scoring.py,0.57
     issues[2]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'pytest' not found,3
@@ -132,15 +135,23 @@ ERRORS[19]{path,score}:
       python.import.resolvable,error,Module 'store' not found,7
       python.import.resolvable,error,Module 'store' not found,50
   backend/routers/auth.py,0.68
-    issues[3]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'fastapi' not found,2
-      python.import.resolvable,error,Module 'fastapi.responses' not found,3
-      python.import.resolvable,error,Module 'config' not found,5
+    issues[6]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'jwt' not found,2
+      python.import.resolvable,error,Module 'fastapi' not found,4
+      python.import.resolvable,error,Module 'fastapi.responses' not found,5
+      python.import.resolvable,error,Module 'fastapi.security' not found,6
+      python.import.resolvable,error,Module 'config' not found,8
+      python.import.resolvable,error,Module 'database' not found,9
   tests/conftest.py,0.68
     issues[3]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'pytest' not found,3
       python.import.resolvable,error,Module 'fastapi.testclient' not found,4
       python.import.resolvable,error,Module 'server' not found,12
+  backend/routers/system.py,0.74
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'fastapi' not found,4
+      python.import.resolvable,error,Module 'config' not found,8
+      python.import.resolvable,error,Module 'store' not found,9
   backend/tests/test_metrics_api.py,0.74
     issues[3]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'pytest' not found,9
@@ -152,6 +163,15 @@ ERRORS[19]{path,score}:
       python.import.resolvable,error,Module 'fastapi.responses' not found,4
       python.import.resolvable,error,Module 'config' not found,5
       python.import.resolvable,error,Module 'database' not found,10
+  backend/routers/audit.py,0.80
+    issues[7]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'fastapi' not found,12
+      python.import.resolvable,error,Module 'config' not found,14
+      python.import.resolvable,error,Module 'services.analyzer' not found,15
+      python.import.resolvable,error,Module 'services.scoring' not found,16
+      python.import.resolvable,error,Module 'store' not found,17
+      python.import.resolvable,error,Module 'database' not found,18
+      python.import.resolvable,error,Module 'routers.auth' not found,19
   backend/routers/mcp.py,0.81
     issues[4]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'fastapi' not found,20
@@ -165,14 +185,6 @@ ERRORS[19]{path,score}:
       python.import.resolvable,error,Module 'services.github_client' not found,13
       python.import.resolvable,error,Module 'services.scoring' not found,14
       python.import.resolvable,error,Module 'store' not found,15
-  backend/routers/audit.py,0.82
-    issues[6]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'fastapi' not found,12
-      python.import.resolvable,error,Module 'config' not found,14
-      python.import.resolvable,error,Module 'services.analyzer' not found,15
-      python.import.resolvable,error,Module 'services.scoring' not found,16
-      python.import.resolvable,error,Module 'store' not found,17
-      python.import.resolvable,error,Module 'database' not found,18
   backend/scripts/scan_samples.py,0.84
     issues[3]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'routers.audit' not found,10
@@ -184,8 +196,8 @@ ERRORS[19]{path,score}:
       python.import.resolvable,error,Module 'config' not found,10
 
 UNSUPPORTED[5]{bucket,count}:
-  *.md,50
+  *.md,56
   Dockerfile*,2
   *.txt,2
-  *.yml,1
-  other,11
+  *.yml,3
+  other,12

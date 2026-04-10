@@ -110,9 +110,29 @@
 </head>
 <body>
     <header>
-        <h1>semcod<span>.dev</span> Docs</h1>
+        <h1 id="domain-title">semcod<span>.dev</span> Docs</h1>
         <a href="/">← Back to App</a>
     </header>
+    <script>
+        // Fetch domain from backend API
+        async function setDomain() {
+            try {
+                const response = await fetch('/api/config/domain');
+                const data = await response.json();
+                const domain = data.domain;
+                const titleEl = document.getElementById('domain-title');
+                if (titleEl && domain) {
+                    const domainParts = domain.split('.');
+                    if (domainParts.length >= 2) {
+                        titleEl.innerHTML = `${domainParts[0]}<span>.${domainParts.slice(1).join('.')}</span> Docs`;
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to fetch domain:', error);
+            }
+        }
+        setDomain();
+    </script>
     <main>
         <a href="/" class="back-link">← Back to Application</a>
         <h2>Documentation</h2>

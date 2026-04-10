@@ -15,6 +15,7 @@ Tools:
 """
 
 import hashlib
+import re
 from datetime import datetime, timezone
 from typing import Any, Optional
 from fastapi import APIRouter, HTTPException
@@ -23,6 +24,10 @@ from pydantic import BaseModel, Field
 from store import audit_results, badge_cache, scan_history
 from database import get_recent_scans, get_total_scan_count
 from services.scoring import calculate_health_score, score_to_grade, generate_recommendations
+
+
+def _utc_now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
 
 router = APIRouter(prefix="/mcp", tags=["mcp"])
 
@@ -177,7 +182,7 @@ async def mcp_get_resource(uri: str) -> MCPResourceResponse:
             mime_type="application/json",
             content={
                 "meta": {
-                    "generated_at": datetime.now(timezone.utc).isoformat(),
+                    "generated_at": _utc_now_iso(),
                     "total_scans": len(scans),
                 },
                 "summary": summary,
@@ -301,14 +306,14 @@ async def mcp_invoke_tool(request: MCPToolRequest) -> dict:
         
         # Generate audit ID
         audit_id = hashlib.sha256(
-            f"{repo}-{datetime.now(timezone.utc).isoformat()}".encode()
+            f"{repo}-{_utc_now_iso()}".encode()
         ).hexdigest()[:12]
-        
+
         # Store initial status
         audit_results[audit_id] = {
             "status": "running",
             "repo": repo,
-            "started": datetime.now(timezone.utc).isoformat(),
+            "started": _utc_now_iso(),
         }
         
         return {
@@ -373,8 +378,6 @@ async def mcp_invoke_tool(request: MCPToolRequest) -> dict:
         if not repo_url:
             raise HTTPException(400, "repo_url is required")
         
-        import re
-        
         # Parse owner/repo from URL
         match = (
             re.search(r"github\.com/([^/]+)/([^/\.]+)", repo_url)
@@ -387,15 +390,15 @@ async def mcp_invoke_tool(request: MCPToolRequest) -> dict:
         
         owner, repo = match.group(1), match.group(2)
         audit_id = hashlib.sha256(
-            f"{owner}/{repo}-{datetime.now(timezone.utc).isoformat()}".encode()
+            f"{owner}/{repo}-{_utc_now_iso()}".encode()
         ).hexdigest()[:12]
-        
+
         audit_results[audit_id] = {
             "status": "running",
             "repo": f"{owner}/{repo}",
             "sandbox": True,
             "repo_url": repo_url,
-            "started": datetime.now(timezone.utc).isoformat(),
+            "started": _utc_now_iso(),
         }
         
         return {

@@ -32,6 +32,7 @@ npx playwright test --debug
 - `specs/smoke.spec.js` - Basic smoke tests (homepage, navigation, scan flow)
 - `specs/audit.spec.js` - Audit flow tests (GitHub OAuth requires backend)
 - `specs/badge.spec.js` - Badge generator tests
+- `specs/demo-mode.spec.js` - Demo login flow tests (no backend required)
 - `specs/metrics.spec.js` - Metrics display tests
 - `specs/recent-scans.spec.js` - Recent scans tab tests
 - `specs/scan-workflow.spec.js` - Multi-provider scan tests (GitHub, GitLab, Bitbucket)
