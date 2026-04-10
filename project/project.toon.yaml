@@ -1,40 +1,51 @@
-# www | 45 func | 2f | 1502L | javascript | 2026-04-09
+# www | 212 func | 46f | 5716L | javascript | 2026-04-10
 
 HEALTH:
-  CC̄=2.8  critical=1 (limit:10)  dup=0  cycles=0
+  CC̄=2.8  critical=8 (limit:10)  dup=0  cycles=0
 
-ALERTS[5]:
-  !   high_fan_out     _run_audit_pipeline = 14 (limit:10)
-  !   high_fan_out     github_webhook = 13 (limit:10)
-  !   high_fan_out     _analyze_pr_files = 12 (limit:10)
-  !   high_fan_out     _count_code_stats = 11 (limit:10)
-  !   high_fan_out     _get_installation_token = 10 (limit:10)
+ALERTS[20]:
+  !!! cc_exceeded      useAppState = 45 (limit:15)
+  !!! high_fan_out     useAppState = 40 (limit:10)
+  !!! high_fan_out     RecentScansTab = 23 (limit:10)
+  !!! high_fan_out     ResultPhase = 22 (limit:10)
+  !!! high_fan_out     mcp_get_resource = 21 (limit:10)
+  !!  cc_exceeded      mcp_get_resource = 22 (limit:15)
+  !!  high_fan_out     LandingPhase = 19 (limit:10)
+  !!  high_fan_out     _run_audit_pipeline = 18 (limit:10)
+  !!  high_fan_out     _run_sandbox_analysis = 16 (limit:10)
+  !!  high_fan_out     handleDownloadToon = 16 (limit:10)
 
-MODULES[5] (top by size):
-  M[backend/server.py] 762L C:0 F:20 CC↑14 D:0 (python)
-  M[frontend/src/App.jsx] 680L C:0 F:25 CC↑5 D:0 (javascript)
-  M[project.sh] 35L C:0 F:0 CC↑0 D:0 (shell)
-  M[frontend/vite.config.js] 15L C:0 F:0 CC↑0 D:0 (javascript)
-  M[frontend/src/main.jsx] 10L C:0 F:0 CC↑0 D:0 (javascript)
-  LANGS: javascript:3/python:1/shell:1
+MODULES[68] (top by size):
+  M[backend/routers/mcp.py] 433L C:4 F:5 CC↑22 D:0 (python)
+  M[frontend/src/components/tabs/RecentScansTab.jsx] 320L C:0 F:10 CC↑13 D:0 (javascript)
+  M[backend/routers/audit.py] 302L C:0 F:8 CC↑7 D:1 (python)
+  M[frontend/src/components/phases/ResultPhase.jsx] 285L C:0 F:12 CC↑14 D:0 (javascript)
+  M[backend/routers/metrics.py] 257L C:0 F:6 CC↑10 D:0 (python)
+  M[backend/routers/webhook.py] 255L C:0 F:5 CC↑14 D:0 (python)
+  M[frontend/src/hooks/useAppState.js] 253L C:0 F:28 CC↑45 D:0 (javascript)
+  M[frontend/src/components/phases/LandingPhase.jsx] 211L C:0 F:8 CC↑5 D:0 (javascript)
+  M[backend/routers/badge.py] 139L C:0 F:4 CC↑5 D:0 (python)
+  M[e2e/specs/metrics.spec.js] 125L C:0 F:6 CC↑2 D:0 (javascript)
+  M[frontend/e2e/metrics.spec.js] 125L C:0 F:6 CC↑2 D:0 (javascript)
+  M[frontend/src/components/tabs/BadgeTab.jsx] 109L C:0 F:7 CC↑7 D:0 (javascript)
+  M[backend/services/scoring.py] 106L C:0 F:3 CC↑9 D:2 (python)
+  M[backend/database.py] 105L C:0 F:4 CC↑2 D:3 (python)
+  M[e2e/specs/scan-workflow.spec.js] 99L C:0 F:9 CC↑2 D:0 (javascript)
+  LANGS: javascript:49/python:18/shell:1
 
-HOTSPOTS[5]:
-  ★ _run_audit_pipeline fan=14  // Background pipeline: clone → code2llm → redup → pyqual → regix → report.
+HOTSPOTS[10]:
+  ★ useAppState fan=40  // Orchestrates 40 calls
+  ★ RecentScansTab fan=23  // Orchestrates 23 calls
+  ★ ResultPhase fan=22  // Orchestrates 22 calls
+  ★ mcp_get_resource fan=21  // Get content of a specific MCP resource by URI.
+  ★ LandingPhase fan=19  // Orchestrates 19 calls
 
-This i
-  ★ github_webhook fan=13  // Handle GitHub webhook events.
-
-Supported events:
-- pull_request (opened, synchro
-  ★ _analyze_pr_files fan=12  // Analysis pipeline, 12 stages
-  ★ _count_code_stats fan=11  // Count source files and lines.
-  ★ _get_installation_token fan=10  // Get GitHub App installation access token using JWT.
-
-In production, use PyJWT to
-
-REFACTOR[2]:
-  [1] H/H Split god module backend/server.py (762L, 0 classes)
-  [2] H/H Split god module frontend/src/App.jsx (680L, 0 classes)
+REFACTOR[6]:
+  [1] H/L Split useAppState (CC=45 → target CC<10)
+  [2] M/L Split mcp_get_resource (CC=22 → target CC<10)
+  [3] M/L Split mcp_invoke_tool (CC=17 → target CC<10)
+  [4] M/M Reduce useAppState fan-out (currently 40)
+  [5] M/M Reduce RecentScansTab fan-out (currently 23)
 
 EVOLUTION:
-  2026-04-09 CC̄=2.8 crit=1 1502L // Automated analysis
+  2026-04-10 CC̄=2.8 crit=8 5716L // Automated analysis

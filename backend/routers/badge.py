@@ -3,6 +3,7 @@ from typing import Optional
 from fastapi import APIRouter
 from fastapi.responses import Response
 
+from config import APP_URL
 from store import badge_cache
 
 router = APIRouter()
@@ -37,6 +38,24 @@ async def health_badge(repo_slug: str, style: str = "flat"):
         headers={
             "Cache-Control": "no-cache, no-store, must-revalidate",
             "ETag": f'"{grade}-{score}"',
+        },
+    )
+
+
+@router.get("/badge/scan-count.svg")
+async def scan_count_badge():
+    """
+    Generate SVG badge showing total number of scans performed.
+    """
+    from store import scan_history
+    
+    total_scans = len(scan_history)
+    svg = _generate_count_badge_svg("semcod scans", total_scans)
+    return Response(
+        content=svg,
+        media_type="image/svg+xml",
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
         },
     )
 
@@ -83,6 +102,38 @@ def _generate_badge_svg(grade: str, score: Optional[int], style: str, weekly_iss
     <text x=\"{label_width/2}\" y=\"14\">{label}</text>
     <text aria-hidden=\"true\" x=\"{label_width + value_width/2}\" y=\"15\" fill=\"#010101\" fill-opacity=\".3\">{value}</text>
     <text x=\"{label_width + value_width/2}\" y=\"14\">{value}</text>
+  </g>
+</svg>"""
+    return svg
+
+
+def _generate_count_badge_svg(label: str, count: int) -> str:
+    """Generate SVG badge for scan count."""
+    value = str(count)
+    label_width = len(label) * 6.5 + 12
+    value_width = len(value) * 7 + 12
+    total_width = label_width + value_width
+    color = "#06b6d4"
+
+    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{total_width}" height="20" role="img" aria-label="{label}: {value}">
+  <title>{label}: {value}</title>
+  <linearGradient id="s" x2="0" y2="100%">
+    <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+    <stop offset="1" stop-opacity=".1"/>
+  </linearGradient>
+  <clipPath id="r">
+    <rect width="{total_width}" height="20" rx="3" fill="#fff"/>
+  </clipPath>
+  <g clip-path="url(#r)">
+    <rect width="{label_width}" height="20" fill="#555"/>
+    <rect x="{label_width}" width="{value_width}" height="20" fill="{color}"/>
+    <rect width="{total_width}" height="20" fill="url(#s)"/>
+  </g>
+  <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="11">
+    <text aria-hidden="true" x="{label_width/2}" y="15" fill="#010101" fill-opacity=".3">{label}</text>
+    <text x="{label_width/2}" y="14">{label}</text>
+    <text aria-hidden="true" x="{label_width + value_width/2}" y="15" fill="#010101" fill-opacity=".3">{value}</text>
+    <text x="{label_width + value_width/2}" y="14">{value}</text>
   </g>
 </svg>"""
     return svg

@@ -23,6 +23,9 @@ test.describe('Smoke Tests', () => {
     
     await page.getByRole('button', { name: 'Audit' }).click();
     await expect(page.getByText('One-click')).toBeVisible();
+    
+    await page.getByRole('button', { name: /Ostatnie Skany/i }).click();
+    await expect(page.getByText('Ostatnio skanowane projekty')).toBeVisible();
   });
 
   test('sandbox repo input accepts URL', async ({ page }) => {
@@ -33,12 +36,17 @@ test.describe('Smoke Tests', () => {
     await expect(input).toHaveValue('github.com/facebook/react');
   });
 
-  test('clicking Scan button starts analysis flow', async ({ page }) => {
+  test('clicking Scan button shows demo result with all elements', async ({ page }) => {
     await page.goto('/');
-    
+
     await page.getByPlaceholder('github.com/owner/repo').fill('github.com/octocat/Hello-World');
     await page.getByRole('button', { name: 'Scan' }).click();
-    
+
     await expect(page.getByText(/Analyzing/i)).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText('Report:', { exact: false })).toBeVisible();
+    await expect(page.getByText('octocat/Hello-World')).toBeVisible();
+    await expect(page.getByText('Recommendations')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'New audit' })).toBeVisible();
+    await expect(page.getByText('Sandbox', { exact: false })).toBeVisible();
   });
 });

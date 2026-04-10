@@ -1,4 +1,4 @@
-import { C } from "../../lib/config";
+import { C } from "../../constants";
 
 export function ReposPhase({ repos, startAudit }) {
   return (

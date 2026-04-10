@@ -2,8 +2,8 @@ import { useAppState } from "./hooks/useAppState";
 import { Header } from "./components/Header";
 import { ProgressSteps } from "./components/ProgressSteps";
 import { LandingPhase, AuthPhase, ReposPhase, ScanningPhase, ResultPhase } from "./components/phases";
-import { PRBotTab, RepoTab, BadgeTab } from "./components/tabs";
-import { C } from "./lib/config";
+import { PRBotTab, RepoTab, BadgeTab, RecentScansTab } from "./components/tabs";
+import { C } from "./constants";
 
 export default function App() {
   const {
@@ -15,12 +15,13 @@ export default function App() {
     audit,
     repoUrl, setRepoUrl,
     isSandbox,
-    reset, startOAuth, confirmAuth, startAudit, startSandbox,
+    sessionToken, user,
+    reset, startOAuth, confirmAuth, startAudit, startSandbox, doLogout,
   } = useAppState();
 
   return (
     <div style={{ minHeight: "100vh", background: C.bg, color: C.fg }}>
-      <Header tab={tab} setTab={setTab} reset={reset} />
+      <Header tab={tab} setTab={setTab} reset={reset} user={user} doLogout={doLogout} />
 
       <main style={{ maxWidth: 1000, margin: "0 auto", padding: "32px 24px 80px" }}>
         {tab === "audit" && (
@@ -36,7 +37,7 @@ export default function App() {
               />
             )}
 
-            {phase === "auth" && <AuthPhase confirmAuth={confirmAuth} />}
+            {phase === "auth" && <AuthPhase />}
 
             {phase === "repos" && (
               <ReposPhase repos={repos} startAudit={startAudit} />
@@ -71,6 +72,7 @@ export default function App() {
         )}
 
         {tab === "prbot" && <PRBotTab />}
+        {tab === "recent" && <RecentScansTab />}
         {tab === "repo" && <RepoTab />}
         {tab === "badge" && <BadgeTab />}
       </main>

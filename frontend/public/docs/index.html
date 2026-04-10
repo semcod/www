@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semcod Documentation</title>
+    <style>
+        :root {
+            --bg-color: #05080f;
+            --text-color: #c9d1d9;
+            --link-color: #00d4ff;
+            --border-color: #1e2530;
+            --header-bg: #0d1117;
+            --card-bg: #0d1117;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        header {
+            background: var(--header-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        header h1 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            color: var(--link-color);
+        }
+        header h1 span { color: #88919c; }
+        header a {
+            color: var(--link-color);
+            text-decoration: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+        main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: border-color 0.2s;
+        }
+        .card:hover {
+            border-color: var(--link-color);
+        }
+        .card h3 {
+            color: var(--link-color);
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        .card p {
+            color: #88919c;
+            font-size: 0.9rem;
+        }
+        .card a {
+            display: inline-block;
+            margin-top: 1rem;
+            color: var(--link-color);
+            text-decoration: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+        .card a:hover {
+            text-decoration: underline;
+        }
+        h2 {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        .intro {
+            color: #88919c;
+            margin-bottom: 2rem;
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--link-color);
+            text-decoration: none;
+            margin-bottom: 2rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>semcod<span>.dev</span> Docs</h1>
+        <a href="/">← Back to App</a>
+    </header>
+    <main>
+        <a href="/" class="back-link">← Back to Application</a>
+        <h2>Documentation</h2>
+        <p class="intro">Complete documentation for Semcod - Code Health Analysis Tool</p>
+        
+        <div class="grid">
+            <div class="card">
+                <h3>🚀 Getting Started</h3>
+                <p>Quick start guide, installation, and first audit walkthrough.</p>
+                <a href="https://github.com/semcod/www/blob/main/docs/getting-started.md">Read →</a>
+            </div>
+            <div class="card">
+                <h3>📚 API Reference</h3>
+                <p>Complete REST API documentation with examples and endpoints.</p>
+                <a href="https://github.com/semcod/www/blob/main/docs/api.md">Read →</a>
+            </div>
+            <div class="card">
+                <h3>🏗️ Architecture</h3>
+                <p>System design, data flow, and component architecture.</p>
+                <a href="https://github.com/semcod/www/blob/main/docs/architecture.md">Read →</a>
+            </div>
+            <div class="card">
+                <h3>🤖 MCP Integration</h3>
+                <p>AI assistant integration via Model Context Protocol.</p>
+                <a href="https://github.com/semcod/www/blob/main/docs/MCP.md">Read →</a>
+            </div>
+        </div>
+        
+        <div class="card" style="margin-top: 2rem;">
+            <h3>🔗 GitHub Repository</h3>
+            <p>Source code, issues, and full documentation available on GitHub.</p>
+            <a href="https://github.com/semcod/www">github.com/semcod/www →</a>
+        </div>
+    </main>
+</body>
+</html>

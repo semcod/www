@@ -1,19 +1,26 @@
-# code2llm/evolution | 45 func | 2f | 2026-04-09
+# code2llm/evolution | 211 func | 45f | 2026-04-10
 
-NEXT[1] (ranked by impact):
-  [1] !! SPLIT           backend/server.py
-      WHY: 762L, 0 classes, max CC=14
-      EFFORT: ~4h  IMPACT: 10668
+NEXT[3] (ranked by impact):
+  [1] !! SPLIT-FUNC      useAppState  CC=45  fan=40
+      WHY: CC=45 exceeds 15
+      EFFORT: ~1h  IMPACT: 1800
+
+  [2] !  SPLIT-FUNC      mcp_get_resource  CC=22  fan=21
+      WHY: CC=22 exceeds 15
+      EFFORT: ~1h  IMPACT: 462
+
+  [3] !  SPLIT-FUNC      mcp_invoke_tool  CC=17  fan=15
+      WHY: CC=17 exceeds 15
+      EFFORT: ~1h  IMPACT: 255
 
 
-RISKS[1]:
-  ⚠ Splitting backend/server.py may break 20 import paths
+RISKS[0]: none
 
 METRICS-TARGET:
   CC̄:          2.8 → ≤2.0
-  max-CC:      14 → ≤7
-  god-modules: 1 → 0
-  high-CC(≥15): 0 → ≤0
+  max-CC:      45 → ≤20
+  god-modules: 0 → 0
+  high-CC(≥15): 3 → ≤1
   hub-types:   0 → ≤0
 
 PATTERNS (language parser shared logic):
@@ -41,4 +48,4 @@ PATTERNS (language parser shared logic):
     - Standardized FunctionInfo/ClassInfo models
 
 HISTORY:
-  (first run — no previous data)
+  prev CC̄=2.8 → now CC̄=2.8

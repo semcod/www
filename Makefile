@@ -16,6 +16,7 @@ help:
 	@echo "  make docker-up    - Uruchamia wszystko przez Docker Compose"
 	@echo "  make docker-down  - Zatrzymuje kontenery Docker"
 	@echo "  make test         - Uruchamia wszystkie testy"
+	@echo "  make test-fast    - Uruchamia TYLKO szybkie testy (unit, ~2s)"
 	@echo "  make test-backend - Uruchamia testy backendu (pytest)"
 	@echo "  make test-e2e     - Uruchamia testy E2E (Playwright)"
 	@echo "  make clean        - Czyści zainstalowane zależności"
@@ -75,6 +76,11 @@ clean:
 # Testy
 test: test-backend test-e2e
 	@echo "=== Wszystkie testy zakończone ==="
+
+test-fast:
+	@echo "=== Uruchamianie SZYBKICH testów (tylko unit/fast) ==="
+	cd backend && python3 -m pytest ../tests/backend/ -v -m "fast or unit" --tb=line -q
+	@echo "=== Szybkie testy zakończone (~2s) ==="
 
 test-backend:
 	@echo "=== Uruchamianie testów backendu ==="

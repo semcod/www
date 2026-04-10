@@ -1,0 +1,191 @@
+# vallm batch | 154f | 48✓ 23⚠ 19✗ | 2026-04-10
+
+SUMMARY:
+  scanned: 154  passed: 48 (31.2%)  warnings: 23  errors: 19  unsupported: 66
+
+WARNINGS[23]{path,score}:
+  frontend/src/App.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/components/GradeCircle.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/components/Header.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/components/LanguageBar.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/components/MetricCard.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/components/ProgressSteps.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/components/RecommendationCard.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/components/phases/AuthPhase.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/components/phases/LandingPhase.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/components/phases/ReposPhase.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/components/phases/ResultPhase.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/components/phases/ScanningPhase.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/components/tabs/BadgeTab.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/components/tabs/PRBotTab.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/components/tabs/RecentScansTab.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/components/tabs/RepoTab.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/components/ui/GradeCircle.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/components/ui/LanguageBar.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/components/ui/MetricCard.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/components/ui/RecommendationCard.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/main.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/vite.config.js,0.83
+    issues[1]{rule,severity,message,line}:
+      js.import.resolvable,warning,Module 'vite' not found,1
+  frontend/src/hooks/useAppState.js,0.89
+    issues[1]{rule,severity,message,line}:
+      js.import.resolvable,warning,Module 'react' not found,1
+
+ERRORS[19]{path,score}:
+  backend/routers/report.py,0.57
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'fastapi' not found,3
+      python.import.resolvable,error,Module 'fastapi.responses' not found,4
+      python.import.resolvable,error,Module 'config' not found,6
+  backend/server.py,0.57
+    issues[13]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'fastapi' not found,9
+      python.import.resolvable,error,Module 'fastapi.middleware.cors' not found,10
+      python.import.resolvable,error,Module 'config' not found,12
+      python.import.resolvable,error,Module 'routers.auth' not found,13
+      python.import.resolvable,error,Module 'routers.audit' not found,14
+      python.import.resolvable,error,Module 'routers.webhook' not found,15
+      python.import.resolvable,error,Module 'routers.badge' not found,16
+      python.import.resolvable,error,Module 'routers.report' not found,17
+      python.import.resolvable,error,Module 'routers.metrics' not found,18
+      python.import.resolvable,error,Module 'routers.mcp' not found,19
+      python.import.resolvable,error,Module 'store' not found,20
+      python.import.resolvable,error,Module 'uvicorn' not found,61
+      python.import.resolvable,error,Module 'config' not found,62
+  backend/tests/test_app.py,0.57
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'fastapi.testclient' not found,1
+      python.import.resolvable,error,Module 'server' not found,3
+  backend/tests/test_auth.py,0.57
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'fastapi.testclient' not found,1
+      python.import.resolvable,error,Module 'routers.auth' not found,3
+      python.import.resolvable,error,Module 'server' not found,4
+  backend/tests/test_badge_and_report.py,0.57
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'fastapi.testclient' not found,1
+      python.import.resolvable,error,Module 'server' not found,3
+      python.import.resolvable,error,Module 'store' not found,4
+  tests/backend/test_audit.py,0.57
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,3
+  tests/backend/test_mcp.py,0.57
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,3
+      python.import.resolvable,error,Module 'fastapi.testclient' not found,6
+      python.import.resolvable,error,Module 'server' not found,7
+  tests/backend/test_scoring.py,0.57
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,3
+      python.import.resolvable,error,Module 'services.scoring' not found,6
+  tests/backend/test_webhook.py,0.57
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,3
+  backend/routers/badge.py,0.64
+    issues[5]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'fastapi' not found,3
+      python.import.resolvable,error,Module 'fastapi.responses' not found,4
+      python.import.resolvable,error,Module 'config' not found,6
+      python.import.resolvable,error,Module 'store' not found,7
+      python.import.resolvable,error,Module 'store' not found,50
+  backend/routers/auth.py,0.68
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'fastapi' not found,2
+      python.import.resolvable,error,Module 'fastapi.responses' not found,3
+      python.import.resolvable,error,Module 'config' not found,5
+  tests/conftest.py,0.68
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,3
+      python.import.resolvable,error,Module 'fastapi.testclient' not found,4
+      python.import.resolvable,error,Module 'server' not found,12
+  backend/tests/test_metrics_api.py,0.74
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,9
+      python.import.resolvable,error,Module 'fastapi.testclient' not found,10
+      python.import.resolvable,error,Module 'server' not found,12
+  backend/routers/metrics.py,0.76
+    issues[4]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'fastapi' not found,3
+      python.import.resolvable,error,Module 'fastapi.responses' not found,4
+      python.import.resolvable,error,Module 'config' not found,5
+      python.import.resolvable,error,Module 'database' not found,10
+  backend/routers/mcp.py,0.81
+    issues[4]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'fastapi' not found,20
+      python.import.resolvable,error,Module 'store' not found,23
+      python.import.resolvable,error,Module 'database' not found,24
+      python.import.resolvable,error,Module 'services.scoring' not found,25
+  backend/routers/webhook.py,0.81
+    issues[5]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'fastapi' not found,9
+      python.import.resolvable,error,Module 'config' not found,12
+      python.import.resolvable,error,Module 'services.github_client' not found,13
+      python.import.resolvable,error,Module 'services.scoring' not found,14
+      python.import.resolvable,error,Module 'store' not found,15
+  backend/routers/audit.py,0.82
+    issues[6]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'fastapi' not found,12
+      python.import.resolvable,error,Module 'config' not found,14
+      python.import.resolvable,error,Module 'services.analyzer' not found,15
+      python.import.resolvable,error,Module 'services.scoring' not found,16
+      python.import.resolvable,error,Module 'store' not found,17
+      python.import.resolvable,error,Module 'database' not found,18
+  backend/scripts/scan_samples.py,0.84
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'routers.audit' not found,10
+      python.import.resolvable,error,Module 'database' not found,11
+      python.import.resolvable,error,Module 'sample_projects' not found,12
+  backend/services/github_client.py,0.86
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'jwt' not found,8
+      python.import.resolvable,error,Module 'config' not found,10
+
+UNSUPPORTED[5]{bucket,count}:
+  *.md,50
+  Dockerfile*,2
+  *.txt,2
+  *.yml,1
+  other,11

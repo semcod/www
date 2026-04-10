@@ -7,34 +7,50 @@ import shutil
 import tempfile
 from datetime import datetime
 from pathlib import Path
+from datetime import timezone
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from config import APP_URL
 from services.analyzer import count_code_stats, run_tool
 from services.scoring import calculate_health_score, generate_recommendations, score_to_grade
-from store import audit_results, badge_cache
+from store import audit_results, badge_cache, scan_history
+from database import save_scan, get_recent_scans
+from routers.auth import get_current_user
 
 router = APIRouter()
 
 
+def _utc_now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _schedule_background_task(coroutine):
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        coroutine.close()
+        return
+    loop.create_task(coroutine)
+
+
 @router.post("/api/audit")
-async def run_audit(request: Request):
-    """Run one-click audit on a repo. Body: { "repo": "owner/name", "token": "ghp_..." }"""
+async def run_audit(request: Request, user: dict = Depends(get_current_user)):
+    """Run one-click audit on a repo. Requires authentication."""
     body = await request.json()
     repo = body["repo"]
-    token = body["token"]
+    token = user["github_token"]
     audit_id = hashlib.sha256(
-        f"{repo}-{datetime.utcnow().isoformat()}".encode()
+        f"{repo}-{_utc_now_iso()}".encode()
     ).hexdigest()[:12]
 
     audit_results[audit_id] = {
         "status": "running",
         "repo": repo,
-        "started": datetime.utcnow().isoformat(),
+        "started": _utc_now_iso(),
     }
 
-    asyncio.create_task(_run_audit_pipeline(audit_id, repo, token))
+    _schedule_background_task(_run_audit_pipeline(audit_id, repo, token))
     return {"audit_id": audit_id, "status": "running"}
 
 
@@ -45,6 +61,23 @@ async def get_audit_result(audit_id: str):
     if not result:
         raise HTTPException(404, "Audit not found")
     return result
+
+
+@router.get("/api/scans/recent")
+async def get_recent_scans_api(limit: int = 100):
+    """Get list of recent scans with metrics."""
+    # Try to get from SQLite first, fall back to in-memory
+    try:
+        scans = get_recent_scans(limit)
+        total = len(scans)
+    except Exception:
+        scans = scan_history[:limit]
+        total = len(scan_history)
+    
+    return {
+        "scans": scans,
+        "total": total,
+    }
 
 
 @router.post("/api/analyze")
@@ -74,17 +107,17 @@ async def analyze_repo(request: Request):
 
     owner, repo = match.group(1), match.group(2)
     audit_id = hashlib.sha256(
-        f"{owner}/{repo}-{datetime.utcnow().isoformat()}".encode()
+        f"{owner}/{repo}-{_utc_now_iso()}".encode()
     ).hexdigest()[:12]
 
     audit_results[audit_id] = {
         "status": "running",
         "repo": f"{owner}/{repo}",
         "sandbox": sandbox,
-        "started": datetime.utcnow().isoformat(),
+        "started": _utc_now_iso(),
     }
 
-    asyncio.create_task(_run_sandbox_analysis(audit_id, repo_url, f"{owner}/{repo}"))
+    _schedule_background_task(_run_sandbox_analysis(audit_id, repo_url, f"{owner}/{repo}"))
     return {"audit_id": audit_id, "status": "running", "sandbox": True}
 
 
@@ -114,6 +147,13 @@ async def _run_audit_pipeline(audit_id: str, repo: str, token: str):
             fallback={"cc_avg": 0, "functions": 0, "classes": 0, "modules": 0},
         )
 
+        # Generate file contents for LLM prompts
+        code2llm_files = await run_tool(
+            "code2llm",
+            [str(repo_path), "-f", "all", "--format", "json"],
+            fallback={"files": []},
+        )
+
         redup_result = await run_tool(
             "redup",
             ["scan", str(repo_path), "--format", "json"],
@@ -132,7 +172,7 @@ async def _run_audit_pipeline(audit_id: str, repo: str, token: str):
         report = {
             "status": "complete",
             "repo": repo,
-            "completed": datetime.utcnow().isoformat(),
+            "completed": _utc_now_iso(),
             "stats": stats,
             "health_score": health_score,
             "grade": score_to_grade(health_score),
@@ -143,6 +183,7 @@ async def _run_audit_pipeline(audit_id: str, repo: str, token: str):
             },
             "recommendations": recommendations,
             "badge_url": f"{APP_URL}/badge/{repo.replace('/', '-')}.svg",
+            "files": code2llm_files.get("files", []),
         }
 
         audit_results[audit_id] = report
@@ -153,9 +194,22 @@ async def _run_audit_pipeline(audit_id: str, repo: str, token: str):
         badge_cache[repo] = {
             "score": health_score,
             "grade": score_to_grade(health_score),
-            "updated": datetime.utcnow().isoformat(),
+            "updated": _utc_now_iso(),
             "weekly_issues": weekly_issues,
         }
+
+        # Add to scan history (keep last 100)
+        scan_entry = {
+            "repo": repo,
+            "health_score": health_score,
+            "grade": score_to_grade(health_score),
+            "stats": stats,
+            "completed": _utc_now_iso(),
+            "badge_url": f"{APP_URL}/badge/{repo.replace('/', '-')}.svg",
+        }
+        scan_history.insert(0, scan_entry)
+        if len(scan_history) > 100:
+            scan_history.pop()
 
     except Exception as e:
         audit_results[audit_id] = {
@@ -200,6 +254,13 @@ async def _run_sandbox_analysis(audit_id: str, repo_url: str, repo: str):
             fallback={"cc_avg": 0, "functions": 0, "classes": 0, "modules": 0},
         )
 
+        # Generate file contents for LLM prompts
+        code2llm_files = await run_tool(
+            "code2llm",
+            [str(repo_path), "-f", "all", "--format", "json"],
+            fallback={"files": []},
+        )
+
         redup_result = await run_tool(
             "redup",
             ["scan", str(repo_path), "--format", "json"],
@@ -219,7 +280,7 @@ async def _run_sandbox_analysis(audit_id: str, repo_url: str, repo: str):
             "status": "complete",
             "repo": repo,
             "sandbox": True,
-            "completed": datetime.utcnow().isoformat(),
+            "completed": _utc_now_iso(),
             "stats": stats,
             "health_score": health_score,
             "grade": score_to_grade(health_score),
@@ -229,9 +290,24 @@ async def _run_sandbox_analysis(audit_id: str, repo_url: str, repo: str):
                 "quality": pyqual_result,
             },
             "recommendations": recommendations,
+            "files": code2llm_files.get("files", []),
         }
 
         audit_results[audit_id] = report
+
+        # Add to scan history (keep last 100)
+        scan_entry = {
+            "repo": repo,
+            "health_score": health_score,
+            "grade": score_to_grade(health_score),
+            "stats": stats,
+            "completed": _utc_now_iso(),
+            "sandbox": True,
+            "badge_url": f"{APP_URL}/badge/{repo.replace('/', '-')}.svg",
+        }
+        scan_history.insert(0, scan_entry)
+        if len(scan_history) > 100:
+            scan_history.pop()
 
     except Exception as e:
         audit_results[audit_id] = {

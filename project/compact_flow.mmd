@@ -1,3 +1,10 @@
 flowchart TD
-    backend__server["backend.server<br/>20 funcs"]
-    frontend__src["frontend.src<br/>25 funcs"]
+    backend__database["backend.database<br/>4 funcs"]
+    backend__routers["backend.routers<br/>32 funcs"]
+    backend__sample_projects["backend.sample_projects<br/>1 funcs"]
+    backend__scripts["backend.scripts<br/>1 funcs"]
+    backend__services["backend.services<br/>6 funcs"]
+    backend__routers ==>|19| backend__services
+    backend__routers ==>|9| backend__database
+    backend__scripts -->|1| backend__sample_projects
+    backend__scripts -->|1| backend__routers

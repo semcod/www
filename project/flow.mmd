@@ -4,22 +4,22 @@ flowchart TD
     classDef entry fill:#4dabf7,stroke:#1971c2,color:#fff
 
     subgraph Core
-        frontend__src__App__API["API"]
-        frontend__src__App__GradeCircle["GradeCircle"]
-        frontend__src__App__color["color"]
-        frontend__src__App__r["r"]
-        frontend__src__App__circ["circ"]
-        frontend__src__App__targetOffset["targetOffset"]
-        frontend__src__App__t["t"]
-        frontend__src__App__MetricCard["MetricCard"]
-        frontend__src__App__RecommendationCard["RecommendationCard"]
-        frontend__src__App__LanguageBar["LanguageBar"]
-        frontend__src__App__total["total"]
-        frontend__src__App__PRCommentPreview["PRCommentPreview"]
-        frontend__src__App__BadgeSVG["BadgeSVG"]
-        frontend__src__App__labelW["labelW"]
-        frontend__src__App__valueText["valueText"]
-        ...["+19 more"]
+        backend__services__scoring__score_to_grade["score_to_grade"]
+        backend__services__github_client__get_installation_token["get_installation_token"]
+        backend__server__health_check["health_check"]
+        backend__routers__auth__github_oauth_start["github_oauth_start"]
+        backend__routers__auth__github_oauth_callback["github_oauth_callback"]
+        backend__routers__auth__list_repos["list_repos"]
+        backend__routers__webhook__github_webhook["github_webhook"]
+        backend__routers__webhook___handle_pr_event["_handle_pr_event"]
+        backend__routers__webhook___analyze_pr_files("_analyze_pr_files CC=14")
+        backend__routers__badge__health_badge["health_badge"]
+        backend__routers__badge__scan_count_badge["scan_count_badge"]
+        backend__routers__metrics__get_standard_metrics["get_standard_metrics"]
+        backend__routers__metrics__get_metrics_summary["get_metrics_summary"]
+        backend__routers__metrics__get_repository_metrics["get_repository_metrics"]
+        backend__routers__metrics__download_project_prompt["download_project_prompt"]
+        ...["+162 more"]
     end
 
-    class frontend__src__App__API,frontend__src__App__GradeCircle,frontend__src__App__color,frontend__src__App__r,frontend__src__App__circ,frontend__src__App__targetOffset,frontend__src__App__t,frontend__src__App__MetricCard,frontend__src__App__RecommendationCard,frontend__src__App__LanguageBar entry
+    class backend__services__github_client__get_installation_token,backend__server__health_check,backend__routers__auth__github_oauth_start,backend__routers__auth__github_oauth_callback,backend__routers__auth__list_repos,backend__routers__webhook__github_webhook,backend__routers__badge__health_badge,backend__routers__badge__scan_count_badge,backend__routers__metrics__get_standard_metrics,backend__routers__metrics__get_metrics_summary entry

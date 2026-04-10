@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { C, gradeColor } from "../../lib/config";
+import { C, gradeColor } from "../../constants";
+import { config } from "../../config";
 
 function BadgeSVG({ grade, score, width = 152 }) {
   const color = gradeColor(grade);
@@ -34,7 +35,7 @@ function BadgeSVG({ grade, score, width = 152 }) {
 export function BadgeTab() {
   const [badgeRepo, setBadgeRepo] = useState("owner/repo");
 
-  const badgeUrl = `https://semcod.dev/badge/${badgeRepo.replace("/", "-")}.svg`;
+  const badgeUrl = config.getBadgeUrl(badgeRepo);
   const markdown = `![Code Health](${badgeUrl})`;
 
   return (

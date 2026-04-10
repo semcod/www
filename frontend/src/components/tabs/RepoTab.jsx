@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { C } from "../../lib/config";
+import { C } from "../../constants";
 
 export function RepoTab() {
   const [repoUrl, setRepoUrl] = useState("");

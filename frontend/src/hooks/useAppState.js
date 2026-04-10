@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
-import { analyzePublicRepo, fetchAudit, fetchRepos, startAudit as startAuditRequest } from "../api";
-import { DEMO_REPOS, DEMO_AUDIT } from "../constants";
+import { analyzePublicRepo, fetchAudit, fetchRepos, fetchMe, logout as logoutRequest, startAudit as startAuditRequest } from "../api";
+import { DEMO_REPOS, DEMO_AUDIT, API } from "../constants";
+
+const SESSION_KEY = "semcod_session";
 
 export function useAppState() {
   const [tab, setTab] = useState("audit");
@@ -11,21 +13,47 @@ export function useAppState() {
   const [scanLabel, setScanLabel] = useState("");
   const [audit, setAudit] = useState(null);
   const [badgeRepo, setBadgeRepo] = useState("acme/backend-api");
-  const [token, setToken] = useState(null);
+  const [sessionToken, setSessionToken] = useState(() => localStorage.getItem(SESSION_KEY) || null);
+  const [user, setUser] = useState(null);
   const [repoUrl, setRepoUrl] = useState("");
   const [isSandbox, setIsSandbox] = useState(false);
   const [auditId, setAuditId] = useState(null);
+
+  // Read session token from URL callback (OAuth redirect) on mount
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const session = searchParams.get("session");
+    if (session) {
+      setSessionToken(session);
+      localStorage.setItem(SESSION_KEY, session);
+      // Clean URL
+      window.history.replaceState({}, "", window.location.pathname + window.location.hash);
+    }
+  }, []);
+
+  // Fetch user profile when session token is available
+  useEffect(() => {
+    if (!sessionToken) {
+      setUser(null);
+      return;
+    }
+    fetchMe(sessionToken)
+      .then(setUser)
+      .catch(() => {
+        // Session expired or invalid
+        localStorage.removeItem(SESSION_KEY);
+        setSessionToken(null);
+        setUser(null);
+      });
+  }, [sessionToken]);
 
   // Read state from URL hash on mount
   useEffect(() => {
     const hash = window.location.hash.slice(1);
     const params = new URLSearchParams(hash);
 
-    const t = params.get("token");
-    if (t) setToken(t);
-
     const tabParam = params.get("tab");
-    if (tabParam && ["audit", "prbot", "badge"].includes(tabParam)) {
+    if (tabParam && ["audit", "prbot", "badge", "recent", "repo"].includes(tabParam)) {
       setTab(tabParam);
     }
 
@@ -67,11 +95,6 @@ export function useAppState() {
           .catch(() => {});
       }
     }
-
-    const searchParams = new URLSearchParams(window.location.search);
-    if (searchParams.get("token")) {
-      window.history.replaceState({}, "", window.location.pathname + window.location.hash);
-    }
   }, []);
 
   // Update URL hash when state changes
@@ -79,21 +102,20 @@ export function useAppState() {
     const params = new URLSearchParams();
     params.set("tab", tab);
     params.set("phase", phase);
-    if (token) params.set("token", token);
     if (selectedRepo?.full_name) params.set("repo", selectedRepo.full_name);
     if (isSandbox) params.set("sandbox", "1");
     if (auditId) params.set("audit", auditId);
 
     window.history.replaceState({}, "", `#${params.toString()}`);
-  }, [tab, phase, token, selectedRepo, isSandbox, auditId]);
+  }, [tab, phase, selectedRepo, isSandbox, auditId]);
 
-  // Fetch repos when token available
+  // Fetch repos when session token available and phase is repos
   useEffect(() => {
-    if (!token || phase !== "repos") return;
-    fetchRepos(token)
+    if (!sessionToken || phase !== "repos") return;
+    fetchRepos(sessionToken)
       .then(setRepos)
       .catch(() => setRepos(DEMO_REPOS));
-  }, [token, phase]);
+  }, [sessionToken, phase]);
 
   // Scan animation
   useEffect(() => {
@@ -168,20 +190,24 @@ export function useAppState() {
   }, []);
 
   const startOAuth = useCallback(() => {
-    setPhase("auth");
+    window.location.href = `${API}/auth/github`;
   }, []);
 
   const confirmAuth = useCallback(() => {
-    setRepos(DEMO_REPOS);
-    setPhase("repos");
-  }, []);
+    if (sessionToken) {
+      setPhase("repos");
+    } else {
+      setRepos(DEMO_REPOS);
+      setPhase("repos");
+    }
+  }, [sessionToken]);
 
   const startAudit = useCallback((repo) => {
     setSelectedRepo(repo);
     setPhase("scanning");
 
-    if (token) {
-      startAuditRequest(repo.full_name, token)
+    if (sessionToken) {
+      startAuditRequest(repo.full_name, sessionToken)
         .then((data) => {
           if (data.audit_id) {
             setAuditId(data.audit_id);
@@ -189,7 +215,7 @@ export function useAppState() {
         })
         .catch(() => {});
     }
-  }, [token]);
+  }, [sessionToken]);
 
   const startSandbox = useCallback(() => {
     if (!repoUrl.trim()) return;
@@ -236,6 +262,21 @@ export function useAppState() {
     }
   }, [repoUrl]);
 
+  const doLogout = useCallback(() => {
+    if (sessionToken) {
+      logoutRequest(sessionToken).catch(() => {});
+    }
+    localStorage.removeItem(SESSION_KEY);
+    setSessionToken(null);
+    setUser(null);
+    setPhase("landing");
+    setSelectedRepo(null);
+    setAudit(null);
+    setIsSandbox(false);
+    setRepoUrl("");
+    setAuditId(null);
+  }, [sessionToken]);
+
   return {
     tab, setTab,
     phase, setPhase,
@@ -244,10 +285,11 @@ export function useAppState() {
     scanProgress, scanLabel,
     audit, setAudit,
     badgeRepo, setBadgeRepo,
-    token, setToken,
+    sessionToken, setSessionToken,
+    user,
     repoUrl, setRepoUrl,
     isSandbox, setIsSandbox,
     auditId, setAuditId,
-    reset, startOAuth, confirmAuth, startAudit, startSandbox,
+    reset, startOAuth, confirmAuth, startAudit, startSandbox, doLogout,
   };
 }

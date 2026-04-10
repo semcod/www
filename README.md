@@ -1,5 +1,18 @@
 # Semcod GitHub App
 
+
+## AI Cost Tracking
+
+![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.1.1-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
+![AI Cost](https://img.shields.io/badge/AI%20Cost-$0.60-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-3.0h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
+
+- 🤖 **LLM usage:** $0.6000 (4 commits)
+- 👤 **Human dev:** ~$300 (3.0h @ $100/h, 30min dedup)
+
+Generated on 2026-04-10 using [openrouter/qwen/qwen3-coder-next](https://openrouter.ai/qwen/qwen3-coder-next)
+
+---
+
 **One-click Audit · PR Comment Bot · Code Health Badge**
 
 Zautomatyzowany pipeline jakości kodu jako GitHub App — od podłączenia repo do badge w README w 60 sekund.
@@ -96,6 +109,37 @@ docker-compose up -d
 | `POST /webhook/github` | Webhook (PR bot, instalacje) |
 | `GET /badge/{owner-repo}.svg` | Badge SVG |
 | `GET /api/health` | Health check |
+| `GET /mcp/info` | MCP server info |
+| `GET /mcp/resources` | MCP resources list |
+| `POST /mcp/invoke` | MCP tool invocation |
+
+## MCP Integration
+
+Semcod supports [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) for AI assistant integration. AI assistants can programmatically:
+- Start audits: `POST /mcp/invoke` with `{"name": "start_audit"}`
+- Check scan status: `{"name": "get_scan_status"}`
+- Query metrics: `GET /mcp/resources/content?uri=metrics://summary`
+
+📚 [Full MCP Documentation](./docs/MCP.md)
+
+## Testowanie
+
+```bash
+# Szybkie testy (~2 sekundy) - tylko unit tests
+make test-fast
+
+# Wszystkie testy backendu
+make test-backend
+
+# Testy E2E (wymaga uruchomionego frontendu)
+make test-e2e
+```
+
+Testy są oznaczone markerami:
+- `@pytest.mark.fast` - szybkie testy bez zewnętrznych zależności
+- `@pytest.mark.unit` - izolowane testy jednostkowe
+- `@pytest.mark.integration` - testy integracyjne
+- `@pytest.mark.slow` - wolne testy (domyślnie pomijane w `test-fast`)
 
 ## Model cenowy (rekomendowany)
 
@@ -104,6 +148,15 @@ docker-compose up -d
 | **Free** | $0 | Public repo, 3 skany/mies., badge, PR bot (metrics only) |
 | **Pro** | $9/mies. | Private repo, unlimited, PR bot + auto-fix suggestions |
 | **Team** | $29/mies. | Org-wide, dashboard, custom rules, priority support |
+
+## Dokumentacja
+
+📖 **[Pełna dokumentacja](https://semcod.github.io/www/)** - dostępna na GitHub Pages
+
+- [Getting Started](./docs/getting-started.md) - Szybki start
+- [API Reference](./docs/api.md) - Dokumentacja API
+- [Architecture](./docs/architecture.md) - Architektura systemu
+- [MCP Integration](./docs/MCP.md) - Integracja z AI
 
 ## Licencja
 

@@ -1,13 +1,11 @@
 """Webhook handler tests."""
 
 import pytest
-from fastapi.testclient import TestClient
-from server import app
 
-client = TestClient(app)
+pytestmark = [pytest.mark.fast, pytest.mark.unit]
 
 
-def test_webhook_without_signature_ignored():
+def test_webhook_without_signature_ignored(client):
     """Test webhook without signature is processed (no secret set)."""
     response = client.post(
         "/webhook/github",
@@ -18,7 +16,7 @@ def test_webhook_without_signature_ignored():
     assert response.status_code in [200, 202]
 
 
-def test_webhook_installation_event():
+def test_webhook_installation_event(client):
     """Test installation created webhook."""
     payload = {
         "action": "created",

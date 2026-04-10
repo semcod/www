@@ -1,6 +1,38 @@
-import { C } from "../../lib/config";
+import { useState, useEffect } from "react";
+import { C, gradeColor } from "../../constants";
+import { getShareUrls } from "../../utils/share";
 
 export function LandingPhase({ startOAuth, repoUrl, setRepoUrl, startSandbox }) {
+  const [recentScans, setRecentScans] = useState([]);
+
+  useEffect(() => {
+    fetchRecentScans();
+  }, []);
+
+  const fetchRecentScans = async () => {
+    try {
+      const response = await fetch("/api/scans/recent?limit=5");
+      const data = await response.json();
+      setRecentScans(data.scans || []);
+    } catch (error) {
+      console.error("Failed to fetch recent scans:", error);
+    }
+  };
+
+  const handleShare = (scan, platform) => {
+    const shareUrls = getShareUrls(scan, scan.repo);
+    window.open(shareUrls[platform], '_blank', 'width=600,height=400');
+  };
+
+  const formatDate = (isoString) => {
+    const date = new Date(isoString);
+    return date.toLocaleDateString("pl-PL", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
+
   return (
     <div style={{ textAlign: "center", padding: "80px 0 60px" }}>
       <div style={{
@@ -66,6 +98,114 @@ export function LandingPhase({ startOAuth, repoUrl, setRepoUrl, startSandbox }) 
           </div>
         ))}
       </div>
+
+      {recentScans.length > 0 && (
+        <div style={{ marginTop: 80, maxWidth: 800, margin: "80px auto 0" }}>
+          <h3 style={{ fontSize: 18, fontWeight: 700, marginBottom: 24, textAlign: "center" }}>
+            Ostatnio skanowane projekty
+          </h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {recentScans.map((scan, index) => (
+              <div
+                key={`${scan.repo}-${index}`}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 16,
+                  padding: 16,
+                  background: C.bg2,
+                  borderRadius: 10,
+                  border: `1px solid ${C.border}`,
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                }}
+                onClick={() => {
+                  window.open(`https://github.com/${scan.repo}`, "_blank");
+                }}
+              >
+                <div
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: "50%",
+                    background: gradeColor(scan.grade),
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontWeight: 700,
+                    color: C.bg,
+                    fontSize: 14,
+                    flexShrink: 0,
+                  }}
+                >
+                  {scan.grade}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 600,
+                      color: C.fg,
+                      marginBottom: 4,
+                      fontFamily: "'JetBrains Mono', monospace",
+                    }}
+                  >
+                    {scan.repo}
+                  </div>
+                  <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                    <span style={{ fontSize: 11, color: C.fg3 }}>
+                      {formatDate(scan.completed)}
+                    </span>
+                    <span style={{ fontSize: 11, color: C.fg3 }}>
+                      {scan.health_score}% zdrowie kodu
+                    </span>
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: 6 }}>
+                  <button
+                    style={{
+                      padding: "6px 10px",
+                      background: "#1DA1F2",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: 6,
+                      fontSize: 11,
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleShare(scan, 'twitter');
+                    }}
+                    title="Share on X (Twitter)"
+                  >
+                    𝕏
+                  </button>
+                  <button
+                    style={{
+                      padding: "6px 10px",
+                      background: "#0077B5",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: 6,
+                      fontSize: 11,
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleShare(scan, 'linkedin');
+                    }}
+                    title="Share on LinkedIn"
+                  >
+                    in
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
