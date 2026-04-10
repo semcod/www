@@ -4,7 +4,7 @@ import { test, expect } from '@playwright/test';
 const skipInCI = process.env.CI ? test.skip : test;
 
 test.describe('Metrics API', () => {
-  const baseURL = 'http://localhost:8000';
+  const baseURL = 'http://localhost:9000';
 
   skipInCI('GET /api/metrics/standard returns standardized metrics', async ({ request }) => {
     const response = await request.get(`${baseURL}/api/metrics/standard?limit=5`);
