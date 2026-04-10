@@ -207,6 +207,79 @@ done
 echo -e "  5 concurrent health checks... ${GREEN}PASS${NC}"
 echo ""
 
+# 21. Benchmark Tests
+echo "=== Benchmark Tests ==="
+test_endpoint "Benchmark summary" "GET" "/api/benchmark/summary" "" "200" ""
+
+# Create a benchmark case
+CASE_RESPONSE=$(curl -s -X POST "$BASE_URL/api/benchmark/cases" -H "Content-Type: application/json" -d '{"case_id":"BM-E2E-001","repo":"acme/backend-api","source_type":"pr","change_type":"bugfix","baseline_detected":true,"baseline_tools":["ruff","ci"]}')
+if echo "$CASE_RESPONSE" | jq -e '.case_id' > /dev/null 2>&1; then
+    echo -e "  Create benchmark case... ${GREEN}PASS${NC}"
+    ((pass_count++))
+else
+    echo -e "  Create benchmark case... ${RED}FAIL${NC}"
+    ((fail_count++))
+fi
+
+test_endpoint "List benchmark cases" "GET" "/api/benchmark/cases" "" "200" ""
+test_endpoint "Get specific benchmark case" "GET" "/api/benchmark/cases/BM-E2E-001" "" "200" ""
+
+# Patch case
+PATCH_RESPONSE=$(curl -s -X PATCH "$BASE_URL/api/benchmark/cases/BM-E2E-001" -H "Content-Type: application/json" -d '{"reviewer_verdict":"go","pr_candidate":true}')
+if echo "$PATCH_RESPONSE" | jq -e '.reviewer_verdict == "go"' > /dev/null 2>&1; then
+    echo -e "  Patch benchmark case... ${GREEN}PASS${NC}"
+    ((pass_count++))
+else
+    echo -e "  Patch benchmark case... ${RED}FAIL${NC}"
+    ((fail_count++))
+fi
+
+# Post decision
+DECISION_RESPONSE=$(curl -s -X POST "$BASE_URL/api/benchmark/cases/BM-E2E-001/decision" -H "Content-Type: application/json" -d '{"deployment_model_selected":"hybrid","pr_candidate":true}')
+if echo "$DECISION_RESPONSE" | jq -e '.deployment_model_selected == "hybrid"' > /dev/null 2>&1; then
+    echo -e "  Post benchmark decision... ${GREEN}PASS${NC}"
+    ((pass_count++))
+else
+    echo -e "  Post benchmark decision... ${RED}FAIL${NC}"
+    ((fail_count++))
+fi
+
+# Post feedback
+FEEDBACK_RESPONSE=$(curl -s -X POST "$BASE_URL/api/benchmark/cases/BM-E2E-001/recommendations/rec123abc/feedback" -H "Content-Type: application/json" -d '{"accepted":true,"novelty_score":3,"usefulness_score":2,"notes":"Good recommendation"}')
+if echo "$FEEDBACK_RESPONSE" | jq -e '.accepted == true' > /dev/null 2>&1; then
+    echo -e "  Post recommendation feedback... ${GREEN}PASS${NC}"
+    ((pass_count++))
+else
+    echo -e "  Post recommendation feedback... ${RED}FAIL${NC}"
+    ((fail_count++))
+fi
+
+# Post event
+EVENT_RESPONSE=$(curl -s -X POST "$BASE_URL/api/benchmark/cases/BM-E2E-001/events" -H "Content-Type: application/json" -d '{"event_name":"result_viewed","audit_id":"abc123"}')
+if echo "$EVENT_RESPONSE" | jq -e '.event_name == "result_viewed"' > /dev/null 2>&1; then
+    echo -e "  Post benchmark event... ${GREEN}PASS${NC}"
+    ((pass_count++))
+else
+    echo -e "  Post benchmark event... ${RED}FAIL${NC}"
+    ((fail_count++))
+fi
+
+test_endpoint "List benchmark events" "GET" "/api/benchmark/cases/BM-E2E-001/events" "" "200" ""
+test_endpoint "List recommendation feedback" "GET" "/api/benchmark/cases/BM-E2E-001/recommendations/feedback" "" "200" ""
+test_endpoint "Export benchmark JSON" "GET" "/api/benchmark/export.json" "" "200" ""
+test_endpoint "Export benchmark CSV" "GET" "/api/benchmark/export.csv" "" "200" ""
+
+# Benchmark error scenarios
+echo ""
+echo "=== Benchmark Error Scenarios ==="
+test_endpoint "Duplicate case rejection" "POST" "/api/benchmark/cases" '{"case_id":"BM-E2E-001","repo":"test"}' "409" ""
+test_endpoint "Get non-existent case" "GET" "/api/benchmark/cases/NONEXISTENT" "" "404" ""
+test_endpoint "Patch non-existent case" "PATCH" "/api/benchmark/cases/NONEXISTENT" '{"reviewer_verdict":"go"}' "404" ""
+test_endpoint "Post decision for non-existent case" "POST" "/api/benchmark/cases/NONEXISTENT/decision" '{"pr_candidate":true}' "404" ""
+test_endpoint "Post feedback for non-existent case" "POST" "/api/benchmark/cases/NONEXISTENT/recommendations/rec123/feedback" '{"accepted":true}' "404" ""
+test_endpoint "Post event for non-existent case" "POST" "/api/benchmark/cases/NONEXISTENT/events" '{"event_name":"test"}' "404" ""
+echo ""
+
 # Summary
 echo "=========================================="
 echo "Test Summary"

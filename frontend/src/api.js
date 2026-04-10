@@ -190,3 +190,69 @@ export async function getAppStatus(repo, provider, sessionToken) {
   if (!res.ok) throw new Error("Failed to fetch app status");
   return res.json();
 }
+
+
+// ─── Benchmark ────────────────────────────────────────────────────────────────
+
+export async function createBenchmarkCase(payload) {
+  const res = await fetch(`${API}/api/benchmark/cases`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error("Failed to create benchmark case");
+  return res.json();
+}
+
+export async function updateBenchmarkCase(caseId, updates) {
+  const res = await fetch(`${API}/api/benchmark/cases/${caseId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updates),
+  });
+  if (!res.ok) throw new Error("Failed to update benchmark case");
+  return res.json();
+}
+
+export async function submitRecommendationFeedback(caseId, recommendationId, payload) {
+  const res = await fetch(
+    `${API}/api/benchmark/cases/${caseId}/recommendations/${recommendationId}/feedback`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }
+  );
+  if (!res.ok) throw new Error("Failed to submit recommendation feedback");
+  return res.json();
+}
+
+export async function submitBenchmarkDecision(caseId, payload) {
+  const res = await fetch(`${API}/api/benchmark/cases/${caseId}/decision`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error("Failed to submit benchmark decision");
+  return res.json();
+}
+
+export async function trackBenchmarkEvent(caseId, payload) {
+  const res = await fetch(`${API}/api/benchmark/cases/${caseId}/events`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error("Failed to track benchmark event");
+  return res.json();
+}
+
+export async function fetchBenchmarkSummary() {
+  const res = await fetch(`${API}/api/benchmark/summary`);
+  if (!res.ok) throw new Error("Failed to fetch benchmark summary");
+  return res.json();
+}
+
+export function downloadBenchmarkExport(format) {
+  window.open(`${API}/api/benchmark/export.${format}`, "_blank");
+}

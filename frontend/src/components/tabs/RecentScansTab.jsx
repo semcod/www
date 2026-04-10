@@ -11,6 +11,7 @@ import { fetchRecentScans } from "./recentScansHelpers.js";
 export function RecentScansTab() {
   const [scans, setScans] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [benchmarkOnly, setBenchmarkOnly] = useState(false);
 
   useEffect(() => {
     fetchRecentScans()
@@ -38,11 +39,23 @@ export function RecentScansTab() {
       {scans.length === 0 ? (
         <RecentScansEmptyState />
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {scans.map((scan, index) => (
+        <>
+          <div style={{ marginBottom: 10, display: "flex", alignItems: "center", gap: 8 }}>
+            <label style={{ fontSize: 12, color: C.fg2, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
+              <input
+                type="checkbox"
+                checked={benchmarkOnly}
+                onChange={(e) => setBenchmarkOnly(e.target.checked)}
+              />
+              Tylko benchmark
+            </label>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {(benchmarkOnly ? scans.filter((s) => s.benchmark_mode) : scans).map((scan, index) => (
             <RecentScanCard key={`${scan.repo}-${index}`} scan={scan} />
           ))}
-        </div>
+          </div>
+        </>
       )}
 
       <RecentScansBadgeInfo />

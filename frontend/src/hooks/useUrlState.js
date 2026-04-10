@@ -90,6 +90,10 @@ export function useHashBootstrap({
     }
 
     setAuditId(auditParam);
+    // Only fetch audit data when in audit tab, not marketplace
+    if (tabParam !== "audit") {
+      return;
+    }
     if (!phaseParam || !["scanning", "result", "value", "trial"].includes(phaseParam)) {
       return;
     }

@@ -19,6 +19,7 @@ export default function App() {
     sessionToken, user,
     reset, startOAuth, confirmAuth, startAudit, startSandbox, startDemoLogin, doLogout,
     billingStatus, paywallVisible, checkoutLoading, openCheckout, dismissPaywall,
+    benchmarkCaseId, setBenchmarkCaseId,
   } = useAppState();
 
   return (
@@ -69,6 +70,8 @@ export default function App() {
                 selectedRepo={selectedRepo}
                 isSandbox={isSandbox}
                 reset={reset}
+                benchmarkCaseId={benchmarkCaseId}
+                setBenchmarkCaseId={setBenchmarkCaseId}
               />
             )}
 
@@ -78,6 +81,8 @@ export default function App() {
                 selectedRepo={selectedRepo}
                 isSandbox={isSandbox}
                 reset={reset}
+                benchmarkCaseId={benchmarkCaseId}
+                setBenchmarkCaseId={setBenchmarkCaseId}
               />
             )}
           </>

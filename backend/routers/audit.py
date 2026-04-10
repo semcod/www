@@ -43,15 +43,26 @@ async def run_audit(request: Request, user: dict = Depends(get_current_user)):
         f"{repo}-{_utc_now_iso()}".encode()
     ).hexdigest()[:12]
 
+    benchmark_meta = {
+        "case_id": body.get("case_id"),
+        "source_type": body.get("source_type"),
+        "change_type": body.get("change_type"),
+        "baseline_detected": body.get("baseline_detected"),
+        "benchmark_mode": body.get("benchmark_mode", False),
+        "ticket_id": body.get("ticket_id"),
+        "pr_reference": body.get("pr_reference"),
+    }
+
     # Save initial audit status to database
     save_audit_result(audit_id, {
         "status": "running",
         "repo": repo,
         "started": _utc_now_iso(),
+        **{k: v for k, v in benchmark_meta.items() if v is not None},
     })
 
     _schedule_background_task(_run_audit_pipeline(audit_id, repo, token))
-    return {"audit_id": audit_id, "status": "running"}
+    return {"audit_id": audit_id, "status": "running", **{k: v for k, v in benchmark_meta.items() if v is not None}}
 
 
 @router.get("/api/audit/{audit_id}")
@@ -110,16 +121,27 @@ async def analyze_repo(request: Request):
         f"{owner}/{repo}-{_utc_now_iso()}".encode()
     ).hexdigest()[:12]
 
+    benchmark_meta = {
+        "case_id": body.get("case_id"),
+        "source_type": body.get("source_type"),
+        "change_type": body.get("change_type"),
+        "baseline_detected": body.get("baseline_detected"),
+        "benchmark_mode": body.get("benchmark_mode", False),
+        "ticket_id": body.get("ticket_id"),
+        "pr_reference": body.get("pr_reference"),
+    }
+
     # Save initial audit status to database
     save_audit_result(audit_id, {
         "status": "running",
         "repo": f"{owner}/{repo}",
         "sandbox": sandbox,
         "started": _utc_now_iso(),
+        **{k: v for k, v in benchmark_meta.items() if v is not None},
     })
 
     _schedule_background_task(_run_sandbox_analysis(audit_id, repo_url, f"{owner}/{repo}"))
-    return {"audit_id": audit_id, "status": "running", "sandbox": True}
+    return {"audit_id": audit_id, "status": "running", "sandbox": True, **{k: v for k, v in benchmark_meta.items() if v is not None}}
 
 
 async def _run_audit_pipeline(audit_id: str, repo: str, token: str):

@@ -13,6 +13,7 @@ import { fetchRepos } from "../api.js";
 import { DEMO_REPOS } from "../constants.js";
 import { useBilling } from "./useBilling.js";
 import { useAuditActions } from "./useAuditActions.js";
+import { useBenchmarkTracking } from "./useBenchmarkTracking.js";
 
 const SESSION_KEY = "semcod_session";
 
@@ -26,6 +27,8 @@ export function useAppState() {
   const [user, setUser] = useState(null);
   const [repoUrl, setRepoUrl] = useState("");
   const [isSandbox, setIsSandbox] = useState(false);
+  const [benchmarkMode, setBenchmarkMode] = useState(false);
+  const [benchmarkCaseId, setBenchmarkCaseId] = useState("");
 
   const {
     billingStatus,
@@ -91,6 +94,13 @@ export function useAppState() {
   // Poll for analysis results (real API for sandbox, demo otherwise)
   useAuditPolling(phase, auditId, setAudit, setPhase);
 
+  useBenchmarkTracking({
+    phase,
+    auditId,
+    caseId: benchmarkCaseId,
+    repo: selectedRepo?.full_name || "",
+  });
+
   const reset = useCallback(() => {
     setPhase("landing");
     setSelectedRepo(null);
@@ -130,5 +140,7 @@ export function useAppState() {
     auditId, setAuditId,
     reset, startOAuth, confirmAuth, startAudit, startSandbox, startDemoLogin, doLogout,
     billingStatus, paywallVisible, checkoutLoading, openCheckout, dismissPaywall, refreshBilling,
+    benchmarkMode, setBenchmarkMode,
+    benchmarkCaseId, setBenchmarkCaseId,
   };
 }

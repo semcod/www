@@ -300,3 +300,120 @@ Feature: Semcod API E2E Tests
     And request { name: 'get_scan_status', arguments: { audit_id: '#(auditId)' } }
     When method post
     Then status 200
+
+  # ==================== Benchmark Tests ====================
+
+  Scenario: Benchmark summary
+    Given path '/api/benchmark/summary'
+    When method get
+    Then status 200
+    And match response contains { total_cases: '#number', pr_conversion_rate: '#number' }
+
+  Scenario: Create benchmark case
+    Given path '/api/benchmark/cases'
+    And request { case_id: 'BM-KARATE-001', repo: 'acme/backend-api', source_type: 'pr', change_type: 'bugfix', baseline_detected: true, baseline_tools: ['ruff', 'ci'] }
+    When method post
+    Then status 201
+    And match response.case_id == 'BM-KARATE-001'
+
+  Scenario: List benchmark cases
+    Given path '/api/benchmark/cases'
+    When method get
+    Then status 200
+    And match response.cases == '#array'
+
+  Scenario: Get specific benchmark case
+    Given path '/api/benchmark/cases/BM-KARATE-001'
+    When method get
+    Then status 200
+    And match response.repo == 'acme/backend-api'
+
+  Scenario: Patch benchmark case
+    Given path '/api/benchmark/cases/BM-KARATE-001'
+    And request { reviewer_verdict: 'go', pr_candidate: true }
+    When method patch
+    Then status 200
+    And match response.reviewer_verdict == 'go'
+    And match response.pr_candidate == true
+
+  Scenario: Post benchmark decision
+    Given path '/api/benchmark/cases/BM-KARATE-001/decision'
+    And request { deployment_model_selected: 'hybrid', pr_candidate: true }
+    When method post
+    Then status 200
+    And match response.deployment_model_selected == 'hybrid'
+
+  Scenario: Post recommendation feedback
+    Given path '/api/benchmark/cases/BM-KARATE-001/recommendations/rec123abc/feedback'
+    And request { accepted: true, novelty_score: 3, usefulness_score: 2, notes: 'Good recommendation' }
+    When method post
+    Then status 200
+    And match response.accepted == true
+
+  Scenario: Post benchmark event
+    Given path '/api/benchmark/cases/BM-KARATE-001/events'
+    And request { event_name: 'result_viewed', audit_id: 'abc123' }
+    When method post
+    Then status 201
+    And match response.event_name == 'result_viewed'
+
+  Scenario: List benchmark events
+    Given path '/api/benchmark/cases/BM-KARATE-001/events'
+    When method get
+    Then status 200
+    And match response.events == '#array'
+
+  Scenario: List recommendation feedback
+    Given path '/api/benchmark/cases/BM-KARATE-001/recommendations/feedback'
+    When method get
+    Then status 200
+    And match response.feedback == '#array'
+
+  Scenario: Export benchmark JSON
+    Given path '/api/benchmark/export.json'
+    When method get
+    Then status 200
+    And match response contains { cases: '#array', summary: '#object' }
+
+  Scenario: Export benchmark CSV
+    Given path '/api/benchmark/export.csv'
+    When method get
+    Then status 200
+    And match responseHeaders['Content-Type'] contains 'text/csv'
+
+  # ==================== Benchmark Error Scenarios ====================
+
+  Scenario: Duplicate benchmark case rejection
+    Given path '/api/benchmark/cases'
+    And request { case_id: 'BM-KARATE-001', repo: 'test' }
+    When method post
+    Then status 409
+
+  Scenario: Get non-existent benchmark case
+    Given path '/api/benchmark/cases/NONEXISTENT'
+    When method get
+    Then status 404
+
+  Scenario: Patch non-existent benchmark case
+    Given path '/api/benchmark/cases/NONEXISTENT'
+    And request { reviewer_verdict: 'go' }
+    When method patch
+    Then status 404
+
+  Scenario: Post decision for non-existent case
+    Given path '/api/benchmark/cases/NONEXISTENT/decision'
+    And request { pr_candidate: true }
+    When method post
+    Then status 404
+
+  Scenario: Post feedback for non-existent case
+    Given path '/api/benchmark/cases/NONEXISTENT/recommendations/rec123/feedback'
+    And request { accepted: true }
+    When method post
+    Then status 404
+
+  Scenario: Post event for non-existent case
+    Given path '/api/benchmark/cases/NONEXISTENT/events'
+    And request { event_name: 'test' }
+    When method post
+    Then status 404

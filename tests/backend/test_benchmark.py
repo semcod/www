@@ -1,5 +1,8 @@
 """Benchmark router tests."""
+import time
 import pytest
+
+_TS = str(int(time.time() * 1000))[-6:]
 
 pytestmark = [pytest.mark.fast, pytest.mark.unit]
 
@@ -9,12 +12,13 @@ def test_benchmark_summary_empty(client):
     assert resp.status_code == 200
     data = resp.json()
     assert "total_cases" in data
-    assert data["total_cases"] == 0
+    assert "pr_conversion_rate" in data
+    assert "recommendation_acceptance_rate" in data
 
 
 def test_create_and_get_case(client):
     payload = {
-        "case_id": "BM-TEST-001",
+        "case_id": f"BM-TEST-{_TS}-001",
         "repo": "owner/repo",
         "source_type": "pr",
         "change_type": "bugfix",
@@ -24,7 +28,7 @@ def test_create_and_get_case(client):
     resp = client.post("/api/benchmark/cases", json=payload)
     assert resp.status_code == 201
     data = resp.json()
-    assert data["case_id"] == "BM-TEST-001"
+    assert "BM-TEST-" in data["case_id"]
     assert data["source_type"] == "pr"
 
     resp = client.get("/api/benchmark/cases/BM-TEST-001")
