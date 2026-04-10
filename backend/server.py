@@ -6,6 +6,8 @@ One-click Audit + PR Comment Bot + Code Health Badge
 Deploy: uvicorn server:app --host 0.0.0.0 --port 9000
 """
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -18,10 +20,20 @@ from routers.report import router as report_router
 from routers.metrics import router as metrics_router
 from routers.mcp import router as mcp_router
 from routers.system import router as system_router
+from routers.trend import router as trend_router
+from scheduler.cron import router as scheduler_router, start_scheduler, stop_scheduler
+from routers.billing import router as billing_router
 
 # ─── Config ───────────────────────────────────────────────────────────────────
 
-app = FastAPI(title="Semcod", version="1.0.0")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    start_scheduler()
+    yield
+    stop_scheduler()
+
+
+app = FastAPI(title="Semcod", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -41,6 +53,9 @@ app.include_router(report_router)
 app.include_router(metrics_router)
 app.include_router(mcp_router)
 app.include_router(system_router)
+app.include_router(trend_router)
+app.include_router(scheduler_router)
+app.include_router(billing_router)
 
 
 # ─── Entry point ──────────────────────────────────────────────────────────────

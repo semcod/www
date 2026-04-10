@@ -49,17 +49,110 @@ To model biznesowy, w którym AI jest platformą, nie narzędziem.
 
 ## Obecny stan
 
-Platforma jest w fazie MVP z działającym:
+# Walkthrough: Refaktoryzacja semcod/www — Fazy 0, 1, 2
 
-- One-click audit dla publicznych i prywatnych repozytoriów
-- GitHub OAuth + webhook integration
-- PR comment bot z wynikami analizy
-- Health badge do README (shields.io style)
-- MCP integration (Model Context Protocol) dla agentów AI
-- SQLite persistence + recent scans dashboard
-- E2E testy (Playwright)
+## Cel
 
-Aktualny stan techniczny platformy: 73 pliki, 5776 linii kodu, CC̄=3.0, 244 funkcje. Backend w Python (FastAPI), frontend w React (Vite).
+Realizacja zadań z `docs/refactoring-todo.toon.yaml` dla projektu `semcod/www`:
+redukcja złożoności cyklomatycznej (CC), eliminacja god-modules, usunięcie martwego kodu.
+
+---
+
+## PHASE 0 — Cleanup (dead files)
+
+Usunięte pliki o 0 linii kodu, nigdy nieimportowane:
+
+- `backend/server_new.py`
+- `frontend/src/components/PRCommentPreview.jsx`
+- `frontend/src/screens/index.js`
+
+`server_old.py` — nie istniał już w repozytorium.
+
+---
+
+## PHASE 1 — Split Frontend Hotspots
+
+### 1.1 `useAppState` → 4 pliki
+
+**Przed:** `useAppState.js` (131L) + `useAppState.helpers.js` (389L) — monolityczny plik z URL logic, polling, auth, repos loading
+
+**Po:**
+
+| Plik | Odpowiedzialność |
+|------|-----------------|
+| `hooks/useUrlState.js` | `useHashBootstrap`, `useHashSync`, `parseRepositoryReference`, `createSelectedRepo` |
+| `hooks/usePolling.js` | `useScanAnimation`, `useAuditPolling`, stałe SCAN_STEPS |
+| `hooks/useAuth.js` | `useSessionCallbackBootstrap`, `useSessionProfile`, `getOAuthStartUrl`, OAuth flow helpers |
+| `hooks/useAppState.js` | Cienki orchestrator — tylko `useState`, `useCallback`, deleguje do sub-hooków |
+
+Usunięto: `useAppState.helpers.js`
+
+### 1.2 `ResultPhase` → pakiet result/
+
+**Przed:** `ResultPhase.jsx` (257L) + `resultPhaseContent.js` (222L) — download logic, share buttons, metrics grid, recommendations, header
+
+**Po:**
+
+| Plik | Odpowiedzialność |
+|------|-----------------|
+| `phases/result/index.jsx` | Wrapper, tab logic, error state, conditional render |
+| `phases/result/ResultHeader.jsx` | Tytuł, sandbox badge, przyciski exportów |
+| `phases/result/ResultMetrics.jsx` | GradeCircle, MetricCard grid, LanguageBar |
+| `phases/result/ResultRecommendations.jsx` | Lista RecommendationCard |
+| `hooks/useDownloads.js` | Wszystkie builderzy treści + `useDownloads` hook |
+
+`phases/index.js` zaktualizowany: `export { ResultPhase } from "./result"` — import w `App.jsx` bez zmian.
+
+### 1.3 Wspólny komponent `ShareButtons`
+
+Zduplikowany kod (~90L) w `ResultPhase`, `RecentScansTab`, `LandingPhase` zastąpiony wspólnym komponentem:
+
+```jsx
+<ShareButtons scan={scan} repo={repoName} size="default|small" />
+```
+
+Obsługuje: 𝕏 Twitter / LinkedIn / Bluesky. Propagacja `e.stopPropagation()` obsługiwana wewnątrz.
+
+---
+
+## PHASE 2 — Split Backend: `mcp.py` → pakiet `mcp/`
+
+**Przed:** `backend/routers/mcp.py` (211L) + `backend/routers/mcp_helpers.py` (228L) — 4 modele, logika resources i tools w dwóch plikach
+
+**Po:**
+
+| Plik | Odpowiedzialność |
+|------|-----------------|
+| `routers/mcp/__init__.py` | APIRouter z prefiksem `/mcp`, montuje sub-routery, endpoint `/info` |
+| `routers/mcp/models.py` | 4 modele Pydantic: `MCPResource`, `MCPTool`, `MCPResourceResponse`, `MCPToolRequest` |
+| `routers/mcp/resources.py` | `GET /mcp/resources`, `GET /mcp/resources/content`, helpery `_get_scans_list`, `_get_scan_detail`, `_get_metrics_summary`, `_get_badge_status` |
+| `routers/mcp/tools.py` | `GET /mcp/tools`, `POST /mcp/tools/invoke`, helpery `_invoke_start_audit`, `_invoke_get_status`, `_invoke_get_metrics`, `_invoke_analyze_public` |
+
+Wszystkie endpointy `/mcp/*` zachowane, `server.py` bez zmian.
+
+---
+
+## Weryfikacja
+
+| Check | Wynik |
+|-------|-------|
+| `npm run build` | ✅ 62 modułów, 0 błędów, 192KB JS |
+| `pytest backend/tests/` | ✅ 19/19 PASSED |
+| E2E Playwright | ⚠️ Konflikt wersji playwright (e2e/node_modules vs global) — wymaga uruchomienia z poziomu `e2e/` |
+
+---
+
+## Podsumowanie metryk
+
+**Frontend:**
+- Usunięto ~420 linii kodu (helpers + ResultPhase monolith)
+- 4 nowe wyspecjalizowane hooki zamiast 1 monolitycznego
+- 4 sub-komponenty zamiast 1 monolitycznego ResultPhase
+
+**Backend:**
+- `mcp.py` (211L) + `mcp_helpers.py` (228L) → 4 pliki max ~150L każdy
+- CC sprawdzony przez brak monolitycznych `if/elif` łańcuchów w routerze
+- Każdy handler tool ma CC ≤ 5
 
 ## Co dalej
 

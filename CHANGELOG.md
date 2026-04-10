@@ -35,6 +35,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Quadlet deployment docs link in README
 - Full env vars table in README
 
+## [0.1.8] - 2026-04-10
+
+### Docs
+- Update README.md
+- Update TODO.md
+- Update docs/01-semcod-platform-overview.md
+- Update docs/benchmark-kpi-product-plan.md
+- Update project/README.md
+- Update project/context.md
+
+### Test
+- Update tests/backend/test_billing.py
+- Update tests/backend/test_scheduler.py
+- Update tests/backend/test_trend.py
+- Update tests/conftest.py
+
+### Other
+- Update .code2llm.yaml
+- Update backend/config.py
+- Update backend/database.py
+- Update backend/requirements.txt
+- Update backend/routers/billing.py
+- Update backend/routers/mcp.py
+- Update backend/routers/mcp/__init__.py
+- Update backend/routers/mcp/models.py
+- Update backend/routers/mcp/resources.py
+- Update backend/routers/mcp/tools.py
+- ... and 23 more files
+
 ## [0.1.7] - 2026-04-10
 
 ### Docs

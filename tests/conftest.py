@@ -1,5 +1,6 @@
 """Pytest configuration and fixtures for faster testing."""
 
+import asyncio
 import pytest
 from fastapi.testclient import TestClient
 
@@ -21,8 +22,12 @@ def mock_asyncio_create_task(monkeypatch):
     original_create_task = asyncio.create_task
     
     def mock_create_task(coro, *, name=None, context=None):
-        # Don't actually run the coroutine, just return a mock task
+        # Don't actually run the coroutine, but close it to suppress warnings
         class MockTask:
+            def __init__(self):
+                # Close the coroutine to suppress "never awaited" warning
+                if asyncio.iscoroutine(coro):
+                    coro.close()
             def cancel(self):
                 pass
             def cancelled(self):
@@ -31,6 +36,9 @@ def mock_asyncio_create_task(monkeypatch):
                 return True
             def result(self):
                 return None
+            def add_done_callback(self, fn):
+                # Immediately call the callback since we're "done"
+                fn(self)
         return MockTask()
     
     monkeypatch.setattr(asyncio, "create_task", mock_create_task)

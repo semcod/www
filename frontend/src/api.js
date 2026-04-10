@@ -56,6 +56,24 @@ export async function demoLogin() {
   return res.json();
 }
 
+export async function fetchBillingStatus(sessionToken) {
+  const res = await fetch(`${API}/api/billing/status`, {
+    headers: { "Authorization": `Bearer ${sessionToken}` },
+  });
+  if (!res.ok) throw new Error("Failed to fetch billing status");
+  return res.json();
+}
+
+export async function createCheckoutSession(plan, billing, sessionToken) {
+  const res = await fetch(`${API}/api/billing/checkout`, {
+    method: "POST",
+    headers: authHeaders(sessionToken),
+    body: JSON.stringify({ plan, billing }),
+  });
+  if (!res.ok) throw new Error("Failed to create checkout session");
+  return res.json();
+}
+
 export async function analyzePublicRepo(repoUrl) {
   const res = await fetch(`${API}/api/analyze`, {
     method: "POST",

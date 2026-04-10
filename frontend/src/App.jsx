@@ -4,6 +4,7 @@ import { ProgressSteps } from "./components/ProgressSteps";
 import { LandingPhase, AuthPhase, ReposPhase, ScanningPhase, ResultPhase } from "./components/phases";
 import { PRBotTab, RepoTab, BadgeTab, RecentScansTab } from "./components/tabs";
 import { C } from "./constants";
+import { PaywallModal } from "./components/PaywallModal";
 
 export default function App() {
   const {
@@ -17,10 +18,19 @@ export default function App() {
     isSandbox,
     sessionToken, user,
     reset, startOAuth, confirmAuth, startAudit, startSandbox, startDemoLogin, doLogout,
+    billingStatus, paywallVisible, checkoutLoading, openCheckout, dismissPaywall,
   } = useAppState();
 
   return (
     <div style={{ minHeight: "100vh", background: C.bg, color: C.fg }}>
+      {paywallVisible && (
+        <PaywallModal
+          billingStatus={billingStatus}
+          onSelect={openCheckout}
+          onDismiss={dismissPaywall}
+          loading={checkoutLoading}
+        />
+      )}
       <Header tab={tab} setTab={setTab} reset={reset} user={user} doLogout={doLogout} />
 
       <main style={{ maxWidth: 1000, margin: "0 auto", padding: "32px 24px 80px" }}>

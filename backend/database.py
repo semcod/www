@@ -28,6 +28,21 @@ def init_db():
     """)
 
     cursor.execute("""
+        CREATE TABLE IF NOT EXISTS subscriptions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            plan TEXT NOT NULL DEFAULT 'free',
+            stripe_customer_id TEXT DEFAULT '',
+            stripe_subscription_id TEXT DEFAULT '',
+            status TEXT NOT NULL DEFAULT 'active',
+            scans_this_week INTEGER DEFAULT 0,
+            week_reset_at TEXT DEFAULT '',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             github_id INTEGER UNIQUE NOT NULL,
@@ -100,6 +115,37 @@ def get_recent_scans(limit: int = 100) -> List[Dict]:
     return scans
 
 
+def get_repo_scans(repo: str, limit: int = 100) -> List[Dict]:
+    """Get scans for a specific repository ordered by date ascending."""
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT repo, health_score, grade, stats, completed, sandbox, badge_url
+        FROM scans
+        WHERE repo = ?
+        ORDER BY created_at ASC
+        LIMIT ?
+    """, (repo, limit))
+
+    rows = cursor.fetchall()
+    conn.close()
+
+    return [
+        {
+            "repo": row["repo"],
+            "health_score": row["health_score"],
+            "grade": row["grade"],
+            "stats": json.loads(row["stats"]),
+            "completed": row["completed"],
+            "sandbox": bool(row["sandbox"]),
+            "badge_url": row["badge_url"],
+        }
+        for row in rows
+    ]
+
+
 def get_total_scan_count() -> int:
     """Get total number of scans in the database."""
     conn = sqlite3.connect(DB_PATH)
@@ -164,6 +210,93 @@ def get_user_by_id(user_id: int) -> Optional[Dict]:
     if not row:
         return None
     return dict(row)
+
+
+def get_subscription(user_id: int) -> Optional[Dict]:
+    """Get active subscription for a user. Returns None if not found (treat as free)."""
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT * FROM subscriptions WHERE user_id = ? ORDER BY id DESC LIMIT 1",
+        (user_id,),
+    )
+    row = cursor.fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+
+def upsert_subscription(user_id: int, plan: str, stripe_customer_id: str = "",
+                         stripe_subscription_id: str = "", status: str = "active") -> Dict:
+    """Create or update subscription for a user."""
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    now = datetime.now(timezone.utc).isoformat()
+
+    cursor.execute("SELECT id FROM subscriptions WHERE user_id = ?", (user_id,))
+    row = cursor.fetchone()
+
+    if row:
+        cursor.execute("""
+            UPDATE subscriptions
+            SET plan=?, stripe_customer_id=?, stripe_subscription_id=?, status=?, updated_at=?
+            WHERE user_id=?
+        """, (plan, stripe_customer_id, stripe_subscription_id, status, now, user_id))
+    else:
+        cursor.execute("""
+            INSERT INTO subscriptions (user_id, plan, stripe_customer_id, stripe_subscription_id, status, week_reset_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (user_id, plan, stripe_customer_id, stripe_subscription_id, status, now))
+
+    conn.commit()
+    conn.close()
+    return get_subscription(user_id)
+
+
+def increment_scan_count(user_id: int) -> int:
+    """Increment scans_this_week counter. Resets if a new week has started. Returns new count."""
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    now = datetime.now(timezone.utc)
+    now_iso = now.isoformat()
+
+    cursor.execute("SELECT * FROM subscriptions WHERE user_id = ?", (user_id,))
+    row = cursor.fetchone()
+
+    if not row:
+        cursor.execute("""
+            INSERT INTO subscriptions (user_id, plan, scans_this_week, week_reset_at)
+            VALUES (?, 'free', 1, ?)
+        """, (user_id, now_iso))
+        conn.commit()
+        conn.close()
+        return 1
+
+    week_reset_at = row["week_reset_at"]
+    scans = row["scans_this_week"]
+
+    if week_reset_at:
+        try:
+            reset_dt = datetime.fromisoformat(week_reset_at.replace("Z", "+00:00"))
+            if (now - reset_dt).days >= 7:
+                scans = 0
+                week_reset_at = now_iso
+        except ValueError:
+            week_reset_at = now_iso
+            scans = 0
+    else:
+        week_reset_at = now_iso
+
+    new_count = scans + 1
+    cursor.execute("""
+        UPDATE subscriptions SET scans_this_week=?, week_reset_at=?, updated_at=?
+        WHERE user_id=?
+    """, (new_count, week_reset_at, now_iso, user_id))
+    conn.commit()
+    conn.close()
+    return new_count
 
 
 # Initialize database on import

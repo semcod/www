@@ -1,59 +1,69 @@
-# code2llm | 73f 5780L | javascript:51,python:20,shell:2 | 2026-04-10
-# CC̄=3.0 | critical:4/244 | dups:0 | cycles:0
+# code2llm | 87f 6495L | javascript:59,python:26,shell:2 | 2026-04-10
+# CC̄=2.7 | critical:3/326 | dups:0 | cycles:0
 
-HEALTH[4]:
-  🟡 CC    useAppState CC=51 (limit:15)
-  🟡 CC    ResultPhase CC=54 (limit:15)
-  🟡 CC    mcp_get_resource CC=22 (limit:15)
-  🟡 CC    mcp_invoke_tool CC=17 (limit:15)
+HEALTH[3]:
+  🟡 CC    useAppState CC=16 (limit:15)
+  🟡 CC    ResultPhase CC=16 (limit:15)
+  🟡 CC    ResultHeader CC=29 (limit:15)
 
 REFACTOR[1]:
-  1. split 4 high-CC methods  (CC>15)
+  1. split 3 high-CC methods  (CC>15)
 
-PIPELINES[167]:
-  [1] Src [health_check]: health_check
+PIPELINES[201]:
+  [1] Src [init_db]: init_db
       PURITY: 100% pure
-  [2] Src [get_domain_config]: get_domain_config
+  [2] Src [get_user_by_github_id]: get_user_by_github_id
       PURITY: 100% pure
-  [3] Src [scan_sample_projects]: scan_sample_projects → get_sample_projects
+  [3] Src [lifespan]: lifespan → start_scheduler
       PURITY: 100% pure
-  [4] Src [init_db]: init_db
+  [4] Src [health_check]: health_check
       PURITY: 100% pure
-  [5] Src [get_user_by_github_id]: get_user_by_github_id
+  [5] Src [get_domain_config]: get_domain_config
       PURITY: 100% pure
 
 LAYERS:
-  backend/                        CC̄=3.9    ←in:15  →out:0
-  │ !! mcp                        436L  4C    6m  CC=22     ←0
+  backend/                        CC̄=3.1    ←in:20  →out:2
   │ audit                      331L  0C    8m  CC=7      ←1
   │ metrics                    257L  0C    6m  CC=10     ←0
   │ webhook                    255L  0C    5m  CC=14     ←0
-  │ database                   170L  0C    7m  CC=2      ←4
+  │ trend                      250L  0C    8m  CC=6      ←0
+  │ database                   201L  0C    8m  CC=2      ←7
+  │ tools                      198L  0C   11m  CC=4      ←0
+  │ cron                       183L  2C   11m  CC=3      ←1
   │ auth                       166L  0C    9m  CC=4      ←0
+  │ scan_job                   164L  0C    5m  CC=8      ←1
+  │ resources                  149L  0C    9m  CC=9      ←0
   │ badge                      139L  0C    4m  CC=5      ←0
-  │ scoring                    106L  0C    3m  CC=9      ←2
+  │ scoring                    106L  0C    3m  CC=9      ←3
   │ scan_samples                74L  0C    1m  CC=5      ←0
   │ sample_projects             72L  0C    1m  CC=1      ←1
-  │ analyzer                    66L  0C    2m  CC=7      ←1
-  │ server                      51L  0C    0m  CC=0.0    ←0
+  │ analyzer                    66L  0C    2m  CC=7      ←2
+  │ server                      64L  0C    1m  CC=1      ←0
   │ github_client               37L  0C    1m  CC=2      ←1
   │ system                      34L  0C    2m  CC=2      ←0
+  │ __init__                    34L  0C    1m  CC=1      ←0
+  │ models                      25L  4C    0m  CC=0.0    ←0
   │ config                      22L  0C    0m  CC=0.0    ←0
   │ report                      14L  0C    1m  CC=1      ←0
   │ store                        3L  0C    0m  CC=0.0    ←0
-  │ server_new                   0L  0C    0m  CC=0.0    ←0
+  │ __init__                     0L  0C    0m  CC=0.0    ←0
   │ __init__                     0L  0C    0m  CC=0.0    ←0
   │ __init__                     0L  0C    0m  CC=0.0    ←0
   │
-  frontend/                       CC̄=2.9    ←in:0  →out:0
-  │ !! ResultPhase.jsx            544L  0C   15m  CC=54     ←0
-  │ RecentScansTab.jsx         320L  0C   10m  CC=13     ←0
-  │ !! useAppState.js             308L  0C   30m  CC=51     ←0
-  │ LandingPhase.jsx           232L  0C    8m  CC=5      ←0
+  frontend/                       CC̄=2.6    ←in:0  →out:0
+  │ useDownloads.js            242L  0C   21m  CC=7      ←0
+  │ RecentScansTab.parts.jsx   229L  0C    7m  CC=5      ←0
+  │ LandingPhase.jsx           191L  0C    6m  CC=5      ←0
+  │ !! useAppState.js             164L  0C   12m  CC=16     ←0
+  │ !! index.jsx                  128L  0C    6m  CC=16     ←0
+  │ useUrlState.js             125L  0C   18m  CC=13     ←0
   │ metrics.spec.js            125L  0C    6m  CC=2      ←0
   │ BadgeTab.jsx               109L  0C    7m  CC=7      ←0
   │ scan-workflow.spec.js       99L  0C    9m  CC=2      ←0
+  │ usePolling.js               92L  0C   10m  CC=9      ←0
+  │ !! ResultHeader.jsx            88L  0C    1m  CC=29     ←0
   │ App.jsx                     83L  0C    0m  CC=0.0    ←0
+  │ useAuth.js                  80L  0C    9m  CC=3      ←0
   │ recent-scans.spec.js        80L  0C    6m  CC=3      ←0
   │ constants.js                71L  0C    2m  CC=3      ←0
   │ PRBotTab.jsx                71L  0C    1m  CC=2      ←0
@@ -61,19 +71,24 @@ LAYERS:
   │ Header.jsx                  61L  0C    2m  CC=5      ←0
   │ AuthPhase.jsx               61L  0C    4m  CC=4      ←0
   │ social-sharing.spec.js      58L  0C    8m  CC=4      ←0
+  │ ShareButtons.jsx            51L  0C    3m  CC=5      ←0
+  │ RecentScansTab.jsx          51L  0C    1m  CC=4      ←0
   │ RecommendationCard.jsx      48L  0C    1m  CC=5      ←0
   │ ProgressSteps.jsx           47L  0C    5m  CC=13     ←0
   │ smoke.spec.js               47L  0C    1m  CC=1      ←0
   │ audit.spec.js               46L  0C    0m  CC=0.0    ←0
   │ ReposPhase.jsx              41L  0C    1m  CC=4      ←0
+  │ recentScansHelpers.js       34L  0C    8m  CC=3      ←0
   │ GradeCircle.jsx             33L  0C    6m  CC=2      ←0
   │ share.js                    29L  0C    8m  CC=5      ←0
   │ ScanningPhase.jsx           28L  0C    1m  CC=3      ←0
   │ LanguageBar.jsx             26L  0C    3m  CC=1      ←0
   │ badge.spec.js               26L  0C    1m  CC=1      ←0
   │ playwright.config.js        22L  0C    0m  CC=0.0    ←0
+  │ ResultMetrics.jsx           19L  0C    1m  CC=1      ←0
   │ vite.config.js              15L  0C    0m  CC=0.0    ←0
   │ MetricCard.jsx              14L  0C    1m  CC=2      ←0
+  │ ResultRecommendations.jsx    14L  0C    1m  CC=1      ←0
   │ RepoTab.jsx                 11L  0C    1m  CC=1      ←0
   │ main.jsx                    10L  0C    0m  CC=0.0    ←0
   │ config.js                    8L  0C    1m  CC=2      ←0
@@ -85,8 +100,6 @@ LAYERS:
   │ MetricCard.jsx               1L  0C    0m  CC=0.0    ←0
   │ RecommendationCard.jsx       1L  0C    0m  CC=0.0    ←0
   │ GradeCircle.jsx              1L  0C    0m  CC=0.0    ←0
-  │ PRCommentPreview.jsx         0L  0C    0m  CC=0.0    ←0
-  │ index.js                     0L  0C    0m  CC=0.0    ←0
   │
   e2e/                            CC̄=2.2    ←in:0  →out:0
   │ metrics.spec.js            128L  0C    7m  CC=4      ←0
@@ -108,21 +121,21 @@ LAYERS:
   │
   ── zero ──
      backend/routers/__init__.py               0L
-     backend/server_new.py                     0L
+     backend/scheduler/__init__.py             0L
      backend/services/__init__.py              0L
-     frontend/src/components/PRCommentPreview.jsx  0L
-     frontend/src/screens/index.js             0L
 
 COUPLING:
-                     backend.routers  backend.services           backend   backend.scripts
-   backend.routers                ──                21                14                ←1  !! fan-out
-  backend.services               ←21                ──                                      hub
-           backend               ←14                                  ──                ←1  hub
-   backend.scripts                 1                                   1                ──
+                       backend.routers   backend.services            backend  backend.scheduler    backend.scripts
+    backend.routers                 ──                 21                 17                                    ←1  !! fan-out
+   backend.services                ←21                 ──                                    ←8                     hub
+            backend                ←17                                    ──                  2                 ←1  hub
+  backend.scheduler                                     8                  2                 ──                     !! fan-out
+    backend.scripts                  1                                     1                                    ──
   CYCLES: none
-  HUB: backend/ (fan-in=15)
-  HUB: backend.services/ (fan-in=21)
-  SMELL: backend.routers/ fan-out=35 → split needed
+  HUB: backend/ (fan-in=20)
+  HUB: backend.services/ (fan-in=29)
+  SMELL: backend.scheduler/ fan-out=10 → split needed
+  SMELL: backend.routers/ fan-out=38 → split needed
 
 EXTERNAL:
   validation: run `vallm batch .` → validation.toon

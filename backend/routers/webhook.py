@@ -16,6 +16,9 @@ from store import audit_results
 
 router = APIRouter()
 
+# Keep references to background tasks to prevent garbage collection
+_background_tasks = set()
+
 
 @router.post("/webhook/github")
 async def github_webhook(request: Request):
@@ -35,7 +38,10 @@ async def github_webhook(request: Request):
     if event == "pull_request":
         action = payload.get("action")
         if action in ("opened", "synchronize"):
-            asyncio.create_task(_handle_pr_event(payload))
+            task = asyncio.create_task(_handle_pr_event(payload))
+            # Store reference to prevent garbage collection
+            _background_tasks.add(task)
+            task.add_done_callback(_background_tasks.discard)
             return {"status": "processing"}
 
     if event == "installation":

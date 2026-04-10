@@ -1,17 +1,20 @@
-# www | 73f 5780L | shell:2,python:20,javascript:51 | 2026-04-10
-# stats: 244 func | 0 cls | 73 mod | CC̄=3.0 | critical:4 | cycles:0
-# alerts[5]: CC ResultPhase=54; CC useAppState=51; fan-out useAppState=48; fan-out ResultPhase=26; fan-out RecentScansTab=23
-# hotspots[5]: useAppState fan=48; ResultPhase fan=26; RecentScansTab fan=23; _run_audit_pipeline fan=20; mcp_get_resource fan=20
-# evolution: CC̄ 3.0→3.0 (flat 0.0)
+# www | 83f 5845L | shell:2,python:22,javascript:59 | 2026-04-10
+# stats: 299 func | 0 cls | 83 mod | CC̄=2.7 | critical:2 | cycles:0
+# alerts[5]: CC ResultHeader=29; fan-out useAppState=29; fan-out _run_audit_pipeline=20; fan-out _run_sandbox_analysis=18; CC ResultPhase=16
+# hotspots[5]: useAppState fan=29; _run_audit_pipeline fan=20; _run_sandbox_analysis fan=18; useHashBootstrap fan=16; LandingPhase fan=15
+# evolution: CC̄ 3.0→2.7 (improved -0.3)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[73]:
+M[83]:
   backend/config.py,22
   backend/database.py,170
   backend/routers/__init__.py,0
   backend/routers/audit.py,331
   backend/routers/auth.py,166
   backend/routers/badge.py,139
-  backend/routers/mcp.py,436
+  backend/routers/mcp/__init__.py,34
+  backend/routers/mcp/models.py,25
+  backend/routers/mcp/resources.py,149
+  backend/routers/mcp/tools.py,198
   backend/routers/metrics.py,257
   backend/routers/report.py,14
   backend/routers/system.py,34
@@ -19,7 +22,6 @@ M[73]:
   backend/sample_projects.py,72
   backend/scripts/scan_samples.py,74
   backend/server.py,51
-  backend/server_new.py,0
   backend/services/__init__.py,0
   backend/services/analyzer.py,66
   backend/services/github_client.py,37
@@ -50,20 +52,25 @@ M[73]:
   frontend/src/components/Header.jsx,61
   frontend/src/components/LanguageBar.jsx,26
   frontend/src/components/MetricCard.jsx,14
-  frontend/src/components/PRCommentPreview.jsx,0
   frontend/src/components/ProgressSteps.jsx,47
   frontend/src/components/RecommendationCard.jsx,48
+  frontend/src/components/ShareButtons.jsx,51
   frontend/src/components/phases/index.js,5
   frontend/src/components/phases/AuthPhase.jsx,61
-  frontend/src/components/phases/LandingPhase.jsx,232
+  frontend/src/components/phases/LandingPhase.jsx,191
   frontend/src/components/phases/ReposPhase.jsx,41
-  frontend/src/components/phases/ResultPhase.jsx,544
   frontend/src/components/phases/ScanningPhase.jsx,28
+  frontend/src/components/phases/result/ResultHeader.jsx,88
+  frontend/src/components/phases/result/ResultMetrics.jsx,19
+  frontend/src/components/phases/result/ResultRecommendations.jsx,14
+  frontend/src/components/phases/result/index.jsx,128
   frontend/src/components/tabs/index.js,4
   frontend/src/components/tabs/BadgeTab.jsx,109
   frontend/src/components/tabs/PRBotTab.jsx,71
-  frontend/src/components/tabs/RecentScansTab.jsx,320
+  frontend/src/components/tabs/RecentScansTab.jsx,51
+  frontend/src/components/tabs/RecentScansTab.parts.jsx,229
   frontend/src/components/tabs/RepoTab.jsx,11
+  frontend/src/components/tabs/recentScansHelpers.js,34
   frontend/src/components/ui/index.js,4
   frontend/src/components/ui/GradeCircle.jsx,1
   frontend/src/components/ui/LanguageBar.jsx,1
@@ -71,92 +78,30 @@ M[73]:
   frontend/src/components/ui/RecommendationCard.jsx,1
   frontend/src/config.js,8
   frontend/src/constants.js,71
-  frontend/src/hooks/useAppState.js,308
+  frontend/src/hooks/useAppState.js,157
+  frontend/src/hooks/useAuth.js,78
+  frontend/src/hooks/useDownloads.js,242
+  frontend/src/hooks/usePolling.js,92
+  frontend/src/hooks/useUrlState.js,125
   frontend/src/main.jsx,10
-  frontend/src/screens/index.js,0
   frontend/src/utils/share.js,29
   frontend/vite.config.js,15
   project.sh,35
   traefik/generate-certs.sh,27
 D:
-  frontend/src/components/phases/ResultPhase.jsx:
-    i: ../../constants,../../utils/share,../ui,react
-    e: ResultPhase,data,repoName,shareUrls,handleShare,handleDownloadMetrics,blob,url,a,handleDownloadPrompt,filesContent,blob,url,a,handleDownloadMarkdown,blob,url,a,handleDownloadToon,blob,url,a,getTabContent,filesContent,content,blob,url,a,content
+  frontend/src/components/phases/result/ResultHeader.jsx:
+    i: ../../../constants
+    e: ResultHeader
+    ResultHeader()
+  frontend/src/components/phases/result/index.jsx:
+    i: ../../../constants,../../../hooks/useDownloads,../../ShareButtons,./ResultHeader,./ResultMetrics,./ResultRecommendations,react
+    e: ResultPhase,data,repoName,activeContent,handleCopy,handleDownload
     ResultPhase()
     data()
     repoName()
-    shareUrls()
-    handleShare()
-    handleDownloadMetrics()
-    blob()
-    url()
-    a()
-    handleDownloadPrompt()
-    filesContent()
-    blob()
-    url()
-    a()
-    handleDownloadMarkdown()
-    blob()
-    url()
-    a()
-    handleDownloadToon()
-    blob()
-    url()
-    a()
-    getTabContent()
-    filesContent()
-    content()
-    blob()
-    url()
-    a()
-    content()
-  frontend/src/hooks/useAppState.js:
-    i: ../api,../constants,react
-    e: useAppState,searchParams,session,hash,params,tabParam,phaseParam,repoParam,parts,owner,repo,auditParam,params,timers,done,pollCount,maxPolls,poll,data,interval,shouldStop,reset,startOAuth,confirmAuth,startAudit,startSandbox,url,match,sshMatch,startDemoLogin,doLogout
-    useAppState()
-    searchParams()
-    session()
-    hash()
-    params()
-    tabParam()
-    phaseParam()
-    repoParam()
-    parts()
-    owner()
-    repo()
-    auditParam()
-    params()
-    timers()
-    done()
-    pollCount()
-    maxPolls()
-    poll()
-    data()
-    interval()
-    shouldStop()
-    reset()
-    startOAuth()
-    confirmAuth()
-    startAudit()
-    startSandbox()
-    url()
-    match()
-    sshMatch()
-    startDemoLogin()
-    doLogout()
-  backend/routers/mcp.py:
-    e: MCPResource,MCPTool,MCPResourceResponse,MCPToolRequest,_utc_now_iso,mcp_list_resources,mcp_get_resource,mcp_list_tools,mcp_invoke_tool,mcp_server_info
-    MCPResource(BaseModel):  # MCP Resource definition...
-    MCPTool(BaseModel):  # MCP Tool definition...
-    MCPResourceResponse(BaseModel):  # MCP resource content response...
-    MCPToolRequest(BaseModel):  # MCP tool invocation request...
-    _utc_now_iso()
-    mcp_list_resources()
-    mcp_get_resource(uri)
-    mcp_list_tools()
-    mcp_invoke_tool(request)
-    mcp_server_info()
+    activeContent()
+    handleCopy()
+    handleDownload()
   backend/routers/webhook.py:
     e: github_webhook,_handle_pr_event,_analyze_pr_files,_build_pr_summary,_build_pr_comment
     github_webhook(request)
@@ -164,6 +109,43 @@ D:
     _analyze_pr_files(files)
     _build_pr_summary(analysis)
     _build_pr_comment(analysis;repo;sha;report_url)
+  frontend/src/hooks/useAppState.js:
+    i: ../api.js,../constants.js,./usePolling.js,./useUrlState.js,react
+    e: useAppState,reset,startOAuth,confirmAuth,startAudit,data,startSandbox,url,repoData,data,startDemoLogin,doLogout
+    useAppState()
+    reset()
+    startOAuth()
+    confirmAuth()
+    startAudit()
+    data()
+    startSandbox()
+    url()
+    repoData()
+    data()
+    startDemoLogin()
+    doLogout()
+  frontend/src/hooks/useUrlState.js:
+    i: ../api.js,react
+    e: VALID_TABS,VALID_PHASES,parseRepositoryReference,trimmed,urlMatch,parts,createSelectedRepo,parsed,useHashBootstrap,hash,params,tabParam,phaseParam,repoParam,sandboxMode,repoData,auditParam,useHashSync,params
+    VALID_TABS()
+    VALID_PHASES()
+    parseRepositoryReference()
+    trimmed()
+    urlMatch()
+    parts()
+    createSelectedRepo()
+    parsed()
+    useHashBootstrap()
+    hash()
+    params()
+    tabParam()
+    phaseParam()
+    repoParam()
+    sandboxMode()
+    repoData()
+    auditParam()
+    useHashSync()
+    params()
   frontend/src/components/ProgressSteps.jsx:
     i: ../constants
     e: ProgressSteps,currentIdx,stepIdx,done,active
@@ -172,19 +154,6 @@ D:
     stepIdx()
     done()
     active()
-  frontend/src/components/tabs/RecentScansTab.jsx:
-    i: ../../config,../../constants,../../utils/share,react
-    e: RecentScansTab,fetchRecentScans,response,data,formatDate,date,getLanguageBadge,topLang,handleShare,shareUrls
-    RecentScansTab()
-    fetchRecentScans()
-    response()
-    data()
-    formatDate()
-    date()
-    getLanguageBadge()
-    topLang()
-    handleShare()
-    shareUrls()
   backend/routers/metrics.py:
     e: _utc_now_iso,get_standard_metrics,get_metrics_summary,get_repository_metrics,download_project_prompt,download_project_prompt_markdown
     _utc_now_iso()
@@ -232,20 +201,34 @@ D:
     calculate_health_score(stats;complexity;duplication;quality)
     score_to_grade(score)
     generate_recommendations(complexity;duplication;quality)
+  backend/routers/mcp/resources.py:
+    e: _utc_now_iso,_summarize_scan,_build_metrics_summary,_get_scans_list,_get_scan_detail,_get_metrics_summary,_get_badge_status,mcp_list_resources,mcp_get_resource
+    _utc_now_iso()
+    _summarize_scan(scan)
+    _build_metrics_summary(scans)
+    _get_scans_list()
+    _get_scan_detail(audit_id)
+    _get_metrics_summary()
+    _get_badge_status(repo_slug)
+    mcp_list_resources()
+    mcp_get_resource(uri)
+  frontend/src/hooks/usePolling.js:
+    i: ../api.js,../constants.js,react
+    e: useScanAnimation,timers,done,useAuditPolling,pollCount,MAX_POLLS,poll,data,interval,shouldStop
+    useScanAnimation()
+    timers()
+    done()
+    useAuditPolling()
+    pollCount()
+    MAX_POLLS()
+    poll()
+    data()
+    interval()
+    shouldStop()
   backend/services/analyzer.py:
     e: count_code_stats,run_tool
     count_code_stats(repo_path)
     run_tool(name;args;fallback)
-  frontend/src/components/tabs/BadgeTab.jsx:
-    i: ../../config,../../constants,react
-    e: BadgeSVG,color,labelW,valueText,valueW,BadgeTab,badgeUrl
-    BadgeSVG()
-    color()
-    labelW()
-    valueText()
-    valueW()
-    BadgeTab()
-    badgeUrl()
   backend/routers/audit.py:
     e: _utc_now_iso,_schedule_background_task,run_audit,get_audit_result,get_recent_scans_api,analyze_repo,_run_audit_pipeline,_run_sandbox_analysis
     _utc_now_iso()
@@ -256,6 +239,40 @@ D:
     analyze_repo(request)
     _run_audit_pipeline(audit_id;repo;token)
     _run_sandbox_analysis(audit_id;repo_url;repo)
+  frontend/src/hooks/useDownloads.js:
+    i: react
+    e: recommendationLabel,recommendationLine,markdownRecommendationLine,toonRecommendationLine,filesContent,buildMetricsExportData,buildPromptText,buildMarkdownText,buildToonText,buildShareText,getResultTabContent,downloadContent,blob,url,link,useDownloads,handleDownloadMetrics,handleDownloadPrompt,handleDownloadMarkdown,handleDownloadToon,handleGenericDownload
+    recommendationLabel()
+    recommendationLine()
+    markdownRecommendationLine()
+    toonRecommendationLine()
+    filesContent()
+    buildMetricsExportData()
+    buildPromptText()
+    buildMarkdownText()
+    buildToonText()
+    buildShareText()
+    getResultTabContent()
+    downloadContent()
+    blob()
+    url()
+    link()
+    useDownloads()
+    handleDownloadMetrics()
+    handleDownloadPrompt()
+    handleDownloadMarkdown()
+    handleDownloadToon()
+    handleGenericDownload()
+  frontend/src/components/tabs/BadgeTab.jsx:
+    i: ../../config,../../constants,react
+    e: BadgeSVG,color,labelW,valueText,valueW,BadgeTab,badgeUrl
+    BadgeSVG()
+    color()
+    labelW()
+    valueText()
+    valueW()
+    BadgeTab()
+    badgeUrl()
   backend/scripts/scan_samples.py:
     e: scan_sample_projects
     scan_sample_projects()
@@ -274,17 +291,31 @@ D:
     i: ../constants,react
     e: RecommendationCard
     RecommendationCard()
+  frontend/src/components/ShareButtons.jsx:
+    i: ../utils/share
+    e: ShareButtons,handleShare,shareUrls
+    ShareButtons()
+    handleShare()
+    shareUrls()
   frontend/src/components/phases/LandingPhase.jsx:
-    i: ../../constants,../../utils/share,react
-    e: LandingPhase,fetchRecentScans,response,data,handleShare,shareUrls,formatDate,date
+    i: ../../constants,../../utils/share,../ShareButtons,react
+    e: LandingPhase,fetchRecentScans,response,data,formatDate,date
     LandingPhase()
     fetchRecentScans()
     response()
     data()
-    handleShare()
-    shareUrls()
     formatDate()
     date()
+  frontend/src/components/tabs/RecentScansTab.parts.jsx:
+    i: ../../constants,../ShareButtons
+    e: LanguageBadge,language,ScanMetrics,RecentScanCard,RecentScansEmptyState,RecentScansHeader,RecentScansBadgeInfo
+    LanguageBadge()
+    language()
+    ScanMetrics()
+    RecentScanCard()
+    RecentScansEmptyState()
+    RecentScansHeader()
+    RecentScansBadgeInfo()
   frontend/src/utils/share.js:
     i: ../config
     e: generateShareText,grade,score,files,lines,getShareUrls,text,url
@@ -307,6 +338,19 @@ D:
     get_me(user)
     logout()
     list_repos(user)
+  backend/routers/mcp/tools.py:
+    e: _utc_now_iso,_build_audit_id,_required_argument,_parse_public_repo,_normalize_repo,_invoke_start_audit,_invoke_get_status,_invoke_get_metrics,_invoke_analyze_public,mcp_list_tools,mcp_invoke_tool
+    _utc_now_iso()
+    _build_audit_id(value;now_iso)
+    _required_argument(arguments;name)
+    _parse_public_repo(repo_url)
+    _normalize_repo(repo)
+    _invoke_start_audit(arguments)
+    _invoke_get_status(arguments)
+    _invoke_get_metrics(arguments)
+    _invoke_analyze_public(arguments)
+    mcp_list_tools()
+    mcp_invoke_tool(request)
   frontend/src/components/phases/AuthPhase.jsx:
     i: ../../api,../../constants
     e: AuthPhase,handleLogin,handleDemoLogin,data
@@ -318,6 +362,10 @@ D:
     i: ../../constants
     e: ReposPhase
     ReposPhase()
+  frontend/src/components/tabs/RecentScansTab.jsx:
+    i: ../../constants,./recentScansHelpers.js,react
+    e: RecentScansTab
+    RecentScansTab()
   frontend/e2e/social-sharing.spec.js:
     i: @playwright/test
     e: twitterButton,linkedinButton,blueskyButton,anyVisible,shareButtons,count,recentSection,isVisible,shareButtons,count
@@ -352,10 +400,33 @@ D:
     e: API,gradeColor
     API()
     gradeColor()
+  frontend/src/hooks/useAuth.js:
+    i: ../api.js,../constants.js,react
+    e: useSessionCallbackBootstrap,searchParams,session,useSessionProfile,getOAuthStartUrl,confirmAuthFlow,startDemoSession,data,logoutSession
+    useSessionCallbackBootstrap()
+    searchParams()
+    session()
+    useSessionProfile()
+    getOAuthStartUrl()
+    confirmAuthFlow()
+    startDemoSession()
+    data()
+    logoutSession()
   frontend/src/components/phases/ScanningPhase.jsx:
     i: ../../constants
     e: ScanningPhase
     ScanningPhase()
+  frontend/src/components/tabs/recentScansHelpers.js:
+    i: ../../constants
+    e: fetchRecentScans,response,data,formatRecentScanDate,date,getPrimaryLanguage,openRecentScanRepository,openRecentScanAudit
+    fetchRecentScans()
+    response()
+    data()
+    formatRecentScanDate()
+    date()
+    getPrimaryLanguage()
+    openRecentScanRepository()
+    openRecentScanAudit()
   frontend/e2e/recent-scans.spec.js:
     i: @playwright/test
     e: recentSection,isVisible,scanCards,count,scanCard,count,viewButton,count
@@ -398,9 +469,6 @@ D:
     upsert_user(github_id;login;name;avatar_url;github_token)
     get_user_by_github_id(github_id)
     get_user_by_id(user_id)
-  frontend/src/config.js:
-    e: PUBLIC_URL
-    PUBLIC_URL()
   frontend/src/api.js:
     i: ./constants
     e: authHeaders,fetchMe,res,logout,res,fetchRepos,res,startAudit,res,fetchAudit,res,demoLogin,res,analyzePublicRepo,res
@@ -419,6 +487,9 @@ D:
     res()
     analyzePublicRepo()
     res()
+  frontend/src/config.js:
+    e: PUBLIC_URL
+    PUBLIC_URL()
   frontend/src/components/MetricCard.jsx:
     i: ../constants
     e: MetricCard
@@ -487,12 +558,23 @@ D:
   backend/routers/report.py:
     e: report_page
     report_page(owner;repo)
+  backend/routers/mcp/__init__.py:
+    e: mcp_server_info
+    mcp_server_info()
   frontend/src/components/LanguageBar.jsx:
     i: ../constants
     e: LanguageBar,total,entries
     LanguageBar()
     total()
     entries()
+  frontend/src/components/phases/result/ResultMetrics.jsx:
+    i: ../../ui
+    e: ResultMetrics
+    ResultMetrics()
+  frontend/src/components/phases/result/ResultRecommendations.jsx:
+    i: ../../ui
+    e: ResultRecommendations
+    ResultRecommendations()
   frontend/src/components/tabs/RepoTab.jsx:
     i: ../../constants
     e: RepoTab
@@ -516,9 +598,8 @@ D:
     count()
   project.sh:
   traefik/generate-certs.sh:
-  backend/config.py:
-  backend/server_new.py:
   backend/store.py:
+  backend/config.py:
   backend/server.py:
   backend/services/__init__.py:
   backend/routers/__init__.py:
@@ -530,7 +611,6 @@ D:
     i: ./components/Header,./components/ProgressSteps,./components/phases,./components/tabs,./constants,./hooks/useAppState
   frontend/src/main.jsx:
     i: ./App.jsx,react,react-dom/client
-  frontend/src/components/PRCommentPreview.jsx:
   frontend/src/components/index.js:
   frontend/src/components/phases/index.js:
   frontend/src/components/ui/LanguageBar.jsx:
@@ -539,10 +619,15 @@ D:
   frontend/src/components/ui/GradeCircle.jsx:
   frontend/src/components/ui/index.js:
   frontend/src/components/tabs/index.js:
-  frontend/src/screens/index.js:
   frontend/e2e/audit.spec.js:
     i: @playwright/test
   e2e/playwright.config.js:
     i: @playwright/test
   e2e/specs/demo-login.spec.js:
     i: @playwright/test
+  backend/routers/mcp/models.py:
+    e: MCPResource,MCPTool,MCPResourceResponse,MCPToolRequest
+    MCPResource(BaseModel):  # MCP Resource definition...
+    MCPTool(BaseModel):  # MCP Tool definition...
+    MCPResourceResponse(BaseModel):  # MCP resource content response...
+    MCPToolRequest(BaseModel):  # MCP tool invocation request...

@@ -4,8 +4,8 @@ flowchart TD
     classDef entry fill:#4dabf7,stroke:#1971c2,color:#fff
 
     subgraph Core
-        backend__services__github_client__get_installation_token["get_installation_token"]
         backend__services__scoring__score_to_grade["score_to_grade"]
+        backend__services__github_client__get_installation_token["get_installation_token"]
         backend__routers__system__health_check["health_check"]
         backend__routers__system__get_domain_config["get_domain_config"]
         backend__database__init_db["init_db"]
@@ -17,9 +17,12 @@ flowchart TD
         backend__routers__auth__get_me["get_me"]
         backend__routers__auth__logout["logout"]
         backend__routers__auth__list_repos["list_repos"]
-        backend__routers__webhook__github_webhook["github_webhook"]
-        backend__routers__webhook___handle_pr_event["_handle_pr_event"]
-        ...["+186 more"]
+        backend__routers__report__report_page["report_page"]
+        backend__routers__badge__health_badge["health_badge"]
+        ...["+223 more"]
+    end
+
+    subgraph Exporters
     end
 
     class backend__services__github_client__get_installation_token,backend__routers__system__health_check,backend__routers__system__get_domain_config,backend__database__init_db,backend__database__get_user_by_github_id,backend__routers__auth__get_current_user,backend__routers__auth__github_oauth_start,backend__routers__auth__github_oauth_callback,backend__routers__auth__demo_login,backend__routers__auth__get_me entry

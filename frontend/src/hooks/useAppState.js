@@ -11,6 +11,7 @@ import {
 } from "./useAuth.js";
 import { fetchRepos, startAudit as startAuditRequest, analyzePublicRepo } from "../api.js";
 import { DEMO_REPOS } from "../constants.js";
+import { useBilling } from "./useBilling.js";
 
 const SESSION_KEY = "semcod_session";
 
@@ -28,6 +29,16 @@ export function useAppState() {
   const [repoUrl, setRepoUrl] = useState("");
   const [isSandbox, setIsSandbox] = useState(false);
   const [auditId, setAuditId] = useState(null);
+
+  const {
+    billingStatus,
+    paywallVisible,
+    checkoutLoading,
+    checkScanAllowed,
+    openCheckout,
+    dismissPaywall,
+    refreshBilling,
+  } = useBilling(sessionToken);
 
   // Read session token from URL callback (OAuth redirect) on mount
   useSessionCallbackBootstrap(setSessionToken, SESSION_KEY);
@@ -52,6 +63,13 @@ export function useAppState() {
   // Fetch repos when session token available and phase is repos
   useEffect(() => {
     if (!sessionToken || phase !== "repos") {
+      return;
+    }
+
+    // Skip API call for demo users - use DEMO_REPOS directly
+    const demoUser = localStorage.getItem("semcod_demo_user");
+    if (demoUser === "1") {
+      setRepos(DEMO_REPOS);
       return;
     }
 
@@ -84,6 +102,8 @@ export function useAppState() {
   }, [sessionToken, setRepos, setPhase]);
 
   const startAudit = useCallback(async (repo) => {
+    if (!checkScanAllowed()) return;
+
     setSelectedRepo(repo);
     setPhase("scanning");
     setIsSandbox(false);
@@ -101,9 +121,11 @@ export function useAppState() {
       }
     } catch (error) {
     }
-  }, [sessionToken, setSelectedRepo, setPhase, setIsSandbox, setAudit, setAuditId]);
+  }, [checkScanAllowed, sessionToken, setSelectedRepo, setPhase, setIsSandbox, setAudit, setAuditId]);
 
   const startSandbox = useCallback(async () => {
+    if (!checkScanAllowed()) return false;
+
     const url = repoUrl.trim();
     if (!url) {
       return false;
@@ -129,7 +151,7 @@ export function useAppState() {
     }
 
     return true;
-  }, [repoUrl, setSelectedRepo, setIsSandbox, setPhase, setAudit, setAuditId]);
+  }, [checkScanAllowed, repoUrl, setSelectedRepo, setIsSandbox, setPhase, setAudit, setAuditId]);
 
   const startDemoLogin = useCallback(() => {
     startDemoSession(setSessionToken, setRepos, setPhase, SESSION_KEY);
@@ -153,5 +175,6 @@ export function useAppState() {
     isSandbox, setIsSandbox,
     auditId, setAuditId,
     reset, startOAuth, confirmAuth, startAudit, startSandbox, startDemoLogin, doLogout,
+    billingStatus, paywallVisible, checkoutLoading, openCheckout, dismissPaywall, refreshBilling,
   };
 }

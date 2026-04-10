@@ -23,3 +23,7 @@
 - [ ] Quadlet: update `semcod-backend.container` z nowymi env vars (`DB_PATH`, `CORS_ORIGINS`, itp.)
 - [ ] Quadlet README: update env vars list
 - [ ] CI/CD: GitHub Actions deploy z nowymi env vars
+
+
+
+można też dodać paczke python semcod ktora bedzie robiła te metryki przez cli shell, api rest i api mcp

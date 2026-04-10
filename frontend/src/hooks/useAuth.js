@@ -57,6 +57,7 @@ export async function startDemoSession(setSessionToken, setRepos, setPhase, sess
 
     setSessionToken(data.session);
     localStorage.setItem(sessionKey, data.session);
+    localStorage.setItem("semcod_demo_user", "1");
     setRepos(DEMO_REPOS);
     setPhase("repos");
   } catch (error) {
@@ -72,6 +73,7 @@ export async function logoutSession(sessionToken, sessionKey, setSessionToken, s
   }
 
   localStorage.removeItem(sessionKey);
+  localStorage.removeItem("semcod_demo_user");
   setSessionToken(null);
   setUser(null);
   reset();
