@@ -23,6 +23,7 @@ from routers.system import router as system_router
 from routers.trend import router as trend_router
 from scheduler.cron import router as scheduler_router, start_scheduler, stop_scheduler
 from routers.billing import router as billing_router
+from routers.autopr import router as autopr_router
 
 # ─── Config ───────────────────────────────────────────────────────────────────
 
@@ -56,6 +57,7 @@ app.include_router(system_router)
 app.include_router(trend_router)
 app.include_router(scheduler_router)
 app.include_router(billing_router)
+app.include_router(autopr_router)
 
 
 # ─── Entry point ──────────────────────────────────────────────────────────────

@@ -35,6 +35,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Quadlet deployment docs link in README
 - Full env vars table in README
 
+## [0.1.9] - 2026-04-10
+
+### Docs
+- Update README.md
+
+### Test
+- Update tests/backend/test_autopr.py
+
+### Other
+- Update backend/routers/autopr.py
+- Update backend/server.py
+
 ## [0.1.8] - 2026-04-10
 
 ### Docs
