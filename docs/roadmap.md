@@ -157,6 +157,8 @@ To nie jest refaktoryzacja „dla porządku”. To warunek, żeby bezpiecznie do
 
 Udowodnić na danych, że Semcod dostarcza nową jakość względem standardowego stacku narzędzi.
 
+Szczegółowy plan wykonawczy znajduje się w `docs/validation-benchmark.md`.
+
 ### Zakres testu
 
 Należy przygotować benchmark obejmujący:
