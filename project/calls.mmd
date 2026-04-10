@@ -1,38 +1,38 @@
 flowchart LR
     subgraph backend__database
+        backend__database__get_total_scan_count["get_total_scan_count"]
+        backend__database__get_user_by_id["get_user_by_id"]
         backend__database__get_recent_scans["get_recent_scans"]
         backend__database__upsert_user["upsert_user"]
-        backend__database__get_user_by_id["get_user_by_id"]
-        backend__database__get_total_scan_count["get_total_scan_count"]
     end
     subgraph backend__routers
-        backend__routers__auth__demo_login["demo_login"]
-        backend__routers__auth__decode_session_token["decode_session_token"]
-        backend__routers__metrics__get_standard_metrics["get_standard_metrics"]
-        backend__routers__audit__run_audit["run_audit"]
-        backend__routers__audit__get_recent_scans_api["get_recent_scans_api"]
-        backend__routers__audit___run_audit_pipeline["_run_audit_pipeline"]
-        backend__routers__auth__github_oauth_callback["github_oauth_callback"]
-        backend__routers__audit__analyze_repo["analyze_repo"]
-        backend__routers__webhook___handle_pr_event["_handle_pr_event"]
-        backend__routers__auth__create_session_token["create_session_token"]
-        backend__routers__audit___schedule_background_task["_schedule_background_task"]
-        backend__routers__mcp__mcp_invoke_tool["mcp_invoke_tool"]
-        backend__routers__badge___generate_count_badge_svg["_generate_count_badge_svg"]
-        backend__routers__audit___utc_now_iso["_utc_now_iso"]
-        backend__routers__auth__get_current_user["get_current_user"]
-        backend__routers__audit___run_sandbox_analysis["_run_sandbox_analysis"]
-        backend__routers__metrics__get_repository_metrics["get_repository_metrics"]
-        backend__routers__mcp___utc_now_iso["_utc_now_iso"]
-        backend__routers__metrics___utc_now_iso["_utc_now_iso"]
-        backend__routers__badge__health_badge["health_badge"]
-        backend__routers__mcp__mcp_get_resource["mcp_get_resource"]
-        backend__routers__badge___generate_badge_svg["_generate_badge_svg"]
-        backend__routers__webhook___build_pr_comment["_build_pr_comment"]
-        backend__routers__webhook___analyze_pr_files["_analyze_pr_files"]
-        backend__routers__badge__scan_count_badge["scan_count_badge"]
         backend__routers__metrics__get_metrics_summary["get_metrics_summary"]
         backend__routers__webhook___build_pr_summary["_build_pr_summary"]
+        backend__routers__metrics___utc_now_iso["_utc_now_iso"]
+        backend__routers__webhook___build_pr_comment["_build_pr_comment"]
+        backend__routers__badge__scan_count_badge["scan_count_badge"]
+        backend__routers__auth__decode_session_token["decode_session_token"]
+        backend__routers__mcp__mcp_invoke_tool["mcp_invoke_tool"]
+        backend__routers__audit___run_sandbox_analysis["_run_sandbox_analysis"]
+        backend__routers__audit___run_audit_pipeline["_run_audit_pipeline"]
+        backend__routers__mcp__mcp_get_resource["mcp_get_resource"]
+        backend__routers__audit___schedule_background_task["_schedule_background_task"]
+        backend__routers__webhook___analyze_pr_files["_analyze_pr_files"]
+        backend__routers__audit__get_recent_scans_api["get_recent_scans_api"]
+        backend__routers__auth__create_session_token["create_session_token"]
+        backend__routers__metrics__get_repository_metrics["get_repository_metrics"]
+        backend__routers__auth__demo_login["demo_login"]
+        backend__routers__webhook___handle_pr_event["_handle_pr_event"]
+        backend__routers__badge___generate_count_badge_svg["_generate_count_badge_svg"]
+        backend__routers__audit__analyze_repo["analyze_repo"]
+        backend__routers__metrics__get_standard_metrics["get_standard_metrics"]
+        backend__routers__mcp___utc_now_iso["_utc_now_iso"]
+        backend__routers__audit___utc_now_iso["_utc_now_iso"]
+        backend__routers__badge___generate_badge_svg["_generate_badge_svg"]
+        backend__routers__audit__run_audit["run_audit"]
+        backend__routers__auth__github_oauth_callback["github_oauth_callback"]
+        backend__routers__badge__health_badge["health_badge"]
+        backend__routers__auth__get_current_user["get_current_user"]
     end
     subgraph backend__sample_projects
         backend__sample_projects__get_sample_projects["get_sample_projects"]
@@ -41,74 +41,74 @@ flowchart LR
         backend__scripts__scan_samples__scan_sample_projects["scan_sample_projects"]
     end
     subgraph backend__services
-        backend__services__scoring__generate_recommendations["generate_recommendations"]
         backend__services__github_client__get_installation_token["get_installation_token"]
-        backend__services__scoring__score_to_grade["score_to_grade"]
         backend__services__analyzer__count_code_stats["count_code_stats"]
         backend__services__scoring__calculate_health_score["calculate_health_score"]
         backend__services__analyzer__run_tool["run_tool"]
+        backend__services__scoring__score_to_grade["score_to_grade"]
+        backend__services__scoring__generate_recommendations["generate_recommendations"]
     end
     subgraph e2e__specs
-        e2e__specs__social_sharing__spec__isVisible["isVisible"]
         e2e__specs__social_sharing__spec__hasScan["hasScan"]
-        e2e__specs__social_sharing__spec__recentSection["recentSection"]
         e2e__specs__metrics__spec__scan["scan"]
+        e2e__specs__recent_scans__spec__count["count"]
+        e2e__specs__social_sharing__spec__recentSection["recentSection"]
         e2e__specs__recent_scans__spec__recentSection["recentSection"]
+        e2e__specs__recent_scans__spec__isVisible["isVisible"]
+        e2e__specs__social_sharing__spec__isVisible["isVisible"]
         e2e__specs__social_sharing__spec__scanCard["scanCard"]
         e2e__specs__metrics__spec__skipInCI["skipInCI"]
-        e2e__specs__recent_scans__spec__count["count"]
-        e2e__specs__recent_scans__spec__isVisible["isVisible"]
     end
     subgraph frontend__e2e
-        frontend__e2e__social_sharing__spec__count["count"]
-        frontend__e2e__recent_scans__spec__count["count"]
         frontend__e2e__recent_scans__spec__recentSection["recentSection"]
+        frontend__e2e__recent_scans__spec__count["count"]
         frontend__e2e__social_sharing__spec__recentSection["recentSection"]
         frontend__e2e__social_sharing__spec__isVisible["isVisible"]
+        frontend__e2e__social_sharing__spec__count["count"]
         frontend__e2e__recent_scans__spec__isVisible["isVisible"]
     end
     subgraph frontend__src
-        frontend__src__api__authHeaders["authHeaders"]
-        frontend__src__hooks__useAppState__url["url"]
-        frontend__src__components__Header__Header["Header"]
-        frontend__src__api__startAudit["startAudit"]
-        frontend__src__api__logout["logout"]
-        frontend__src__hooks__useAppState__startSandbox["startSandbox"]
-        frontend__src__components__LanguageBar__entries["entries"]
-        frontend__src__hooks__useAppState__poll["poll"]
-        frontend__src__components__phases__LandingPhase__LandingPhase["LandingPhase"]
-        frontend__src__components__tabs__RecentScansTab__RecentScansTab["RecentScansTab"]
-        frontend__src__components__tabs__RecentScansTab__fetchRecentScans["fetchRecentScans"]
-        frontend__src__components__LanguageBar__LanguageBar["LanguageBar"]
-        frontend__src__components__Header__tabBtn["tabBtn"]
         frontend__src__hooks__useAppState__match["match"]
-        frontend__src__components__phases__LandingPhase__fetchRecentScans["fetchRecentScans"]
-        frontend__src__utils__share__generateShareText["generateShareText"]
         frontend__src__utils__share__getShareUrls["getShareUrls"]
+        frontend__src__components__Header__Header["Header"]
+        frontend__src__components__phases__LandingPhase__fetchRecentScans["fetchRecentScans"]
+        frontend__src__components__LanguageBar__LanguageBar["LanguageBar"]
+        frontend__src__components__tabs__RecentScansTab__RecentScansTab["RecentScansTab"]
+        frontend__src__components__Header__tabBtn["tabBtn"]
+        frontend__src__api__startAudit["startAudit"]
+        frontend__src__components__LanguageBar__entries["entries"]
+        frontend__src__utils__share__generateShareText["generateShareText"]
+        frontend__src__api__authHeaders["authHeaders"]
         frontend__src__hooks__useAppState__interval["interval"]
+        frontend__src__api__logout["logout"]
+        frontend__src__components__phases__LandingPhase__LandingPhase["LandingPhase"]
+        frontend__src__components__tabs__RecentScansTab__fetchRecentScans["fetchRecentScans"]
+        frontend__src__hooks__useAppState__url["url"]
+        frontend__src__hooks__useAppState__startSandbox["startSandbox"]
+        frontend__src__hooks__useAppState__poll["poll"]
     end
     backend__scripts__scan_samples__scan_sample_projects --> backend__sample_projects__get_sample_projects
-    backend__routers__metrics__get_standard_metrics --> backend__database__get_recent_scans
-    backend__routers__metrics__get_standard_metrics --> backend__database__get_total_scan_count
-    backend__routers__metrics__get_standard_metrics --> backend__routers__metrics___utc_now_iso
-    backend__routers__metrics__get_metrics_summary --> backend__database__get_recent_scans
-    backend__routers__metrics__get_repository_metrics --> backend__database__get_recent_scans
-    backend__routers__metrics__get_repository_metrics --> backend__routers__metrics___utc_now_iso
-    backend__routers__webhook___handle_pr_event --> backend__services__github_client__get_installation_token
-    backend__routers__webhook___handle_pr_event --> backend__routers__webhook___analyze_pr_files
-    backend__routers__webhook___handle_pr_event --> backend__routers__webhook___build_pr_comment
-    backend__routers__webhook___handle_pr_event --> backend__routers__webhook___build_pr_summary
-    backend__routers__webhook___analyze_pr_files --> backend__services__scoring__score_to_grade
     backend__routers__auth__get_current_user --> backend__routers__auth__decode_session_token
     backend__routers__auth__get_current_user --> backend__database__get_user_by_id
     backend__routers__auth__github_oauth_callback --> backend__database__upsert_user
     backend__routers__auth__github_oauth_callback --> backend__routers__auth__create_session_token
     backend__routers__auth__demo_login --> backend__database__upsert_user
     backend__routers__auth__demo_login --> backend__routers__auth__create_session_token
-    frontend__src__api__logout --> frontend__src__api__authHeaders
-    frontend__src__api__startAudit --> frontend__src__api__authHeaders
+    backend__routers__webhook___handle_pr_event --> backend__services__github_client__get_installation_token
+    backend__routers__webhook___handle_pr_event --> backend__routers__webhook___analyze_pr_files
+    backend__routers__webhook___handle_pr_event --> backend__routers__webhook___build_pr_comment
+    backend__routers__webhook___handle_pr_event --> backend__routers__webhook___build_pr_summary
+    backend__routers__webhook___analyze_pr_files --> backend__services__scoring__score_to_grade
+    backend__routers__metrics__get_standard_metrics --> backend__database__get_recent_scans
+    backend__routers__metrics__get_standard_metrics --> backend__database__get_total_scan_count
+    backend__routers__metrics__get_standard_metrics --> backend__routers__metrics___utc_now_iso
+    backend__routers__metrics__get_metrics_summary --> backend__database__get_recent_scans
+    backend__routers__metrics__get_repository_metrics --> backend__database__get_recent_scans
+    backend__routers__metrics__get_repository_metrics --> backend__routers__metrics___utc_now_iso
     backend__routers__badge__health_badge --> backend__routers__badge___generate_badge_svg
     backend__routers__badge__scan_count_badge --> backend__routers__badge___generate_count_badge_svg
+    frontend__src__api__logout --> frontend__src__api__authHeaders
+    frontend__src__api__startAudit --> frontend__src__api__authHeaders
     frontend__src__components__Header__Header --> frontend__src__components__Header__tabBtn
     frontend__src__components__LanguageBar__LanguageBar --> frontend__src__components__LanguageBar__entries
     frontend__src__hooks__useAppState__interval --> frontend__src__hooks__useAppState__poll
@@ -127,12 +127,12 @@ flowchart LR
     backend__routers__audit___run_sandbox_analysis --> backend__services__scoring__generate_recommendations
     backend__routers__audit___run_sandbox_analysis --> backend__services__analyzer__count_code_stats
     backend__routers__audit___run_sandbox_analysis --> backend__services__analyzer__run_tool
-    frontend__src__components__tabs__RecentScansTab__RecentScansTab --> frontend__src__components__tabs__RecentScansTab__fetchRecentScans
     frontend__src__utils__share__getShareUrls --> frontend__src__utils__share__generateShareText
     frontend__e2e__recent_scans__spec__recentSection --> frontend__e2e__recent_scans__spec__count
     frontend__e2e__recent_scans__spec__isVisible --> frontend__e2e__recent_scans__spec__count
     frontend__e2e__social_sharing__spec__recentSection --> frontend__e2e__social_sharing__spec__count
     frontend__e2e__social_sharing__spec__isVisible --> frontend__e2e__social_sharing__spec__count
+    frontend__src__components__tabs__RecentScansTab__RecentScansTab --> frontend__src__components__tabs__RecentScansTab__fetchRecentScans
     e2e__specs__recent_scans__spec__recentSection --> e2e__specs__recent_scans__spec__count
     e2e__specs__recent_scans__spec__isVisible --> e2e__specs__recent_scans__spec__count
     e2e__specs__metrics__spec__scan --> e2e__specs__metrics__spec__skipInCI

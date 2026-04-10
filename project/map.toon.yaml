@@ -1,4 +1,4 @@
-# www | 73f 5776L | shell:2,python:20,javascript:51 | 2026-04-10
+# www | 73f 5780L | shell:2,python:20,javascript:51 | 2026-04-10
 # stats: 244 func | 0 cls | 73 mod | CC̄=3.0 | critical:4 | cycles:0
 # alerts[5]: CC ResultPhase=54; CC useAppState=51; fan-out useAppState=48; fan-out ResultPhase=26; fan-out RecentScansTab=23
 # hotspots[5]: useAppState fan=48; ResultPhase fan=26; RecentScansTab fan=23; _run_audit_pipeline fan=20; mcp_get_resource fan=20
@@ -9,7 +9,7 @@ M[73]:
   backend/database.py,170
   backend/routers/__init__.py,0
   backend/routers/audit.py,331
-  backend/routers/auth.py,163
+  backend/routers/auth.py,166
   backend/routers/badge.py,139
   backend/routers/mcp.py,436
   backend/routers/metrics.py,257
@@ -43,7 +43,7 @@ M[73]:
   frontend/e2e/smoke.spec.js,47
   frontend/e2e/social-sharing.spec.js,58
   frontend/playwright.config.js,22
-  frontend/src/App.jsx,82
+  frontend/src/App.jsx,83
   frontend/src/api.js,67
   frontend/src/components/index.js,4
   frontend/src/components/GradeCircle.jsx,33
@@ -236,16 +236,6 @@ D:
     e: count_code_stats,run_tool
     count_code_stats(repo_path)
     run_tool(name;args;fallback)
-  backend/routers/audit.py:
-    e: _utc_now_iso,_schedule_background_task,run_audit,get_audit_result,get_recent_scans_api,analyze_repo,_run_audit_pipeline,_run_sandbox_analysis
-    _utc_now_iso()
-    _schedule_background_task(coroutine)
-    run_audit(request;user)
-    get_audit_result(audit_id)
-    get_recent_scans_api(limit)
-    analyze_repo(request)
-    _run_audit_pipeline(audit_id;repo;token)
-    _run_sandbox_analysis(audit_id;repo_url;repo)
   frontend/src/components/tabs/BadgeTab.jsx:
     i: ../../config,../../constants,react
     e: BadgeSVG,color,labelW,valueText,valueW,BadgeTab,badgeUrl
@@ -256,6 +246,16 @@ D:
     valueW()
     BadgeTab()
     badgeUrl()
+  backend/routers/audit.py:
+    e: _utc_now_iso,_schedule_background_task,run_audit,get_audit_result,get_recent_scans_api,analyze_repo,_run_audit_pipeline,_run_sandbox_analysis
+    _utc_now_iso()
+    _schedule_background_task(coroutine)
+    run_audit(request;user)
+    get_audit_result(audit_id)
+    get_recent_scans_api(limit)
+    analyze_repo(request)
+    _run_audit_pipeline(audit_id;repo;token)
+    _run_sandbox_analysis(audit_id;repo_url;repo)
   backend/scripts/scan_samples.py:
     e: scan_sample_projects
     scan_sample_projects()
@@ -382,6 +382,13 @@ D:
     count()
     viewButton()
     count()
+  backend/services/github_client.py:
+    e: get_installation_token
+    get_installation_token(installation_id)
+  backend/routers/system.py:
+    e: health_check,get_domain_config
+    health_check()
+    get_domain_config()
   backend/database.py:
     e: init_db,save_scan,get_recent_scans,get_total_scan_count,upsert_user,get_user_by_github_id,get_user_by_id
     init_db()
@@ -391,13 +398,6 @@ D:
     upsert_user(github_id;login;name;avatar_url;github_token)
     get_user_by_github_id(github_id)
     get_user_by_id(user_id)
-  backend/services/github_client.py:
-    e: get_installation_token
-    get_installation_token(installation_id)
-  backend/routers/system.py:
-    e: health_check,get_domain_config
-    health_check()
-    get_domain_config()
   frontend/src/config.js:
     e: PUBLIC_URL
     PUBLIC_URL()
@@ -516,11 +516,11 @@ D:
     count()
   project.sh:
   traefik/generate-certs.sh:
-  backend/server.py:
   backend/config.py:
-  backend/store.py:
-  backend/services/__init__.py:
   backend/server_new.py:
+  backend/store.py:
+  backend/server.py:
+  backend/services/__init__.py:
   backend/routers/__init__.py:
   frontend/playwright.config.js:
     i: @playwright/test

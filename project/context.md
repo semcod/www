@@ -37,13 +37,13 @@
 - **Functions**: 13
 - **File**: `metrics.spec.js`
 
-### frontend.src.components.tabs.RecentScansTab
-- **Functions**: 10
-- **File**: `RecentScansTab.jsx`
-
 ### frontend.e2e.social-sharing.spec
 - **Functions**: 10
 - **File**: `social-sharing.spec.js`
+
+### frontend.src.components.tabs.RecentScansTab
+- **Functions**: 10
+- **File**: `RecentScansTab.jsx`
 
 ### backend.routers.auth
 - **Functions**: 9
@@ -160,14 +160,14 @@ Useful for dashboards and monitoring.
 ### e2e.specs.audit.spec.skipInCI
 - **Calls**: e2e.specs.audit.spec.describe, e2e.specs.audit.spec.goto, e2e.specs.audit.spec.getByRole, e2e.specs.audit.spec.click, e2e.specs.audit.spec.expect, e2e.specs.audit.spec.getByText, e2e.specs.audit.spec.toBeVisible, e2e.specs.audit.spec.first
 
+### backend.routers.auth.list_repos
+> List user's repos for audit selection.
+- **Calls**: router.get, Depends, resp.json, user.get, httpx.AsyncClient, client.get, r.get, r.get
+
 ### backend.routers.metrics.get_repository_metrics
 > Get metrics for a specific repository.
 repo_path format: "owner/repo" or with platform prefix "github:owner/repo"
 - **Calls**: router.get, backend.database.get_recent_scans, repo_path.split, HTTPException, HTTPException, backend.routers.metrics._utc_now_iso, len, latest_scan.get
-
-### backend.routers.auth.list_repos
-> List user's repos for audit selection.
-- **Calls**: router.get, Depends, resp.json, httpx.AsyncClient, client.get, r.get, r.get, r.get
 
 ### frontend.src.hooks.useAppState.doLogout
 - **Calls**: frontend.src.hooks.useAppState.useCallback, frontend.src.hooks.useAppState.logoutRequest, frontend.src.hooks.useAppState.removeItem, frontend.src.hooks.useAppState.setSessionToken, frontend.src.hooks.useAppState.setUser, frontend.src.hooks.useAppState.setPhase, frontend.src.hooks.useAppState.setSelectedRepo, frontend.src.hooks.useAppState.setAudit
@@ -322,13 +322,13 @@ Functions exposed as public API (no underscore prefix):
 - `frontend.src.components.phases.ResultPhase.handleDownloadPrompt` - 14 calls
 - `frontend.src.components.phases.ResultPhase.handleDownloadMarkdown` - 14 calls
 - `e2e.specs.audit.spec.skipInCI` - 13 calls
+- `backend.routers.auth.list_repos` - 12 calls
 - `backend.routers.metrics.get_repository_metrics` - 12 calls
 - `e2e.specs.metrics.spec.skipInCI` - 12 calls
 - `backend.services.analyzer.count_code_stats` - 11 calls
-- `backend.routers.auth.list_repos` - 11 calls
 - `frontend.src.hooks.useAppState.doLogout` - 11 calls
-- `backend.database.upsert_user` - 10 calls
 - `backend.services.github_client.get_installation_token` - 10 calls
+- `backend.database.upsert_user` - 10 calls
 - `backend.routers.audit.run_audit` - 10 calls
 - `backend.services.scoring.calculate_health_score` - 9 calls
 - `backend.services.scoring.generate_recommendations` - 9 calls

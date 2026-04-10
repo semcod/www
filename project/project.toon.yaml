@@ -1,4 +1,4 @@
-# www | 244 func | 48f | 6631L | javascript | 2026-04-10
+# www | 244 func | 48f | 6635L | javascript | 2026-04-10
 
 HEALTH:
   CC̄=3.0  critical=10 (limit:10)  dup=0  cycles=0
@@ -25,7 +25,7 @@ MODULES[73] (top by size):
   M[backend/routers/webhook.py] 255L C:0 F:5 CC↑14 D:0 (python)
   M[frontend/src/components/phases/LandingPhase.jsx] 232L C:0 F:8 CC↑5 D:0 (javascript)
   M[backend/database.py] 170L C:0 F:7 CC↑2 D:4 (python)
-  M[backend/routers/auth.py] 163L C:0 F:9 CC↑4 D:0 (python)
+  M[backend/routers/auth.py] 166L C:0 F:9 CC↑4 D:0 (python)
   M[backend/routers/badge.py] 139L C:0 F:4 CC↑5 D:0 (python)
   M[e2e/specs/metrics.spec.js] 128L C:0 F:7 CC↑4 D:0 (javascript)
   M[frontend/e2e/metrics.spec.js] 125L C:0 F:6 CC↑2 D:0 (javascript)
@@ -48,4 +48,4 @@ REFACTOR[8]:
   [5] M/L Split mcp_invoke_tool (CC=17 → target CC<10)
 
 EVOLUTION:
-  2026-04-10 CC̄=3.0 crit=10 6631L // Automated analysis
+  2026-04-10 CC̄=3.0 crit=10 6635L // Automated analysis

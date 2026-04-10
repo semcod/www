@@ -1,7 +1,7 @@
-# vallm batch | 175f | 50✓ 24⚠ 21✗ | 2026-04-10
+# vallm batch | 173f | 49✓ 24⚠ 21✗ | 2026-04-10
 
 SUMMARY:
-  scanned: 175  passed: 50 (28.6%)  warnings: 24  errors: 21  unsupported: 82
+  scanned: 173  passed: 49 (28.3%)  warnings: 24  errors: 21  unsupported: 81
 
 WARNINGS[24]{path,score}:
   frontend/src/App.jsx,0.78
@@ -199,7 +199,7 @@ ERRORS[21]{path,score}:
       python.import.resolvable,error,Module 'config' not found,8
 
 UNSUPPORTED[5]{bucket,count}:
-  *.md,57
+  *.md,56
   Dockerfile*,2
   *.txt,2
   *.yml,4
