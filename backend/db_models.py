@@ -152,6 +152,7 @@ class AuditResult(Base):
     metrics = Column(Text)
     recommendations = Column(Text)
     error = Column(Text)
+    audit_meta = Column(Text, default="{}")  # JSON: benchmark_mode, case_id, source_type, …
     created_at = Column(DateTime(timezone=True), default=_utcnow)
 
 

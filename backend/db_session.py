@@ -1,7 +1,7 @@
 """SQLAlchemy session and engine configuration."""
 from os import getenv
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session, sessionmaker
 
 from config import DATABASE_URL, DB_PATH, DB_TYPE
@@ -38,3 +38,18 @@ def init_db():
     """Initialize database with all tables."""
     from db_models import Base
     Base.metadata.create_all(bind=engine)
+    _run_migrations()
+
+
+def _run_migrations():
+    """Apply additive schema migrations for existing databases."""
+    migrations = [
+        "ALTER TABLE audit_results ADD COLUMN audit_meta TEXT DEFAULT '{}'",
+    ]
+    with engine.connect() as conn:
+        for sql in migrations:
+            try:
+                conn.execute(text(sql))
+                conn.commit()
+            except Exception:
+                pass  # column already exists or table doesn't exist yet

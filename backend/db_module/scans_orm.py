@@ -75,15 +75,26 @@ def get_total_scan_count(db: Session) -> int:
     return result or 0
 
 
+_BENCHMARK_META_KEYS = {
+    "case_id", "source_type", "change_type", "baseline_detected",
+    "benchmark_mode", "ticket_id", "pr_reference",
+}
+
+
 def save_audit_result(db: Session, audit_id: str, audit_data: Dict) -> None:
-    """Save audit result to database."""
+    """Save audit result to database. Merges benchmark meta into audit_meta JSON."""
     audit = db.query(AuditResult).filter(AuditResult.audit_id == audit_id).first()
-    
+
+    # Extract and merge benchmark meta fields
+    incoming_meta = {k: v for k, v in audit_data.items() if k in _BENCHMARK_META_KEYS}
+
     if audit:
-        # Update existing
-        audit.repo = audit_data.get("repo")
+        existing_meta = json.loads(audit.audit_meta or "{}") if hasattr(audit, "audit_meta") else {}
+        merged_meta = {**existing_meta, **incoming_meta}
+        audit.repo = audit_data.get("repo") or audit.repo
         audit.status = audit_data.get("status")
-        audit.started = audit_data.get("started")
+        if audit_data.get("started"):
+            audit.started = audit_data["started"]
         audit.completed = audit_data.get("completed")
         audit.health_score = audit_data.get("health_score")
         audit.grade = audit_data.get("grade")
@@ -91,8 +102,9 @@ def save_audit_result(db: Session, audit_id: str, audit_data: Dict) -> None:
         audit.metrics = json.dumps(audit_data.get("metrics", {}))
         audit.recommendations = json.dumps(audit_data.get("recommendations", []))
         audit.error = audit_data.get("error")
+        if hasattr(audit, "audit_meta"):
+            audit.audit_meta = json.dumps(merged_meta)
     else:
-        # Create new
         audit = AuditResult(
             audit_id=audit_id,
             repo=audit_data.get("repo"),
@@ -105,9 +117,10 @@ def save_audit_result(db: Session, audit_id: str, audit_data: Dict) -> None:
             metrics=json.dumps(audit_data.get("metrics", {})),
             recommendations=json.dumps(audit_data.get("recommendations", [])),
             error=audit_data.get("error"),
+            audit_meta=json.dumps(incoming_meta),
         )
         db.add(audit)
-    
+
     db.commit()
 
 
@@ -119,18 +132,34 @@ def get_audit_result(db: Session, audit_id: str) -> Optional[Dict]:
     if not audit:
         return None
     
+    meta = json.loads(audit.audit_meta) if hasattr(audit, "audit_meta") and audit.audit_meta else {}
+
+    # Compute duration_seconds
+    duration_seconds = None
+    if audit.started and audit.completed:
+        try:
+            from datetime import datetime, timezone
+            fmt = "%Y-%m-%dT%H:%M:%S.%f%z"
+            t0 = datetime.fromisoformat(audit.started)
+            t1 = datetime.fromisoformat(audit.completed)
+            duration_seconds = int((t1 - t0).total_seconds())
+        except Exception:
+            pass
+
     return {
         "audit_id": audit.audit_id,
         "repo": audit.repo,
         "status": audit.status,
         "started": audit.started,
         "completed": audit.completed,
+        "duration_seconds": duration_seconds,
         "health_score": audit.health_score,
         "grade": audit.grade,
         "stats": json.loads(audit.stats) if audit.stats else {},
         "metrics": json.loads(audit.metrics) if audit.metrics else {},
         "recommendations": json.loads(audit.recommendations) if audit.recommendations else [],
         "error": audit.error,
+        **meta,
     }
 
 
