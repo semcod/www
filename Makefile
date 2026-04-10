@@ -1,4 +1,4 @@
-.PHONY: help install dev dev-demo build docker-up docker-down clean venv certs
+.PHONY: help install dev dev-demo build docker-up docker-down clean venv certs quality quality-baseline pre-commit-install
 
 VENV_DIR = backend/.venv
 PYTHON = $(VENV_DIR)/bin/python
@@ -36,7 +36,12 @@ help:
 	@echo "    make test-demo     - Testy demo login (wymaga dev-demo)"
 	@echo ""
 	@echo "  Inne:"
-	@echo "    make clean         - Czyści zainstalowane zależności"
+	@echo "    make clean              - Czyści zainstalowane zależności"
+	@echo ""
+	@echo "  Jakość kodu:"
+	@echo "    make quality            - Uruchamia quality gate (CC, file size)"
+	@echo "    make quality-baseline   - Zapisuje aktualny snapshot jako baseline"
+	@echo "    make pre-commit-install - Instaluje pre-commit hook"
 
 # Tworzenie wirtualnego środowiska Python
 venv:
@@ -132,3 +137,19 @@ test-e2e-ui:
 test-demo:
 	@echo "=== Uruchamianie testów demo login (wymaga make dev-demo) ==="
 	cd e2e && BASE_URL=http://localhost:$(FRONTEND_PORT) npx playwright test demo-login --headed
+
+# Quality gate
+quality:
+	@echo "=== Quality Gate ==="
+	python3 backend/quality_gate.py --baseline .quality-baseline.json
+
+quality-baseline:
+	@echo "=== Zapisuję baseline jakości ==="
+	python3 backend/quality_gate.py --save-baseline .quality-baseline.json
+	@echo "=== Baseline zapisany w .quality-baseline.json ==="
+
+pre-commit-install:
+	@echo "=== Instalacja pre-commit hook ==="
+	@printf '#!/bin/sh\npython3 backend/quality_gate.py --baseline .quality-baseline.json || { echo "Quality gate failed - commit rejected."; exit 1; }\n' > .git/hooks/pre-commit
+	chmod +x .git/hooks/pre-commit
+	@echo "=== pre-commit hook zainstalowany ==="

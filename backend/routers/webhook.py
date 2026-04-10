@@ -130,6 +130,22 @@ async def _handle_pr_event(payload: dict):
     print(f"[pr-bot] Commented on {repo_full}#{pr_number}: {grade} → {report_url}")
 
 
+def _score_analysis(files_count: int, has_tests: bool, total_changes: int,
+                    large_files: list, risky_files: list) -> int:
+    """Compute PR quality score from aggregated signals."""
+    score = 85
+    if not has_tests and total_changes > 50:
+        score -= 15
+    if files_count > 20:
+        score -= 10
+    elif files_count > 10:
+        score -= 5
+    score -= min(20, len(large_files) * 5)
+    if risky_files and not has_tests:
+        score -= 10
+    return max(0, min(100, score))
+
+
 def _analyze_pr_files(files: list[dict]) -> dict:
     """Analyze PR changed files for quality signals."""
     total_additions = 0
@@ -138,6 +154,7 @@ def _analyze_pr_files(files: list[dict]) -> dict:
     risky_files = []
     has_tests = False
     file_types: dict[str, int] = {}
+    risky_patterns = ["migration", "schema", "config", "secret", ".env", "deploy"]
 
     for f in files:
         if not isinstance(f, dict):
@@ -148,38 +165,17 @@ def _analyze_pr_files(files: list[dict]) -> dict:
         deletions = f.get("deletions", 0)
         total_additions += additions
         total_deletions += deletions
-
-        ext = Path(filename).suffix
-        file_types[ext] = file_types.get(ext, 0) + 1
+        file_types[Path(filename).suffix] = file_types.get(Path(filename).suffix, 0) + 1
 
         if "test" in filename.lower() or "spec" in filename.lower():
             has_tests = True
-
         if additions + deletions > LARGE_FILE_THRESHOLD:
             large_files.append({"file": filename, "changes": additions + deletions})
-
-        risky_patterns = ["migration", "schema", "config", "secret", ".env", "deploy"]
         if any(p in filename.lower() for p in risky_patterns):
             risky_files.append(filename)
 
-    score = 85
-
-    code_changes = total_additions + total_deletions
-    if not has_tests and code_changes > 50:
-        score -= 15
-
-    if len(files) > 20:
-        score -= 10
-    elif len(files) > 10:
-        score -= 5
-
-    score -= min(20, len(large_files) * 5)
-
-    if risky_files and not has_tests:
-        score -= 10
-
-    score = max(0, min(100, score))
-
+    score = _score_analysis(len(files), has_tests, total_additions + total_deletions,
+                            large_files, risky_files)
     return {
         "score": score,
         "grade": score_to_grade(score),

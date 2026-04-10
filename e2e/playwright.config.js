@@ -9,16 +9,11 @@ export default defineConfig({
   workers: 1,
   reporter: 'list',
   use: {
-    baseURL: process.env.BASE_URL || 'http://localhost:5173',
+    baseURL: process.env.BASE_URL || 'https://semcod.localhost',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     headless: !!process.env.CI,
-  },
-  webServer: {
-    command: 'npm run dev -- --host 127.0.0.1 --port 5173',
-    cwd: '../frontend',
-    url: 'http://127.0.0.1:5173',
-    reuseExistingServer: true,
+    ignoreHTTPSErrors: true, // Allow self-signed certs
   },
   projects: [
     {

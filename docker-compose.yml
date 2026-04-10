@@ -1,6 +1,26 @@
 version: "3.9"
 
 services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: semcod
+      POSTGRES_USER: semcod
+      POSTGRES_PASSWORD: semcod
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+
   backend:
     build:
       context: ./backend
@@ -16,7 +36,34 @@ services:
       - CORS_ORIGINS=http://nvidia:3000,https://semcod.com
     volumes:
       - ./private-key.pem:/app/private-key.pem:ro
+    depends_on:
+      - db
+      - redis
     restart: unless-stopped
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: celery -A worker worker --loglevel=info
+    env_file:
+      - .env
+    environment:
+      - GITHUB_PRIVATE_KEY_PATH=/app/private-key.pem
+      - REDIS_URL=redis://redis:6379/0
+      - DATABASE_URL=postgresql://semcod:semcod@db:5432/semcod
+    volumes:
+      - ./private-key.pem:/app/private-key.pem:ro
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "celery", "-A", "worker", "inspect", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   frontend:
     build:
@@ -29,3 +76,7 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:

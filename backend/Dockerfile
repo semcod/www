@@ -12,10 +12,15 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy all backend files including modular structure
-COPY server.py config.py store.py database.py sample_projects.py ./
+COPY server.py config.py store.py database.py sample_projects.py worker.py quality_gate.py ./
 COPY services/ ./services/
 COPY routers/ ./routers/
 COPY scripts/ ./scripts/
+COPY worker/ ./worker/
+COPY events/ ./events/
+COPY adapters/ ./adapters/
+COPY scheduler/ ./scheduler/
+COPY apps/ ./apps/
 
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \

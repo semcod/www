@@ -5,7 +5,7 @@ set -e
 CERTS_DIR="$(dirname "$0")/certs"
 mkdir -p "$CERTS_DIR"
 
-if [ -f "$CERTS/local-cert.pem" ]; then
+if [ -f "$CERTS_DIR/local-cert.pem" ]; then
   echo "Certs already exist in $CERTS_DIR — skipping."
   echo "Delete them and re-run to regenerate."
   exit 0
@@ -16,8 +16,8 @@ echo "Generating self-signed certificate for semcod.localhost ..."
 openssl req -x509 -nodes \
   -days 365 \
   -newkey rsa:2048 \
-  -keyout "$CERTS/local-key.pem" \
-  -out "$CERTS/local-cert.pem" \
+  -keyout "$CERTS_DIR/local-key.pem" \
+  -out "$CERTS_DIR/local-cert.pem" \
   -subj "/CN=semcod.localhost" \
   -addext "subjectAltName=DNS:semcod.localhost,DNS:localhost,IP:127.0.0.1"
 

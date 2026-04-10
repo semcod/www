@@ -83,3 +83,67 @@ export async function analyzePublicRepo(repoUrl) {
   if (!res.ok) throw new Error("Failed to analyze repo");
   return res.json();
 }
+
+// ─── Multi-platform Auth ──────────────────────────────────────────────────────
+
+export function loginWithProvider(provider) {
+  window.location.href = `${API}/auth/${provider}`;
+}
+
+// ─── PR Preview ───────────────────────────────────────────────────────────────
+
+export async function getPreview(repo, provider, sessionToken) {
+  const res = await fetch(`${API}/api/preview`, {
+    method: "POST",
+    headers: authHeaders(sessionToken),
+    body: JSON.stringify({ repo, provider }),
+  });
+  if (!res.ok) throw new Error("Failed to get preview");
+  return res.json();
+}
+
+// ─── App Installation ─────────────────────────────────────────────────────────
+
+export async function installApp(repo, provider, apps, sessionToken) {
+  const res = await fetch(`${API}/api/install`, {
+    method: "POST",
+    headers: authHeaders(sessionToken),
+    body: JSON.stringify({ repo, provider, apps }),
+  });
+  if (!res.ok) throw new Error("Failed to install app");
+  return res.json();
+}
+
+export async function getInstallations(sessionToken) {
+  const res = await fetch(`${API}/api/installations`, {
+    headers: { "Authorization": `Bearer ${sessionToken}` },
+  });
+  if (!res.ok) throw new Error("Failed to fetch installations");
+  return res.json();
+}
+
+export async function uninstallApp(repo, provider, sessionToken) {
+  const res = await fetch(`${API}/api/install`, {
+    method: "DELETE",
+    headers: authHeaders(sessionToken),
+    body: JSON.stringify({ repo, provider }),
+  });
+  if (!res.ok) throw new Error("Failed to uninstall app");
+  return res.json();
+}
+
+// ─── Marketplace Apps ─────────────────────────────────────────────────────────
+
+export async function getApps() {
+  const res = await fetch(`${API}/api/apps`);
+  if (!res.ok) throw new Error("Failed to fetch apps");
+  return res.json();
+}
+
+export async function getAppStatus(repo, provider, sessionToken) {
+  const res = await fetch(`${API}/api/apps/status?repo=${encodeURIComponent(repo)}&provider=${provider}`, {
+    headers: { "Authorization": `Bearer ${sessionToken}` },
+  });
+  if (!res.ok) throw new Error("Failed to fetch app status");
+  return res.json();
+}
