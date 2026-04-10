@@ -30,6 +30,7 @@ export default function App() {
 
             {phase === "landing" && (
               <LandingPhase
+                key={`landing-${Date.now()}`}
                 startOAuth={startOAuth}
                 startDemoLogin={startDemoLogin}
                 repoUrl={repoUrl}

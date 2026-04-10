@@ -35,6 +35,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Quadlet deployment docs link in README
 - Full env vars table in README
 
+## [0.1.7] - 2026-04-10
+
+### Docs
+- Update README.md
+- Update docs/roadmap.md
+
+### Other
+- Update backend/routers/auth.py
+- Update frontend/src/App.jsx
+- Update frontend/src/components/phases/LandingPhase.jsx
+- Update frontend/src/components/tabs/RecentScansTab.jsx
+
 ## [0.1.6] - 2026-04-10
 
 ### Docs

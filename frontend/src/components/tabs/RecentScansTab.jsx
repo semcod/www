@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { C, gradeColor } from "../../constants";
+import { C, gradeColor, API } from "../../constants";
 import { getShareUrls } from "../../utils/share";
 import { config } from "../../config";
 
@@ -13,7 +13,7 @@ export function RecentScansTab() {
 
   const fetchRecentScans = async () => {
     try {
-      const response = await fetch("/api/scans/recent?limit=100");
+      const response = await fetch(`${API}/api/scans/recent?limit=100`);
       const data = await response.json();
       setScans(data.scans || []);
     } catch (error) {

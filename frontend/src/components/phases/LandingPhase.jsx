@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { C, gradeColor } from "../../constants";
+import { C, gradeColor, API } from "../../constants";
 import { getShareUrls } from "../../utils/share";
 
 export function LandingPhase({ startOAuth, startDemoLogin, repoUrl, setRepoUrl, startSandbox }) {
@@ -11,7 +11,7 @@ export function LandingPhase({ startOAuth, startDemoLogin, repoUrl, setRepoUrl, 
 
   const fetchRecentScans = async () => {
     try {
-      const response = await fetch("/api/scans/recent?limit=5");
+      const response = await fetch(`${API}/api/scans/recent?limit=5`);
       const data = await response.json();
       setRecentScans(data.scans || []);
     } catch (error) {

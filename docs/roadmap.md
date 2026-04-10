@@ -112,7 +112,16 @@ Trzeba sprawdzić, która ścieżka ma większą konwersję:
 
 ## Roadmapa wykonania
 
-## Faza 0 — stabilizacja pod roadmapę
+Sugerowany horyzont realizacji:
+
+- Faza 0 — 1-2 tygodnie
+- Faza 1 — 2-3 tygodnie
+- Faza 2 — 2-4 tygodnie
+- Faza 3 — 1-2 tygodnie
+- Faza 4 — 3-6 tygodni
+- Faza 5 — 4-8 tygodni
+
+### Faza 0 — stabilizacja pod roadmapę (1-2 tyg.)
 
 ### Cel
 
@@ -142,7 +151,7 @@ To nie jest refaktoryzacja „dla porządku”. To warunek, żeby bezpiecznie do
 - wynik skanu i działania użytkownika są mierzalne,
 - główne flow audytu i prezentacji wyniku są zabezpieczone testami regresyjnymi.
 
-## Faza 1 — test walidacyjny „co nowego wykrywa?”
+### Faza 1 — test walidacyjny „co nowego wykrywa?” (2-3 tyg.)
 
 ### Cel
 
@@ -181,7 +190,7 @@ Należy przygotować benchmark obejmujący:
 - czas od skanu do rekomendacji,
 - liczba wyników, które przeszły do etapu poprawki lub PR.
 
-## Faza 2 — warstwa rekomendacji i propozycji poprawy
+### Faza 2 — warstwa rekomendacji i propozycji poprawy (2-4 tyg.)
 
 ### Cel
 
@@ -215,7 +224,7 @@ Ta warstwa powinna być widoczna równolegle w:
 - użytkownik widzi nie tylko „co jest źle”, ale też „co zrobić teraz”,
 - możliwe jest przejście z rekomendacji do szkicu PR bez ręcznego przepisywania analizy.
 
-## Faza 3 — produktowe ścieżki wdrożenia
+### Faza 3 — produktowe ścieżki wdrożenia (1-2 tyg.)
 
 ### Cel
 
@@ -266,7 +275,7 @@ Semcod dostarcza wtedy:
 - każda ścieżka ma opis: dla kogo, co obejmuje, jakie są ograniczenia,
 - klient po skanie dostaje jasne pytanie o preferowany model wdrożenia.
 
-## Faza 4 — automatyzacja na bazie ticketów i zmian
+### Faza 4 — automatyzacja na bazie ticketów i zmian (3-6 tyg.)
 
 ### Cel
 
@@ -307,7 +316,7 @@ Z partnerami można dostarczać:
 - istnieje approval gate człowieka przed merge lub deploymentem,
 - wynik automatyzacji jest mierzalny: czas, jakość, liczba poprawek manualnych.
 
-## Faza 5 — marketplace artefaktów i rozliczenie usługi
+### Faza 5 — marketplace artefaktów i rozliczenie usługi (4-8 tyg.)
 
 ### Cel
 

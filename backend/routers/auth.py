@@ -138,6 +138,9 @@ async def logout():
 @router.get("/api/repos")
 async def list_repos(user: dict = Depends(get_current_user)):
     """List user's repos for audit selection."""
+    if not user.get('github_token'):
+        return []
+    
     async with httpx.AsyncClient() as client:
         resp = await client.get(
             "https://api.github.com/user/repos",
