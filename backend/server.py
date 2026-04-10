@@ -9,7 +9,7 @@ Deploy: uvicorn server:app --host 0.0.0.0 --port 9000
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from config import FRONTEND_URL
+from config import CORS_ORIGINS
 from routers.auth import router as auth_router
 from routers.audit import router as audit_router
 from routers.webhook import router as webhook_router
@@ -25,7 +25,7 @@ app = FastAPI(title="Semcod", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[FRONTEND_URL, "https://semcod.com"],
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

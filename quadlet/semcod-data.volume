@@ -1,0 +1,4 @@
+[Volume]
+VolumeName=semcod-data
+Driver=local
+Label=app=semcod

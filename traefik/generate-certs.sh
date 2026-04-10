@@ -3,7 +3,7 @@
 set -e
 
 CERTS_DIR="$(dirname "$0")/certs"
-mkdir -p "$CERTS"
+mkdir -p "$CERTS_DIR"
 
 if [ -f "$CERTS/local-cert.pem" ]; then
   echo "Certs already exist in $CERTS_DIR — skipping."

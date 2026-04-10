@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import RedirectResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-from config import APP_URL, FRONTEND_URL, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, SECRET_KEY, SESSION_EXPIRE_HOURS, DEMO_MODE
+from config import APP_URL, FRONTEND_URL, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_SCOPE, SECRET_KEY, SESSION_EXPIRE_HOURS, DEMO_MODE, REPOS_PER_PAGE
 from database import upsert_user, get_user_by_id
 
 router = APIRouter()
@@ -46,7 +46,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
 @router.get("/auth/github")
 async def github_oauth_start():
     """Step 1: Redirect user to GitHub OAuth."""
-    scope = "repo,read:org"
+    scope = GITHUB_OAUTH_SCOPE
     url = (
         f"https://github.com/login/oauth/authorize"
         f"?client_id={GITHUB_CLIENT_ID}"
@@ -141,7 +141,7 @@ async def list_repos(user: dict = Depends(get_current_user)):
     async with httpx.AsyncClient() as client:
         resp = await client.get(
             "https://api.github.com/user/repos",
-            params={"sort": "updated", "per_page": 30, "type": "owner"},
+            params={"sort": "updated", "per_page": REPOS_PER_PAGE, "type": "owner"},
             headers={
                 "Authorization": f"Bearer {user['github_token']}",
                 "Accept": "application/vnd.github+json",

@@ -1,0 +1,4 @@
+[Network]
+NetworkName=semcod
+Driver=bridge
+Label=app=semcod

@@ -9,7 +9,7 @@ from pathlib import Path
 from fastapi import APIRouter, HTTPException, Request
 import httpx
 
-from config import APP_URL, GITHUB_WEBHOOK_SECRET
+from config import APP_URL, GITHUB_WEBHOOK_SECRET, LARGE_FILE_THRESHOLD
 from services.github_client import get_installation_token
 from services.scoring import score_to_grade
 from store import audit_results
@@ -149,7 +149,7 @@ def _analyze_pr_files(files: list[dict]) -> dict:
         if "test" in filename.lower() or "spec" in filename.lower():
             has_tests = True
 
-        if additions + deletions > 300:
+        if additions + deletions > LARGE_FILE_THRESHOLD:
             large_files.append({"file": filename, "changes": additions + deletions})
 
         risky_patterns = ["migration", "schema", "config", "secret", ".env", "deploy"]

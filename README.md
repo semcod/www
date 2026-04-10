@@ -1,56 +1,69 @@
-# Semcod GitHub App
+# Semcod
 
 
 ## AI Cost Tracking
 
-![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.1.5-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
-![AI Cost](https://img.shields.io/badge/AI%20Cost-$1.20-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-5.2h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
+![PyPI](https://img.shields.io/badge/pypi-costs-blue) ![Version](https://img.shields.io/badge/version-0.1.6-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
+![AI Cost](https://img.shields.io/badge/AI%20Cost-$1.50-orange) ![Human Time](https://img.shields.io/badge/Human%20Time-6.4h-blue) ![Model](https://img.shields.io/badge/Model-openrouter%2Fqwen%2Fqwen3--coder--next-lightgrey)
 
-- 🤖 **LLM usage:** $1.2000 (8 commits)
-- 👤 **Human dev:** ~$521 (5.2h @ $100/h, 30min dedup)
+- 🤖 **LLM usage:** $1.5000 (10 commits)
+- 👤 **Human dev:** ~$640 (6.4h @ $100/h, 30min dedup)
 
 Generated on 2026-04-10 using [openrouter/qwen/qwen3-coder-next](https://openrouter.ai/qwen/qwen3-coder-next)
 
 ---
 
-**One-click Audit · PR Comment Bot · Code Health Badge**
+**One-click Audit · PR Comment Bot · Code Health Badge · MCP Integration**
 
 Zautomatyzowany pipeline jakości kodu jako GitHub App — od podłączenia repo do badge w README w 60 sekund.
 
 ```
-semcod-github-app/
+semcod/
 ├── backend/                 # FastAPI server
-│   ├── server.py           # Główny serwer (OAuth, Webhook, Badge, Audit pipeline)
-│   ├── requirements.txt
+│   ├── server.py           # Główny serwer (CORS, routers)
+│   ├── config.py           # Konfiguracja z env (20 zmiennych)
+│   ├── database.py         # SQLite persistence (scans, users)
+│   ├── store.py            # In-memory cache (audit_results, badge_cache, scan_history)
+│   ├── routers/
+│   │   ├── audit.py        # Audit pipeline + sandbox analysis
+│   │   ├── auth.py         # OAuth + demo login
+│   │   ├── webhook.py      # GitHub webhook (PR bot)
+│   │   ├── badge.py        # SVG badge generator
+│   │   ├── metrics.py      # Standardized metrics API
+│   │   ├── mcp.py          # Model Context Protocol
+│   │   └── system.py       # Health check, domain config
+│   ├── services/
+│   │   ├── analyzer.py     # code2llm, redup, pyqual runners
+│   │   ├── scoring.py      # Health score, grades, recommendations
+│   │   └── github_client.py # GitHub App JWT auth
 │   └── Dockerfile
 ├── frontend/               # React + Vite
 │   ├── src/
-│   │   ├── App.jsx         # Główny komponent (3 taby: Audit, PR Bot, Badge)
-│   │   ├── main.jsx
-│   │   └── index.css
-│   ├── index.html
-│   ├── package.json
-│   └── vite.config.js
-├── articles/               # 28 artykułów WordPress (Markdown + frontmatter)
-├── .github/workflows/
-│   └── deploy.yml          # CI/CD: build + deploy
-├── docker-compose.yml      # Pełny deployment stack
-├── github-app-manifest.json # Manifest do rejestracji GitHub App
-├── .env.example
-├── SETUP.md                # Szczegółowa instrukcja wdrożenia
-└── README.md               # Ten plik
+│   │   ├── App.jsx         # Główny komponent
+│   │   ├── api.js          # API client
+│   │   ├── config.js       # Frontend config (VITE_ vars)
+│   │   ├── constants.js    # Colors, grades, demo data
+│   │   ├── hooks/          # useAppState (URL hash routing)
+│   │   ├── components/     # Phases, tabs, shared UI
+│   │   └── screens/        # Screen layouts
+│   └── Dockerfile
+├── quadlet/                # Podman Quadlet (systemd deployment)
+├── traefik/                # Traefik config (local HTTPS + production)
+├── articles/               # 28 artykułów WordPress
+├── .env.example            # Wszystkie zmienne konfiguracyjne
+├── docker-compose.yml      # Production stack
+├── docker-compose.override.yml # Local dev (Traefik + demo mode)
+└── README.md
 ```
 
 ## Szybki start
 
-### 1. Zarejestruj GitHub App
+### 1. Konfiguracja
 
 ```bash
-# Idź do https://github.com/settings/apps/new
-# Użyj github-app-manifest.json jako template
-# Zapisz credentials do .env
 cp .env.example .env
 # Uzupełnij: GITHUB_APP_ID, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_WEBHOOK_SECRET
+# Dostosuj: APP_URL, FRONTEND_URL, CORS_ORIGINS (dla LAN: http://HOSTNAME:PORT)
 ```
 
 ### 2. Backend
@@ -58,7 +71,7 @@ cp .env.example .env
 ```bash
 cd backend/
 pip install -r requirements.txt
-uvicorn server:app --reload --port 8000
+uvicorn server:app --reload --port 9000
 ```
 
 ### 3. Frontend
@@ -70,48 +83,63 @@ npm run dev
 # → http://localhost:5173
 ```
 
-### 4. Produkcja (Docker)
+### 4. Docker (LAN access)
 
 ```bash
-docker-compose up -d
-# Backend: :8000, Frontend: :3000
+docker compose up -d
+# Frontend: http://nvidia:3000  Backend: http://nvidia:8003
+# HTTPS: https://semcod.localhost
 ```
+
+### 5. Podman Quadlet (produkcja VPS)
+
+Zobacz [quadlet/README.md](./quadlet/README.md) — systemd + Traefik + Let's Encrypt.
 
 ## Co jest w paczce
 
-### Backend (`server.py`)
-- **OAuth flow** — `/auth/github` → GitHub → `/auth/callback` → token
+### Backend
+- **OAuth flow** — `/auth/github` → GitHub → `/auth/callback` → JWT session
+- **Demo login** — `/auth/demo` (gdy `DEMO_MODE=1`)
 - **One-click Audit** — `/api/audit` → background pipeline (code2llm → redup → pyqual → regix) → raport JSON
+- **Sandbox Analysis** — `/api/analyze` → public repo bez autoryzacji
 - **PR Comment Bot** — `/webhook/github` → analiza plików PR → komentarz Markdown z metrykami
 - **Badge SVG** — `/badge/{owner-repo}.svg` → dynamiczny shields.io-style badge
+- **Scan History** — `/api/scans/recent` → SQLite + in-memory fallback
+- **MCP Server** — `/mcp/*` → Model Context Protocol dla AI
 - **Webhook security** — HMAC-SHA256 signature verification
 
-### Frontend (`App.jsx`)
-- **Tab: One-click Audit** — OAuth → wybór repo → animowany skan → raport z grade circle, metrykami, language bar, rekomendacjami z komendami ReDSL/redup/pyqual
-- **Tab: PR Bot** — realistyczny preview komentarza GitHub (tabela metryk, flagi ryzyka, sugestie)
+### Frontend
+- **Tab: Audit** — OAuth → wybór repo → animowany skan → raport z grade, metrykami, rekomendacjami
+- **Tab: Recent Scans** — lista ostatnich skanów z metrykami i share buttons
 - **Tab: Badge** — generator kodu Markdown/HTML z live preview badge'ów
+- **Sandbox mode** — skanowanie publicznych repo bez logowania
 
-### Artykuły (`articles/`)
-28 artykułów WordPress-ready (Markdown + YAML frontmatter):
-- 1 overview ekosystemu Semcod
-- 1 strategia biznesowa
-- 26 artykułów per-projekt (code2llm, pyqual, redup, regix, vallm, llx, proxym, preLLM, goal, planfile, pfix, algitex, metrun, nfo, cost, code2docs, domd, clickmd, toonic, code2logic, prefact, qualbench, weekly, pactfix, heal, ats-benchmark)
+### Deployment
+- **Docker Compose** — lokalny dev z Traefik HTTPS + LAN access
+- **Podman Quadlet** — produkcja VPS z systemd + Let's Encrypt
+- **20 zmiennych env** — pełna konfiguracja bez hardkodu (zobacz `.env.example`)
 
 ## Endpointy API
 
 | Endpoint | Metoda | Opis |
 |----------|--------|------|
-| `GET /auth/github` | OAuth start |
-| `GET /auth/callback` | OAuth callback → redirect z tokenem |
-| `GET /api/repos?token=` | Lista repozytoriów użytkownika |
-| `POST /api/audit` | Uruchom audyt `{repo, token}` → `{audit_id}` |
-| `GET /api/audit/{id}` | Pobierz wynik audytu |
-| `POST /webhook/github` | Webhook (PR bot, instalacje) |
-| `GET /badge/{owner-repo}.svg` | Badge SVG |
-| `GET /api/health` | Health check |
-| `GET /mcp/info` | MCP server info |
-| `GET /mcp/resources` | MCP resources list |
-| `POST /mcp/invoke` | MCP tool invocation |
+| `GET /auth/github` | GET | OAuth start |
+| `GET /auth/callback` | GET | OAuth callback → redirect z tokenem |
+| `POST /auth/demo` | POST | Demo login (DEMO_MODE=1) |
+| `GET /api/me` | GET | Profil użytkownika |
+| `GET /api/repos` | GET | Lista repozytoriów użytkownika |
+| `POST /api/audit` | POST | Uruchom audyt `{repo}` → `{audit_id}` |
+| `POST /api/analyze` | POST | Sandbox analysis `{repo_url, sandbox}` |
+| `GET /api/audit/{id}` | GET | Pobierz wynik audytu |
+| `GET /api/scans/recent` | GET | Ostatnie skany z metrykami |
+| `GET /api/metrics/standard` | GET | Standaryzowane metryki |
+| `GET /api/config/domain` | GET | Konfiguracja domeny |
+| `GET /api/health` | GET | Health check |
+| `POST /webhook/github` | POST | Webhook (PR bot, instalacje) |
+| `GET /badge/{owner-repo}.svg` | GET | Badge SVG |
+| `GET /mcp/info` | GET | MCP server info |
+| `GET /mcp/resources` | GET | MCP resources list |
+| `POST /mcp/invoke` | POST | MCP tool invocation |
 
 ## MCP Integration
 
@@ -141,13 +169,31 @@ Testy są oznaczone markerami:
 - `@pytest.mark.integration` - testy integracyjne
 - `@pytest.mark.slow` - wolne testy (domyślnie pomijane w `test-fast`)
 
-## Model cenowy (rekomendowany)
+## Zmienne środowiskowe
 
-| Tier | Cena | Co dostaje |
-|------|------|-----------|
-| **Free** | $0 | Public repo, 3 skany/mies., badge, PR bot (metrics only) |
-| **Pro** | $9/mies. | Private repo, unlimited, PR bot + auto-fix suggestions |
-| **Team** | $29/mies. | Org-wide, dashboard, custom rules, priority support |
+Wszystkie ustawienia w `.env` — bez hardkodu w kodzie. Pełna lista w `.env.example`:
+
+| Zmienna | Domyślnie | Opis |
+|---------|-----------|------|
+| `GITHUB_APP_ID` | | GitHub App ID |
+| `GITHUB_CLIENT_ID` | | OAuth Client ID |
+| `GITHUB_CLIENT_SECRET` | | OAuth Client Secret |
+| `GITHUB_WEBHOOK_SECRET` | | Webhook signing secret |
+| `GITHUB_PRIVATE_KEY_PATH` | `private-key.pem` | Ścieżka do klucza prywatnego |
+| `GITHUB_OAUTH_SCOPE` | `repo,read:org` | OAuth scope |
+| `APP_URL` | `http://localhost:9000` | URL backendu |
+| `FRONTEND_URL` | `http://localhost:5173` | URL frontendu |
+| `PUBLIC_URL` | `$APP_URL` | Publiczny URL |
+| `HOST` | `0.0.0.0` | Bind address |
+| `PORT` | `9000` | Port backendu |
+| `SECRET_KEY` | `dev-secret-change-me` | Klucz JWT (zmień w produkcji!) |
+| `SESSION_EXPIRE_HOURS` | `168` | Czas wygaśnięcia sesji (7 dni) |
+| `DEMO_MODE` | `0` | Włącz demo login (`1` = tak) |
+| `DB_PATH` | `scans.db` | Ścieżka do SQLite |
+| `SCAN_HISTORY_LIMIT` | `100` | Limit skanów w pamięci |
+| `REPOS_PER_PAGE` | `30` | Repozytoria na stronę |
+| `CORS_ORIGINS` | `$FRONTEND_URL,https://semcod.com` | Dozwolone origins (comma-separated) |
+| `LARGE_FILE_THRESHOLD` | `300` | Próg zmian w pliku (PR bot) |
 
 ## Dokumentacja
 
@@ -156,7 +202,9 @@ Testy są oznaczone markerami:
 - [Getting Started](./docs/getting-started.md) - Szybki start
 - [API Reference](./docs/api.md) - Dokumentacja API
 - [Architecture](./docs/architecture.md) - Architektura systemu
+- [Roadmap](./docs/roadmap.md) - Roadmapa walidacji wartości, automatyzacji i deploymentu
 - [MCP Integration](./docs/MCP.md) - Integracja z AI
+- [Quadlet Deployment](./quadlet/README.md) - VPS z Podman + systemd
 
 ## Licencja
 

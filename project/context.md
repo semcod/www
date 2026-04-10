@@ -6,10 +6,10 @@
 - **Primary Language**: javascript
 - **Languages**: javascript: 51, python: 20, shell: 2
 - **Analysis Mode**: static
-- **Total Functions**: 245
+- **Total Functions**: 244
 - **Total Classes**: 4
 - **Modules**: 73
-- **Entry Points**: 199
+- **Entry Points**: 198
 
 ## Architecture by Module
 
@@ -57,13 +57,13 @@
 - **Functions**: 9
 - **File**: `scan-workflow.spec.js`
 
-### backend.routers.audit
-- **Functions**: 8
-- **File**: `audit.py`
-
 ### frontend.src.components.phases.LandingPhase
 - **Functions**: 8
 - **File**: `LandingPhase.jsx`
+
+### backend.routers.audit
+- **Functions**: 8
+- **File**: `audit.py`
 
 ### frontend.src.utils.share
 - **Functions**: 8
@@ -128,12 +128,12 @@ Response format:
 ### frontend.src.components.tabs.RecentScansTab.RecentScansTab
 - **Calls**: frontend.src.components.tabs.RecentScansTab.useState, frontend.src.components.tabs.RecentScansTab.useEffect, frontend.src.components.tabs.RecentScansTab.fetchRecentScans, frontend.src.components.tabs.RecentScansTab.fetch, frontend.src.components.tabs.RecentScansTab.json, frontend.src.components.tabs.RecentScansTab.setScans, frontend.src.components.tabs.RecentScansTab.error, frontend.src.components.tabs.RecentScansTab.setLoading
 
+### frontend.src.components.phases.LandingPhase.LandingPhase
+- **Calls**: frontend.src.components.phases.LandingPhase.useState, frontend.src.components.phases.LandingPhase.useEffect, frontend.src.components.phases.LandingPhase.fetchRecentScans, frontend.src.components.phases.LandingPhase.fetch, frontend.src.components.phases.LandingPhase.json, frontend.src.components.phases.LandingPhase.setRecentScans, frontend.src.components.phases.LandingPhase.error, frontend.src.components.phases.LandingPhase.getShareUrls
+
 ### backend.routers.audit.analyze_repo
 > Analyze any public repository by URL (sandbox mode).
 - **Calls**: router.post, body.get, body.get, backend.routers.audit._schedule_background_task, request.json, HTTPException, re.search, re.search
-
-### frontend.src.components.phases.LandingPhase.LandingPhase
-- **Calls**: frontend.src.components.phases.LandingPhase.useState, frontend.src.components.phases.LandingPhase.useEffect, frontend.src.components.phases.LandingPhase.fetchRecentScans, frontend.src.components.phases.LandingPhase.fetch, frontend.src.components.phases.LandingPhase.json, frontend.src.components.phases.LandingPhase.setRecentScans, frontend.src.components.phases.LandingPhase.error, frontend.src.components.phases.LandingPhase.getShareUrls
 
 ### backend.routers.auth.github_oauth_callback
 > Step 2: Exchange code for token, fetch profile, create user, issue JWT.
@@ -182,10 +182,6 @@ repo_path format: "owner/repo" or with platform prefix "github:owner/repo"
 ### frontend.src.components.phases.ResultPhase.handleDownloadMetrics
 - **Calls**: frontend.src.components.phases.ResultPhase.Blob, frontend.src.components.phases.ResultPhase.stringify, frontend.src.components.phases.ResultPhase.createObjectURL, frontend.src.components.phases.ResultPhase.createElement, frontend.src.components.phases.ResultPhase.replace, frontend.src.components.phases.ResultPhase.appendChild, frontend.src.components.phases.ResultPhase.click, frontend.src.components.phases.ResultPhase.removeChild
 
-### backend.database.save_scan
-> Save a scan to the database.
-- **Calls**: sqlite3.connect, conn.cursor, cursor.execute, conn.commit, conn.close, json.dumps, scan_data.get, scan_data.get
-
 ### backend.routers.auth.get_current_user
 - **Calls**: Depends, backend.routers.auth.decode_session_token, payload.get, backend.database.get_user_by_id, HTTPException, HTTPException, int, HTTPException
 
@@ -207,6 +203,9 @@ repo_path format: "owner/repo" or with platform prefix "github:owner/repo"
 
 ### frontend.src.components.tabs.BadgeTab.BadgeTab
 - **Calls**: frontend.src.components.tabs.BadgeTab.useState, frontend.src.components.tabs.BadgeTab.getBadgeUrl, frontend.src.components.tabs.BadgeTab.Repository, frontend.src.components.tabs.BadgeTab.setBadgeRepo, frontend.src.components.tabs.BadgeTab.writeText, frontend.src.components.tabs.BadgeTab.map, frontend.src.components.tabs.BadgeTab.gradeColor
+
+### frontend.e2e.recent-scans.spec.recentSection
+- **Calls**: frontend.e2e.recent-scans.spec.locator, frontend.e2e.recent-scans.spec.filter, frontend.e2e.recent-scans.spec.count, frontend.e2e.recent-scans.spec.expect, frontend.e2e.recent-scans.spec.toBeGreaterThan, frontend.e2e.recent-scans.spec.first, frontend.e2e.recent-scans.spec.toBeVisible
 
 ## Process Flows
 
@@ -251,15 +250,15 @@ ResultPhase [frontend.src.components.phases.ResultPhase]
 RecentScansTab [frontend.src.components.tabs.RecentScansTab]
 ```
 
-### Flow 8: analyze_repo
+### Flow 8: LandingPhase
+```
+LandingPhase [frontend.src.components.phases.LandingPhase]
+```
+
+### Flow 9: analyze_repo
 ```
 analyze_repo [backend.routers.audit]
   └─> _schedule_background_task
-```
-
-### Flow 9: LandingPhase
-```
-LandingPhase [frontend.src.components.phases.LandingPhase]
 ```
 
 ### Flow 10: github_oauth_callback
@@ -314,8 +313,8 @@ Functions exposed as public API (no underscore prefix):
 - `backend.routers.metrics.get_standard_metrics` - 28 calls
 - `frontend.src.components.phases.ResultPhase.ResultPhase` - 26 calls
 - `frontend.src.components.tabs.RecentScansTab.RecentScansTab` - 23 calls
-- `backend.routers.audit.analyze_repo` - 19 calls
 - `frontend.src.components.phases.LandingPhase.LandingPhase` - 19 calls
+- `backend.routers.audit.analyze_repo` - 19 calls
 - `backend.routers.auth.github_oauth_callback` - 18 calls
 - `backend.routers.metrics.get_metrics_summary` - 17 calls
 - `frontend.src.components.phases.ResultPhase.handleDownloadToon` - 16 calls

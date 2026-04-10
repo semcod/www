@@ -1,0 +1,54 @@
+[Unit]
+Description=Semcod Backend API
+After=network-online.target semcod-network.service
+Wants=network-online.target
+
+[Container]
+ContainerName=semcod-backend
+Image=semcod-backend:latest
+AutoUpdate=registry
+Network=semcod.network
+
+# Port mapping (internal 8000, exposed via Traefik)
+PublishPort=8000
+
+# Environment
+EnvFile=/opt/semcod/.env
+Environment=PORT=8000
+Environment=APP_URL=https://api.semcod.com
+Environment=FRONTEND_URL=https://semcod.com
+
+# Persistent data
+Volume=semcod-data.volume:/app/data
+Volume=/opt/semcod/private-key.pem:/app/private-key.pem:ro,Z
+
+# Health check
+HealthCheckCmd=curl -f http://localhost:8000/api/health || exit 1
+HealthCheckInterval=30s
+HealthCheckTimeout=5s
+HealthCheckStartPeriod=10s
+HealthCheckRetries=3
+
+# Labels for Traefik
+Label=traefik.enable=true
+Label=traefik.http.routers.semcod-api.rule=PathPrefix(`/api/`) || PathPrefix(`/auth/`) || PathPrefix(`/webhook/`) || PathPrefix(`/badge/`) || PathPrefix(`/report/`) || PathPrefix(`/mcp/`)
+Label=traefik.http.routers.semcod-api.entrypoints=websecure
+Label=traefik.http.routers.semcod-api.tls=true
+Label=traefik.http.routers.semcod-api.tls.certresolver=letsencrypt
+Label=traefik.http.services.semcod-api.loadbalancer.server.port=8000
+
+# Security
+ReadOnly=true
+Volume=/app/data:/app/data
+Volume=/tmp:/tmp
+
+# Resource limits
+MemoryLimit=512M
+CPULimit=1.0
+
+[Service]
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

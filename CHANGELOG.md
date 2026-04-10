@@ -7,6 +7,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Sandbox/guest scans now persist to SQLite (were only in-memory, lost on restart)
+- `_run_audit_pipeline` and `_run_sandbox_analysis` now call `save_scan()` after completion
+
+### Changed
+- All hardcoded values moved to environment variables (20 vars total in `.env`)
+- `DB_PATH` — was hardcoded `Path("scans.db")` in database.py
+- `SCAN_HISTORY_LIMIT` — was hardcoded `100` in audit.py
+- `REPOS_PER_PAGE` — was hardcoded `30` in auth.py
+- `GITHUB_OAUTH_SCOPE` — was hardcoded `"repo,read:org"` in auth.py
+- `CORS_ORIGINS` — was hardcoded `[FRONTEND_URL, "https://semcod.com"]` in server.py
+- `LARGE_FILE_THRESHOLD` — was hardcoded `300` in webhook.py
+- Docker Compose: ports bound to `0.0.0.0`, URLs use hostname `nvidia` for LAN access
+- Docker Compose: `env_file: .env` instead of individual variable pass-through
+- Docker override: restored direct port mapping (3000, 8003) alongside Traefik
+- `.env`: updated headers, URLs to `nvidia` hostname, fixed `CORS_ORIGINS` protocol
+
+### Added
+- `GITHUB_OAUTH_SCOPE` env var
+- `DB_PATH` env var
+- `SCAN_HISTORY_LIMIT` env var
+- `REPOS_PER_PAGE` env var
+- `CORS_ORIGINS` env var (comma-separated list)
+- `LARGE_FILE_THRESHOLD` env var
+- LAN access from other computers via `http://nvidia:3000` and `http://nvidia:8003`
+- Quadlet deployment docs link in README
+- Full env vars table in README
+
+## [0.1.6] - 2026-04-10
+
+### Docs
+- Update CHANGELOG.md
+- Update README.md
+- Update TODO.md
+- Update backend/code2llm_output/README.md
+- Update docs/README.md
+- Update docs/roadmap.md
+- Update project/README.md
+- Update project/context.md
+- Update quadlet/README.md
+
+### Other
+- Update .env.example
+- Update backend/Dockerfile
+- Update backend/config.py
+- Update backend/database.py
+- Update backend/routers/audit.py
+- Update backend/routers/auth.py
+- Update backend/routers/webhook.py
+- Update backend/scans.db
+- Update backend/server.py
+- Update docker-compose.override.yml
+- ... and 25 more files
+
 ## [0.1.5] - 2026-04-10
 
 ### Docs

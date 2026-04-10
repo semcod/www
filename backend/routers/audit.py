@@ -11,7 +11,7 @@ from datetime import timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
-from config import APP_URL
+from config import APP_URL, SCAN_HISTORY_LIMIT
 from services.analyzer import count_code_stats, run_tool
 from services.scoring import calculate_health_score, generate_recommendations, score_to_grade
 from store import audit_results, badge_cache, scan_history
@@ -198,7 +198,7 @@ async def _run_audit_pipeline(audit_id: str, repo: str, token: str):
             "weekly_issues": weekly_issues,
         }
 
-        # Add to scan history (keep last 100)
+        # Add to scan history
         scan_entry = {
             "repo": repo,
             "health_score": health_score,
@@ -208,7 +208,7 @@ async def _run_audit_pipeline(audit_id: str, repo: str, token: str):
             "badge_url": f"{APP_URL}/badge/{repo.replace('/', '-')}.svg",
         }
         scan_history.insert(0, scan_entry)
-        if len(scan_history) > 100:
+        if len(scan_history) > SCAN_HISTORY_LIMIT:
             scan_history.pop()
 
         # Persist to database
@@ -301,7 +301,7 @@ async def _run_sandbox_analysis(audit_id: str, repo_url: str, repo: str):
 
         audit_results[audit_id] = report
 
-        # Add to scan history (keep last 100)
+        # Add to scan history
         scan_entry = {
             "repo": repo,
             "health_score": health_score,
@@ -312,7 +312,7 @@ async def _run_sandbox_analysis(audit_id: str, repo_url: str, repo: str):
             "badge_url": f"{APP_URL}/badge/{repo.replace('/', '-')}.svg",
         }
         scan_history.insert(0, scan_entry)
-        if len(scan_history) > 100:
+        if len(scan_history) > SCAN_HISTORY_LIMIT:
             scan_history.pop()
 
         # Persist to database

@@ -3,11 +3,9 @@
 import sqlite3
 import json
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import List, Dict, Optional
 
-
-DB_PATH = Path("scans.db")
+from config import DB_PATH
 
 
 def init_db():

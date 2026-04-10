@@ -69,25 +69,39 @@ export function LandingPhase({ startOAuth, startDemoLogin, repoUrl, setRepoUrl, 
           Demo Login
         </button>
         <span style={{ color: C.fg3, padding: "16px 8px" }}>or</span>
-        <div style={{ display: "flex", gap: 8 }}>
-          <input
-            type="text"
-            placeholder="github.com/owner/repo"
-            value={repoUrl}
-            onChange={(e) => setRepoUrl(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && startSandbox()}
-            style={{
-              background: C.bg2, border: `1px solid ${C.border}`, borderRadius: 10,
-              padding: "14px 18px", fontSize: 14, color: C.fg, width: 220,
-              fontFamily: "'JetBrains Mono', monospace",
-            }}
-          />
-          <button onClick={startSandbox} style={{
-            background: C.bg3, color: C.fg, border: `1px solid ${C.border}`, borderRadius: 10,
-            padding: "14px 20px", fontSize: 14, cursor: "pointer", fontFamily: "inherit",
-          }}>
-            Scan
-          </button>
+        <div style={{ maxWidth: 600, margin: "0 auto", textAlign: "center" }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>📁</div>
+          <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>Analyze any public repo</h2>
+          <p style={{ fontSize: 14, color: C.fg2, marginBottom: 32 }}>
+            Enter a GitHub, GitLab, or Bitbucket repository URL.
+            Works with any public repository — no authentication required.
+          </p>
+
+          <div style={{ display: "flex", gap: 12, marginBottom: 24 }}>
+            <input
+              type="text"
+              placeholder="https://github.com/owner/repo"
+              value={repoUrl}
+              onChange={(e) => setRepoUrl(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && startSandbox()}
+              style={{
+                flex: 1, background: C.bg2, border: `1px solid ${C.border}`, borderRadius: 10,
+                padding: "14px 18px", fontSize: 14, color: C.fg,
+                fontFamily: "'JetBrains Mono', monospace",
+              }}
+            />
+            <button onClick={startSandbox} style={{
+              background: C.cyan, color: C.bg, border: "none", borderRadius: 10,
+              padding: "14px 28px", fontSize: 15, fontWeight: 700, cursor: "pointer",
+              fontFamily: "inherit",
+            }}>
+              Analyze →
+            </button>
+          </div>
+
+          <div style={{ fontSize: 12, color: C.fg3, fontFamily: "'JetBrains Mono', monospace" }}>
+            Supports: github.com / gitlab.com / bitbucket.org
+          </div>
         </div>
       </div>
 

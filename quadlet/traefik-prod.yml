@@ -1,0 +1,36 @@
+# Traefik production config for Podman Quadlet deployment
+# Place in /opt/semcod/traefik/traefik-prod.yml
+
+api:
+  dashboard: true
+  insecure: false
+
+providers:
+  docker:
+    exposedByDefault: false
+    endpoint: "unix:///var/run/docker.sock"
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+  websecure:
+    address: ":443"
+  traefik:
+    address: ":8080"
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: admin@semcod.com
+      storage: /etc/traefik/acme.json
+      tlsChallenge: true
+
+log:
+  level: INFO
+
+accessLog: {}

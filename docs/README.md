@@ -1,7 +1,7 @@
 <!-- code2docs:start --># www
 
-![version](https://img.shields.io/badge/version-0.1.0-blue) ![python](https://img.shields.io/badge/python-%3E%3D3.8-blue) ![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey) ![functions](https://img.shields.io/badge/functions-245-green)
-> **245** functions | **4** classes | **73** files | CC̄ = 3.0
+![version](https://img.shields.io/badge/version-0.1.0-blue) ![python](https://img.shields.io/badge/python-%3E%3D3.8-blue) ![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey) ![functions](https://img.shields.io/badge/functions-244-green)
+> **244** functions | **4** classes | **73** files | CC̄ = 3.0
 
 > Auto-generated project documentation from source code analysis.
 
@@ -146,7 +146,7 @@ Content outside the markers is preserved when regenerating. Enable this with `sy
 
 ```
 www/
-├── project    ├── generate-certs    ├── config    ├── database    ├── sample_projects    ├── server_new        ├── scoring        ├── analyzer    ├── services/    ├── store        ├── github_client        ├── system        ├── scan_samples    ├── server    ├── routers/        ├── metrics        ├── auth        ├── report        ├── badge        ├── config        ├── config        ├── constants        ├── config        ├── api        ├── App        ├── webhook        ├── main            ├── Header            ├── LanguageBar            ├── ProgressSteps            ├── MetricCard            ├── RecommendationCard            ├── PRCommentPreview            ├── GradeCircle        ├── components/            ├── useAppState                ├── AuthPhase            ├── phases/                ├── ScanningPhase        ├── audit                ├── LandingPhase                ├── LanguageBar                ├── MetricCard                ├── RecommendationCard                ├── GradeCircle            ├── ui/                ├── ReposPhase                ├── RepoTab                ├── PRBotTab            ├── tabs/                ├── BadgeTab        ├── screens/            ├── share            ├── spec            ├── spec                ├── RecentScansTab                ├── ResultPhase            ├── spec            ├── spec            ├── spec            ├── spec        ├── config            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec        ├── mcp```
+├── project    ├── generate-certs    ├── server    ├── store    ├── sample_projects    ├── server_new        ├── scoring    ├── services/    ├── database        ├── analyzer        ├── github_client    ├── config        ├── system        ├── scan_samples    ├── routers/        ├── auth        ├── metrics        ├── report        ├── webhook        ├── badge        ├── config        ├── constants        ├── config        ├── config        ├── App        ├── main        ├── api            ├── Header            ├── LanguageBar            ├── ProgressSteps            ├── MetricCard            ├── RecommendationCard            ├── useAppState            ├── PRCommentPreview        ├── components/            ├── GradeCircle                ├── AuthPhase            ├── phases/                ├── ScanningPhase                ├── LandingPhase        ├── audit                ├── ReposPhase                ├── MetricCard                ├── RecommendationCard                ├── GradeCircle            ├── ui/                ├── PRBotTab                ├── LanguageBar                ├── RepoTab            ├── tabs/                ├── BadgeTab        ├── screens/            ├── share            ├── spec            ├── spec                ├── ResultPhase                ├── RecentScansTab            ├── spec            ├── spec            ├── spec            ├── spec        ├── config            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec        ├── mcp```
 
 ## API Overview
 
@@ -159,6 +159,10 @@ www/
 
 ### Functions
 
+- `get_sample_projects()` — Return list of sample projects for scanning.
+- `calculate_health_score(stats, complexity, duplication, quality)` — Calculate 0-100 health score from metrics.
+- `score_to_grade(score)` — Convert score to letter grade.
+- `generate_recommendations(complexity, duplication, quality)` — Generate actionable recommendations based on metrics.
 - `init_db()` — Initialize the database and create tables.
 - `save_scan(scan_data)` — Save a scan to the database.
 - `get_recent_scans(limit)` — Get recent scans from the database.
@@ -166,21 +170,12 @@ www/
 - `upsert_user(github_id, login, name, avatar_url)` — Create or update a user. Returns the user dict.
 - `get_user_by_github_id(github_id)` — Get user by GitHub ID.
 - `get_user_by_id(user_id)` — Get user by internal ID.
-- `get_sample_projects()` — Return list of sample projects for scanning.
-- `calculate_health_score(stats, complexity, duplication, quality)` — Calculate 0-100 health score from metrics.
-- `score_to_grade(score)` — Convert score to letter grade.
-- `generate_recommendations(complexity, duplication, quality)` — Generate actionable recommendations based on metrics.
 - `count_code_stats(repo_path)` — Count source files and lines.
 - `run_tool(name, args, fallback)` — Run a semcod tool, return JSON result or fallback.
 - `get_installation_token(installation_id)` — Get GitHub App installation access token using JWT.
 - `health_check()` — Health check endpoint with cache stats.
 - `get_domain_config()` — Return the configured domain from environment.
 - `scan_sample_projects()` — Scan all sample projects and save to database.
-- `get_standard_metrics(limit)` — Get standardized metrics for recent scans.
-- `get_metrics_summary()` — Get summary statistics of all scans.
-- `get_repository_metrics(repo_path)` — Get metrics for a specific repository.
-- `download_project_prompt()` — Download the project prompt.txt file for LLM analysis.
-- `download_project_prompt_markdown()` — Download the project prompt as markdown format.
 - `create_session_token(user_id)` — —
 - `decode_session_token(token)` — —
 - `get_current_user(credentials)` — —
@@ -190,7 +185,13 @@ www/
 - `get_me(user)` — —
 - `logout()` — —
 - `list_repos(user)` — List user's repos for audit selection.
+- `get_standard_metrics(limit)` — Get standardized metrics for recent scans.
+- `get_metrics_summary()` — Get summary statistics of all scans.
+- `get_repository_metrics(repo_path)` — Get metrics for a specific repository.
+- `download_project_prompt()` — Download the project prompt.txt file for LLM analysis.
+- `download_project_prompt_markdown()` — Download the project prompt as markdown format.
 - `report_page(owner, repo)` — Redirect to frontend report page.
+- `github_webhook(request)` — Handle GitHub webhook events.
 - `health_badge(repo_slug, style)` — Generate SVG badge with code health score.
 - `scan_count_badge()` — Generate SVG badge showing total number of scans performed.
 - `API()` — —
@@ -205,7 +206,6 @@ www/
 - `fetchAudit()` — —
 - `demoLogin()` — —
 - `analyzePublicRepo()` — —
-- `github_webhook(request)` — Handle GitHub webhook events.
 - `Header()` — —
 - `tabBtn()` — —
 - `LanguageBar()` — —
@@ -218,12 +218,6 @@ www/
 - `active()` — —
 - `MetricCard()` — —
 - `RecommendationCard()` — —
-- `GradeCircle()` — —
-- `color()` — —
-- `r()` — —
-- `circ()` — —
-- `targetOffset()` — —
-- `t()` — —
 - `useAppState()` — —
 - `searchParams()` — —
 - `session()` — —
@@ -254,15 +248,17 @@ www/
 - `sshMatch()` — —
 - `startDemoLogin()` — —
 - `doLogout()` — —
+- `GradeCircle()` — —
+- `color()` — —
+- `r()` — —
+- `circ()` — —
+- `targetOffset()` — —
+- `t()` — —
 - `AuthPhase()` — —
 - `handleLogin()` — —
 - `handleDemoLogin()` — —
 - `data()` — —
 - `ScanningPhase()` — —
-- `run_audit(request, user)` — Run one-click audit on a repo. Requires authentication.
-- `get_audit_result(audit_id)` — Poll audit status and results.
-- `get_recent_scans_api(limit)` — Get list of recent scans with metrics.
-- `analyze_repo(request)` — Analyze any public repository by URL (sandbox mode).
 - `LandingPhase()` — —
 - `fetchRecentScans()` — —
 - `response()` — —
@@ -271,10 +267,13 @@ www/
 - `shareUrls()` — —
 - `formatDate()` — —
 - `date()` — —
+- `run_audit(request, user)` — Run one-click audit on a repo. Requires authentication.
+- `get_audit_result(audit_id)` — Poll audit status and results.
+- `get_recent_scans_api(limit)` — Get list of recent scans with metrics.
+- `analyze_repo(request)` — Analyze any public repository by URL (sandbox mode).
 - `ReposPhase()` — —
-- `RepoTab()` — —
-- `handleAnalyze()` — —
 - `PRBotTab()` — —
+- `RepoTab()` — —
 - `BadgeSVG()` — —
 - `color()` — —
 - `labelW()` — —
@@ -291,16 +290,6 @@ www/
 - `text()` — —
 - `url()` — —
 - `input()` — —
-- `RecentScansTab()` — —
-- `fetchRecentScans()` — —
-- `response()` — —
-- `data()` — —
-- `formatDate()` — —
-- `date()` — —
-- `getLanguageBadge()` — —
-- `topLang()` — —
-- `handleShare()` — —
-- `shareUrls()` — —
 - `ResultPhase()` — —
 - `data()` — —
 - `repoName()` — —
@@ -316,6 +305,16 @@ www/
 - `handleDownloadToon()` — —
 - `getTabContent()` — —
 - `content()` — —
+- `RecentScansTab()` — —
+- `fetchRecentScans()` — —
+- `response()` — —
+- `data()` — —
+- `formatDate()` — —
+- `date()` — —
+- `getLanguageBadge()` — —
+- `topLang()` — —
+- `handleShare()` — —
+- `shareUrls()` — —
 - `recentSection()` — —
 - `isVisible()` — —
 - `scanCards()` — —
@@ -328,7 +327,6 @@ www/
 - `listResponse()` — —
 - `listData()` — —
 - `repo()` — —
-- `input()` — —
 - `twitterButton()` — —
 - `linkedinButton()` — —
 - `blueskyButton()` — —
@@ -337,6 +335,7 @@ www/
 - `count()` — —
 - `recentSection()` — —
 - `isVisible()` — —
+- `input()` — —
 - `input()` — —
 - `currentUrl()` — —
 - `recentScansSection()` — —
@@ -358,6 +357,22 @@ www/
 - `count()` — —
 - `input()` — —
 - `reportVisible()` — —
+- `skipInCI()` — —
+- `response()` — —
+- `data()` — —
+- `scan()` — —
+- `listResponse()` — —
+- `listData()` — —
+- `repo()` — —
+- `currentUrl()` — —
+- `recentScansSection()` — —
+- `isVisible()` — —
+- `twitterButton()` — —
+- `linkedinButton()` — —
+- `twitterVisible()` — —
+- `linkedinVisible()` — —
+- `recentTab()` — —
+- `isTabVisible()` — —
 - `noScansMessage()` — —
 - `hasNoScans()` — —
 - `scanCard()` — —
@@ -371,22 +386,6 @@ www/
 - `recentSection()` — —
 - `isVisible()` — —
 - `hasScan()` — —
-- `currentUrl()` — —
-- `recentScansSection()` — —
-- `isVisible()` — —
-- `twitterButton()` — —
-- `linkedinButton()` — —
-- `twitterVisible()` — —
-- `linkedinVisible()` — —
-- `recentTab()` — —
-- `isTabVisible()` — —
-- `skipInCI()` — —
-- `response()` — —
-- `data()` — —
-- `scan()` — —
-- `listResponse()` — —
-- `listData()` — —
-- `repo()` — —
 - `mcp_list_resources()` — List all available MCP resources.
 - `mcp_get_resource(uri)` — Get content of a specific MCP resource by URI.
 - `mcp_list_tools()` — List all available MCP tools.
@@ -454,7 +453,7 @@ www/
 📄 `frontend.src.components.tabs.BadgeTab` (7 functions)
 📄 `frontend.src.components.tabs.PRBotTab` (1 functions)
 📄 `frontend.src.components.tabs.RecentScansTab` (10 functions)
-📄 `frontend.src.components.tabs.RepoTab` (2 functions)
+📄 `frontend.src.components.tabs.RepoTab` (1 functions)
 📦 `frontend.src.components.ui`
 📄 `frontend.src.components.ui.GradeCircle`
 📄 `frontend.src.components.ui.LanguageBar`
