@@ -204,6 +204,10 @@ Wszystkie ustawienia w `.env` — bez hardkodu w kodzie. Pełna lista w `.env.ex
 - [Architecture](./docs/architecture.md) - Architektura systemu
 - [Roadmap](./docs/roadmap.md) - Roadmapa walidacji wartości, automatyzacji i deploymentu
 - [Validation Benchmark](./docs/validation-benchmark.md) - Plan benchmarku, KPI i pilota wdrożeniowego
+- [Benchmark Checklist](./docs/validation-benchmark-checklist.md) - Checklista wykonawcza benchmarku
+- [Benchmark Template](./docs/validation-benchmark-template.md) - Szablon Markdown do wypełniania przypadków
+- [Benchmark CSV Template](./docs/validation-benchmark-template.csv) - Szablon CSV do zbierania wyników
+- [Benchmark KPI Product Plan](./docs/benchmark-kpi-product-plan.md) - Plan zmian UI/API do zbierania KPI
 - [MCP Integration](./docs/MCP.md) - Integracja z AI
 - [Quadlet Deployment](./quadlet/README.md) - VPS z Podman + systemd
 

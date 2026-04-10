@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { C, gradeColor, API } from "../../constants";
 import { getShareUrls } from "../../utils/share";
+import { ShareButtons } from "../ShareButtons";
 
 export function LandingPhase({ startOAuth, startDemoLogin, repoUrl, setRepoUrl, startSandbox }) {
   const [recentScans, setRecentScans] = useState([]);
@@ -19,10 +20,7 @@ export function LandingPhase({ startOAuth, startDemoLogin, repoUrl, setRepoUrl, 
     }
   };
 
-  const handleShare = (scan, platform) => {
-    const shareUrls = getShareUrls(scan, scan.repo);
-    window.open(shareUrls[platform], '_blank', 'width=600,height=400');
-  };
+
 
   const formatDate = (isoString) => {
     const date = new Date(isoString);
@@ -182,46 +180,7 @@ export function LandingPhase({ startOAuth, startDemoLogin, repoUrl, setRepoUrl, 
                     </span>
                   </div>
                 </div>
-                <div style={{ display: "flex", gap: 6 }}>
-                  <button
-                    style={{
-                      padding: "6px 10px",
-                      background: "#1DA1F2",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: 6,
-                      fontSize: 11,
-                      fontWeight: 600,
-                      cursor: "pointer",
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleShare(scan, 'twitter');
-                    }}
-                    title="Share on X (Twitter)"
-                  >
-                    𝕏
-                  </button>
-                  <button
-                    style={{
-                      padding: "6px 10px",
-                      background: "#0077B5",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: 6,
-                      fontSize: 11,
-                      fontWeight: 600,
-                      cursor: "pointer",
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleShare(scan, 'linkedin');
-                    }}
-                    title="Share on LinkedIn"
-                  >
-                    in
-                  </button>
-                </div>
+                <ShareButtons scan={scan} repo={scan.repo} size="small" />
               </div>
             ))}
           </div>

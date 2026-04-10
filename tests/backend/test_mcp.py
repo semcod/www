@@ -92,23 +92,19 @@ class TestMCPTools:
     def test_tool_get_scan_status(self, client):
         """Test get_scan_status tool."""
         # First create a scan
-        client.post("/mcp/invoke", json={
+        start_response = client.post("/mcp/invoke", json={
             "name": "start_audit",
             "arguments": {"repo": "test/repo"}
         })
-        
-        # Get list to find the audit_id
-        scans_response = client.get("/mcp/resources/content?uri=scans://list")
-        scans = scans_response.json()["content"]["scans"]
-        
-        if scans:
-            audit_id = scans[0]["audit_id"]
-            response = client.post("/mcp/invoke", json={
-                "name": "get_scan_status",
-                "arguments": {"audit_id": audit_id}
-            })
-            assert response.status_code == 200
-            assert response.json()["audit_id"] == audit_id
+        assert start_response.status_code == 200
+
+        audit_id = start_response.json()["audit_id"]
+        response = client.post("/mcp/invoke", json={
+            "name": "get_scan_status",
+            "arguments": {"audit_id": audit_id}
+        })
+        assert response.status_code == 200
+        assert response.json()["audit_id"] == audit_id
     
     def test_tool_get_scan_status_not_found(self, client):
         """Test get_scan_status for non-existent scan."""

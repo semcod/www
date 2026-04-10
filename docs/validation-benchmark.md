@@ -8,6 +8,15 @@ Ten dokument przekłada Fazę 1 z `docs/roadmap.md` na plan wykonawczy. Jego cel
 2. Czy wykrycia są wystarczająco użyteczne, aby przechodzić do rekomendacji, PR lub wdrożenia.
 3. Który model wdrożeniowy najlepiej pasuje do klienta: jego GitHub/GitLab, nasza infrastruktura, czy model hybrydowy.
 
+## Artefakty robocze
+
+Do pracy operacyjnej z benchmarkiem używaj razem z tym dokumentem:
+
+- `docs/validation-benchmark-checklist.md` — checklista wykonawcza benchmarku,
+- `docs/validation-benchmark-template.md` — szablon Markdown do wypełniania case-by-case,
+- `docs/validation-benchmark-template.csv` — szablon CSV do zbierania wyników,
+- `docs/benchmark-kpi-product-plan.md` — plan zmian UI/API potrzebnych do zbierania KPI.
+
 ## Decyzje, które dokument ma umożliwić
 
 Po wykonaniu benchmarku i pilota powinniśmy umieć odpowiedzieć:
