@@ -1,0 +1,45 @@
+# Local dev override: Traefik HTTPS reverse proxy + demo mode
+# Usage: docker compose up
+#
+# App available at: https://semcod.localhost
+
+services:
+  traefik:
+    image: traefik:v3.3
+    command:
+      - "--configFile=/etc/traefik/traefik.yml"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik/certs:/etc/traefik/certs:ro
+    labels:
+      - "traefik.enable=true"
+
+  backend:
+    environment:
+      - APP_URL=https://semcod.localhost
+      - FRONTEND_URL=https://semcod.localhost
+      - DEMO_MODE=1
+      - SECRET_KEY=dev-secret-change-me
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=PathPrefix(`/api/`) || PathPrefix(`/auth/`) || PathPrefix(`/webhook/`) || PathPrefix(`/badge/`) || PathPrefix(`/report/`) || PathPrefix(`/mcp/`)"
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.backend.tls=true"
+      - "traefik.http.services.backend.loadbalancer.server.port=8000"
+    ports: !override []
+
+  frontend:
+    environment:
+      - VITE_PUBLIC_URL=https://semcod.localhost
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.priority=1"
+      - "traefik.http.routers.frontend.tls=true"
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+    ports: !override []

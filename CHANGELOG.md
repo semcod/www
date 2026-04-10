@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-04-10
+
+### Docs
+- Update README.md
+
+### Other
+- Update backend/scans.db
+- Update backend/tests/test_auth.py
+- Update docker-compose.override.yml
+- Update frontend/src/App.jsx
+- Update frontend/src/components/phases/AuthPhase.jsx
+- Update frontend/src/components/phases/LandingPhase.jsx
+- Update frontend/src/hooks/useAppState.js
+- Update traefik/generate-certs.sh
+- Update traefik/traefik.yml
+
 ## [0.1.1] - 2026-04-10
 
 ### Docs

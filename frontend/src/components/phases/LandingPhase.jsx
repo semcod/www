@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { C, gradeColor } from "../../constants";
 import { getShareUrls } from "../../utils/share";
 
-export function LandingPhase({ startOAuth, repoUrl, setRepoUrl, startSandbox }) {
+export function LandingPhase({ startOAuth, startDemoLogin, repoUrl, setRepoUrl, startSandbox }) {
   const [recentScans, setRecentScans] = useState([]);
 
   useEffect(() => {
@@ -60,6 +60,13 @@ export function LandingPhase({ startOAuth, repoUrl, setRepoUrl, startSandbox }) 
           fontFamily: "inherit",
         }}>
           Connect GitHub →
+        </button>
+        <button onClick={startDemoLogin} style={{
+          background: C.bg3, color: C.fg, border: `1px solid ${C.border}`, borderRadius: 10,
+          padding: "16px 24px", fontSize: 14, fontWeight: 600, cursor: "pointer",
+          fontFamily: "inherit",
+        }}>
+          Demo Login
         </button>
         <span style={{ color: C.fg3, padding: "16px 8px" }}>or</span>
         <div style={{ display: "flex", gap: 8 }}>

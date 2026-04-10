@@ -16,7 +16,7 @@ export default function App() {
     repoUrl, setRepoUrl,
     isSandbox,
     sessionToken, user,
-    reset, startOAuth, confirmAuth, startAudit, startSandbox, doLogout,
+    reset, startOAuth, confirmAuth, startAudit, startSandbox, startDemoLogin, doLogout,
   } = useAppState();
 
   return (
@@ -31,6 +31,7 @@ export default function App() {
             {phase === "landing" && (
               <LandingPhase
                 startOAuth={startOAuth}
+                startDemoLogin={startDemoLogin}
                 repoUrl={repoUrl}
                 setRepoUrl={setRepoUrl}
                 startSandbox={startSandbox}
