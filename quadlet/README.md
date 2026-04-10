@@ -70,12 +70,25 @@ journalctl -u semcod-traefik -f
 Required in `/opt/semcod/.env`:
 
 ```env
-GITHUB_APP_ID=...
-GITHUB_CLIENT_ID=...
-GITHUB_CLIENT_SECRET=...
-GITHUB_WEBHOOK_SECRET=...
-GITHUB_PRIVATE_KEY_PATH=
+# ── GitHub OAuth / App ───────────────────────────────────────
+GITHUB_APP_ID=
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+GITHUB_WEBHOOK_SECRET=
+GITHUB_PRIVATE_KEY_PATH=/app/private-key.pem
 GITHUB_OAUTH_SCOPE=repo,read:org
+GITHUB_TOKEN=
+
+# ── GitLab ───────────────────────────────────────────────────
+GITLAB_TOKEN=
+GITLAB_WEBHOOK_SECRET=
+
+# ── Gitea ────────────────────────────────────────────────────
+GITEA_TOKEN=
+GITEA_WEBHOOK_SECRET=
+GITEA_BASE_URL=http://localhost:3000
+
+# ── App ──────────────────────────────────────────────────────
 SECRET_KEY=
 APP_URL=https://api.semcod.com
 FRONTEND_URL=https://semcod.com
@@ -84,9 +97,25 @@ HOST=0.0.0.0
 PORT=8000
 SESSION_EXPIRE_HOURS=168
 DEMO_MODE=0
+CORS_ORIGINS=https://semcod.com,https://api.semcod.com
+
+# ── Database ─────────────────────────────────────────────────
+DATABASE_URL=postgresql://semcod:semcod@semcod-db:5432/semcod
 DB_PATH=/app/data/scans.db
 SCAN_HISTORY_LIMIT=100
 REPOS_PER_PAGE=30
-CORS_ORIGINS=https://semcod.com,https://api.semcod.com
 LARGE_FILE_THRESHOLD=300
+
+# ── Task queue ───────────────────────────────────────────────
+REDIS_URL=redis://semcod-redis:6379/0
+
+# ── Stripe ───────────────────────────────────────────────────
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+STRIPE_PRICE_PRO_MONTHLY=
+STRIPE_PRICE_PRO_ANNUAL=
+STRIPE_PRICE_TEAM_MONTHLY=
+STRIPE_PRICE_ANALYSIS_PER_PR=50
+STRIPE_PRICE_AUTOFIX_PER_RUN=100
+STRIPE_PRICE_REPO_ACTIVE_MONTHLY=200
 ```

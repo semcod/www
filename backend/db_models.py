@@ -163,3 +163,59 @@ class BadgeCache(Base):
     grade = Column(String)
     updated = Column(String)
     weekly_issues = Column(Integer, default=0)
+
+
+class BenchmarkCase(Base):
+    __tablename__ = "benchmark_cases"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    case_id = Column(String, unique=True, nullable=False, index=True)
+    audit_id = Column(String, nullable=True, index=True)
+    repo = Column(String, nullable=False)
+    source_type = Column(String, default="repo")
+    change_type = Column(String, default="")
+    baseline_tools = Column(Text, default="[]")
+    baseline_findings = Column(Text, default="")
+    baseline_detected = Column(Boolean, default=False)
+    reviewer_verdict = Column(String, default="")
+    recommendation_accepted = Column(Boolean, nullable=True)
+    pr_candidate = Column(Boolean, nullable=True)
+    deployment_candidate = Column(Boolean, nullable=True)
+    deployment_model_selected = Column(String, default="")
+    pr_reference = Column(Text, default="")
+    ticket_id = Column(String, default="")
+    benchmark_mode = Column(Boolean, default=True)
+    time_to_first_result_seconds = Column(Integer, nullable=True)
+    time_to_first_useful_recommendation_seconds = Column(Integer, nullable=True)
+    next_action = Column(String, default="")
+    created_at = Column(DateTime(timezone=True), default=_utcnow)
+    updated_at = Column(DateTime(timezone=True), default=_utcnow, onupdate=_utcnow)
+
+
+class BenchmarkEvent(Base):
+    __tablename__ = "benchmark_events"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    case_id = Column(String, nullable=False, index=True)
+    audit_id = Column(String, nullable=True)
+    event_name = Column(String, nullable=False)
+    event_value = Column(String, default="")
+    metadata_json = Column(Text, default="{}")
+    created_at = Column(DateTime(timezone=True), default=_utcnow)
+
+
+class RecommendationFeedback(Base):
+    __tablename__ = "recommendation_feedback"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    case_id = Column(String, nullable=False, index=True)
+    audit_id = Column(String, nullable=True)
+    recommendation_id = Column(String, nullable=False, index=True)
+    accepted = Column(Boolean, nullable=True)
+    novelty_score = Column(Integer, nullable=True)
+    usefulness_score = Column(Integer, nullable=True)
+    accuracy_score = Column(Integer, nullable=True)
+    actionability_score = Column(Integer, nullable=True)
+    business_value_score = Column(Integer, nullable=True)
+    notes = Column(Text, default="")
+    created_at = Column(DateTime(timezone=True), default=_utcnow)

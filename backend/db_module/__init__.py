@@ -32,6 +32,15 @@ from .wrappers import (
     queue_event,
     get_pending_events,
     update_event_status,
+    create_benchmark_case,
+    get_benchmark_cases,
+    get_benchmark_case,
+    update_benchmark_case,
+    create_benchmark_event,
+    get_benchmark_events,
+    upsert_recommendation_feedback,
+    get_feedback_for_case,
+    get_benchmark_summary,
 )
 
 # Use ORM initialization
@@ -68,6 +77,15 @@ __all__ = [
     "queue_event",
     "get_pending_events",
     "update_event_status",
+    "create_benchmark_case",
+    "get_benchmark_cases",
+    "get_benchmark_case",
+    "update_benchmark_case",
+    "create_benchmark_event",
+    "get_benchmark_events",
+    "upsert_recommendation_feedback",
+    "get_feedback_for_case",
+    "get_benchmark_summary",
 ]
 
 # Initialize database on import

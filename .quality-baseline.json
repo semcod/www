@@ -1,8 +1,11 @@
 {
-  "files": 37,
-  "functions": 204,
-  "cc_mean": 2.711,
+  "files": 64,
+  "functions": 382,
+  "cc_mean": 2.746,
   "cc_max": 12,
   "critical_count": 0,
-  "max_file_lines": 332
+  "max_file_lines": 408,
+  "oversized_files": {
+    "/home/tom/github/semcod/www/backend/adapters/gitea.py": 408
+  }
 }

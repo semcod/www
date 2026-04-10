@@ -115,7 +115,7 @@ class TestFormatPRComment:
 
 
 class TestProcessPushEvent:
-    @patch("worker.tasks.run_audit")
+    @patch("worker.tasks.scan.run_audit")
     def test_process_main_branch(self, mock_run_audit):
         mock_task = MagicMock()
         mock_task.id = "task-123"
@@ -154,9 +154,9 @@ class TestProcessPushEvent:
 
 
 class TestProcessPREvent:
-    @patch("worker.tasks._get_token_for_provider")
-    @patch("worker.tasks.get_adapter_for_event")
-    @patch("worker.tasks._analyze_diff")
+    @patch("worker.tasks.scan._get_token_for_provider")
+    @patch("worker.tasks.scan.get_adapter_for_event")
+    @patch("worker.tasks.scan._analyze_diff")
     def test_process_pr_success(self, mock_analyze, mock_get_adapter, mock_get_token):
         # Setup mocks
         mock_get_token.return_value = "fake_token"
@@ -216,7 +216,7 @@ class TestRunAudit:
 
 
 class TestCreateAutoPR:
-    @patch("worker.tasks.GitHubAdapter")
+    @patch("worker.tasks.autopr.GitHubAdapter")
     def test_create_pr_success(self, mock_adapter_class):
         # Setup mock
         mock_adapter = MagicMock()

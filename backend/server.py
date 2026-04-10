@@ -27,6 +27,7 @@ from routers.autopr import router as autopr_router
 from routers.marketplace import router as marketplace_router
 from routers.webhook_v2 import router as webhook_v2_router
 from routers.mirror import router as mirror_router
+from routers.benchmark import router as benchmark_router
 
 # ─── Config ───────────────────────────────────────────────────────────────────
 
@@ -64,6 +65,7 @@ app.include_router(autopr_router)
 app.include_router(marketplace_router)
 app.include_router(mirror_router)
 app.include_router(webhook_v2_router, prefix="/v2")
+app.include_router(benchmark_router)
 
 
 # ─── Entry point ──────────────────────────────────────────────────────────────

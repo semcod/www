@@ -1,7 +1,7 @@
-# vallm batch | 308f | 74✓ 50⚠ 84✗ | 2026-04-10
+# vallm batch | 309f | 74✓ 50⚠ 85✗ | 2026-04-10
 
 SUMMARY:
-  scanned: 308  passed: 74 (24.0%)  warnings: 50  errors: 84  unsupported: 107
+  scanned: 309  passed: 74 (23.9%)  warnings: 50  errors: 85  unsupported: 107
 
 WARNINGS[50]{path,score}:
   frontend/src/hooks/useDownloads.js,0.67
@@ -159,7 +159,7 @@ WARNINGS[50]{path,score}:
     issues[1]{rule,severity,message,line}:
       js.import.resolvable,warning,Module 'react' not found,1
 
-ERRORS[84]{path,score}:
+ERRORS[85]{path,score}:
   backend/database.py,0.57
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'db_module' not found,7
@@ -178,6 +178,9 @@ ERRORS[84]{path,score}:
       python.import.resolvable,error,Module 'fastapi' not found,3
       python.import.resolvable,error,Module 'fastapi.responses' not found,4
       python.import.resolvable,error,Module 'config' not found,6
+  backend/services/scan_service.py,0.57
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'database' not found,6
   backend/tests/test_app.py,0.57
     issues[2]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'fastapi.testclient' not found,1
@@ -388,7 +391,7 @@ ERRORS[84]{path,score}:
   backend/routers/mcp/resources.py,0.74
     issues[3]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'fastapi' not found,2
-      python.import.resolvable,error,Module 'database' not found,5
+      python.import.resolvable,error,Module 'services.scan_service' not found,5
       python.import.resolvable,error,Module 'store' not found,6
   backend/routers/system.py,0.74
     issues[3]{rule,severity,message,line}:
@@ -427,7 +430,7 @@ ERRORS[84]{path,score}:
       python.import.resolvable,error,Module 'fastapi' not found,3
       python.import.resolvable,error,Module 'fastapi.responses' not found,4
       python.import.resolvable,error,Module 'config' not found,5
-      python.import.resolvable,error,Module 'database' not found,10
+      python.import.resolvable,error,Module 'services.scan_service' not found,10
   backend/routers/billing.py,0.77
     issues[6]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'stripe' not found,6
@@ -477,7 +480,7 @@ ERRORS[84]{path,score}:
   backend/routers/trend.py,0.79
     issues[2]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'fastapi' not found,6
-      python.import.resolvable,error,Module 'database' not found,8
+      python.import.resolvable,error,Module 'services.scan_service' not found,8
   backend/services/stripe_connect.py,0.79
     issues[2]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'stripe' not found,5
@@ -521,12 +524,12 @@ ERRORS[84]{path,score}:
       python.import.resolvable,error,Module 'config' not found,14
       python.import.resolvable,error,Module 'services.analyzer' not found,15
       python.import.resolvable,error,Module 'services.scoring' not found,16
-      python.import.resolvable,error,Module 'database' not found,17
+      python.import.resolvable,error,Module 'services.scan_service' not found,17
       python.import.resolvable,error,Module 'routers.auth' not found,18
   backend/routers/mcp/tools.py,0.82
     issues[3]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'fastapi' not found,4
-      python.import.resolvable,error,Module 'database' not found,7
+      python.import.resolvable,error,Module 'services.scan_service' not found,7
       python.import.resolvable,error,Module 'store' not found,8
   backend/worker/tasks/marketplace.py,0.82
     issues[3]{rule,severity,message,line}:
@@ -612,7 +615,7 @@ ERRORS[84]{path,score}:
   backend/routers/autopr.py,0.90
     issues[3]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'fastapi' not found,12
-      python.import.resolvable,error,Module 'database' not found,15
+      python.import.resolvable,error,Module 'services.scan_service' not found,15
       python.import.resolvable,error,Module 'routers.auth' not found,16
   backend/services/mirror.py,0.90
     issues[3]{rule,severity,message,line}:

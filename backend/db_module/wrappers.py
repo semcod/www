@@ -40,6 +40,17 @@ from .events_orm import (
     get_pending_events as get_pending_events_orm,
     update_event_status as update_event_status_orm,
 )
+from .benchmark_orm import (
+    create_benchmark_case as create_benchmark_case_orm,
+    get_benchmark_cases as get_benchmark_cases_orm,
+    get_benchmark_case as get_benchmark_case_orm,
+    update_benchmark_case as update_benchmark_case_orm,
+    create_benchmark_event as create_benchmark_event_orm,
+    get_benchmark_events as get_benchmark_events_orm,
+    upsert_recommendation_feedback as upsert_recommendation_feedback_orm,
+    get_feedback_for_case as get_feedback_for_case_orm,
+    get_benchmark_summary as get_benchmark_summary_orm,
+)
 
 
 # Scan operations
@@ -268,5 +279,78 @@ def update_event_status(event_id, status, error_message=""):
     db = SessionLocal()
     try:
         return update_event_status_orm(db, event_id, status, error_message)
+    finally:
+        db.close()
+
+
+# Benchmark operations
+def create_benchmark_case(payload):
+    db = SessionLocal()
+    try:
+        return create_benchmark_case_orm(db, payload)
+    finally:
+        db.close()
+
+
+def get_benchmark_cases():
+    db = SessionLocal()
+    try:
+        return get_benchmark_cases_orm(db)
+    finally:
+        db.close()
+
+
+def get_benchmark_case(case_id):
+    db = SessionLocal()
+    try:
+        return get_benchmark_case_orm(db, case_id)
+    finally:
+        db.close()
+
+
+def update_benchmark_case(case_id, updates):
+    db = SessionLocal()
+    try:
+        return update_benchmark_case_orm(db, case_id, updates)
+    finally:
+        db.close()
+
+
+def create_benchmark_event(case_id, payload):
+    db = SessionLocal()
+    try:
+        return create_benchmark_event_orm(db, case_id, payload)
+    finally:
+        db.close()
+
+
+def get_benchmark_events(case_id):
+    db = SessionLocal()
+    try:
+        return get_benchmark_events_orm(db, case_id)
+    finally:
+        db.close()
+
+
+def upsert_recommendation_feedback(case_id, recommendation_id, payload):
+    db = SessionLocal()
+    try:
+        return upsert_recommendation_feedback_orm(db, case_id, recommendation_id, payload)
+    finally:
+        db.close()
+
+
+def get_feedback_for_case(case_id):
+    db = SessionLocal()
+    try:
+        return get_feedback_for_case_orm(db, case_id)
+    finally:
+        db.close()
+
+
+def get_benchmark_summary():
+    db = SessionLocal()
+    try:
+        return get_benchmark_summary_orm(db)
     finally:
         db.close()

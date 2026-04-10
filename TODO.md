@@ -19,10 +19,10 @@
 - Marketplace: oferowanie deploymentu artefaktów (SaaS, desktop, mobile) — płatne, z łatwą dystrybucją i rozliczaniem (tokeny, czas, usługa)
 
 ### Tech
-- [ ] Testy E2E dla sandbox scans w recent scans
-- [ ] Quadlet: update `semcod-backend.container` z nowymi env vars (`DB_PATH`, `CORS_ORIGINS`, itp.)
-- [ ] Quadlet README: update env vars list
-- [ ] CI/CD: GitHub Actions deploy z nowymi env vars
+- [x] Testy E2E dla sandbox scans w recent scans — `e2e/specs/sandbox-recent-scans.spec.js` (5 scenariuszy)
+- [x] Quadlet: update `semcod-backend.container` z nowymi env vars (`DATABASE_URL`, `REDIS_URL`, `SESSION_EXPIRE_HOURS`, `DEMO_MODE`, `GITHUB_PRIVATE_KEY_PATH`)
+- [x] Quadlet README: update env vars list — pełna lista z sekcjami (GitHub, GitLab, Gitea, App, DB, Redis, Stripe)
+- [x] CI/CD: GitHub Actions deploy z nowymi env vars — `quality-gate` job, pytest z env, Write .env step, deploy via SSH + `alembic upgrade head`
 
 
 

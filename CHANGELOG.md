@@ -35,6 +35,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Quadlet deployment docs link in README
 - Full env vars table in README
 
+## [0.1.10] - 2026-04-10
+
+### Docs
+- Update README.md
+
+### Test
+- Update tests/backend/test_autofix.py
+
+### Other
+- Update .quality-baseline.json
+- Update Makefile
+- Update backend/Dockerfile
+- Update backend/adapters/gitea.py
+- Update backend/adapters/gitlab_events.py
+- Update backend/database.py
+- Update backend/db_module/__init__.py
+- Update backend/db_module/events.py
+- Update backend/db_module/installations.py
+- Update backend/db_module/repositories.py
+- ... and 17 more files
+
 ## [0.1.9] - 2026-04-10
 
 ### Docs

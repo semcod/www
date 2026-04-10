@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends git curl && rm 
 COPY --from=builder /install /usr/local
 
 # Copy application code
-COPY server.py config.py store.py database.py sample_projects.py worker.py quality_gate.py db_models.py alembic.ini ./
+COPY server.py config.py store.py database.py sample_projects.py worker.py quality_gate.py db_models.py db_session.py alembic.ini ./
 COPY alembic/ ./alembic/
 COPY services/ ./services/
 COPY routers/ ./routers/

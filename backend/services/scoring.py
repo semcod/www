@@ -1,4 +1,9 @@
 """Health score calculation and grading."""
+import hashlib
+
+
+def _rec_id(category: str, title: str) -> str:
+    return hashlib.sha1(f"{category}:{title}".encode()).hexdigest()[:12]
 
 
 def calculate_health_score(stats, complexity, duplication, quality) -> int:
@@ -61,10 +66,12 @@ def generate_recommendations(complexity, duplication, quality) -> list[dict]:
 
     cc = complexity.get("cc_avg", 0)
     if cc > 7:
+        title = "Wysoka złożoność cyklomatyczna"
         recs.append({
+            "recommendation_id": _rec_id("complexity", title),
             "priority": "high",
             "category": "complexity",
-            "title": "Wysoka złożoność cyklomatyczna",
+            "title": title,
             "description": f"Średnia CC = {cc:.1f}. Cel: < 5. Rozważ podział złożonych funkcji na mniejsze.",
             "tool": "redsl",
             "action": "redsl refactor --strategy split-complex",
@@ -73,10 +80,12 @@ def generate_recommendations(complexity, duplication, quality) -> list[dict]:
     dup = duplication.get("duplication_groups", 0)
     if dup > 5:
         recoverable = duplication.get("recoverable_lines", 0)
+        title = f"{dup} grup duplikacji ({recoverable} linii do odzyskania)"
         recs.append({
+            "recommendation_id": _rec_id("duplication", title),
             "priority": "medium",
             "category": "duplication",
-            "title": f"{dup} grup duplikacji ({recoverable} linii do odzyskania)",
+            "title": title,
             "description": "Zduplikowany kod zwiększa koszt utrzymania. Ekstrakcja wspólnych funkcji.",
             "tool": "redup",
             "action": f"redup plan --top {min(dup, 10)}",
@@ -84,20 +93,24 @@ def generate_recommendations(complexity, duplication, quality) -> list[dict]:
 
     errors = quality.get("errors", 0)
     if errors > 0:
+        title = f"{errors} błędów jakości kodu"
         recs.append({
+            "recommendation_id": _rec_id("quality", title),
             "priority": "high",
             "category": "quality",
-            "title": f"{errors} błędów jakości kodu",
+            "title": title,
             "description": "Błędy statycznej analizy (typy, security, style). Napraw przed merge.",
             "tool": "pyqual",
             "action": "pyqual fix --auto",
         })
 
     if not recs:
+        title = "Kod w dobrej kondycji"
         recs.append({
+            "recommendation_id": _rec_id("maintenance", title),
             "priority": "low",
             "category": "maintenance",
-            "title": "Kod w dobrej kondycji",
+            "title": title,
             "description": "Brak krytycznych problemów. Kontynuuj monitorowanie z weekly scans.",
             "tool": "weekly",
             "action": "weekly analyze",

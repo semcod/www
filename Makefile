@@ -1,4 +1,4 @@
-.PHONY: help install dev dev-demo build docker-up docker-down clean venv certs quality quality-baseline pre-commit-install
+.PHONY: help install dev dev-demo build docker-up docker-down clean venv certs quality quality-baseline pre-commit-install test-e2e-frontend
 
 VENV_DIR = backend/.venv
 PYTHON = $(VENV_DIR)/bin/python
@@ -133,6 +133,10 @@ test-e2e:
 test-e2e-ui:
 	@echo "=== Uruchamianie testów E2E w trybie UI ==="
 	cd e2e && BASE_URL=http://localhost:$(FRONTEND_PORT) npx playwright test --ui --headed
+
+test-e2e-frontend:
+	@echo "=== Uruchamianie testów E2E (frontend/e2e, Vite dev server) ==="
+	cd frontend && npx playwright test --config=playwright.config.js
 
 test-demo:
 	@echo "=== Uruchamianie testów demo login (wymaga make dev-demo) ==="

@@ -34,6 +34,8 @@ services:
       - APP_URL=http://nvidia:8003
       - FRONTEND_URL=http://nvidia:3000
       - CORS_ORIGINS=http://nvidia:3000,https://semcod.com
+      - DATABASE_URL=postgresql://semcod:semcod@db:5432/semcod
+      - REDIS_URL=redis://redis:6379/0
     volumes:
       - ./private-key.pem:/app/private-key.pem:ro
     depends_on:
