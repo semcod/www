@@ -1,22 +1,36 @@
-# code2llm/evolution | 298 func | 59f | 2026-04-10
+# code2llm/evolution | 663 func | 104f | 2026-04-10
 
-NEXT[2] (ranked by impact):
-  [1] !  SPLIT-FUNC      ResultPhase  CC=16  fan=6
+NEXT[5] (ranked by impact):
+  [1] !! SPLIT           backend/routers/marketplace.py
+      WHY: 549L, 7 classes, max CC=13
+      EFFORT: ~4h  IMPACT: 7137
+
+  [2] !! SPLIT           backend/worker/tasks.py
+      WHY: 618L, 0 classes, max CC=9
+      EFFORT: ~4h  IMPACT: 5562
+
+  [3] !  SPLIT-FUNC      useAppState  CC=18  fan=31
+      WHY: CC=18 exceeds 15
+      EFFORT: ~1h  IMPACT: 558
+
+  [4] !  SPLIT-FUNC      analyze_quality  CC=17  fan=9
+      WHY: CC=17 exceeds 15
+      EFFORT: ~1h  IMPACT: 153
+
+  [5] !  SPLIT-FUNC      ResultPhase  CC=16  fan=6
       WHY: CC=16 exceeds 15
       EFFORT: ~1h  IMPACT: 96
 
-  [2] !! SPLIT-FUNC      ResultHeader  CC=29  fan=3
-      WHY: CC=29 exceeds 15
-      EFFORT: ~1h  IMPACT: 87
 
-
-RISKS[0]: none
+RISKS[2]:
+  ⚠ Splitting backend/worker/tasks.py may break 13 import paths
+  ⚠ Splitting backend/routers/marketplace.py may break 11 import paths
 
 METRICS-TARGET:
-  CC̄:          2.7 → ≤1.9
+  CC̄:          2.8 → ≤2.0
   max-CC:      29 → ≤14
-  god-modules: 0 → 0
-  high-CC(≥15): 2 → ≤1
+  god-modules: 2 → 0
+  high-CC(≥15): 4 → ≤2
   hub-types:   0 → ≤0
 
 PATTERNS (language parser shared logic):
@@ -44,4 +58,4 @@ PATTERNS (language parser shared logic):
     - Standardized FunctionInfo/ClassInfo models
 
 HISTORY:
-  prev CC̄=3.0 → now CC̄=2.7
+  prev CC̄=2.7 → now CC̄=2.8

@@ -1,5 +1,7 @@
 """Webhook handler tests."""
 
+from typing import Any
+
 import pytest
 
 pytestmark = [pytest.mark.fast, pytest.mark.unit]

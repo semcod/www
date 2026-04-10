@@ -1,51 +1,60 @@
-# www | 244 func | 48f | 6635L | javascript | 2026-04-10
+# www | 664 func | 105f | 18047L | javascript | 2026-04-10
 
 HEALTH:
-  CC̄=3.0  critical=10 (limit:10)  dup=0  cycles=0
+  CC̄=2.9  critical=18 (limit:10)  dup=0  cycles=0
 
 ALERTS[20]:
-  !!! cc_exceeded      ResultPhase = 54 (limit:15)
-  !!! cc_exceeded      useAppState = 51 (limit:15)
-  !!! high_fan_out     useAppState = 48 (limit:10)
-  !!! high_fan_out     ResultPhase = 26 (limit:10)
-  !!! high_fan_out     RecentScansTab = 23 (limit:10)
-  !!! high_fan_out     _run_audit_pipeline = 20 (limit:10)
-  !!! high_fan_out     mcp_get_resource = 20 (limit:10)
-  !!  cc_exceeded      mcp_get_resource = 22 (limit:15)
-  !!  high_fan_out     LandingPhase = 19 (limit:10)
-  !!  high_fan_out     _run_sandbox_analysis = 18 (limit:10)
+  !!! high_fan_out     useAppState = 31 (limit:10)
+  !!! cc_exceeded      ResultHeader = 29 (limit:15)
+  !!! high_fan_out     create_auto_pr = 26 (limit:10)
+  !!! high_fan_out     run_scheduled_scan = 23 (limit:10)
+  !!  high_fan_out     _run_audit_pipeline = 19 (limit:10)
+  !!  high_fan_out     AutoFixService.create_auto_fix_pr = 18 (limit:10)
+  !!  high_fan_out     MirrorService.create_mirror = 18 (limit:10)
+  !!  high_fan_out     create_auto_pr = 18 (limit:10)
+  !!  high_fan_out     process_pr_event = 16 (limit:10)
+  !!  high_fan_out     _run_sandbox_analysis = 16 (limit:10)
 
-MODULES[73] (top by size):
-  M[frontend/src/components/phases/ResultPhase.jsx] 544L C:0 F:15 CC↑54 D:0 (javascript)
-  M[backend/routers/mcp.py] 436L C:4 F:6 CC↑22 D:0 (python)
-  M[backend/routers/audit.py] 331L C:0 F:8 CC↑7 D:1 (python)
-  M[frontend/src/components/tabs/RecentScansTab.jsx] 320L C:0 F:10 CC↑13 D:0 (javascript)
-  M[frontend/src/hooks/useAppState.js] 308L C:0 F:30 CC↑51 D:0 (javascript)
+MODULES[132] (top by size):
+  M[backend/worker/tasks.py] 618L C:0 F:13 CC↑9 D:0 (python)
+  M[backend/routers/marketplace.py] 549L C:7 F:11 CC↑13 D:0 (python)
+  M[backend/services/mirror.py] 411L C:3 F:11 CC↑6 D:0 (python)
+  M[backend/adapters/gitea.py] 407L C:1 F:23 CC↑5 D:1 (python)
+  M[backend/adapters/github.py] 392L C:1 F:22 CC↑6 D:1 (python)
+  M[backend/adapters/gitlab.py] 379L C:1 F:21 CC↑5 D:0 (python)
+  M[backend/services/billing.py] 343L C:3 F:16 CC↑7 D:2 (python)
+  M[backend/routers/audit.py] 330L C:0 F:8 CC↑7 D:1 (python)
+  M[frontend/src/components/MarketplaceDashboard.jsx] 301L C:0 F:4 CC↑2 D:0 (javascript)
+  M[backend/services/autofix.py] 299L C:4 F:8 CC↑7 D:0 (python)
+  M[backend/routers/billing.py] 291L C:2 F:12 CC↑8 D:0 (python)
+  M[backend/services/analyzer.py] 289L C:0 F:6 CC↑17 D:3 (python)
+  M[backend/routers/autopr.py] 287L C:3 F:12 CC↑10 D:0 (python)
+  M[backend/quality_gate.py] 272L C:3 F:12 CC↑8 D:0 (python)
   M[backend/routers/metrics.py] 257L C:0 F:6 CC↑10 D:0 (python)
-  M[backend/routers/webhook.py] 255L C:0 F:5 CC↑14 D:0 (python)
-  M[frontend/src/components/phases/LandingPhase.jsx] 232L C:0 F:8 CC↑5 D:0 (javascript)
-  M[backend/database.py] 170L C:0 F:7 CC↑2 D:4 (python)
-  M[backend/routers/auth.py] 166L C:0 F:9 CC↑4 D:0 (python)
-  M[backend/routers/badge.py] 139L C:0 F:4 CC↑5 D:0 (python)
-  M[e2e/specs/metrics.spec.js] 128L C:0 F:7 CC↑4 D:0 (javascript)
-  M[frontend/e2e/metrics.spec.js] 125L C:0 F:6 CC↑2 D:0 (javascript)
-  M[e2e/specs/social-sharing.spec.js] 120L C:0 F:13 CC↑10 D:0 (javascript)
-  M[frontend/src/components/tabs/BadgeTab.jsx] 109L C:0 F:7 CC↑7 D:0 (javascript)
-  LANGS: javascript:51/python:20/shell:2
+  LANGS: javascript:67/python:63/shell:2
 
 HOTSPOTS[10]:
-  ★ useAppState fan=48  // Orchestrates 48 calls
-  ★ ResultPhase fan=26  // Orchestrates 26 calls
-  ★ RecentScansTab fan=23  // Orchestrates 23 calls
-  ★ _run_audit_pipeline fan=20  // Background pipeline: clone → code2llm → redup → pyqual → report.
-  ★ mcp_get_resource fan=20  // Get content of a specific MCP resource by URI.
+  ★ useAppState fan=31  // Orchestrates 31 calls
+  ★ create_auto_pr fan=26  // Apply LLM-generated patches to a repository and create a GitHub PR.
 
-REFACTOR[8]:
-  [1] H/L Split useAppState (CC=51 → target CC<10)
-  [2] H/L Split ResultPhase (CC=54 → target CC<10)
-  [3] H/H Split god module frontend/src/components/phases/ResultPhase.jsx (544L, 0 classes)
-  [4] M/L Split mcp_get_resource (CC=22 → target CC<10)
-  [5] M/L Split mcp_invoke_tool (CC=17 → target CC<10)
+Flow:
+  1. 
+  ★ run_scheduled_scan fan=23  // Execute a full audit pipeline for *repo* (scheduled, no HTTP context).
+
+Returns 
+  ★ _run_audit_pipeline fan=19  // Background pipeline: clone → code2llm → redup → pyqual → report.
+  ★ AutoFixService.create_auto_fix_pr fan=18  // Create automated PR with fixes.
+
+Flow:
+1. Generate patches from analysis
+2. Crea
+
+REFACTOR[9]:
+  [1] H/L Split ResultHeader (CC=29 → target CC<10)
+  [2] H/H Split god module backend/routers/marketplace.py (549L, 7 classes)
+  [3] H/H Split god module backend/worker/tasks.py (618L, 0 classes)
+  [4] M/L Split analyze_quality (CC=17 → target CC<10)
+  [5] M/L Split useAppState (CC=18 → target CC<10)
 
 EVOLUTION:
-  2026-04-10 CC̄=3.0 crit=10 6635L // Automated analysis
+  2026-04-10 CC̄=2.9 crit=18 18047L // Automated analysis

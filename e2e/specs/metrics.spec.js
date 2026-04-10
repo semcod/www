@@ -4,10 +4,8 @@ import { test, expect } from '@playwright/test';
 const skipInCI = process.env.CI ? test.skip : test;
 
 test.describe('Metrics API', () => {
-  const baseURL = 'http://localhost:9000';
-
   skipInCI('GET /api/metrics/standard returns standardized metrics', async ({ request }) => {
-    const response = await request.get(`${baseURL}/api/metrics/standard?limit=5`);
+    const response = await request.get('/api/metrics/standard?limit=5');
     
     expect(response.status()).toBe(200);
     
@@ -51,7 +49,7 @@ test.describe('Metrics API', () => {
   });
 
   skipInCI('GET /api/metrics/summary returns statistics', async ({ request }) => {
-    const response = await request.get(`${baseURL}/api/metrics/summary`);
+    const response = await request.get('/api/metrics/summary');
     
     expect(response.status()).toBe(200);
     
@@ -76,7 +74,7 @@ test.describe('Metrics API', () => {
 
   skipInCI('GET /api/metrics/repository/{repo} returns specific repo metrics', async ({ request }) => {
     // First, get recent scans to find a valid repo
-    const listResponse = await request.get(`${baseURL}/api/metrics/standard?limit=1`);
+    const listResponse = await request.get('/api/metrics/standard?limit=1');
     const listData = await listResponse.json();
     
     if (listData.scans.length === 0) {
@@ -85,7 +83,7 @@ test.describe('Metrics API', () => {
     }
     
     const repo = listData.scans[0].repository;
-    const response = await request.get(`${baseURL}/api/metrics/repository/${repo}`);
+    const response = await request.get(`/api/metrics/repository/${repo}`);
     
     expect(response.status()).toBe(200);
     
@@ -107,13 +105,13 @@ test.describe('Metrics API', () => {
   });
 
   skipInCI('GET /api/metrics/repository/{repo} returns 404 for non-existent repo', async ({ request }) => {
-    const response = await request.get(`${baseURL}/api/metrics/repository/nonexistent/fake-repo`);
+    const response = await request.get('/api/metrics/repository/nonexistent/fake-repo');
     
     expect(response.status()).toBe(404);
   });
 
   skipInCI('GET /api/scans/recent returns scan history', async ({ request }) => {
-    const response = await request.get(`${baseURL}/api/scans/recent?limit=10`);
+    const response = await request.get('/api/scans/recent?limit=10');
     
     expect(response.status()).toBe(200);
     

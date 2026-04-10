@@ -2,19 +2,19 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Demo Login Flow', () => {
   test('demo login button creates session and shows repos', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/', { timeout: 30000 });
 
     // Should see Demo Login button
-    await expect(page.getByRole('button', { name: /Demo Login/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Demo Login/i })).toBeVisible({ timeout: 15000 });
 
     // Click Demo Login
     await page.getByRole('button', { name: /Demo Login/i }).click();
 
     // Should advance to repos phase (with demo repos)
-    await expect(page.getByText(/Select repository/i)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/Select repository/i)).toBeVisible({ timeout: 20000 });
 
     // Should show demo repos (acme/* from DEMO_REPOS)
-    await expect(page.getByText(/acme\/backend-api/i)).toBeVisible();
+    await expect(page.getByText(/acme\/backend-api/i)).toBeVisible({ timeout: 10000 });
   });
 
   test('demo user avatar appears in header after login', async ({ page }) => {

@@ -139,6 +139,43 @@ async def logout():
 async def list_repos(user: dict = Depends(get_current_user)):
     """List user's repos for audit selection."""
     if not user.get('github_token'):
+        # Return demo repos for demo mode
+        if user.get('login') == 'demo-user':
+            return [
+                {
+                    "full_name": "acme/backend-api",
+                    "name": "backend-api",
+                    "html_url": "https://github.com/acme/backend-api",
+                    "clone_url": "https://github.com/acme/backend-api.git",
+                    "language": "Python",
+                    "stars": 42,
+                    "size_kb": 1250,
+                    "private": False,
+                    "default_branch": "main",
+                },
+                {
+                    "full_name": "acme/frontend-app",
+                    "name": "frontend-app",
+                    "html_url": "https://github.com/acme/frontend-app",
+                    "clone_url": "https://github.com/acme/frontend-app.git",
+                    "language": "JavaScript",
+                    "stars": 28,
+                    "size_kb": 890,
+                    "private": False,
+                    "default_branch": "main",
+                },
+                {
+                    "full_name": "acme/data-pipeline",
+                    "name": "data-pipeline",
+                    "html_url": "https://github.com/acme/data-pipeline",
+                    "clone_url": "https://github.com/acme/data-pipeline.git",
+                    "language": "Python",
+                    "stars": 15,
+                    "size_kb": 2100,
+                    "private": False,
+                    "default_branch": "main",
+                },
+            ]
         return []
     
     async with httpx.AsyncClient() as client:

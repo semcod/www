@@ -205,18 +205,47 @@ class GiteaAdapter(GitProvider):
     # ─── Diff & Content ─────────────────────────────────────────────────────────
 
     async def get_pr_diff(self, repo: str, pr_id: int) -> str:
-        """Get PR diff content."""
+        """Get PR diff content from Gitea.
+
+        Gitea provides .diff format via .diff endpoint.
+        """
         url = f"{self.api_base}/repos/{repo}/pulls/{pr_id}.diff"
         async with httpx.AsyncClient() as client:
             resp = await client.get(url, headers=self.get_api_headers())
+
+        if resp.status_code == 404:
+            raise HTTPException(404, f"PR #{pr_id} not found in {repo}")
         if resp.status_code != 200:
             # Try alternative endpoint
             url = f"{self.api_base}/repos/{repo}/pulls/{pr_id}"
             resp = await client.get(url, headers=self.get_api_headers())
             if resp.status_code == 200:
                 return resp.json().get("diff_url", "")
-            raise HTTPException(422, f"Cannot get diff: {resp.text}")
+            raise HTTPException(422, f"Cannot get diff: {resp.status_code} - {resp.text}")
+
         return resp.text
+
+    async def get_pr_files(self, repo: str, pr_id: int) -> list:
+        """Get list of files changed in PR."""
+        url = f"{self.api_base}/repos/{repo}/pulls/{pr_id}/files"
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(url, headers=self.get_api_headers())
+
+        if resp.status_code != 200:
+            raise HTTPException(422, f"Cannot get PR files: {resp.text}")
+
+        files = resp.json()
+        return [
+            {
+                "filename": f.get("filename"),
+                "status": f.get("status"),
+                "additions": f.get("additions", 0),
+                "deletions": f.get("deletions", 0),
+                "changes": f.get("changes", 0),
+                "patch": f.get("patch"),
+            }
+            for f in files
+        ]
 
     async def get_file_content(self, repo: str, path: str, ref: str) -> Optional[str]:
         """Get file content at ref."""

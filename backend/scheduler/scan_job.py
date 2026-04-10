@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from config import APP_URL
-from database import get_repo_scans, save_scan
+from db_module.scans import get_repo_scans, save_scan
 from services.analyzer import count_code_stats, run_tool
 from services.scoring import calculate_health_score, generate_recommendations, score_to_grade
 from store import audit_results, badge_cache, scan_history

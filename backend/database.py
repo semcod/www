@@ -4,7 +4,7 @@ This module is a thin wrapper that re-exports all database functions
 from the database package for backward compatibility.
 """
 
-from database import (
+from db_module import (
     init_db,
     save_scan,
     get_recent_scans,
@@ -30,6 +30,10 @@ from database import (
     queue_event,
     get_pending_events,
     update_event_status,
+    save_audit_result,
+    get_audit_result,
+    save_badge_cache,
+    get_badge_cache,
 )
 
 __all__ = [
@@ -58,6 +62,10 @@ __all__ = [
     "queue_event",
     "get_pending_events",
     "update_event_status",
+    "save_audit_result",
+    "get_audit_result",
+    "save_badge_cache",
+    "get_badge_cache",
 ]
 
 # Initialize database on import

@@ -21,6 +21,8 @@ COPY events/ ./events/
 COPY adapters/ ./adapters/
 COPY scheduler/ ./scheduler/
 COPY apps/ ./apps/
+COPY db_module/ ./db_module/
+COPY templates/ ./templates/
 
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \

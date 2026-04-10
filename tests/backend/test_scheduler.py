@@ -1,5 +1,7 @@
 """Tests for scheduled scans API and scan_job helpers."""
 
+from typing import Any
+
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 

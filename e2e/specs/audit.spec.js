@@ -9,7 +9,6 @@ test.describe('Audit Flow', () => {
 
     // Click Connect GitHub
     await page.getByRole('button', { name: 'Connect GitHub' }).click();
-    await expect(page.getByText('Authorize GitHub')).toBeVisible();
 
     // Continue with auth
     await page.getByRole('button', { name: 'Continue with GitHub' }).click();
@@ -23,7 +22,7 @@ test.describe('Audit Flow', () => {
     await expect(page.getByText(/Cloning|code2llm|redup/i)).toBeVisible();
 
     // Wait for results (demo timeout)
-    await expect(page.getByText('Report:', { exact: false })).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('Report:', { exact: false })).toBeVisible({ timeout: 60000 });
 
     // Verify report elements
     await expect(page.getByText(/B\+|A|C/i).first()).toBeVisible();

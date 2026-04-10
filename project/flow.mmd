@@ -4,25 +4,25 @@ flowchart TD
     classDef entry fill:#4dabf7,stroke:#1971c2,color:#fff
 
     subgraph Core
-        backend__services__scoring__score_to_grade["score_to_grade"]
+        backend__worker__get_celery_app["get_celery_app"]
+        backend__server__lifespan["lifespan"]
+        backend__scheduler__scan_job___detect_degradation["_detect_degradation"]
+        backend__scheduler__scan_job__run_scheduled_scan("run_scheduled_scan CC=8")
+        backend__services__autofix__PatchGenerator__analyze_and_generate_patches["analyze_and_generate_patches"]
+        backend__services__autofix__PatchGenerator___parse_diff_original["_parse_diff_original"]
+        backend__services__autofix__PatchGenerator___apply_fixes["_apply_fixes"]
+        backend__services__autofix__PatchGenerator__generate_fix_description["generate_fix_description"]
+        backend__services__autofix__AutoFixService__create_auto_fix_pr["create_auto_fix_pr"]
+        backend__services__autofix__AutoFixService__check_score_improvement["check_score_improvement"]
+        backend__services__analyzer__analyze_quality{{analyze_quality CC=17}}
         backend__services__github_client__get_installation_token["get_installation_token"]
-        backend__routers__system__health_check["health_check"]
-        backend__routers__system__get_domain_config["get_domain_config"]
-        backend__database__init_db["init_db"]
-        backend__database__get_user_by_github_id["get_user_by_github_id"]
-        backend__routers__auth__get_current_user["get_current_user"]
-        backend__routers__auth__github_oauth_start["github_oauth_start"]
-        backend__routers__auth__github_oauth_callback["github_oauth_callback"]
-        backend__routers__auth__demo_login["demo_login"]
-        backend__routers__auth__get_me["get_me"]
-        backend__routers__auth__logout["logout"]
-        backend__routers__auth__list_repos["list_repos"]
-        backend__routers__report__report_page["report_page"]
-        backend__routers__badge__health_badge["health_badge"]
-        ...["+223 more"]
+        backend__services__mirror__MirrorService__create_mirror["create_mirror"]
+        backend__services__mirror__MirrorService__sync_mirror["sync_mirror"]
+        backend__services__mirror__MirrorService___get_source_adapter["_get_source_adapter"]
+        ...["+482 more"]
     end
 
     subgraph Exporters
     end
 
-    class backend__services__github_client__get_installation_token,backend__routers__system__health_check,backend__routers__system__get_domain_config,backend__database__init_db,backend__database__get_user_by_github_id,backend__routers__auth__get_current_user,backend__routers__auth__github_oauth_start,backend__routers__auth__github_oauth_callback,backend__routers__auth__demo_login,backend__routers__auth__get_me entry
+    class backend__worker__get_celery_app,backend__server__lifespan,backend__services__autofix__PatchGenerator__analyze_and_generate_patches,backend__services__autofix__PatchGenerator___parse_diff_original,backend__services__autofix__PatchGenerator___apply_fixes,backend__services__autofix__PatchGenerator__generate_fix_description,backend__services__autofix__AutoFixService__create_auto_fix_pr,backend__services__autofix__AutoFixService__check_score_improvement,backend__services__github_client__get_installation_token,backend__services__mirror__MirrorService__create_mirror entry

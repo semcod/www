@@ -25,6 +25,8 @@ from scheduler.cron import router as scheduler_router, start_scheduler, stop_sch
 from routers.billing import router as billing_router
 from routers.autopr import router as autopr_router
 from routers.marketplace import router as marketplace_router
+from routers.webhook_v2 import router as webhook_v2_router
+from routers.mirror import router as mirror_router
 
 # ─── Config ───────────────────────────────────────────────────────────────────
 
@@ -60,6 +62,8 @@ app.include_router(scheduler_router)
 app.include_router(billing_router)
 app.include_router(autopr_router)
 app.include_router(marketplace_router)
+app.include_router(mirror_router)
+app.include_router(webhook_v2_router, prefix="/v2")
 
 
 # ─── Entry point ──────────────────────────────────────────────────────────────

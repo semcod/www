@@ -14,8 +14,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from config import APP_URL, SCAN_HISTORY_LIMIT
 from services.analyzer import count_code_stats, run_tool
 from services.scoring import calculate_health_score, generate_recommendations, score_to_grade
-from store import audit_results, badge_cache, scan_history
-from database import save_scan, get_recent_scans
+from database import save_scan, get_recent_scans, save_audit_result, get_audit_result, save_badge_cache, get_badge_cache
 from routers.auth import get_current_user
 
 router = APIRouter()
@@ -44,20 +43,21 @@ async def run_audit(request: Request, user: dict = Depends(get_current_user)):
         f"{repo}-{_utc_now_iso()}".encode()
     ).hexdigest()[:12]
 
-    audit_results[audit_id] = {
+    # Save initial audit status to database
+    save_audit_result(audit_id, {
         "status": "running",
         "repo": repo,
         "started": _utc_now_iso(),
-    }
+    })
 
     _schedule_background_task(_run_audit_pipeline(audit_id, repo, token))
     return {"audit_id": audit_id, "status": "running"}
 
 
 @router.get("/api/audit/{audit_id}")
-async def get_audit_result(audit_id: str):
+async def get_audit_result_endpoint(audit_id: str):
     """Poll audit status and results."""
-    result = audit_results.get(audit_id)
+    result = get_audit_result(audit_id)
     if not result:
         raise HTTPException(404, "Audit not found")
     return result
@@ -110,12 +110,13 @@ async def analyze_repo(request: Request):
         f"{owner}/{repo}-{_utc_now_iso()}".encode()
     ).hexdigest()[:12]
 
-    audit_results[audit_id] = {
+    # Save initial audit status to database
+    save_audit_result(audit_id, {
         "status": "running",
         "repo": f"{owner}/{repo}",
         "sandbox": sandbox,
         "started": _utc_now_iso(),
-    }
+    })
 
     _schedule_background_task(_run_sandbox_analysis(audit_id, repo_url, f"{owner}/{repo}"))
     return {"audit_id": audit_id, "status": "running", "sandbox": True}
@@ -186,17 +187,20 @@ async def _run_audit_pipeline(audit_id: str, repo: str, token: str):
             "files": code2llm_files.get("files", []),
         }
 
-        audit_results[audit_id] = report
+        # Save audit result to database
+        save_audit_result(audit_id, report)
 
         weekly_issues = sum(
             1 for r in recommendations if r.get("priority") in ("high", "medium")
         )
-        badge_cache[repo] = {
+        
+        # Save badge cache to database
+        save_badge_cache(repo, {
             "score": health_score,
             "grade": score_to_grade(health_score),
             "updated": _utc_now_iso(),
             "weekly_issues": weekly_issues,
-        }
+        })
 
         # Add to scan history
         scan_entry = {
@@ -207,9 +211,6 @@ async def _run_audit_pipeline(audit_id: str, repo: str, token: str):
             "completed": _utc_now_iso(),
             "badge_url": f"{APP_URL}/badge/{repo.replace('/', '-')}.svg",
         }
-        scan_history.insert(0, scan_entry)
-        if len(scan_history) > SCAN_HISTORY_LIMIT:
-            scan_history.pop()
 
         # Persist to database
         try:
@@ -218,11 +219,11 @@ async def _run_audit_pipeline(audit_id: str, repo: str, token: str):
             pass
 
     except Exception as e:
-        audit_results[audit_id] = {
+        save_audit_result(audit_id, {
             "status": "error",
             "repo": repo,
             "error": str(e),
-        }
+        })
     finally:
         shutil.rmtree(workdir, ignore_errors=True)
 
@@ -244,11 +245,11 @@ async def _run_sandbox_analysis(audit_id: str, repo_url: str, repo: str):
         await proc.wait()
 
         if proc.returncode != 0:
-            audit_results[audit_id] = {
+            save_audit_result(audit_id, {
                 "status": "error",
                 "error": "Failed to clone repository. Ensure it's public.",
                 "repo": repo,
-            }
+            })
             return
 
         repo_path = workdir / "repo"
@@ -299,7 +300,8 @@ async def _run_sandbox_analysis(audit_id: str, repo_url: str, repo: str):
             "files": code2llm_files.get("files", []),
         }
 
-        audit_results[audit_id] = report
+        # Save audit result to database
+        save_audit_result(audit_id, report)
 
         # Add to scan history
         scan_entry = {
@@ -311,9 +313,6 @@ async def _run_sandbox_analysis(audit_id: str, repo_url: str, repo: str):
             "sandbox": True,
             "badge_url": f"{APP_URL}/badge/{repo.replace('/', '-')}.svg",
         }
-        scan_history.insert(0, scan_entry)
-        if len(scan_history) > SCAN_HISTORY_LIMIT:
-            scan_history.pop()
 
         # Persist to database
         try:
@@ -322,10 +321,10 @@ async def _run_sandbox_analysis(audit_id: str, repo_url: str, repo: str):
             pass
 
     except Exception as e:
-        audit_results[audit_id] = {
+        save_audit_result(audit_id, {
             "status": "error",
             "error": str(e),
             "repo": repo,
-        }
+        })
     finally:
         shutil.rmtree(workdir, ignore_errors=True)

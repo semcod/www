@@ -1,17 +1,44 @@
 """Database schema initialization."""
 
 import sqlite3
-from config import DB_PATH
+from config import DB_PATH, DB_TYPE, DATABASE_URL
+
+# Try to use psycopg2 for PostgreSQL if available
+try:
+    import psycopg2
+    from psycopg2.extras import RealDictCursor
+    USE_POSTGRES = (DB_TYPE == "postgresql")
+except ImportError:
+    USE_POSTGRES = False
+
+
+def get_connection():
+    """Get database connection based on DB_TYPE."""
+    if USE_POSTGRES and DATABASE_URL:
+        return psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
+    else:
+        conn = sqlite3.connect(DB_PATH, timeout=30.0)
+        conn.row_factory = sqlite3.Row
+        return conn
 
 
 def init_db():
     """Initialize the database and create tables."""
-    conn = sqlite3.connect(DB_PATH)
+    conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("""
+    # SQLite-specific optimizations
+    if not USE_POSTGRES:
+        cursor.execute("PRAGMA journal_mode=WAL")
+        cursor.execute("PRAGMA synchronous=NORMAL")
+        cursor.execute("PRAGMA busy_timeout=30000")
+
+    # Use SERIAL for PostgreSQL, AUTOINCREMENT for SQLite
+    id_type = "SERIAL" if USE_POSTGRES else "INTEGER PRIMARY KEY AUTOINCREMENT"
+
+    cursor.execute(f"""
         CREATE TABLE IF NOT EXISTS scans (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id {id_type},
             repo TEXT NOT NULL,
             health_score INTEGER,
             grade TEXT,
@@ -23,9 +50,12 @@ def init_db():
         )
     """)
 
-    cursor.execute("""
+    # Use SERIAL for PostgreSQL, AUTOINCREMENT for SQLite
+    id_type = "SERIAL" if USE_POSTGRES else "INTEGER PRIMARY KEY AUTOINCREMENT"
+
+    cursor.execute(f"""
         CREATE TABLE IF NOT EXISTS subscriptions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id {id_type},
             user_id INTEGER NOT NULL,
             plan TEXT NOT NULL DEFAULT 'free',
             stripe_customer_id TEXT DEFAULT '',
@@ -38,9 +68,9 @@ def init_db():
         )
     """)
 
-    cursor.execute("""
+    cursor.execute(f"""
         CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id {id_type},
             github_id INTEGER UNIQUE NOT NULL,
             login TEXT NOT NULL,
             name TEXT DEFAULT '',
@@ -53,9 +83,9 @@ def init_db():
 
     # ─── SaaS Multi-tenancy Tables ─────────────────────────────────────────────
 
-    cursor.execute("""
+    cursor.execute(f"""
         CREATE TABLE IF NOT EXISTS tenants (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id {id_type},
             provider TEXT NOT NULL,
             provider_user_id TEXT NOT NULL,
             login TEXT NOT NULL,
@@ -65,16 +95,16 @@ def init_db():
             plan TEXT DEFAULT 'free',
             billing_customer_id TEXT DEFAULT '',
             billing_subscription_id TEXT DEFAULT '',
-            usage_limits TEXT DEFAULT '{}',
+            usage_limits TEXT DEFAULT '{{}}',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             UNIQUE(provider, provider_user_id)
         )
     """)
 
-    cursor.execute("""
+    cursor.execute(f"""
         CREATE TABLE IF NOT EXISTS repositories (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id {id_type},
             tenant_id INTEGER NOT NULL,
             provider TEXT NOT NULL,
             repo_provider_id TEXT NOT NULL,
@@ -87,15 +117,13 @@ def init_db():
             clone_url TEXT DEFAULT '',
             status TEXT DEFAULT 'active',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (tenant_id) REFERENCES tenants (id),
-            UNIQUE(tenant_id, provider, full_name)
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
 
-    cursor.execute("""
+    cursor.execute(f"""
         CREATE TABLE IF NOT EXISTS installations (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id {id_type},
             tenant_id INTEGER NOT NULL,
             repository_id INTEGER NOT NULL,
             apps TEXT DEFAULT '[]',
@@ -106,18 +134,15 @@ def init_db():
             installed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             last_scan_at TIMESTAMP DEFAULT NULL,
-            last_scan_score INTEGER DEFAULT NULL,
-            FOREIGN KEY (tenant_id) REFERENCES tenants (id),
-            FOREIGN KEY (repository_id) REFERENCES repositories (id),
-            UNIQUE(tenant_id, repository_id)
+            last_scan_score INTEGER DEFAULT NULL
         )
     """)
 
     # ─── Event Queue Table ──────────────────────────────────────────────────────
 
-    cursor.execute("""
+    cursor.execute(f"""
         CREATE TABLE IF NOT EXISTS events (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id {id_type},
             event_id TEXT UNIQUE NOT NULL,
             type TEXT NOT NULL,
             provider TEXT NOT NULL,
@@ -137,6 +162,40 @@ def init_db():
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_events_status ON events (status)")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_events_type ON events (type)")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_events_provider ON events (provider)")
+
+    # ─── Audit Results Table ─────────────────────────────────────────────────────
+
+    cursor.execute(f"""
+        CREATE TABLE IF NOT EXISTS audit_results (
+            audit_id TEXT PRIMARY KEY,
+            repo TEXT NOT NULL,
+            status TEXT NOT NULL,
+            started TEXT,
+            completed TEXT,
+            health_score INTEGER,
+            grade TEXT,
+            stats TEXT,
+            metrics TEXT,
+            recommendations TEXT,
+            error TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_audit_results_repo ON audit_results (repo)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_audit_results_status ON audit_results (status)")
+
+    # ─── Badge Cache Table ───────────────────────────────────────────────────────
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS badge_cache (
+            repo TEXT PRIMARY KEY,
+            score INTEGER,
+            grade TEXT,
+            updated TEXT,
+            weekly_issues INTEGER DEFAULT 0
+        )
+    """)
 
     conn.commit()
     conn.close()

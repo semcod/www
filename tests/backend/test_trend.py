@@ -1,5 +1,7 @@
 """Tests for trend and scan-diff API endpoints."""
 
+from typing import Any
+
 import pytest
 from unittest.mock import patch
 

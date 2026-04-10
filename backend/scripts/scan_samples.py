@@ -8,7 +8,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from routers.audit import _run_sandbox_analysis
-from database import save_scan
+from db_module.scans import save_scan
 from sample_projects import get_sample_projects
 
 

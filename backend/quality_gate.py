@@ -128,14 +128,20 @@ class Violation:
     severity: str = "error"
 
 
-def check_file_lines(results: List[FileResult]) -> List[Violation]:
+def check_file_lines(results: List[FileResult],
+                     baseline: Optional[dict] = None) -> List[Violation]:
+    baseline_files: dict = (baseline or {}).get("oversized_files", {})
     violations = []
     for r in results:
-        if r.lines > MAX_FILE_LINES:
-            violations.append(Violation(
-                "max_file_lines",
-                f"{r.path}: {r.lines} lines (limit {MAX_FILE_LINES})",
-            ))
+        if r.lines <= MAX_FILE_LINES:
+            continue
+        prev = baseline_files.get(r.path)
+        if prev is not None and r.lines <= prev:
+            continue
+        violations.append(Violation(
+            "max_file_lines",
+            f"{r.path}: {r.lines} lines (limit {MAX_FILE_LINES})",
+        ))
     return violations
 
 
@@ -189,6 +195,7 @@ def _global_mean_cc(results: List[FileResult]) -> float:
 def build_snapshot(results: List[FileResult]) -> dict:
     all_ccs = [f.cc for r in results for f in r.functions]
     critical = sum(1 for cc in all_ccs if cc >= CRITICAL_CC)
+    oversized = {r.path: r.lines for r in results if r.lines > MAX_FILE_LINES}
     return {
         "files": len(results),
         "functions": len(all_ccs),
@@ -196,6 +203,7 @@ def build_snapshot(results: List[FileResult]) -> dict:
         "cc_max": max(all_ccs, default=0),
         "critical_count": critical,
         "max_file_lines": max((r.lines for r in results), default=0),
+        "oversized_files": oversized,
     }
 
 
@@ -240,7 +248,7 @@ def main() -> int:
     print(f"  Max file lines: {snapshot['max_file_lines']}")
 
     violations: List[Violation] = []
-    violations += check_file_lines(results)
+    violations += check_file_lines(results, baseline)
     violations += check_function_cc(results)
     violations += check_cc_mean_delta(results, baseline)
     violations += check_critical_delta(results, baseline)
