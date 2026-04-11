@@ -72,9 +72,9 @@ def parse_gitlab_webhook(payload: dict) -> Optional[Event]:
     return parse_gitlab_event(payload)
 
 
-def parse_gitea_webhook(payload: dict) -> Optional[Event]:
+def parse_gitea_webhook(payload: dict, gitea_event_header: str = "") -> Optional[Event]:
     """Parse Gitea webhook payload into Event."""
-    return parse_gitea_event(payload)
+    return parse_gitea_event(payload, gitea_event_header=gitea_event_header)
 
 
 def verify_github_signature(body: bytes, signature: str, secret: str) -> bool:

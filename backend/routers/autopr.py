@@ -1,24 +1,24 @@
 """Auto-PR generation — applies LLM-generated patches and creates GitHub PRs."""
 
-import hashlib
 import logging
-import shutil
-import tempfile
-from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, List
+from typing import List
 
-import httpx
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from services.scan_service import get_repo_scans
+from services.autopr_helpers import (
+    BranchManager,
+    PatchApplier,
+    PRCreator,
+    generate_fix_id,
+)
+from services.redsl_client import RedslClient
 from routers.auth import get_current_user
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/autopr", tags=["autopr"])
-
-GITHUB_API = "https://api.github.com"
 
 
 # ─── Models ───────────────────────────────────────────────────────────────────
@@ -46,100 +46,24 @@ class AutoPRResult(BaseModel):
     rollback_reason: str | None = None
 
 
-# ─── GitHub helpers ───────────────────────────────────────────────────────────
-
-def _gh_headers(token: str) -> dict:
-    return {
-        "Authorization": f"Bearer {token}",
-        "Accept": "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2022-11-28",
-    }
-
-
-async def _get_default_branch(repo: str, token: str) -> str:
-    async with httpx.AsyncClient() as client:
-        resp = await client.get(f"{GITHUB_API}/repos/{repo}", headers=_gh_headers(token))
-    if resp.status_code != 200:
-        raise HTTPException(422, f"Cannot access repo {repo}: {resp.text}")
-    return resp.json().get("default_branch", "main")
+class RedslRefactorRequest(BaseModel):
+    repo: str
+    project_path: str
+    proposal_type: str = "redsl_refactor"
+    max_actions: int = 10
+    dry_run: bool = False
+    branch_prefix: str = "semcod-fix"
 
 
-async def _get_ref_sha(repo: str, branch: str, token: str) -> str:
-    async with httpx.AsyncClient() as client:
-        resp = await client.get(
-            f"{GITHUB_API}/repos/{repo}/git/refs/heads/{branch}",
-            headers=_gh_headers(token),
-        )
-    if resp.status_code != 200:
-        raise HTTPException(422, f"Cannot get ref for {branch}: {resp.text}")
-    return resp.json()["object"]["sha"]
+class RedslRefactorResult(BaseModel):
+    status: str
+    redsl_available: bool
+    decisions_count: int = 0
+    pr_url: str | None = None
+    branch: str | None = None
+    error: str | None = None
 
 
-async def _create_branch(repo: str, branch: str, sha: str, token: str) -> None:
-    async with httpx.AsyncClient() as client:
-        resp = await client.post(
-            f"{GITHUB_API}/repos/{repo}/git/refs",
-            headers=_gh_headers(token),
-            json={"ref": f"refs/heads/{branch}", "sha": sha},
-        )
-    if resp.status_code not in (201, 422):
-        raise HTTPException(500, f"Failed to create branch {branch}: {resp.text}")
-
-
-async def _get_file_sha(repo: str, path: str, branch: str, token: str) -> str | None:
-    async with httpx.AsyncClient() as client:
-        resp = await client.get(
-            f"{GITHUB_API}/repos/{repo}/contents/{path}",
-            headers=_gh_headers(token),
-            params={"ref": branch},
-        )
-    if resp.status_code == 404:
-        return None
-    if resp.status_code != 200:
-        raise HTTPException(422, f"Cannot read {path}: {resp.text}")
-    return resp.json().get("sha")
-
-
-async def _commit_file(repo: str, path: str, content: str, branch: str,
-                       message: str, token: str, file_sha: str | None) -> None:
-    import base64
-    encoded = base64.b64encode(content.encode()).decode()
-    body: dict = {"message": message, "content": encoded, "branch": branch}
-    if file_sha:
-        body["sha"] = file_sha
-    async with httpx.AsyncClient() as client:
-        resp = await client.put(
-            f"{GITHUB_API}/repos/{repo}/contents/{path}",
-            headers=_gh_headers(token),
-            json=body,
-        )
-    if resp.status_code not in (200, 201):
-        raise HTTPException(500, f"Failed to commit {path}: {resp.text}")
-
-
-async def _create_pr(repo: str, branch: str, base: str, title: str,
-                     body: str, token: str) -> str:
-    async with httpx.AsyncClient() as client:
-        resp = await client.post(
-            f"{GITHUB_API}/repos/{repo}/pulls",
-            headers=_gh_headers(token),
-            json={"title": title, "body": body, "head": branch, "base": base},
-        )
-    if resp.status_code != 201:
-        raise HTTPException(500, f"Failed to create PR: {resp.text}")
-    return resp.json()["html_url"]
-
-
-async def _create_issue(repo: str, title: str, body: str, token: str) -> str:
-    async with httpx.AsyncClient() as client:
-        resp = await client.post(
-            f"{GITHUB_API}/repos/{repo}/issues",
-            headers=_gh_headers(token),
-            json={"title": title, "body": body, "labels": ["semcod", "code-quality"]},
-        )
-    if resp.status_code != 201:
-        raise HTTPException(500, f"Failed to create issue: {resp.text}")
-    return resp.json()["html_url"]
 
 
 # ─── Validation ───────────────────────────────────────────────────────────────
@@ -173,22 +97,20 @@ async def create_auto_pr(
     if not token:
         raise HTTPException(401, "GitHub token required for auto-PR")
 
-    fix_id = hashlib.sha256(
-        f"{body.repo}-{body.proposal_type}-{datetime.now(timezone.utc).isoformat()}".encode()
-    ).hexdigest()[:8]
+    fix_id = generate_fix_id(body.repo, body.proposal_type)
     branch = f"{body.branch_prefix}-{fix_id}"
 
     scans_before = get_repo_scans(body.repo, limit=1)
     score_before = scans_before[-1]["health_score"] if scans_before else None
 
     try:
-        default_branch = await _get_default_branch(body.repo, token)
-        base_sha = await _get_ref_sha(body.repo, default_branch, token)
-        await _create_branch(body.repo, branch, base_sha, token)
+        default_branch = await BranchManager.get_default_branch(body.repo, token)
+        base_sha = await BranchManager.get_ref_sha(body.repo, default_branch, token)
+        await BranchManager.create_branch(body.repo, branch, base_sha, token)
 
         for patch in body.patches:
-            file_sha = await _get_file_sha(body.repo, patch.path, branch, token)
-            await _commit_file(
+            file_sha = await PatchApplier.get_file_sha(body.repo, patch.path, branch, token)
+            await PatchApplier.commit_file(
                 body.repo, patch.path, patch.content, branch,
                 f"fix({body.proposal_type}): auto-fix via Semcod [{fix_id}]",
                 token, file_sha,
@@ -207,8 +129,11 @@ async def create_auto_pr(
 
         if rollback_reason:
             issue_title = f"[Semcod] Auto-fix failed: {body.proposal_type}"
-            issue_body = _build_issue_body(body, fix_id, rollback_reason, score_before, score_after_cmp)
-            issue_url = await _create_issue(body.repo, issue_title, issue_body, token)
+            issue_body = PRCreator.build_issue_body(
+                body.proposal_type, fix_id, rollback_reason, body.llm_prompt, body.patches,
+                score_before, score_after_cmp
+            )
+            issue_url = await PRCreator.create_issue(body.repo, issue_title, issue_body, token)
             logger.warning("Auto-PR rolled back for %s: %s", body.repo, rollback_reason)
             return AutoPRResult(
                 status="rolled_back",
@@ -220,8 +145,10 @@ async def create_auto_pr(
             )
 
         pr_title = f"[Semcod] Auto-fix: {body.proposal_type.replace('_', ' ')} [{fix_id}]"
-        pr_body = _build_pr_body(body, fix_id, score_before, score_after_cmp)
-        pr_url = await _create_pr(body.repo, branch, default_branch, pr_title, pr_body, token)
+        pr_body = PRCreator.build_pr_body(
+            body.proposal_type, fix_id, body.llm_prompt, body.patches, score_before, score_after_cmp
+        )
+        pr_url = await PRCreator.create_pr(body.repo, branch, default_branch, pr_title, pr_body, token)
         logger.info("Auto-PR created for %s: %s", body.repo, pr_url)
 
         return AutoPRResult(
@@ -239,49 +166,141 @@ async def create_auto_pr(
         raise HTTPException(500, f"Auto-PR failed: {str(exc)}")
 
 
-# ─── Body builders ────────────────────────────────────────────────────────────
+# ─── reDSL-powered endpoint ───────────────────────────────────────────────────
 
-def _build_pr_body(req: AutoPRRequest, fix_id: str, score_before: int | None, score_after: int | None) -> str:
-    score_section = ""
-    if score_before is not None and score_after is not None:
-        delta = score_after - score_before
-        sign = "+" if delta >= 0 else ""
-        score_section = f"\n\n## Health Score\n| Before | After | Delta |\n|--------|-------|-------|\n| {score_before} | {score_after} | {sign}{delta} |\n"
+@router.post("/redsl", response_model=RedslRefactorResult)
+async def create_redsl_auto_pr(
+    body: RedslRefactorRequest,
+    user: dict = Depends(get_current_user),
+) -> RedslRefactorResult:
+    """
+    Use reDSL engine to analyze and refactor a project, then create a PR.
 
-    return f"""## Semcod Auto-Fix
+    Flow:
+      1. Check reDSL engine availability
+      2. Run reDSL refactor (dry_run=False) on the project
+      3. Collect decisions and transformed files
+      4. Create branch, commit changes, create PR
+    """
+    token = user.get("github_token", "")
+    if not token:
+        raise HTTPException(401, "GitHub token required for auto-PR")
+
+    redsl = RedslClient()
+    available = await redsl.health()
+
+    if not available:
+        return RedslRefactorResult(
+            status="redsl_unavailable",
+            redsl_available=False,
+            error="reDSL engine is not running. Start it with: docker-compose up agent",
+        )
+
+    try:
+        # Run reDSL refactor on the project
+        refactor_result = await redsl.refactor(
+            project_path=body.project_path,
+            max_actions=body.max_actions,
+            dry_run=body.dry_run,
+            fmt="json",
+        )
+
+        decisions = refactor_result.get("decisions", [])
+        if not decisions:
+            return RedslRefactorResult(
+                status="no_decisions",
+                redsl_available=True,
+                decisions_count=0,
+            )
+
+        # Build patches from reDSL decisions
+        fix_id = generate_fix_id(body.repo, body.proposal_type)
+        branch = f"{body.branch_prefix}-{fix_id}"
+
+        default_branch = await BranchManager.get_default_branch(body.repo, token)
+        base_sha = await BranchManager.get_ref_sha(body.repo, default_branch, token)
+        await BranchManager.create_branch(body.repo, branch, base_sha, token)
+
+        # Commit each decision's target file (reDSL applies changes on disk)
+        committed_files = set()
+        for decision in decisions:
+            target_file = decision.get("target_file", "")
+            if not target_file or target_file in committed_files:
+                continue
+
+            # Read the refactored file content from disk (reDSL wrote it)
+            file_path = Path(body.project_path) / target_file
+            if not file_path.exists():
+                continue
+
+            content = file_path.read_text(encoding="utf-8", errors="replace")
+            file_sha = await PatchApplier.get_file_sha(body.repo, target_file, branch, token)
+            await PatchApplier.commit_file(
+                body.repo, target_file, content, branch,
+                f"refactor({body.proposal_type}): {decision.get('action', 'auto-fix')} via reDSL [{fix_id}]",
+                token, file_sha,
+            )
+            committed_files.add(target_file)
+
+        if not committed_files:
+            return RedslRefactorResult(
+                status="no_changes",
+                redsl_available=True,
+                decisions_count=len(decisions),
+            )
+
+        # Create PR
+        pr_title = f"[Semcod] reDSL refactor: {body.proposal_type.replace('_', ' ')} [{fix_id}]"
+        pr_body = _build_redsl_pr_body(body.proposal_type, fix_id, decisions, committed_files)
+        pr_url = await PRCreator.create_pr(body.repo, branch, default_branch, pr_title, pr_body, token)
+        logger.info("reDSL Auto-PR created for %s: %s", body.repo, pr_url)
+
+        return RedslRefactorResult(
+            status="created",
+            redsl_available=True,
+            decisions_count=len(decisions),
+            pr_url=pr_url,
+            branch=branch,
+        )
+
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.error("reDSL Auto-PR failed for %s: %s", body.repo, exc)
+        return RedslRefactorResult(
+            status="failed",
+            redsl_available=True,
+            error=str(exc),
+        )
+
+
+def _build_redsl_pr_body(proposal_type: str, fix_id: str, decisions: list, files: set) -> str:
+    """Build PR body from reDSL decisions."""
+    decision_lines = []
+    for d in decisions:
+        action = d.get("action", "unknown")
+        target = d.get("target_file", "")
+        score = d.get("score", 0)
+        decision_lines.append(f"| `{action}` | `{target}` | {score:.1f} |")
+
+    return f"""## Semcod reDSL Auto-Fix
 
 **Fix ID:** `{fix_id}`
-**Type:** `{req.proposal_type}`
-{score_section}
-## What was changed
+**Type:** `{proposal_type}`
+**Engine:** reDSL
 
-{req.llm_prompt}
+## Refactoring decisions ({len(decisions)} applied)
 
-## Files modified
+| Action | Target | Score |
+|--------|--------|-------|
+{chr(10).join(decision_lines)}
 
-{chr(10).join(f'- `{p.path}`' for p in req.patches)}
+## Files modified ({len(files)})
+
+{chr(10).join(f'- `{f}`' for f in sorted(files))}
 
 ---
-*Generated by [Semcod](https://semcod.com) — AI-powered code health analysis*
+*Generated by [Semcod](https://semcod.com) — AI-powered code health analysis with [reDSL](https://github.com/softrebel/redsl)*
 """
 
 
-def _build_issue_body(req: AutoPRRequest, fix_id: str, reason: str,
-                      score_before: int | None, score_after: int | None) -> str:
-    return f"""## Semcod Auto-Fix Failed
-
-**Fix ID:** `{fix_id}`
-**Type:** `{req.proposal_type}`
-**Reason:** {reason}
-
-### Attempted patch
-
-{req.llm_prompt}
-
-### Files that would have been modified
-
-{chr(10).join(f'- `{p.path}`' for p in req.patches)}
-
----
-*This issue was created automatically by [Semcod](https://semcod.com)*
-"""

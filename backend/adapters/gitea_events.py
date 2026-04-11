@@ -4,9 +4,9 @@ from typing import Dict, Optional
 from events.models import Event, EventType, ProviderType
 
 
-def parse_gitea_event(payload: Dict) -> Optional[Event]:
+def parse_gitea_event(payload: Dict, gitea_event_header: str = "") -> Optional[Event]:
     """Parse Gitea webhook payload into unified Event."""
-    event_type = _detect_gitea_event_type(payload)
+    event_type = _detect_gitea_event_type(payload, gitea_event_header)
 
     repo_data = payload.get("repository", {})
     repo = repo_data.get("full_name")
@@ -49,8 +49,17 @@ def parse_gitea_event(payload: Dict) -> Optional[Event]:
     )
 
 
-def _detect_gitea_event_type(payload: Dict) -> EventType:
-    """Detect event type from Gitea payload."""
+def _detect_gitea_event_type(payload: Dict, gitea_event_header: str = "") -> EventType:
+    """Detect event type from Gitea X-Gitea-Event header or payload."""
+    header_map = {
+        "push": EventType.PUSH,
+        "pull_request": EventType.PULL_REQUEST,
+        "issues": EventType.ISSUE,
+        "issue_comment": EventType.ISSUE,
+    }
+    if gitea_event_header:
+        return header_map.get(gitea_event_header, EventType.UNKNOWN)
+    # Fallback to payload inspection
     if "pull_request" in payload:
         return EventType.PULL_REQUEST
     elif "commits" in payload and "ref" in payload:

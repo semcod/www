@@ -3,6 +3,7 @@ import { fetchAudit } from "../api.js";
 
 const VALID_TABS = new Set(["audit", "prbot", "badge", "recent", "repo"]);
 const VALID_PHASES = new Set(["landing", "auth", "repos", "scanning", "value", "trial", "result"]);
+const RESULT_PHASES = ["scanning", "result", "value", "trial"];
 
 export function parseRepositoryReference(repoValue) {
   if (!repoValue) {
@@ -16,10 +17,7 @@ export function parseRepositoryReference(repoValue) {
     || trimmed.match(/:([^/]+)\/([^/.?#]+)\.?$/);
 
   if (urlMatch) {
-    return {
-      owner: urlMatch[1],
-      repo: urlMatch[2],
-    };
+    return { owner: urlMatch[1], repo: urlMatch[2] };
   }
 
   const parts = trimmed.split("/").filter(Boolean);
@@ -27,10 +25,7 @@ export function parseRepositoryReference(repoValue) {
     return null;
   }
 
-  return {
-    owner: parts[parts.length - 2],
-    repo: parts[parts.length - 1].replace(/\.git$/, ""),
-  };
+  return { owner: parts[parts.length - 2], repo: parts[parts.length - 1].replace(/\.git$/, "") };
 }
 
 export function createSelectedRepo(repoValue, url = repoValue) {
@@ -50,62 +45,56 @@ export function createSelectedRepo(repoValue, url = repoValue) {
   };
 }
 
+export function parseHashState(hash) {
+  const params = new URLSearchParams(hash);
+  const tab = params.get("tab");
+  const phase = params.get("phase");
+  const repo = params.get("repo");
+  const sandbox = params.get("sandbox") === "1";
+  const audit = params.get("audit");
+
+  return {
+    tab: tab && VALID_TABS.has(tab) ? tab : null,
+    phase: phase && VALID_PHASES.has(phase) ? phase : null,
+    repo,
+    sandbox,
+    audit,
+  };
+}
+
+export function restoreAuditFromHash(auditId, tab, phase, setAudit, setPhase) {
+  if (!auditId || tab !== "audit" || !phase || !RESULT_PHASES.includes(phase)) {
+    return;
+  }
+
+  fetchAudit(auditId)
+    .then((data) => {
+      if (data.status === "complete" || data.status === "error") {
+        setAudit(data);
+        setPhase("result");
+      }
+    })
+    .catch(() => {});
+}
+
 export function useHashBootstrap({
-  setTab,
-  setPhase,
-  setRepoUrl,
-  setIsSandbox,
-  setSelectedRepo,
-  setAuditId,
-  setAudit,
+  setTab, setPhase, setRepoUrl, setIsSandbox, setSelectedRepo, setAuditId, setAudit,
 }) {
   useEffect(() => {
-    const hash = window.location.hash.slice(1);
-    const params = new URLSearchParams(hash);
+    const state = parseHashState(window.location.hash.slice(1));
 
-    const tabParam = params.get("tab");
-    if (tabParam && VALID_TABS.has(tabParam)) {
-      setTab(tabParam);
+    if (state.tab) setTab(state.tab);
+    if (state.phase) setPhase(state.phase);
+    if (state.repo) {
+      setRepoUrl(state.repo);
+      setIsSandbox(state.sandbox);
+      const repoData = createSelectedRepo(state.repo, state.repo);
+      if (repoData) setSelectedRepo(repoData);
     }
-
-    const phaseParam = params.get("phase");
-    if (phaseParam && VALID_PHASES.has(phaseParam)) {
-      setPhase(phaseParam);
+    if (state.audit) {
+      setAuditId(state.audit);
+      restoreAuditFromHash(state.audit, state.tab, state.phase, setAudit, setPhase);
     }
-
-    const repoParam = params.get("repo");
-    const sandboxMode = params.get("sandbox") === "1";
-    if (repoParam) {
-      setRepoUrl(repoParam);
-      setIsSandbox(sandboxMode);
-      const repoData = createSelectedRepo(repoParam, repoParam);
-      if (repoData) {
-        setSelectedRepo(repoData);
-      }
-    }
-
-    const auditParam = params.get("audit");
-    if (!auditParam) {
-      return;
-    }
-
-    setAuditId(auditParam);
-    // Only fetch audit data when in audit tab, not marketplace
-    if (tabParam !== "audit") {
-      return;
-    }
-    if (!phaseParam || !["scanning", "result", "value", "trial"].includes(phaseParam)) {
-      return;
-    }
-
-    fetchAudit(auditParam)
-      .then((data) => {
-        if (data.status === "complete" || data.status === "error") {
-          setAudit(data);
-          setPhase("result");
-        }
-      })
-      .catch(() => {});
   }, [setAudit, setAuditId, setIsSandbox, setPhase, setRepoUrl, setSelectedRepo, setTab]);
 }
 
@@ -114,16 +103,9 @@ export function useHashSync({ tab, phase, selectedRepo, isSandbox, auditId }) {
     const params = new URLSearchParams();
     params.set("tab", tab);
     params.set("phase", phase);
-    if (selectedRepo?.full_name) {
-      params.set("repo", selectedRepo.full_name);
-    }
-    if (isSandbox) {
-      params.set("sandbox", "1");
-    }
-    if (auditId) {
-      params.set("audit", auditId);
-    }
-
+    if (selectedRepo?.full_name) params.set("repo", selectedRepo.full_name);
+    if (isSandbox) params.set("sandbox", "1");
+    if (auditId) params.set("audit", auditId);
     window.history.replaceState({}, "", `#${params.toString()}`);
   }, [auditId, isSandbox, phase, selectedRepo, tab]);
 }

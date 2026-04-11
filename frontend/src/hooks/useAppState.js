@@ -1,134 +1,68 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { useHashBootstrap, useHashSync } from "./useUrlState.js";
 import { useScanAnimation, useAuditPolling } from "./usePolling.js";
-import {
-  useSessionCallbackBootstrap,
-  useSessionProfile,
-  getOAuthStartUrl,
-  confirmAuthFlow,
-  logoutSession
-} from "./useAuth.js";
-import { fetchRepos } from "../api.js";
+import { useSession } from "./useSession.js";
+import { useRepoList } from "./useRepoList.js";
 import { useBilling } from "./useBilling.js";
 import { useAuditActions } from "./useAuditActions.js";
-import { useBenchmarkTracking } from "./useBenchmarkTracking.js";
+import { useBenchmarkState } from "./useBenchmarkState.js";
 
 const SESSION_KEY = "semcod_session";
 
 export function useAppState() {
   const [tab, setTab] = useState("audit");
   const [phase, setPhase] = useState("landing");
-  const [repos, setRepos] = useState([]);
   const [selectedRepo, setSelectedRepo] = useState(null);
   const [badgeRepo, setBadgeRepo] = useState("acme/backend-api");
-  const [sessionToken, setSessionToken] = useState(() => localStorage.getItem(SESSION_KEY) || null);
-  const [user, setUser] = useState(null);
   const [repoUrl, setRepoUrl] = useState("");
   const [isSandbox, setIsSandbox] = useState(false);
-  const [benchmarkMode, setBenchmarkMode] = useState(false);
-  const [benchmarkCaseId, setBenchmarkCaseId] = useState("");
 
-  const {
-    billingStatus,
-    paywallVisible,
-    checkoutLoading,
-    checkScanAllowed,
-    openCheckout,
-    dismissPaywall,
-    refreshBilling,
-  } = useBilling(sessionToken);
+  const session = useSession(SESSION_KEY, setPhase);
+  const { repos, setRepos } = useRepoList(session.sessionToken, phase);
+  const billing = useBilling(session.sessionToken);
+  const audit = useAuditActions(session.sessionToken, repoUrl, billing.checkScanAllowed, setSelectedRepo, setIsSandbox, setPhase);
+  const benchmark = useBenchmarkState(phase, audit.auditId, selectedRepo);
 
-  const {
-    scanProgress, setScanProgress,
-    scanLabel, setScanLabel,
-    audit, setAudit,
-    auditId, setAuditId,
-    startAudit,
-    startSandbox,
-    resetAudit,
-  } = useAuditActions(sessionToken, repoUrl, checkScanAllowed, setSelectedRepo, setIsSandbox, setPhase);
-
-  // Read session token from URL callback (OAuth redirect) on mount
-  useSessionCallbackBootstrap(setSessionToken, SESSION_KEY);
-
-  // Fetch user profile when session token is available
-  useSessionProfile(sessionToken, setSessionToken, setUser, SESSION_KEY);
-
-  // Read state from URL hash on mount
   useHashBootstrap({
-    setTab,
-    setPhase,
-    setRepoUrl,
-    setIsSandbox,
-    setSelectedRepo,
-    setAuditId,
-    setAudit,
+    setTab, setPhase, setRepoUrl, setIsSandbox, setSelectedRepo,
+    setAuditId: audit.setAuditId, setAudit: audit.setAudit,
   });
-
-  // Update URL hash when state changes
-  useHashSync({ tab, phase, selectedRepo, isSandbox, auditId });
-
-  // Fetch repos when session token available and phase is repos
-  useEffect(() => {
-    if (!sessionToken || phase !== "repos") {
-      return;
-    }
-
-    fetchRepos(sessionToken)
-      .then(setRepos)
-      .catch(() => setRepos([]));
-  }, [phase, sessionToken, setRepos]);
-
-  // Scan animation
-  useScanAnimation(phase, auditId, setScanProgress, setScanLabel, setAudit, setPhase);
-
-  // Poll for analysis results
-  useAuditPolling(phase, auditId, setAudit, setPhase);
-
-  useBenchmarkTracking({
-    phase,
-    auditId,
-    caseId: benchmarkCaseId,
-    repo: selectedRepo?.full_name || "",
-  });
+  useHashSync({ tab, phase, selectedRepo, isSandbox, auditId: audit.auditId });
+  useScanAnimation(phase, audit.auditId, audit.setScanProgress, audit.setScanLabel, audit.setAudit, setPhase);
+  useAuditPolling(phase, audit.auditId, audit.setAudit, setPhase);
 
   const reset = useCallback(() => {
     setPhase("landing");
     setSelectedRepo(null);
     setIsSandbox(false);
     setRepoUrl("");
-    resetAudit();
-  }, [setPhase, setSelectedRepo, setIsSandbox, setRepoUrl, resetAudit]);
+    audit.resetAudit();
+  }, [setPhase, setSelectedRepo, setIsSandbox, setRepoUrl, audit.resetAudit]);
 
-  const startOAuth = useCallback(() => {
-    window.location.href = getOAuthStartUrl();
-  }, []);
-
-  const confirmAuth = useCallback(() => {
-    confirmAuthFlow(sessionToken, setPhase);
-  }, [sessionToken, setPhase]);
-
-  
   const doLogout = useCallback(() => {
-    logoutSession(sessionToken, SESSION_KEY, setSessionToken, setUser, reset);
-  }, [sessionToken, setSessionToken, setUser, reset]);
+    session.clearSession(reset);
+  }, [session.clearSession, reset]);
 
   return {
     tab, setTab,
     phase, setPhase,
     repos, setRepos,
     selectedRepo, setSelectedRepo,
-    scanProgress, scanLabel,
-    audit, setAudit,
+    scanProgress: audit.scanProgress, scanLabel: audit.scanLabel,
+    audit: audit.audit, setAudit: audit.setAudit,
     badgeRepo, setBadgeRepo,
-    sessionToken, setSessionToken,
-    user,
+    sessionToken: session.sessionToken, setSessionToken: session.setSessionToken,
+    user: session.user,
     repoUrl, setRepoUrl,
     isSandbox, setIsSandbox,
-    auditId, setAuditId,
-    reset, startOAuth, confirmAuth, startAudit, startSandbox, doLogout,
-    billingStatus, paywallVisible, checkoutLoading, openCheckout, dismissPaywall, refreshBilling,
-    benchmarkMode, setBenchmarkMode,
-    benchmarkCaseId, setBenchmarkCaseId,
+    auditId: audit.auditId, setAuditId: audit.setAuditId,
+    reset, startOAuth: session.startOAuth, confirmAuth: session.confirmAuth,
+    startAudit: audit.startAudit, startSandbox: audit.startSandbox,
+    doLogout,
+    billingStatus: billing.billingStatus, paywallVisible: billing.paywallVisible,
+    checkoutLoading: billing.checkoutLoading, openCheckout: billing.openCheckout,
+    dismissPaywall: billing.dismissPaywall, refreshBilling: billing.refreshBilling,
+    benchmarkMode: benchmark.benchmarkMode, setBenchmarkMode: benchmark.setBenchmarkMode,
+    benchmarkCaseId: benchmark.benchmarkCaseId, setBenchmarkCaseId: benchmark.setBenchmarkCaseId,
   };
 }

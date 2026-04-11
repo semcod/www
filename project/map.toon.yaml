@@ -1,10 +1,13 @@
-# www | 174f 19152L | shell:2,python:87,javascript:85 | 2026-04-11
-# stats: 883 func | 0 cls | 174 mod | CC̄=2.7 | critical:2 | cycles:0
-# alerts[5]: CC TrendTab=27; fan-out useAppState=27; fan-out create_auto_pr=26; fan-out run_scheduled_scan=23; fan-out _run_audit_pipeline=19
-# hotspots[5]: useAppState fan=27; create_auto_pr fan=26; run_scheduled_scan fan=23; _run_audit_pipeline fan=19; MirrorService.create_mirror fan=18
+# www | 191f 20434L | shell:4,python:91,javascript:96 | 2026-04-11
+# stats: 992 func | 0 cls | 191 mod | CC̄=2.7 | critical:2 | cycles:0
+# alerts[5]: CC FRONTEND_URL=33; CC MOCK_GITHUB_URL=33; fan-out FRONTEND_URL=27; fan-out MOCK_GITHUB_URL=27; fan-out BACKEND_URL=25
+# hotspots[5]: FRONTEND_URL fan=27; MOCK_GITHUB_URL fan=27; FRONTEND_URL fan=25; MOCK_GITHUB_URL fan=25; BACKEND_URL fan=25
 # evolution: CC̄ 2.7→2.7 (flat 0.0)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[174]:
+M[191]:
+  TODO/github-login-sim.spec.js,114
+  TODO/run-sim.sh,40
+  TODO/server.py,208
   backend/adapters/__init__.py,34
   backend/adapters/base.py,155
   backend/adapters/gitea.py,349
@@ -22,23 +25,24 @@ M[174]:
   backend/apps/performance/pipeline.py,110
   backend/apps/registry.py,183
   backend/apps/security/pipeline.py,115
-  backend/config.py,68
+  backend/config.py,76
   backend/database.py,72
   backend/db_models.py,222
   backend/db_module/__init__.py,92
   backend/db_module/benchmark_orm.py,208
-  backend/db_module/events.py,88
+  backend/db_module/db_connection.py,26
+  backend/db_module/events.py,70
   backend/db_module/events_orm.py,87
-  backend/db_module/installations.py,152
+  backend/db_module/installations.py,132
   backend/db_module/installations_orm.py,165
-  backend/db_module/repositories.py,102
+  backend/db_module/repositories.py,82
   backend/db_module/repositories_orm.py,154
-  backend/db_module/scans.py,275
+  backend/db_module/scans.py,259
   backend/db_module/scans_orm.py,204
-  backend/db_module/schema.py,201
-  backend/db_module/tenants.py,96
+  backend/db_module/schema.py,184
+  backend/db_module/tenants.py,76
   backend/db_module/tenants_orm.py,121
-  backend/db_module/users.py,174
+  backend/db_module/users.py,157
   backend/db_module/users_orm.py,183
   backend/db_module/wrappers.py,356
   backend/db_session.py,55
@@ -46,8 +50,8 @@ M[174]:
   backend/events/models.py,100
   backend/quality_gate.py,272
   backend/routers/audit.py,352
-  backend/routers/auth.py,206
-  backend/routers/autopr.py,287
+  backend/routers/auth.py,149
+  backend/routers/autopr.py,148
   backend/routers/badge.py,139
   backend/routers/benchmark.py,192
   backend/routers/billing.py,291
@@ -55,7 +59,7 @@ M[174]:
   backend/routers/marketplace/billing.py,81
   backend/routers/marketplace/browse.py,122
   backend/routers/marketplace/connect.py,77
-  backend/routers/marketplace/deploy.py,131
+  backend/routers/marketplace/deploy.py,126
   backend/routers/marketplace/models.py,56
   backend/routers/marketplace/publish.py,215
   backend/routers/mcp/__init__.py,34
@@ -76,6 +80,7 @@ M[174]:
   backend/server.py,76
   backend/services/analyzer.py,320
   backend/services/autofix.py,299
+  backend/services/autopr_helpers.py,179
   backend/services/billing.py,343
   backend/services/github_client.py,37
   backend/services/mirror.py,387
@@ -105,17 +110,22 @@ M[174]:
   e2e/specs/scan-workflow.spec.js,103
   e2e/specs/smoke.spec.js,59
   e2e/specs/social-sharing.spec.js,134
+  frontend/cypress/e2e/oauth-login.cy.js,117
   frontend/e2e/audit.spec.js,46
   frontend/e2e/badge.spec.js,26
   frontend/e2e/benchmark.spec.js,122
+  frontend/e2e/github-login-sim.spec.js,114
+  frontend/e2e/gui-login-enhanced.spec.js,237
+  frontend/e2e/marketplace-flow.spec.js,155
   frontend/e2e/metrics.spec.js,125
   frontend/e2e/recent-scans.spec.js,80
   frontend/e2e/scan-workflow.spec.js,99
   frontend/e2e/smoke.spec.js,47
   frontend/e2e/social-sharing.spec.js,58
+  frontend/e2e/system-integration.spec.js,193
   frontend/playwright.config.js,22
-  frontend/src/App.jsx,101
-  frontend/src/api.js,258
+  frontend/src/App.jsx,100
+  frontend/src/api.js,250
   frontend/src/components/index.js,4
   frontend/src/components/AppCard.jsx,160
   frontend/src/components/GradeCircle.jsx,33
@@ -134,8 +144,8 @@ M[174]:
   frontend/src/components/benchmark/BenchmarkReviewPanel.jsx,149
   frontend/src/components/benchmark/RecommendationFeedbackForm.jsx,107
   frontend/src/components/phases/index.js,5
-  frontend/src/components/phases/AuthPhase.jsx,61
-  frontend/src/components/phases/LandingPhase.jsx,191
+  frontend/src/components/phases/AuthPhase.jsx,40
+  frontend/src/components/phases/LandingPhase.jsx,184
   frontend/src/components/phases/ReposPhase.jsx,41
   frontend/src/components/phases/ScanningPhase.jsx,28
   frontend/src/components/phases/result/DownloadButtons.jsx,30
@@ -144,7 +154,7 @@ M[174]:
   frontend/src/components/phases/result/ResultMetrics.jsx,19
   frontend/src/components/phases/result/ResultRecommendations.jsx,14
   frontend/src/components/phases/result/ResultTabPanel.jsx,69
-  frontend/src/components/phases/result/index.jsx,67
+  frontend/src/components/phases/result/index.jsx,66
   frontend/src/components/tabs/index.js,7
   frontend/src/components/tabs/AddScheduleForm.jsx,49
   frontend/src/components/tabs/BadgeTab.jsx,109
@@ -154,10 +164,12 @@ M[174]:
   frontend/src/components/tabs/RecentScansTab.parts.jsx,229
   frontend/src/components/tabs/RepoTab.jsx,11
   frontend/src/components/tabs/ScheduleRow.jsx,29
-  frontend/src/components/tabs/SettingsTab.jsx,107
+  frontend/src/components/tabs/SettingsTab.jsx,32
+  frontend/src/components/tabs/SettingsTab.parts.jsx,121
   frontend/src/components/tabs/TrendChart.jsx,43
   frontend/src/components/tabs/TrendSummaryCard.jsx,20
-  frontend/src/components/tabs/TrendTab.jsx,81
+  frontend/src/components/tabs/TrendTab.jsx,44
+  frontend/src/components/tabs/TrendTab.parts.jsx,100
   frontend/src/components/tabs/recentScansHelpers.js,34
   frontend/src/components/ui/index.js,4
   frontend/src/components/ui/GradeCircle.jsx,1
@@ -165,41 +177,47 @@ M[174]:
   frontend/src/components/ui/MetricCard.jsx,1
   frontend/src/components/ui/RecommendationCard.jsx,1
   frontend/src/config.js,8
-  frontend/src/constants.js,71
-  frontend/src/hooks/useAppState.js,146
+  frontend/src/constants.js,19
+  frontend/src/hooks/useAppState.js,68
   frontend/src/hooks/useAuditActions.js,79
-  frontend/src/hooks/useAuth.js,80
+  frontend/src/hooks/useAuth.js,58
+  frontend/src/hooks/useBenchmarkState.js,16
   frontend/src/hooks/useBenchmarkTracking.js,71
   frontend/src/hooks/useBilling.js,58
   frontend/src/hooks/useDownloads.js,242
-  frontend/src/hooks/usePolling.js,92
-  frontend/src/hooks/useUrlState.js,129
+  frontend/src/hooks/usePolling.js,91
+  frontend/src/hooks/useRepoList.js,18
+  frontend/src/hooks/useSession.js,30
+  frontend/src/hooks/useUrlState.js,111
   frontend/src/main.jsx,10
   frontend/src/utils/share.js,29
   frontend/vite.config.js,15
+  mock-github/server.py,216
   project.sh,35
+  run-sim.sh,40
   traefik/generate-certs.sh,27
 D:
-  frontend/src/components/tabs/TrendTab.jsx:
-    i: ../../api,../../constants,./TrendChart,./TrendSummaryCard,react
-    e: TrendTab,repoName,history,latest,prev,delta,directionColor
-    TrendTab()
-    repoName()
-    history()
-    latest()
-    prev()
-    delta()
-    directionColor()
-  frontend/src/components/tabs/SettingsTab.jsx:
-    i: ../../api,../../constants,./AddScheduleForm,./ScheduleRow,react
-    e: SectionHeader,SettingsTab,loadSchedules,handleDelete,handleBillingPortal,plan,planColor
-    SectionHeader()
-    SettingsTab()
-    loadSchedules()
-    handleDelete()
-    handleBillingPortal()
-    plan()
-    planColor()
+  frontend/e2e/gui-login-enhanced.spec.js:
+    i: @playwright/test
+    e: FRONTEND_URL,MOCK_GITHUB_URL,res,loginElement,element,currentUrl,userBtn,isLoggedIn,content,testOAuthFlow,loginClicked,userButtonClicked,isLoggedIn,attemptLogin,element,attemptUserLogin,element,checkLoginStatus
+    FRONTEND_URL()
+    MOCK_GITHUB_URL()
+    res()
+    loginElement()
+    element()
+    currentUrl()
+    userBtn()
+    isLoggedIn()
+    content()
+    testOAuthFlow()
+    loginClicked()
+    userButtonClicked()
+    isLoggedIn()
+    attemptLogin()
+    element()
+    attemptUserLogin()
+    element()
+    checkLoginStatus()
   backend/db_module/benchmark_orm.py:
     e: create_benchmark_case,get_benchmark_cases,get_benchmark_case,update_benchmark_case,_case_to_dict,create_benchmark_event,get_benchmark_events,upsert_recommendation_feedback,get_feedback_for_case,_feedback_to_dict,get_benchmark_summary
     create_benchmark_case(db;payload)
@@ -213,28 +231,12 @@ D:
     get_feedback_for_case(db;case_id)
     _feedback_to_dict(f)
     get_benchmark_summary(db)
-  frontend/src/hooks/useUrlState.js:
-    i: ../api.js,react
-    e: VALID_TABS,VALID_PHASES,parseRepositoryReference,trimmed,urlMatch,parts,createSelectedRepo,parsed,useHashBootstrap,hash,params,tabParam,phaseParam,repoParam,sandboxMode,repoData,auditParam,useHashSync,params
-    VALID_TABS()
-    VALID_PHASES()
-    parseRepositoryReference()
-    trimmed()
-    urlMatch()
-    parts()
-    createSelectedRepo()
-    parsed()
-    useHashBootstrap()
-    hash()
-    params()
-    tabParam()
-    phaseParam()
-    repoParam()
-    sandboxMode()
-    repoData()
-    auditParam()
-    useHashSync()
-    params()
+  frontend/src/components/tabs/TrendTab.jsx:
+    i: ../../api,react
+    e: TrendTab,repoName,history
+    TrendTab()
+    repoName()
+    history()
   backend/services/analyzer.py:
     e: count_code_stats,analyze_complexity,_should_skip_line,_process_file_for_duplication,analyze_duplication,_should_skip_file,_check_todo_fixme,_check_long_lines,_check_missing_docstrings,_analyze_file_quality,analyze_quality,analyze_repo,run_tool
     count_code_stats(repo_path)
@@ -265,7 +267,7 @@ Detects:
     done()
     active()
   frontend/src/components/phases/result/index.jsx:
-    i: ../../../constants,../../../hooks/useBenchmarkTracking,../../../hooks/useDownloads,../../benchmark/BenchmarkReviewPanel,./ErrorResult,./ResultHeader,./ResultMetrics,./ResultRecommendations,./ResultTabPanel,react
+    i: ../../../hooks/useBenchmarkTracking,../../../hooks/useDownloads,../../benchmark/BenchmarkReviewPanel,./ErrorResult,./ResultHeader,./ResultMetrics,./ResultRecommendations,./ResultTabPanel,react
     e: ResultPhase,data,repoName,activeContent,handleCopy,handleDownload
     ResultPhase()
     data()
@@ -296,16 +298,6 @@ Detects:
     trackExport()
     trackRecommendationOpened()
     trackDecision()
-  frontend/src/hooks/useAppState.js:
-    i: ../api.js,../constants.js,./useAuditActions.js,./useBenchmarkTracking.js,./useBilling.js,./usePolling.js,./useUrlState.js,react
-    e: useAppState,demoUser,reset,startOAuth,confirmAuth,startDemoLogin,doLogout
-    useAppState()
-    demoUser()
-    reset()
-    startOAuth()
-    confirmAuth()
-    startDemoLogin()
-    doLogout()
   frontend/src/hooks/useBilling.js:
     i: ../api.js,react
     e: useBilling,refreshBilling,checkScanAllowed,openCheckout,dismissPaywall
@@ -358,6 +350,13 @@ Detects:
     e: PlanCard,PaywallModal
     PlanCard()
     PaywallModal()
+  backend/routers/autopr.py:
+    e: PatchFile,AutoPRRequest,AutoPRResult,_score_improved,create_auto_pr
+    PatchFile(BaseModel):
+    AutoPRRequest(BaseModel):
+    AutoPRResult(BaseModel):
+    _score_improved(repo;min_delta)
+    create_auto_pr(body;user)
   e2e/specs/social-sharing.spec.js:
     i: @playwright/test
     e: noScansMessage,hasNoScans,scanCard,hasScan,shareTab,twitterButton,linkedinButton,blueskyButton,twitterVisible,linkedinVisible,blueskyVisible,noScansMessage,hasNoScans,scanCard,hasScan,shareTab,twitterButton,linkedinButton,blueskyButton,twitterVisible,linkedinVisible,blueskyVisible,recentSection,isVisible,scanCard,hasScan,shareTab,twitterButton,linkedinButton,blueskyButton,twitterVisible,linkedinVisible,blueskyVisible
@@ -394,23 +393,6 @@ Detects:
     twitterVisible()
     linkedinVisible()
     blueskyVisible()
-  backend/routers/autopr.py:
-    e: PatchFile,AutoPRRequest,AutoPRResult,_gh_headers,_get_default_branch,_get_ref_sha,_create_branch,_get_file_sha,_commit_file,_create_pr,_create_issue,_score_improved,create_auto_pr,_build_pr_body,_build_issue_body
-    PatchFile(BaseModel):
-    AutoPRRequest(BaseModel):
-    AutoPRResult(BaseModel):
-    _gh_headers(token)
-    _get_default_branch(repo;token)
-    _get_ref_sha(repo;branch;token)
-    _create_branch(repo;branch;sha;token)
-    _get_file_sha(repo;path;branch;token)
-    _commit_file(repo;path;content;branch;message;token;file_sha)
-    _create_pr(repo;branch;base;title;body;token)
-    _create_issue(repo;title;body;token)
-    _score_improved(repo;min_delta)
-    create_auto_pr(body;user)
-    _build_pr_body(req;fix_id;score_before;score_after)
-    _build_issue_body(req;fix_id;reason;score_before;score_after)
   backend/services/scoring.py:
     e: _rec_id,calculate_health_score,score_to_grade,generate_recommendations
     _rec_id(category;title)
@@ -458,7 +440,7 @@ Detects:
     mcp_list_resources()
     mcp_get_resource(uri)
   frontend/src/hooks/usePolling.js:
-    i: ../api.js,../constants.js,react
+    i: ../api.js,react
     e: useScanAnimation,timers,done,useAuditPolling,pollCount,MAX_POLLS,poll,data,interval,shouldStop
     useScanAnimation()
     timers()
@@ -529,6 +511,44 @@ Handles:
     _handle_subscription_deleted(subscription)
     _find_sub_by_customer(customer_id)
     check_scan_allowed(user_id)
+  frontend/src/hooks/useUrlState.js:
+    i: ../api.js,react
+    e: VALID_TABS,VALID_PHASES,parseRepositoryReference,trimmed,urlMatch,parts,createSelectedRepo,parsed,parseHashState,params,tab,phase,repo,sandbox,audit,restoreAuditFromHash,useHashBootstrap,state,repoData,useHashSync,params
+    VALID_TABS()
+    VALID_PHASES()
+    parseRepositoryReference()
+    trimmed()
+    urlMatch()
+    parts()
+    createSelectedRepo()
+    parsed()
+    parseHashState()
+    params()
+    tab()
+    phase()
+    repo()
+    sandbox()
+    audit()
+    restoreAuditFromHash()
+    useHashBootstrap()
+    state()
+    repoData()
+    useHashSync()
+    params()
+  frontend/src/components/tabs/SettingsTab.parts.jsx:
+    i: ../../api,../../constants,./AddScheduleForm,./ScheduleRow,react
+    e: SectionHeader,BillingSection,plan,planColor,handleBillingPortal,getPlanColor,BillingPortalButton,SchedulesSection,handleDelete,AddScheduleButton,SchedulesList
+    SectionHeader()
+    BillingSection()
+    plan()
+    planColor()
+    handleBillingPortal()
+    getPlanColor()
+    BillingPortalButton()
+    SchedulesSection()
+    handleDelete()
+    AddScheduleButton()
+    SchedulesList()
   backend/services/autofix.py:
     e: Patch,FixResult,PatchGenerator,AutoFixService
     Patch:  # Represents a single file patch...
@@ -553,14 +573,6 @@ Handles:
 
 Analyzes:
 - Cyclomatic complex...
-  backend/routers/marketplace/deploy.py:
-    e: _get_user_token,_get_provider_user_id,_check_billing_limit,_record_billing_usage,_handle_mirror_if_requested,trigger_auto_fix
-    _get_user_token(user)
-    _get_provider_user_id(user)
-    _check_billing_limit(tenant_id;usage_tracker;event_type)
-    _record_billing_usage(tenant_id;usage_tracker;event_type;metadata)
-    _handle_mirror_if_requested(request;user)
-    trigger_auto_fix(request;user)
   frontend/src/hooks/useDownloads.js:
     i: react
     e: recommendationLabel,recommendationLine,markdownRecommendationLine,toonRecommendationLine,filesContent,buildMetricsExportData,buildPromptText,buildMarkdownText,buildToonText,buildShareText,getResultTabContent,downloadContent,blob,url,link,useDownloads,handleDownloadMetrics,handleDownloadPrompt,handleDownloadMarkdown,handleDownloadToon,handleGenericDownload
@@ -623,8 +635,7 @@ Analyzes:
     delete_installation(db;tenant_id;repository_id)
     update_installation_scan(db;tenant_id;repository_id;score)
   backend/db_module/scans.py:
-    e: get_connection,save_scan,get_recent_scans,get_repo_scans,get_total_scan_count,save_audit_result,get_audit_result,save_badge_cache,get_badge_cache
-    get_connection()
+    e: save_scan,get_recent_scans,get_repo_scans,get_total_scan_count,save_audit_result,get_audit_result,save_badge_cache,get_badge_cache
     save_scan(scan_data)
     get_recent_scans(limit)
     get_repo_scans(repo;limit)
@@ -634,8 +645,7 @@ Analyzes:
     save_badge_cache(repo;badge_data)
     get_badge_cache(repo)
   backend/db_module/repositories.py:
-    e: get_connection,get_or_create_repository,get_tenant_repositories,get_repository_by_full_name
-    get_connection()
+    e: get_or_create_repository,get_tenant_repositories,get_repository_by_full_name
     get_or_create_repository(tenant_id;provider;repo_provider_id;name;full_name;description;private;default_branch;web_url;clone_url)
     get_tenant_repositories(tenant_id)
     get_repository_by_full_name(tenant_id;provider;full_name)
@@ -673,6 +683,55 @@ Apps must implement:
     e: AddScheduleForm,handleSubmit
     AddScheduleForm()
     handleSubmit()
+  frontend/e2e/marketplace-flow.spec.js:
+    i: @playwright/test
+    e: API,res,ct,body,res,body,res,body,errorText,marketplaceContent,found,el,pricingText,hasPricing,auditTab,badgeTab,marketTab,jsonErrors,url,ct
+    API()
+    res()
+    ct()
+    body()
+    res()
+    body()
+    res()
+    body()
+    errorText()
+    marketplaceContent()
+    found()
+    el()
+    pricingText()
+    hasPricing()
+    auditTab()
+    badgeTab()
+    marketTab()
+    jsonErrors()
+    url()
+    ct()
+  TODO/server.py:
+    e: authorize,issue_code,access_token,_get_user,get_user,get_repos,health
+    authorize(client_id;redirect_uri;scope;state;login)
+    issue_code(request)
+    access_token(request)
+    _get_user(authorization)
+    get_user(authorization)
+    get_repos(authorization;per_page;page;sort)
+    health()
+  mock-github/server.py:
+    e: get_mock_user,authorize,issue_code,access_token,_get_user,get_user,get_repos,health
+    get_mock_user()
+    authorize(client_id;redirect_uri;scope;state;login)
+    issue_code(request)
+    access_token(request)
+    _get_user(authorization)
+    get_user(authorization)
+    get_repos(authorization;per_page;page;sort)
+    health()
+  backend/services/autopr_helpers.py:
+    e: BranchManager,PatchApplier,PRCreator,_gh_headers,generate_fix_id
+    BranchManager: get_default_branch(1),get_ref_sha(2),create_branch(3)  # Manages GitHub branch operations...
+    PatchApplier: get_file_sha(3),commit_file(6)  # Applies patches to files in a GitHub repository...
+    PRCreator: create_pr(5),create_issue(3),build_pr_body(5),build_issue_body(6)  # Creates GitHub PRs and issues...
+    _gh_headers(token)
+    generate_fix_id(repo;proposal_type)
   backend/services/webhook_service.py:
     e: get_adapter_for_event,process_pr_event,process_push_event,parse_github_webhook,parse_gitlab_webhook,parse_gitea_webhook,verify_github_signature,verify_gitea_signature
     get_adapter_for_event(event;token)
@@ -684,8 +743,7 @@ Apps must implement:
     verify_github_signature(body;signature;secret)
     verify_gitea_signature(body;signature;secret)
   backend/db_module/users.py:
-    e: get_connection,convert_query,execute_query,upsert_user,get_user_by_github_id,get_user_by_id,get_subscription,upsert_subscription,increment_scan_count
-    get_connection()
+    e: convert_query,execute_query,upsert_user,get_user_by_github_id,get_user_by_id,get_subscription,upsert_subscription,increment_scan_count
     convert_query(query)
     execute_query(cursor;query;params)
     upsert_user(github_id;login;name;avatar_url;github_token)
@@ -695,8 +753,7 @@ Apps must implement:
     upsert_subscription(user_id;plan;stripe_customer_id;stripe_subscription_id;status)
     increment_scan_count(user_id)
   backend/db_module/tenants.py:
-    e: get_connection,get_or_create_tenant,get_tenant_by_id,update_tenant_plan
-    get_connection()
+    e: get_or_create_tenant,get_tenant_by_id,update_tenant_plan
     get_or_create_tenant(provider;provider_user_id;login;name;email;avatar_url)
     get_tenant_by_id(tenant_id)
     update_tenant_plan(tenant_id;plan;billing_customer_id;billing_subscription_id)
@@ -713,13 +770,13 @@ Apps must implement:
   backend/scripts/scan_samples.py:
     e: scan_sample_projects
     scan_sample_projects()
+  backend/adapters/__init__.py:
+    e: get_adapter_for_event
+    get_adapter_for_event(event;token)
   backend/adapters/gitea_events.py:
     e: parse_gitea_event,_detect_gitea_event_type
     parse_gitea_event(payload)
     _detect_gitea_event_type(payload)
-  backend/adapters/__init__.py:
-    e: get_adapter_for_event
-    get_adapter_for_event(event;token)
   backend/adapters/gitlab.py:
     e: GitLabAdapter
     GitLabAdapter(GitProvider): __init__(2),get_api_headers(0),_get_project_path(1),comment_on_pr(3),update_pr_description(3),create_pr(5),close_pr(3),create_branch(3),delete_branch(2),commit_file(6),get_default_branch(1),get_ref_sha(2),get_file_sha(3),get_pr_diff(2),get_pr_files(2),get_file_content(3),create_issue(4),comment_on_issue(3),create_check_run(6),update_check_run(5),verify_webhook_signature(3)  # GitLab API implementation of GitProvider...
@@ -728,23 +785,20 @@ Apps must implement:
     GiteaAdapter(GitProvider): __init__(2),get_api_headers(0),comment_on_pr(3),update_pr_description(3),create_pr(5),close_pr(3),create_branch(3),_create_branch_via_git(3),delete_branch(2),commit_file(6),get_default_branch(1),get_ref_sha(2),get_file_sha(3),get_pr_diff(2),get_pr_files(2),get_file_content(3),create_issue(4),comment_on_issue(3),create_check_run(6),update_check_run(5),verify_webhook_signature(3)  # Gitea API implementation of GitProvider.
 
 Gitea API is compa...
-  backend/routers/auth.py:
-    e: create_session_token,decode_session_token,get_current_user,github_oauth_start,github_oauth_callback,demo_login,get_me,logout,list_repos
-    create_session_token(user_id)
-    decode_session_token(token)
-    get_current_user(credentials)
-    github_oauth_start()
-    github_oauth_callback(code)
-    demo_login()
-    get_me(user)
-    logout()
-    list_repos(user)
   backend/routers/badge.py:
     e: health_badge,scan_count_badge,_generate_badge_svg,_generate_count_badge_svg
     health_badge(repo_slug;style)
     scan_count_badge()
     _generate_badge_svg(grade;score;style;weekly_issues)
     _generate_count_badge_svg(label;count)
+  backend/routers/marketplace/deploy.py:
+    e: _get_user_token,_get_provider_user_id,_check_billing_limit,_record_billing_usage,_handle_mirror_if_requested,trigger_auto_fix
+    _get_user_token(user)
+    _get_provider_user_id(user)
+    _check_billing_limit(tenant_id;usage_tracker;event_type)
+    _record_billing_usage(tenant_id;usage_tracker;event_type;metadata)
+    _handle_mirror_if_requested(request;user)
+    trigger_auto_fix(request;user)
   backend/routers/marketplace/connect.py:
     e: ConnectRegisterRequest,PayoutRequest,register_publisher,connect_status,trigger_payout
     ConnectRegisterRequest(BaseModel):
@@ -784,6 +838,23 @@ Gitea API is compa...
     i: ../../../constants,../../../hooks/useDownloads,../../ShareButtons
     e: ResultTabPanel
     ResultTabPanel()
+  frontend/src/components/tabs/TrendTab.parts.jsx:
+    i: ../../constants,./TrendChart,./TrendSummaryCard
+    e: TrendEmptyState,TrendHeader,DaySelector,DayButton,TrendLoadingState,TrendErrorState,TrendContent,latest,prev,delta,directionColor,getDirectionColor,TrendSummaryCards,TrendChartContainer
+    TrendEmptyState()
+    TrendHeader()
+    DaySelector()
+    DayButton()
+    TrendLoadingState()
+    TrendErrorState()
+    TrendContent()
+    latest()
+    prev()
+    delta()
+    directionColor()
+    getDirectionColor()
+    TrendSummaryCards()
+    TrendChartContainer()
   frontend/src/components/tabs/RecentScansTab.parts.jsx:
     i: ../../constants,../ShareButtons
     e: LanguageBadge,language,ScanMetrics,RecentScanCard,RecentScansEmptyState,RecentScansHeader,RecentScansBadgeInfo
@@ -815,12 +886,10 @@ Gitea API is compa...
     text()
     url()
   backend/db_module/schema.py:
-    e: get_connection,init_db
-    get_connection()
+    e: init_db
     init_db()
   backend/db_module/installations.py:
-    e: get_connection,create_installation,get_installation,get_tenant_installations,delete_installation,update_installation_scan
-    get_connection()
+    e: create_installation,get_installation,get_tenant_installations,delete_installation,update_installation_scan
     create_installation(tenant_id;repository_id;apps;webhook_id;webhook_secret)
     get_installation(tenant_id;repository_id)
     get_tenant_installations(tenant_id)
@@ -838,6 +907,16 @@ Gitea API is compa...
     Event: is_pr_event(0),is_push_event(0),is_comment_event(0),get_pr_url(0),get_clone_url(0)  # Unified event representation across all git platforms.
 
 This...
+  backend/routers/auth.py:
+    e: create_session_token,decode_session_token,get_current_user,github_oauth_start,github_oauth_callback,get_me,logout,list_repos
+    create_session_token(user_id)
+    decode_session_token(token)
+    get_current_user(credentials)
+    github_oauth_start()
+    github_oauth_callback(code)
+    get_me(user)
+    logout()
+    list_repos(user)
   backend/routers/webhook_v2.py:
     e: github_webhook,gitlab_webhook,gitea_webhook,_route_event,_get_token_for_provider
     github_webhook(request)
@@ -862,18 +941,15 @@ This...
     _invoke_analyze_public(arguments)
     mcp_list_tools()
     mcp_invoke_tool(request)
+  frontend/src/hooks/useRepoList.js:
+    i: ../api.js,react
+    e: useRepoList
+    useRepoList()
   frontend/src/components/benchmark/RecommendationFeedbackForm.jsx:
     i: ../../api,react
     e: ScoreSelect,handleSubmit
     ScoreSelect()
     handleSubmit()
-  frontend/src/components/phases/AuthPhase.jsx:
-    i: ../../api,../../constants
-    e: AuthPhase,handleLogin,handleDemoLogin,data
-    AuthPhase()
-    handleLogin()
-    handleDemoLogin()
-    data()
   frontend/src/components/phases/ReposPhase.jsx:
     i: ../../constants
     e: ReposPhase
@@ -903,6 +979,44 @@ This...
     isVisible()
     shareButtons()
     count()
+  frontend/e2e/github-login-sim.spec.js:
+    i: @playwright/test
+    e: FRONTEND_URL,MOCK_GITHUB_URL,BACKEND_URL,res,body,issueRes,tokenRes,tokenBody,userRes,user,reposRes,repos,tokenRes,userRes,loginBtn,userBtn
+    FRONTEND_URL()
+    MOCK_GITHUB_URL()
+    BACKEND_URL()
+    res()
+    body()
+    issueRes()
+    tokenRes()
+    tokenBody()
+    userRes()
+    user()
+    reposRes()
+    repos()
+    tokenRes()
+    userRes()
+    loginBtn()
+    userBtn()
+  TODO/github-login-sim.spec.js:
+    i: @playwright/test
+    e: FRONTEND_URL,MOCK_GITHUB_URL,BACKEND_URL,res,body,issueRes,tokenRes,tokenBody,userRes,user,reposRes,repos,tokenRes,userRes,loginBtn,userBtn
+    FRONTEND_URL()
+    MOCK_GITHUB_URL()
+    BACKEND_URL()
+    res()
+    body()
+    issueRes()
+    tokenRes()
+    tokenBody()
+    userRes()
+    user()
+    reposRes()
+    repos()
+    tokenRes()
+    userRes()
+    loginBtn()
+    userBtn()
   e2e/specs/metrics.spec.js:
     i: @playwright/test
     e: skipInCI,response,data,scan,response,data,listResponse,listData,repo,response,data,response,response,data
@@ -968,11 +1082,13 @@ This...
     get_account_status(account_id)
     transfer_revenue(amount_cents;account_id;metadata)
   backend/db_module/events.py:
-    e: get_connection,queue_event,get_pending_events,update_event_status
-    get_connection()
+    e: queue_event,get_pending_events,update_event_status
     queue_event(event_id;event_type;provider;repo_full_name;pr_id;payload)
     get_pending_events(limit)
     update_event_status(event_id;status;error_message)
+  backend/db_module/db_connection.py:
+    e: get_connection
+    get_connection()
   backend/alembic/env.py:
     e: get_url,run_migrations_offline,run_migrations_online
     get_url()
@@ -1006,7 +1122,7 @@ This...
     gradeColor()
   frontend/src/api.js:
     i: ./constants
-    e: authHeaders,fetchMe,res,logout,res,fetchRepos,res,startAudit,res,fetchAudit,res,demoLogin,res,fetchBillingStatus,res,createCheckoutSession,res,analyzePublicRepo,res,loginWithProvider,getPreview,res,installApp,res,getInstallations,res,uninstallApp,res,fetchTrend,res,fetchSchedules,res,createSchedule,res,deleteSchedule,res,fetchBillingPortal,res,getApps,res,getAppStatus,res,createBenchmarkCase,res,updateBenchmarkCase,res,submitRecommendationFeedback,res,submitBenchmarkDecision,res,trackBenchmarkEvent,res,fetchBenchmarkSummary,res,downloadBenchmarkExport
+    e: authHeaders,fetchMe,res,logout,res,fetchRepos,res,startAudit,res,fetchAudit,res,fetchBillingStatus,res,createCheckoutSession,res,analyzePublicRepo,res,loginWithProvider,getPreview,res,installApp,res,getInstallations,res,uninstallApp,res,fetchTrend,res,fetchSchedules,res,createSchedule,res,deleteSchedule,res,fetchBillingPortal,res,getApps,res,getAppStatus,res,createBenchmarkCase,res,updateBenchmarkCase,res,submitRecommendationFeedback,res,submitBenchmarkDecision,res,trackBenchmarkEvent,res,fetchBenchmarkSummary,res,downloadBenchmarkExport
     authHeaders()
     fetchMe()
     res()
@@ -1017,8 +1133,6 @@ This...
     startAudit()
     res()
     fetchAudit()
-    res()
-    demoLogin()
     res()
     fetchBillingStatus()
     res()
@@ -1064,16 +1178,18 @@ This...
     downloadBenchmarkExport()
   frontend/src/hooks/useAuth.js:
     i: ../api.js,../constants.js,react
-    e: useSessionCallbackBootstrap,searchParams,session,useSessionProfile,getOAuthStartUrl,confirmAuthFlow,startDemoSession,data,logoutSession
+    e: useSessionCallbackBootstrap,searchParams,session,useSessionProfile,getOAuthStartUrl,confirmAuthFlow,logoutSession
     useSessionCallbackBootstrap()
     searchParams()
     session()
     useSessionProfile()
     getOAuthStartUrl()
     confirmAuthFlow()
-    startDemoSession()
-    data()
     logoutSession()
+  frontend/src/hooks/useBenchmarkState.js:
+    i: ./useBenchmarkTracking.js,react
+    e: useBenchmarkState
+    useBenchmarkState()
   frontend/src/components/AppCard.jsx:
     i: react
     e: isPro,getAppIcon,getTriggerIcon
@@ -1114,6 +1230,11 @@ This...
     e: MarketplaceTab,provider
     MarketplaceTab()
     provider()
+  frontend/src/components/tabs/SettingsTab.jsx:
+    i: ../../api,./SettingsTab.parts,react
+    e: SettingsTab,loadSchedules
+    SettingsTab()
+    loadSchedules()
   frontend/e2e/recent-scans.spec.js:
     i: @playwright/test
     e: recentSection,isVisible,scanCards,count,scanCard,count,viewButton,count
@@ -1181,6 +1302,13 @@ This...
   frontend/src/config.js:
     e: PUBLIC_URL
     PUBLIC_URL()
+  frontend/src/hooks/useSession.js:
+    i: react
+    e: useSession,startOAuth,confirmAuth,clearSession
+    useSession()
+    startOAuth()
+    confirmAuth()
+    clearSession()
   frontend/src/components/MarketplaceDashboard.jsx:
     i: ../api.js,./AppCard.jsx,./InstallButton.jsx,./Preview.jsx,react
     e: loadData,toggleApp,handleRepoSelect,isRepoInstalled
@@ -1208,6 +1336,11 @@ This...
     result()
     formatComment()
     getSeverityIcon()
+  frontend/src/components/phases/AuthPhase.jsx:
+    i: ../../constants
+    e: AuthPhase,handleLogin
+    AuthPhase()
+    handleLogin()
   frontend/src/components/phases/result/ErrorResult.jsx:
     i: ../../../constants
     e: ErrorResult
@@ -1218,7 +1351,8 @@ This...
     PRBotTab()
   frontend/e2e/metrics.spec.js:
     i: @playwright/test
-    e: response,data,scan,response,data,listResponse,listData,repo,response,data,response,response,data
+    e: baseURL,response,data,scan,response,data,listResponse,listData,repo,response,data,response,response,data
+    baseURL()
     response()
     data()
     scan()
@@ -1363,6 +1497,16 @@ Provides...
   backend/routers/mcp/__init__.py:
     e: mcp_server_info
     mcp_server_info()
+  frontend/src/hooks/useAppState.js:
+    i: ./useAuditActions.js,./useBenchmarkState.js,./useBilling.js,./usePolling.js,./useRepoList.js,./useSession.js,./useUrlState.js,react
+    e: useAppState,session,billing,audit,benchmark,reset,doLogout
+    useAppState()
+    session()
+    billing()
+    audit()
+    benchmark()
+    reset()
+    doLogout()
   frontend/src/components/LanguageBar.jsx:
     i: ../constants
     e: LanguageBar,total,entries
@@ -1391,10 +1535,44 @@ Provides...
     i: @playwright/test
     e: input
     input()
+  frontend/e2e/system-integration.spec.js:
+    i: @playwright/test
+    e: API,infoRes,info,resourcesRes,resources,toolsRes,tools,toolNames,invokeRes,invokeBody,create,patch,decision,feedback,event,exp,exportBody,res,ct,res,ct,res,ct,res,res,res,dup
+    API()
+    infoRes()
+    info()
+    resourcesRes()
+    resources()
+    toolsRes()
+    tools()
+    toolNames()
+    invokeRes()
+    invokeBody()
+    create()
+    patch()
+    decision()
+    feedback()
+    event()
+    exp()
+    exportBody()
+    res()
+    ct()
+    res()
+    ct()
+    res()
+    ct()
+    res()
+    res()
+    res()
+    dup()
   frontend/e2e/smoke.spec.js:
     i: @playwright/test
     e: input
     input()
+  frontend/cypress/e2e/oauth-login.cy.js:
+    e: FRONTEND_URL,MOCK_GITHUB_URL
+    FRONTEND_URL()
+    MOCK_GITHUB_URL()
   e2e/specs/badge.spec.js:
     i: @playwright/test
     e: input
@@ -1403,10 +1581,11 @@ Provides...
     e: fn
     fn()
   project.sh:
+  run-sim.sh:
   traefik/generate-certs.sh:
-  backend/store.py:
-  backend/database.py:
   backend/config.py:
+  backend/database.py:
+  backend/store.py:
   backend/worker/__init__.py:
   backend/services/scan_service.py:
   backend/services/mirror_models.py:
@@ -1451,6 +1630,7 @@ Provides...
   frontend/src/components/tabs/index.js:
   frontend/e2e/audit.spec.js:
     i: @playwright/test
+  TODO/run-sim.sh:
   e2e/playwright.config.js:
     i: @playwright/test
   e2e/specs/demo-login.spec.js:

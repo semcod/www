@@ -1,14 +1,14 @@
-# redup/duplication | 28 groups | 87f 12823L | 2026-04-11
+# redup/duplication | 33 groups | 91f 13131L | 2026-04-11
 
 SUMMARY:
-  files_scanned: 87
-  total_lines:   12823
-  dup_groups:    28
-  dup_fragments: 78
-  saved_lines:   387
-  scan_ms:       6630
+  files_scanned: 91
+  total_lines:   13131
+  dup_groups:    33
+  dup_fragments: 87
+  saved_lines:   476
+  scan_ms:       6651
 
-DUPLICATES[28] (ranked by impact):
+DUPLICATES[33] (ranked by impact):
   [428d25b1063f7815] ! STRU  save_scan  L=6 N=14 saved=78 sim=1.00
       backend/db_module/wrappers.py:57-62  (save_scan)
       backend/db_module/wrappers.py:97-102  (get_audit_result)
@@ -24,6 +24,9 @@ DUPLICATES[28] (ranked by impact):
       backend/db_module/wrappers.py:303-308  (get_benchmark_case)
       backend/db_module/wrappers.py:327-332  (get_benchmark_events)
       backend/db_module/wrappers.py:343-348  (get_feedback_for_case)
+  [14e2c7cced0e2e5e] ! EXAC  authorize  L=45 N=2 saved=45 sim=1.00
+      TODO/server.py:66-110  (authorize)
+      mock-github/server.py:74-118  (authorize)
   [92ac9c93a6502705]   STRU  save_audit_result  L=6 N=6 saved=30 sim=1.00
       backend/db_module/wrappers.py:89-94  (save_audit_result)
       backend/db_module/wrappers.py:105-110  (save_badge_cache)
@@ -31,6 +34,9 @@ DUPLICATES[28] (ranked by impact):
       backend/db_module/wrappers.py:245-250  (delete_installation)
       backend/db_module/wrappers.py:311-316  (update_benchmark_case)
       backend/db_module/wrappers.py:319-324  (create_benchmark_event)
+  [38c9ceb79f2d1b5e]   EXAC  access_token  L=28 N=2 saved=28 sim=1.00
+      TODO/server.py:126-153  (access_token)
+      mock-github/server.py:134-161  (access_token)
   [b897d761b6f07dd3]   EXAC  create_pr  L=24 N=2 saved=24 sim=1.00
       backend/adapters/gitea.py:63-86  (create_pr)
       backend/adapters/github.py:60-83  (create_pr)
@@ -44,10 +50,6 @@ DUPLICATES[28] (ranked by impact):
   [fad43fc95d229d5b]   EXAC  create_issue  L=18 N=2 saved=18 sim=1.00
       backend/adapters/gitea.py:269-286  (create_issue)
       backend/adapters/github.py:246-263  (create_issue)
-  [e8a223fe4c3cdc28]   EXAC  get_connection  L=9 N=3 saved=18 sim=1.00
-      backend/db_module/installations.py:12-20  (get_connection)
-      backend/db_module/repositories.py:12-20  (get_connection)
-      backend/db_module/tenants.py:12-20  (get_connection)
   [e5549ff81cdfb0c3]   STRU  get_user_by_github_id  L=15 N=2 saved=15 sim=1.00
       backend/db_module/users_orm.py:49-63  (get_user_by_github_id)
       backend/db_module/users_orm.py:66-80  (get_user_by_id)
@@ -57,6 +59,9 @@ DUPLICATES[28] (ranked by impact):
   [374d097d9c9e4875]   EXAC  close_pr  L=13 N=2 saved=13 sim=1.00
       backend/adapters/gitea.py:88-100  (close_pr)
       backend/adapters/github.py:85-97  (close_pr)
+  [f68066e1148ae325]   EXAC  get_repos  L=12 N=2 saved=12 sim=1.00
+      TODO/server.py:179-190  (get_repos)
+      mock-github/server.py:187-198  (get_repos)
   [e0cbc1f864191078]   STRU  get_adapter_for_event  L=12 N=2 saved=12 sim=1.00
       backend/adapters/__init__.py:11-22  (get_adapter_for_event)
       backend/services/webhook_service.py:17-27  (get_adapter_for_event)
@@ -79,14 +84,20 @@ DUPLICATES[28] (ranked by impact):
       backend/adapters/gitea.py:329-338  (update_check_run)
       backend/adapters/gitlab.py:356-366  (update_check_run)
   [eea9775c0caffe30]   STRU  get_user_by_github_id  L=10 N=2 saved=10 sim=1.00
-      backend/db_module/users.py:69-78  (get_user_by_github_id)
-      backend/db_module/users.py:81-90  (get_user_by_id)
+      backend/db_module/users.py:52-61  (get_user_by_github_id)
+      backend/db_module/users.py:64-73  (get_user_by_id)
+  [be3d909d511a8348]   EXAC  issue_code  L=9 N=2 saved=9 sim=1.00
+      TODO/server.py:114-122  (issue_code)
+      mock-github/server.py:122-130  (issue_code)
+  [b0070d1abd7680ae]   EXAC  _get_user  L=8 N=2 saved=8 sim=1.00
+      TODO/server.py:158-165  (_get_user)
+      mock-github/server.py:166-173  (_get_user)
+  [d463cf6d61e489d2]   EXAC  health  L=8 N=2 saved=8 sim=1.00
+      TODO/server.py:196-203  (health)
+      mock-github/server.py:204-211  (health)
   [3f081aacba691e3b]   EXAC  get_default_branch  L=8 N=2 saved=8 sim=1.00
       backend/adapters/gitea.py:163-170  (get_default_branch)
       backend/adapters/github.py:145-152  (get_default_branch)
-  [5c4afad1eeff7cf4]   EXAC  get_connection  L=8 N=2 saved=8 sim=1.00
-      backend/db_module/schema.py:15-22  (get_connection)
-      backend/db_module/users.py:17-24  (get_connection)
   [13e2a72788c5dc6a]   STRU  get_api_headers  L=6 N=2 saved=6 sim=1.00
       backend/adapters/gitea.py:30-35  (get_api_headers)
       backend/adapters/github.py:27-32  (get_api_headers)
@@ -103,6 +114,9 @@ DUPLICATES[28] (ranked by impact):
       backend/services/webhook_service.py:65-67  (parse_github_webhook)
       backend/services/webhook_service.py:70-72  (parse_gitlab_webhook)
       backend/services/webhook_service.py:75-77  (parse_gitea_webhook)
+  [7799ea7bf48d909b]   EXAC  get_user  L=5 N=2 saved=5 sim=1.00
+      TODO/server.py:170-174  (get_user)
+      mock-github/server.py:178-182  (get_user)
   [a469c73ed720c314]   STRU  list_feedback  L=4 N=2 saved=4 sim=1.00
       backend/routers/benchmark.py:132-135  (list_feedback)
       backend/routers/benchmark.py:148-151  (list_events)
@@ -116,92 +130,107 @@ DUPLICATES[28] (ranked by impact):
       backend/adapters/gitea.py:22-24  (__init__)
       backend/adapters/gitlab.py:15-17  (__init__)
 
-REFACTOR[28] (ranked by priority):
+REFACTOR[33] (ranked by priority):
   [1] ○ extract_function   → backend/db_module/utils/save_scan.py
       WHY: 14 occurrences of 6-line block across 1 files — saves 78 lines
       FILES: backend/db_module/wrappers.py
-  [2] ○ extract_function   → backend/db_module/utils/save_audit_result.py
+  [2] ◐ extract_function   → utils/authorize.py
+      WHY: 2 occurrences of 45-line block across 2 files — saves 45 lines
+      FILES: TODO/server.py, mock-github/server.py
+  [3] ○ extract_function   → backend/db_module/utils/save_audit_result.py
       WHY: 6 occurrences of 6-line block across 1 files — saves 30 lines
       FILES: backend/db_module/wrappers.py
-  [3] ○ extract_function   → backend/adapters/utils/create_pr.py
+  [4] ○ extract_function   → utils/access_token.py
+      WHY: 2 occurrences of 28-line block across 2 files — saves 28 lines
+      FILES: TODO/server.py, mock-github/server.py
+  [5] ○ extract_function   → backend/adapters/utils/create_pr.py
       WHY: 2 occurrences of 24-line block across 2 files — saves 24 lines
       FILES: backend/adapters/gitea.py, backend/adapters/github.py
-  [4] ○ extract_function   → backend/worker/tasks/utils/_get_token_for_provider.py
+  [6] ○ extract_function   → backend/worker/tasks/utils/_get_token_for_provider.py
       WHY: 3 occurrences of 10-line block across 3 files — saves 20 lines
       FILES: backend/worker/tasks/autopr.py, backend/worker/tasks/marketplace.py, backend/worker/tasks/scan.py
-  [5] ○ extract_function   → backend/routers/utils/github_webhook.py
+  [7] ○ extract_function   → backend/routers/utils/github_webhook.py
       WHY: 2 occurrences of 19-line block across 1 files — saves 19 lines
       FILES: backend/routers/webhook_v2.py
-  [6] ○ extract_function   → backend/adapters/utils/create_issue.py
+  [8] ○ extract_function   → backend/adapters/utils/create_issue.py
       WHY: 2 occurrences of 18-line block across 2 files — saves 18 lines
       FILES: backend/adapters/gitea.py, backend/adapters/github.py
-  [7] ○ extract_function   → backend/db_module/utils/get_connection.py
-      WHY: 3 occurrences of 9-line block across 3 files — saves 18 lines
-      FILES: backend/db_module/installations.py, backend/db_module/repositories.py, backend/db_module/tenants.py
-  [8] ○ extract_function   → backend/db_module/utils/get_user_by_github_id.py
+  [9] ○ extract_function   → backend/db_module/utils/get_user_by_github_id.py
       WHY: 2 occurrences of 15-line block across 1 files — saves 15 lines
       FILES: backend/db_module/users_orm.py
-  [9] ○ extract_function   → backend/adapters/utils/get_file_sha.py
+  [10] ○ extract_function   → backend/adapters/utils/get_file_sha.py
       WHY: 2 occurrences of 14-line block across 2 files — saves 14 lines
       FILES: backend/adapters/gitea.py, backend/adapters/github.py
-  [10] ○ extract_function   → backend/adapters/utils/close_pr.py
+  [11] ○ extract_function   → backend/adapters/utils/close_pr.py
       WHY: 2 occurrences of 13-line block across 2 files — saves 13 lines
       FILES: backend/adapters/gitea.py, backend/adapters/github.py
-  [11] ○ extract_function   → backend/utils/get_adapter_for_event.py
+  [12] ○ extract_function   → utils/get_repos.py
+      WHY: 2 occurrences of 12-line block across 2 files — saves 12 lines
+      FILES: TODO/server.py, mock-github/server.py
+  [13] ○ extract_function   → backend/utils/get_adapter_for_event.py
       WHY: 2 occurrences of 12-line block across 2 files — saves 12 lines
       FILES: backend/adapters/__init__.py, backend/services/webhook_service.py
-  [12] ○ extract_function   → backend/utils/get_registry.py
+  [14] ○ extract_function   → backend/utils/get_registry.py
       WHY: 3 occurrences of 6-line block across 2 files — saves 12 lines
       FILES: backend/apps/registry.py, backend/services/billing.py
-  [13] ○ extract_function   → backend/db_module/utils/get_total_scan_count.py
+  [15] ○ extract_function   → backend/db_module/utils/get_total_scan_count.py
       WHY: 3 occurrences of 6-line block across 1 files — saves 12 lines
       FILES: backend/db_module/wrappers.py
-  [14] ○ extract_function   → backend/db_module/utils/get_repository_by_full_name.py
+  [16] ○ extract_function   → backend/db_module/utils/get_repository_by_full_name.py
       WHY: 3 occurrences of 6-line block across 1 files — saves 12 lines
       FILES: backend/db_module/wrappers.py
-  [15] ○ extract_function   → backend/adapters/utils/update_pr_description.py
+  [17] ○ extract_function   → backend/adapters/utils/update_pr_description.py
       WHY: 2 occurrences of 10-line block across 2 files — saves 10 lines
       FILES: backend/adapters/gitea.py, backend/adapters/github.py
-  [16] ○ extract_function   → backend/adapters/utils/update_check_run.py
+  [18] ○ extract_function   → backend/adapters/utils/update_check_run.py
       WHY: 2 occurrences of 10-line block across 2 files — saves 10 lines
       FILES: backend/adapters/gitea.py, backend/adapters/gitlab.py
-  [17] ○ extract_function   → backend/db_module/utils/get_user_by_github_id.py
+  [19] ○ extract_function   → backend/db_module/utils/get_user_by_github_id.py
       WHY: 2 occurrences of 10-line block across 1 files — saves 10 lines
       FILES: backend/db_module/users.py
-  [18] ○ extract_function   → backend/adapters/utils/get_default_branch.py
+  [20] ○ extract_function   → utils/issue_code.py
+      WHY: 2 occurrences of 9-line block across 2 files — saves 9 lines
+      FILES: TODO/server.py, mock-github/server.py
+  [21] ○ extract_function   → utils/_get_user.py
+      WHY: 2 occurrences of 8-line block across 2 files — saves 8 lines
+      FILES: TODO/server.py, mock-github/server.py
+  [22] ○ extract_function   → utils/health.py
+      WHY: 2 occurrences of 8-line block across 2 files — saves 8 lines
+      FILES: TODO/server.py, mock-github/server.py
+  [23] ○ extract_function   → backend/adapters/utils/get_default_branch.py
       WHY: 2 occurrences of 8-line block across 2 files — saves 8 lines
       FILES: backend/adapters/gitea.py, backend/adapters/github.py
-  [19] ○ extract_function   → backend/db_module/utils/get_connection.py
-      WHY: 2 occurrences of 8-line block across 2 files — saves 8 lines
-      FILES: backend/db_module/schema.py, backend/db_module/users.py
-  [20] ○ extract_function   → backend/adapters/utils/get_api_headers.py
+  [24] ○ extract_function   → backend/adapters/utils/get_api_headers.py
       WHY: 2 occurrences of 6-line block across 2 files — saves 6 lines
       FILES: backend/adapters/gitea.py, backend/adapters/github.py
-  [21] ○ extract_function   → backend/adapters/utils/delete_branch.py
+  [25] ○ extract_function   → backend/adapters/utils/delete_branch.py
       WHY: 2 occurrences of 6-line block across 2 files — saves 6 lines
       FILES: backend/adapters/gitea.py, backend/adapters/github.py
-  [22] ○ extract_function   → backend/db_module/utils/get_recent_scans.py
+  [26] ○ extract_function   → backend/db_module/utils/get_recent_scans.py
       WHY: 2 occurrences of 6-line block across 1 files — saves 6 lines
       FILES: backend/db_module/wrappers.py
-  [23] ○ extract_function   → backend/routers/utils/patch_case.py
+  [27] ○ extract_function   → backend/routers/utils/patch_case.py
       WHY: 2 occurrences of 6-line block across 1 files — saves 6 lines
       FILES: backend/routers/benchmark.py
-  [24] ○ extract_function   → backend/services/utils/parse_github_webhook.py
+  [28] ○ extract_function   → backend/services/utils/parse_github_webhook.py
       WHY: 3 occurrences of 3-line block across 1 files — saves 6 lines
       FILES: backend/services/webhook_service.py
-  [25] ○ extract_function   → backend/routers/utils/list_feedback.py
+  [29] ○ extract_function   → utils/get_user.py
+      WHY: 2 occurrences of 5-line block across 2 files — saves 5 lines
+      FILES: TODO/server.py, mock-github/server.py
+  [30] ○ extract_function   → backend/routers/utils/list_feedback.py
       WHY: 2 occurrences of 4-line block across 1 files — saves 4 lines
       FILES: backend/routers/benchmark.py
-  [26] ○ extract_function   → backend/services/utils/verify_github_signature.py
+  [31] ○ extract_function   → backend/services/utils/verify_github_signature.py
       WHY: 2 occurrences of 4-line block across 1 files — saves 4 lines
       FILES: backend/services/webhook_service.py
-  [27] ○ extract_function   → backend/adapters/utils/comment_on_issue.py
+  [32] ○ extract_function   → backend/adapters/utils/comment_on_issue.py
       WHY: 2 occurrences of 3-line block across 2 files — saves 3 lines
       FILES: backend/adapters/gitea.py, backend/adapters/github.py
-  [28] ○ extract_function   → backend/adapters/utils/__init__.py
+  [33] ○ extract_function   → backend/adapters/utils/__init__.py
       WHY: 2 occurrences of 3-line block across 2 files — saves 3 lines
       FILES: backend/adapters/gitea.py, backend/adapters/gitlab.py
 
 METRICS-TARGET:
-  dup_groups:  28 → 0
-  saved_lines: 387 lines recoverable
+  dup_groups:  33 → 0
+  saved_lines: 476 lines recoverable

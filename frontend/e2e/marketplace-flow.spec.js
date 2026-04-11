@@ -118,13 +118,6 @@ test.describe('Multi-step navigation flow', () => {
       await page.waitForTimeout(500);
     }
 
-    // Navigate to PR Bot tab
-    const prTab = page.getByRole('button', { name: /PR Bot/i });
-    if (await prTab.isVisible().catch(() => false)) {
-      await prTab.click();
-      await page.waitForTimeout(500);
-    }
-
     // Navigate to Marketplace tab
     const marketTab = page.getByRole('button', { name: /Marketplace/i });
     if (await marketTab.isVisible().catch(() => false)) {

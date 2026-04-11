@@ -146,11 +146,11 @@ test.describe("Enhanced GUI Login Tests", () => {
     }
     
     // Wait for redirect to mock GitHub
-    await page.waitForURL(/.*4010.*|.*mock.*/, { timeout: 10000 });
+    await page.waitForURL(new RegExp(`.*${MOCK_GITHUB_URL.split(':')[2]}.*|.*mock.*`), { timeout: 10000 });
     await page.waitForLoadState('networkidle');
     
     // Verify we're on the mock GitHub login page
-    expect(page.url()).toContain('4010');
+    expect(page.url()).toContain(MOCK_GITHUB_URL.split(':')[2]);
     
     // Look for and click the user button
     const userButtonClicked = await attemptUserLogin(page);

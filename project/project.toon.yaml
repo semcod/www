@@ -1,21 +1,13 @@
-# www | 883 func | 145f | 22449L | python | 2026-04-11
+# www | 992 func | 160f | 25293L | javascript | 2026-04-11
 
 HEALTH:
-  CC̄=2.7  critical=21 (limit:10)  dup=1  cycles=0
+  CC̄=2.7  critical=20 (limit:10)  dup=1  cycles=0
 
-ALERTS[19]:
-  # [RESOLVED] cc_exceeded TrendTab = 27 → split into parts
-  !!! high_fan_out     useAppState = 27 (limit:10)
+ALERTS[2]:
   !!! high_fan_out     create_auto_pr = 26 (limit:10)
-  !!! high_fan_out     run_scheduled_scan = 23 (limit:10)
-  !!  high_fan_out     _run_audit_pipeline = 19 (limit:10)
-  !!  high_fan_out     MirrorService.create_mirror = 18 (limit:10)
-  !!  high_fan_out     AutoFixService.create_auto_fix_pr = 18 (limit:10)
-  !!  high_fan_out     create_auto_pr = 18 (limit:10)
-  !!  high_fan_out     process_pr_event = 16 (limit:10)
-  !!  high_fan_out     _run_sandbox_analysis = 16 (limit:10)
+  !!  cc_exceeded      analyzer = 13 (limit:10)
 
-MODULES[175] (top by size):
+MODULES[192] (top by size):
   M[backend/adapters/github.py] 392L C:1 F:22 CC↑6 D:1 (python)
   M[backend/services/mirror.py] 387L C:1 F:11 CC↑6 D:0 (python)
   M[backend/adapters/gitlab.py] 379L C:1 F:21 CC↑5 D:0 (python)
@@ -27,34 +19,23 @@ MODULES[175] (top by size):
   M[frontend/src/components/MarketplaceDashboard.jsx] 301L C:0 F:4 CC↑2 D:0 (javascript)
   M[backend/services/autofix.py] 299L C:4 F:8 CC↑7 D:0 (python)
   M[backend/routers/billing.py] 291L C:2 F:12 CC↑8 D:0 (python)
-  M[backend/routers/autopr.py] 287L C:3 F:12 CC↑10 D:0 (python)
   M[backend/worker/tasks/scan.py] 287L C:0 F:7 CC↑9 D:0 (python)
-  M[backend/db_module/scans.py] 275L C:0 F:9 CC↑6 D:7 (python)
   M[backend/quality_gate.py] 272L C:3 F:12 CC↑8 D:0 (python)
-  LANGS: python:88/javascript:85/shell:2
+  M[backend/db_module/scans.py] 259L C:0 F:8 CC↑6 D:7 (python)
+  M[backend/routers/metrics.py] 257L C:0 F:6 CC↑10 D:0 (python)
+  LANGS: javascript:96/python:92/shell:4
 
-HOTSPOTS[10]:
-  ★ useAppState fan=27  // Orchestrates 27 calls
+HOTSPOTS[2]:
   ★ create_auto_pr fan=26  // Apply LLM-generated patches to a repository and create a GitHub PR.
+  ★ analyzer CC=13  // Code analysis pipeline
 
-Flow:
-  1. 
-  ★ run_scheduled_scan fan=23  // Execute a full audit pipeline for *repo* (scheduled, no HTTP context).
-
-Returns 
-  ★ _run_audit_pipeline fan=19  // Background pipeline: clone → code2llm → redup → pyqual → report.
-  ★ MirrorService.create_mirror fan=18  // Create new mirror by cloning source repo to Gitea.
-
-Flow:
-1. Clone source repo t
-
-REFACTOR[5]:
-  [1] [DONE] Split TrendTab (CC=27 → split into TrendTab.parts.jsx)
-  [2] [DONE] Split SettingsTab (CC=18 → split into SettingsTab.parts.jsx)
-  [3] M/M Reduce useAppState fan-out (currently 27)
-  [4] M/M Reduce create_auto_pr fan-out (currently 26)
-  [5] M/M Reduce run_scheduled_scan fan-out (currently 23)
+REFACTOR[2]:
+  [1] M/M Reduce create_auto_pr fan-out (currently 26 → target ≤10)
+  [2] L/L Split analyzer (CC=13 → target CC<10)
 
 EVOLUTION:
-  2026-04-11 CC̄=2.7 crit=21 22449L // Automated analysis
-  2026-04-11 CC̄=2.7 crit=19 22449L // [DONE] Split TrendTab (CC=27) and SettingsTab (CC=18) into .parts.jsx components
+  2026-04-11 CC̄=2.7 crit=20 25293L // Automated analysis
+  2026-04-11 CC̄=2.7 crit=3 25293L // [FIX] False FRONTEND_URL/MOCK_GITHUB_URL alerts removed (test const strings, not functions)
+  2026-04-11 CC̄=2.7 crit=3 25293L // [DONE] Removed DEMO_REPOS/DEMO_AUDIT, reduced useAppState fan-out 25→8, split useUrlState CC=14→5
+  2026-04-11 CC̄=2.7 crit=2 25293L // [DONE] Split benchmark_orm (CC=14→7): extracted _event_to_dict, _update_feedback_fields, _build_feedback_row, _compute_feedback_stats
+  2026-04-11 CC̄=2.7 crit=2 25293L // [DONE] Integrated create_auto_pr with reDSL: added RedslClient, POST /api/autopr/redsl endpoint, docker-compose redsl service

@@ -71,6 +71,18 @@ TEAM_TIER_LIMITS = {
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", GITHUB_CLIENT_SECRET)  # Fallback for compatibility
 GITLAB_TOKEN = os.getenv("GITLAB_TOKEN", "")
 GITLAB_WEBHOOK_SECRET = os.getenv("GITLAB_WEBHOOK_SECRET", "")
+
+# Gitea provider config
 GITEA_TOKEN = os.getenv("GITEA_TOKEN", "")
 GITEA_WEBHOOK_SECRET = os.getenv("GITEA_WEBHOOK_SECRET", "")
 GITEA_BASE_URL = os.getenv("GITEA_BASE_URL", "http://localhost:3000")
+GITEA_URL = os.getenv("GITEA_URL", "")
+GITEA_API_BASE_URL = os.getenv("GITEA_API_BASE_URL", GITEA_URL or GITEA_BASE_URL)
+GITEA_CLIENT_ID = os.getenv("GITEA_CLIENT_ID", "")
+GITEA_CLIENT_SECRET = os.getenv("GITEA_CLIENT_SECRET", "")
+GITEA_OAUTH_AUTHORIZE_URL = os.getenv("GITEA_OAUTH_AUTHORIZE_URL", "")
+GITEA_OAUTH_TOKEN_URL = os.getenv("GITEA_OAUTH_TOKEN_URL", "")
+DEFAULT_GIT_PROVIDER = os.getenv("DEFAULT_GIT_PROVIDER", "github")
+
+# reDSL refactoring engine
+REDLS_URL = os.getenv("REDLS_URL", "http://localhost:8000")

@@ -11,6 +11,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 from scheduler.scan_job import run_scheduled_scan
+from worker.tasks.redsl import task_redsl_scheduled_quality_check, task_redsl_scheduled_auto_refactor
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +30,20 @@ def get_scheduler() -> AsyncIOScheduler:
 def start_scheduler() -> None:
     if not _scheduler.running:
         _scheduler.start()
-        logger.info("APScheduler started")
+        # reDSL scheduled jobs
+        _scheduler.add_job(
+            _run_redsl_quality_check_sync,
+            trigger=IntervalTrigger(hours=1),
+            id="redsl:quality_check",
+            replace_existing=True,
+        )
+        _scheduler.add_job(
+            _run_redsl_auto_refactor_sync,
+            trigger=IntervalTrigger(weeks=1),
+            id="redsl:auto_refactor",
+            replace_existing=True,
+        )
+        logger.info("APScheduler started (reDSL jobs: quality_check hourly, auto_refactor weekly)")
 
 
 def stop_scheduler() -> None:
@@ -76,6 +90,22 @@ def _run_scan_sync(repo: str, token: str, webhook_url: str | None) -> None:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
     loop.run_until_complete(run_scheduled_scan(repo, token, webhook_url))
+
+
+def _run_redsl_quality_check_sync() -> None:
+    """Wrapper for APScheduler — triggers reDSL quality check Celery task."""
+    try:
+        task_redsl_scheduled_quality_check.delay()
+    except Exception as exc:
+        logger.error("Failed to dispatch redsl quality check: %s", exc)
+
+
+def _run_redsl_auto_refactor_sync() -> None:
+    """Wrapper for APScheduler — triggers reDSL auto-refactor Celery task."""
+    try:
+        task_redsl_scheduled_auto_refactor.delay()
+    except Exception as exc:
+        logger.error("Failed to dispatch redsl auto refactor: %s", exc)
 
 
 # ─── API endpoints ─────────────────────────────────────────────────────────────

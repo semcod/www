@@ -1,9 +1,9 @@
-# vallm batch | 321f | 78✓ 54⚠ 88✗ | 2026-04-11
+# vallm batch | 358f | 94✓ 59⚠ 94✗ | 2026-04-11
 
 SUMMARY:
-  scanned: 321  passed: 78 (24.3%)  warnings: 54  errors: 88  unsupported: 109
+  scanned: 358  passed: 94 (26.3%)  warnings: 59  errors: 94  unsupported: 122
 
-WARNINGS[54]{path,score}:
+WARNINGS[59]{path,score}:
   frontend/src/hooks/useDownloads.js,0.67
     issues[1]{rule,severity,message,line}:
       js.import.resolvable,warning,Module 'react' not found,1
@@ -122,6 +122,9 @@ WARNINGS[54]{path,score}:
   frontend/src/components/tabs/SettingsTab.jsx,0.78
     issues[1]{rule,severity,message,line}:
       syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/components/tabs/SettingsTab.parts.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
   frontend/src/components/tabs/TrendChart.jsx,0.78
     issues[1]{rule,severity,message,line}:
       syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
@@ -129,6 +132,9 @@ WARNINGS[54]{path,score}:
     issues[1]{rule,severity,message,line}:
       syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
   frontend/src/components/tabs/TrendTab.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/components/tabs/TrendTab.parts.jsx,0.78
     issues[1]{rule,severity,message,line}:
       syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
   frontend/src/components/ui/GradeCircle.jsx,0.78
@@ -146,10 +152,22 @@ WARNINGS[54]{path,score}:
   frontend/src/main.jsx,0.78
     issues[1]{rule,severity,message,line}:
       syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/hooks/useBenchmarkState.js,0.83
+    issues[1]{rule,severity,message,line}:
+      js.import.resolvable,warning,Module 'react' not found,1
   frontend/src/hooks/useBenchmarkTracking.js,0.83
     issues[1]{rule,severity,message,line}:
       js.import.resolvable,warning,Module 'react' not found,1
   frontend/src/hooks/useBilling.js,0.83
+    issues[1]{rule,severity,message,line}:
+      js.import.resolvable,warning,Module 'react' not found,1
+  frontend/src/hooks/usePolling.js,0.83
+    issues[1]{rule,severity,message,line}:
+      js.import.resolvable,warning,Module 'react' not found,1
+  frontend/src/hooks/useRepoList.js,0.83
+    issues[1]{rule,severity,message,line}:
+      js.import.resolvable,warning,Module 'react' not found,1
+  frontend/src/hooks/useSession.js,0.83
     issues[1]{rule,severity,message,line}:
       js.import.resolvable,warning,Module 'react' not found,1
   frontend/src/hooks/useUrlState.js,0.83
@@ -164,26 +182,22 @@ WARNINGS[54]{path,score}:
   frontend/src/hooks/useAuth.js,0.89
     issues[1]{rule,severity,message,line}:
       js.import.resolvable,warning,Module 'react' not found,1
-  frontend/src/hooks/usePolling.js,0.89
-    issues[1]{rule,severity,message,line}:
-      js.import.resolvable,warning,Module 'react' not found,1
   frontend/src/hooks/useAppState.js,0.96
     issues[1]{rule,severity,message,line}:
       js.import.resolvable,warning,Module 'react' not found,1
 
-ERRORS[88]{path,score}:
+ERRORS[94]{path,score}:
   backend/database.py,0.57
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'db_module' not found,7
   backend/routers/marketplace/deploy.py,0.57
-    issues[8]{rule,severity,message,line}:
+    issues[7]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'fastapi' not found,2
       python.import.resolvable,error,Module 'routers.auth' not found,4
       python.import.resolvable,error,Module 'routers.marketplace.models' not found,5
       python.import.resolvable,error,Module 'database' not found,78
       python.import.resolvable,error,Module 'services.billing' not found,79
-      python.import.resolvable,error,Module 'config' not found,80
-      python.import.resolvable,error,Module 'worker.tasks' not found,116
+      python.import.resolvable,error,Module 'worker.tasks' not found,111
       python.import.resolvable,error,Module 'services.mirror' not found,48
   backend/routers/report.py,0.57
     issues[3]{rule,severity,message,line}:
@@ -242,6 +256,20 @@ ERRORS[88]{path,score}:
       python.import.resolvable,error,Module 'routers.benchmark' not found,30
       python.import.resolvable,error,Module 'uvicorn' not found,74
       python.import.resolvable,error,Module 'config' not found,75
+  tests/backend/test_autopr.py,0.60
+    issues[12]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,3
+      python.import.resolvable,error,Module 'routers.auth' not found,22
+      python.import.resolvable,error,Module 'server' not found,36
+      python.import.resolvable,error,Module 'server' not found,45
+      python.import.resolvable,error,Module 'server' not found,69
+      python.import.resolvable,error,Module 'server' not found,90
+      python.import.resolvable,error,Module 'server' not found,108
+      python.import.resolvable,error,Module 'server' not found,130
+      python.import.resolvable,error,Module 'services.autopr_helpers' not found,150
+      python.import.resolvable,error,Module 'routers.autopr' not found,151
+      python.import.resolvable,error,Module 'services.autopr_helpers' not found,165
+      python.import.resolvable,error,Module 'routers.autopr' not found,166
   backend/routers/marketplace/publish.py,0.61
     issues[11]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'fastapi' not found,3
@@ -267,18 +295,6 @@ ERRORS[88]{path,score}:
       python.import.resolvable,error,Module 'apps.performance.pipeline' not found,234
       python.import.resolvable,error,Module 'apps.registry' not found,255
       python.import.resolvable,error,Module 'apps.registry' not found,276
-  tests/backend/test_autopr.py,0.61
-    issues[10]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'pytest' not found,3
-      python.import.resolvable,error,Module 'routers.auth' not found,22
-      python.import.resolvable,error,Module 'server' not found,36
-      python.import.resolvable,error,Module 'server' not found,45
-      python.import.resolvable,error,Module 'server' not found,69
-      python.import.resolvable,error,Module 'server' not found,90
-      python.import.resolvable,error,Module 'server' not found,108
-      python.import.resolvable,error,Module 'server' not found,130
-      python.import.resolvable,error,Module 'routers.autopr' not found,150
-      python.import.resolvable,error,Module 'routers.autopr' not found,164
   tests/backend/test_marketplace.py,0.61
     issues[11]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'pytest' not found,3
@@ -327,6 +343,18 @@ ERRORS[88]{path,score}:
       python.import.resolvable,error,Module 'database' not found,242
       python.import.resolvable,error,Module 'database' not found,249
       python.import.resolvable,error,Module 'routers.billing' not found,104
+  tests/backend/test_integration_flows.py,0.64
+    issues[10]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,7
+      python.import.resolvable,error,Module 'routers.auth' not found,22
+      python.import.resolvable,error,Module 'server' not found,36
+      python.import.resolvable,error,Module 'server' not found,46
+      python.import.resolvable,error,Module 'server' not found,70
+      python.import.resolvable,error,Module 'server' not found,144
+      python.import.resolvable,error,Module 'server' not found,310
+      python.import.resolvable,error,Module 'server' not found,340
+      python.import.resolvable,error,Module 'server' not found,359
+      python.import.resolvable,error,Module 'server' not found,404
   backend/db_session.py,0.66
     issues[4]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'sqlalchemy' not found,4
@@ -342,6 +370,14 @@ ERRORS[88]{path,score}:
       python.import.resolvable,error,Module 'config' not found,55
       python.import.resolvable,error,Module 'config' not found,75
       python.import.resolvable,error,Module 'config' not found,120
+  backend/routers/auth.py,0.68
+    issues[6]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'jwt' not found,2
+      python.import.resolvable,error,Module 'fastapi' not found,4
+      python.import.resolvable,error,Module 'fastapi.responses' not found,5
+      python.import.resolvable,error,Module 'fastapi.security' not found,6
+      python.import.resolvable,error,Module 'config' not found,8
+      python.import.resolvable,error,Module 'database' not found,9
   backend/services/webhook_service.py,0.68
     issues[3]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'adapters' not found,5
@@ -374,18 +410,18 @@ ERRORS[88]{path,score}:
     issues[2]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'sqlalchemy' not found,4
       python.import.resolvable,error,Module 'sqlalchemy.orm' not found,7
-  backend/routers/auth.py,0.71
-    issues[6]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'jwt' not found,2
-      python.import.resolvable,error,Module 'fastapi' not found,4
-      python.import.resolvable,error,Module 'fastapi.responses' not found,5
-      python.import.resolvable,error,Module 'fastapi.security' not found,6
-      python.import.resolvable,error,Module 'config' not found,8
-      python.import.resolvable,error,Module 'database' not found,9
   tests/backend/test_benchmark.py,0.71
     issues[2]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'pytest' not found,3
       python.import.resolvable,error,Module 'services.scoring' not found,96
+  tests/selenium/oauth_login_test.py,0.71
+    issues[6]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'selenium' not found,10
+      python.import.resolvable,error,Module 'selenium.webdriver.common.by' not found,11
+      python.import.resolvable,error,Module 'selenium.webdriver.support.ui' not found,12
+      python.import.resolvable,error,Module 'selenium.webdriver.support' not found,13
+      python.import.resolvable,error,Module 'selenium.webdriver.chrome.options' not found,14
+      python.import.resolvable,error,Module 'selenium.webdriver.firefox.options' not found,15
   backend/services/billing.py,0.73
     issues[7]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'config' not found,7
@@ -437,6 +473,12 @@ ERRORS[88]{path,score}:
       python.import.resolvable,error,Module 'events.models' not found,86
       python.import.resolvable,error,Module 'services.scoring' not found,188
       python.import.resolvable,error,Module 'services.billing' not found,49
+  backend/routers/autopr.py,0.76
+    issues[4]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'fastapi' not found,6
+      python.import.resolvable,error,Module 'services.scan_service' not found,9
+      python.import.resolvable,error,Module 'services.autopr_helpers' not found,10
+      python.import.resolvable,error,Module 'routers.auth' not found,16
   backend/routers/metrics.py,0.76
     issues[4]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'fastapi' not found,3
@@ -474,6 +516,9 @@ ERRORS[88]{path,score}:
       python.import.resolvable,error,Module 'sqlalchemy' not found,6
       python.import.resolvable,error,Module 'sqlalchemy.orm' not found,7
       python.import.resolvable,error,Module 'db_models' not found,9
+  backend/db_module/db_connection.py,0.79
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'config' not found,3
   backend/db_module/repositories_orm.py,0.79
     issues[2]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'sqlalchemy.orm' not found,5
@@ -483,9 +528,6 @@ ERRORS[88]{path,score}:
       python.import.resolvable,error,Module 'sqlalchemy' not found,5
       python.import.resolvable,error,Module 'sqlalchemy.orm' not found,6
       python.import.resolvable,error,Module 'db_models' not found,8
-  backend/db_module/schema.py,0.79
-    issues[1]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'config' not found,4
   backend/db_module/tenants_orm.py,0.79
     issues[2]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'sqlalchemy.orm' not found,5
@@ -540,14 +582,6 @@ ERRORS[88]{path,score}:
       python.import.resolvable,error,Module 'apscheduler.triggers.interval' not found,9
       python.import.resolvable,error,Module 'fastapi' not found,10
       python.import.resolvable,error,Module 'scheduler.scan_job' not found,13
-  backend/routers/audit.py,0.82
-    issues[6]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'fastapi' not found,12
-      python.import.resolvable,error,Module 'config' not found,14
-      python.import.resolvable,error,Module 'services.analyzer' not found,15
-      python.import.resolvable,error,Module 'services.scoring' not found,16
-      python.import.resolvable,error,Module 'services.scan_service' not found,17
-      python.import.resolvable,error,Module 'routers.auth' not found,18
   backend/routers/benchmark.py,0.82
     issues[3]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'fastapi' not found,6
@@ -571,6 +605,12 @@ ERRORS[88]{path,score}:
     issues[2]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'sqlalchemy.orm' not found,6
       python.import.resolvable,error,Module 'db_models' not found,8
+  TODO/server.py,0.84
+    issues[4]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'fastapi' not found,12
+      python.import.resolvable,error,Module 'fastapi.responses' not found,13
+      python.import.resolvable,error,Module 'starlette.middleware.cors' not found,14
+      python.import.resolvable,error,Module 'uvicorn' not found,207
   backend/scheduler/scan_job.py,0.84
     issues[5]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'config' not found,11
@@ -583,17 +623,26 @@ ERRORS[88]{path,score}:
       python.import.resolvable,error,Module 'routers.audit' not found,10
       python.import.resolvable,error,Module 'db_module.scans' not found,11
       python.import.resolvable,error,Module 'sample_projects' not found,12
+  mock-github/server.py,0.84
+    issues[4]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'fastapi' not found,12
+      python.import.resolvable,error,Module 'fastapi.responses' not found,13
+      python.import.resolvable,error,Module 'starlette.middleware.cors' not found,14
+      python.import.resolvable,error,Module 'uvicorn' not found,215
+  backend/routers/audit.py,0.85
+    issues[6]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'fastapi' not found,12
+      python.import.resolvable,error,Module 'config' not found,14
+      python.import.resolvable,error,Module 'services.analyzer' not found,15
+      python.import.resolvable,error,Module 'services.scoring' not found,16
+      python.import.resolvable,error,Module 'services.scan_service' not found,17
+      python.import.resolvable,error,Module 'routers.auth' not found,18
   backend/apps/security/pipeline.py,0.86
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'apps.base' not found,5
-  backend/db_module/repositories.py,0.86
-    issues[2]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'config' not found,1
-      python.import.resolvable,error,Module 'config' not found,27
-  backend/db_module/tenants.py,0.86
-    issues[2]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'config' not found,1
-      python.import.resolvable,error,Module 'config' not found,27
+  backend/db_module/schema.py,0.86
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'config' not found,4
   backend/services/github_client.py,0.86
     issues[2]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'jwt' not found,8
@@ -604,14 +653,6 @@ ERRORS[88]{path,score}:
   tests/backend/test_trend.py,0.86
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'pytest' not found,5
-  backend/db_module/events.py,0.88
-    issues[2]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'config' not found,1
-      python.import.resolvable,error,Module 'config' not found,26
-  backend/db_module/installations.py,0.88
-    issues[2]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'config' not found,1
-      python.import.resolvable,error,Module 'config' not found,28
   backend/adapters/gitlab.py,0.89
     issues[2]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'fastapi' not found,6
@@ -619,12 +660,6 @@ ERRORS[88]{path,score}:
   backend/apps/registry.py,0.89
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'events.models' not found,3
-  backend/db_module/scans.py,0.89
-    issues[1]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'config' not found,6
-  backend/db_module/users.py,0.89
-    issues[1]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'config' not found,6
   backend/routers/mcp/__init__.py,0.89
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'fastapi' not found,1
@@ -639,29 +674,45 @@ ERRORS[88]{path,score}:
     issues[2]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'fastapi' not found,8
       python.import.resolvable,error,Module 'events.models' not found,10
-  backend/routers/autopr.py,0.90
-    issues[3]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'fastapi' not found,12
-      python.import.resolvable,error,Module 'services.scan_service' not found,15
-      python.import.resolvable,error,Module 'routers.auth' not found,16
   backend/services/mirror.py,0.90
     issues[3]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'adapters.github' not found,13
       python.import.resolvable,error,Module 'adapters.gitlab' not found,14
       python.import.resolvable,error,Module 'adapters.gitea' not found,15
+  backend/db_module/repositories.py,0.91
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'config' not found,6
+  backend/db_module/scans.py,0.91
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'config' not found,6
+  backend/db_module/tenants.py,0.91
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'config' not found,5
+  backend/db_module/users.py,0.91
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'config' not found,6
   backend/adapters/__init__.py,0.93
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'events.models' not found,2
+  backend/db_module/events.py,0.93
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'config' not found,7
+  backend/db_module/installations.py,0.93
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'config' not found,5
   backend/routers/marketplace/__init__.py,0.94
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'fastapi' not found,2
+  backend/services/autopr_helpers.py,0.94
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'fastapi' not found,10
   backend/db_module/wrappers.py,0.95
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'db_session' not found,2
 
 UNSUPPORTED[5]{bucket,count}:
-  *.md,74
-  Dockerfile*,2
-  *.txt,2
-  *.yml,5
-  other,26
+  *.md,81
+  Dockerfile*,3
+  *.txt,3
+  *.yml,7
+  other,28

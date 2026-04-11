@@ -71,6 +71,7 @@ async def gitea_webhook(request: Request):
     """Handle Gitea webhook events."""
     body = await request.body()
     signature = request.headers.get("X-Gitea-Signature", "")
+    gitea_event = request.headers.get("X-Gitea-Event", "")
 
     from config import GITEA_WEBHOOK_SECRET
 
@@ -79,7 +80,7 @@ async def gitea_webhook(request: Request):
             raise HTTPException(401, "Invalid signature")
 
     payload = await request.json()
-    event = parse_gitea_webhook(payload)
+    event = parse_gitea_webhook(payload, gitea_event_header=gitea_event)
 
     if not event:
         return {"status": "ignored", "reason": "could not parse event"}

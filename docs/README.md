@@ -1,7 +1,7 @@
 <!-- code2docs:start --># www
 
-![version](https://img.shields.io/badge/version-0.1.0-blue) ![python](https://img.shields.io/badge/python-%3E%3D3.8-blue) ![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey) ![functions](https://img.shields.io/badge/functions-883-green)
-> **883** functions | **70** classes | **175** files | CC̄ = 2.7
+![version](https://img.shields.io/badge/version-0.1.0-blue) ![python](https://img.shields.io/badge/python-%3E%3D3.9-blue) ![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey) ![functions](https://img.shields.io/badge/functions-992-green)
+> **992** functions | **73** classes | **192** files | CC̄ = 2.7
 
 > Auto-generated project documentation from source code analysis.
 
@@ -146,7 +146,7 @@ Content outside the markers is preserved when regenerating. Enable this with `sy
 
 ```
 www/
-    ├── generate-certs├── project    ├── store    ├── server    ├── config    ├── database    ├── sample_projects    ├── db_session    ├── worker/        ├── scan_job    ├── db_models        ├── webhook_service        ├── mirror    ├── quality_gate        ├── scoring        ├── autofix        ├── stripe_connect        ├── scan_service        ├── analyzer        ├── github_client        ├── tenants_orm        ├── mirror_models        ├── users        ├── schema        ├── tenants        ├── events        ├── users_orm    ├── db_module/        ├── benchmark_orm        ├── installations        ├── repositories_orm        ├── installations_orm        ├── scans        ├── scans_orm        ├── repositories        ├── billing        ├── env        ├── events_orm        ├── _celery_stub        ├── wrappers            ├── marketplace            ├── 0001_initial_schema            ├── maintenance        ├── tasks/            ├── autopr    ├── events/        ├── scan_samples            ├── scan        ├── loader        ├── registry    ├── apps/            ├── pipeline            ├── hooks        ├── base            ├── pipeline        ├── base            ├── pipeline    ├── adapters/        ├── gitea_events        ├── gitlab        ├── gitea        ├── gitlab_events        ├── system        ├── models        ├── github        ├── webhook        ├── auth        ├── trend        ├── metrics        ├── badge        ├── cron        ├── webhook_v2        ├── report        ├── audit        ├── billing        ├── marketplace/            ├── deploy            ├── publish            ├── models            ├── browse            ├── connect            ├── billing            ├── resources            ├── tools        ├── mcp/            ├── models        ├── config        ├── config        ├── constants        ├── config        ├── autopr        ├── App        ├── main        ├── api            ├── useAuth            ├── usePolling        ├── mirror            ├── useBenchmarkTracking            ├── useUrlState            ├── useAuditActions            ├── useAppState            ├── useBilling            ├── MarketplaceDashboard            ├── Header            ├── useDownloads            ├── LanguageBar            ├── MetricCard            ├── ProgressSteps            ├── RecommendationCard            ├── GradeCircle            ├── PaywallModal            ├── Preview        ├── components/            ├── LoginMultiPlatform            ├── ShareButtons            ├── AppCard                ├── BenchmarkDecisionPanel            ├── InstallButton                ├── RecommendationFeedbackForm                ├── BenchmarkReviewPanel            ├── phases/                ├── AuthPhase                ├── ScanningPhase                ├── ReposPhase                    ├── ErrorResult                    ├── ResultRecommendations                    ├── ResultMetrics                ├── LandingPhase                    ├── DownloadButtons                    ├── ResultHeader                    ├── ResultTabPanel                    ├── index/                ├── LanguageBar                ├── MetricCard                ├── RecommendationCard                ├── GradeCircle            ├── ui/                ├── recentScansHelpers                ├── PRBotTab                ├── RepoTab                ├── TrendTab                ├── TrendSummaryCard            ├── tabs/                    ├── parts                ├── AddScheduleForm                ├── BadgeTab                ├── MarketplaceTab                ├── RecentScansTab                ├── SettingsTab                ├── ScheduleRow            ├── share                ├── TrendChart            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec        ├── config            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec        ├── karate-config            ├── spec        ├── benchmark```
+├── project├── run-sim    ├── generate-certs    ├── store    ├── server    ├── database    ├── config    ├── db_session    ├── sample_projects    ├── worker/    ├── db_models        ├── scan_job        ├── autopr_helpers        ├── webhook_service        ├── mirror    ├── quality_gate        ├── scoring        ├── autofix        ├── analyzer        ├── scan_service        ├── stripe_connect        ├── github_client        ├── tenants_orm        ├── mirror_models        ├── schema        ├── users        ├── events        ├── tenants        ├── users_orm    ├── db_module/        ├── benchmark_orm        ├── installations        ├── repositories_orm        ├── installations_orm        ├── scans        ├── db_connection        ├── repositories        ├── scans_orm        ├── events_orm        ├── billing        ├── wrappers        ├── env        ├── _celery_stub            ├── marketplace            ├── maintenance        ├── tasks/            ├── autopr            ├── 0001_initial_schema    ├── events/        ├── scan_samples            ├── scan        ├── loader        ├── registry    ├── apps/        ├── models            ├── hooks            ├── pipeline        ├── base        ├── base            ├── pipeline    ├── adapters/            ├── pipeline        ├── gitea_events        ├── gitea        ├── gitlab        ├── github        ├── gitlab_events        ├── system        ├── webhook        ├── auth        ├── trend        ├── metrics        ├── badge        ├── cron        ├── webhook_v2        ├── report        ├── audit        ├── billing        ├── marketplace/            ├── deploy            ├── publish            ├── models            ├── browse            ├── connect        ├── mirror        ├── autopr            ├── billing        ├── benchmark        ├── mcp/            ├── resources            ├── models        ├── config        ├── config        ├── config            ├── tools        ├── App        ├── constants        ├── main            ├── useAuth            ├── usePolling            ├── useSession            ├── useBenchmarkState            ├── useBenchmarkTracking        ├── api            ├── useRepoList            ├── useAppState            ├── useUrlState            ├── useAuditActions            ├── useBilling            ├── Header            ├── LanguageBar            ├── MarketplaceDashboard            ├── MetricCard            ├── ProgressSteps            ├── useDownloads            ├── RecommendationCard            ├── GradeCircle        ├── components/            ├── Preview            ├── PaywallModal            ├── LoginMultiPlatform            ├── ShareButtons            ├── InstallButton            ├── AppCard                ├── BenchmarkDecisionPanel                ├── BenchmarkReviewPanel                ├── RecommendationFeedbackForm            ├── phases/                ├── AuthPhase                ├── ScanningPhase                    ├── ErrorResult                ├── ReposPhase                    ├── ResultMetrics                    ├── ResultRecommendations                    ├── DownloadButtons                    ├── index/                ├── LanguageBar                    ├── ResultHeader                ├── MetricCard                ├── RecommendationCard                    ├── ResultTabPanel                ├── GradeCircle            ├── ui/                ├── LandingPhase                ├── TrendTab                ├── recentScansHelpers                ├── RepoTab                    ├── parts                ├── PRBotTab                ├── TrendSummaryCard            ├── tabs/                    ├── parts                ├── SettingsTab                ├── AddScheduleForm                ├── MarketplaceTab                    ├── parts                ├── BadgeTab                ├── RecentScansTab                ├── ScheduleRow            ├── spec            ├── spec            ├── share                ├── TrendChart            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec                ├── cy            ├── spec            ├── spec            ├── spec    ├── run-sim        ├── config            ├── spec        ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec        ├── karate-config    ├── server    ├── server```
 
 ## API Overview
 
@@ -165,6 +165,9 @@ www/
 - **`BenchmarkCase`** — —
 - **`BenchmarkEvent`** — —
 - **`RecommendationFeedback`** — —
+- **`BranchManager`** — Manages GitHub branch operations.
+- **`PatchApplier`** — Applies patches to files in a GitHub repository.
+- **`PRCreator`** — Creates GitHub PRs and issues.
 - **`MirrorService`** — Service for mirroring repos to local Gitea.
 - **`FunctionResult`** — —
 - **`FileResult`** — —
@@ -179,18 +182,18 @@ www/
 - **`UsageTracker`** — Tracks usage per tenant for billing purposes.
 - **`StripeBilling`** — Stripe integration for usage-based billing.
 - **`AppRegistry`** — Central registry for all marketplace apps.
+- **`EventType`** — Supported event types across all platforms.
+- **`ProviderType`** — Supported git providers.
+- **`Event`** — Unified event representation across all git platforms.
 - **`SecurityApp`** — Security vulnerability scanner.
 - **`AppResult`** — Standard result format for all apps.
 - **`AppContext`** — Context passed to apps during execution.
 - **`AppBase`** — Base class for all marketplace apps.
-- **`AuditApp`** — Main code quality audit app.
 - **`GitProvider`** — Abstract base class for git platform integrations.
 - **`PerformanceApp`** — Performance bottleneck analyzer.
-- **`GitLabAdapter`** — GitLab API implementation of GitProvider.
+- **`AuditApp`** — Main code quality audit app.
 - **`GiteaAdapter`** — Gitea API implementation of GitProvider.
-- **`EventType`** — Supported event types across all platforms.
-- **`ProviderType`** — Supported git providers.
-- **`Event`** — Unified event representation across all git platforms.
+- **`GitLabAdapter`** — GitLab API implementation of GitProvider.
 - **`GitHubAdapter`** — GitHub API implementation of GitProvider.
 - **`ScheduleCreate`** — —
 - **`ScheduleOut`** — —
@@ -205,31 +208,32 @@ www/
 - **`AutoFixResponse`** — —
 - **`ConnectRegisterRequest`** — —
 - **`PayoutRequest`** — —
-- **`MCPResource`** — MCP Resource definition.
-- **`MCPTool`** — MCP Tool definition.
-- **`MCPResourceResponse`** — MCP resource content response.
-- **`MCPToolRequest`** — MCP tool invocation request.
-- **`PatchFile`** — —
-- **`AutoPRRequest`** — —
-- **`AutoPRResult`** — —
 - **`CreateMirrorRequest`** — —
 - **`SyncMirrorRequest`** — —
 - **`MirrorResponse`** — —
 - **`MirrorInfo`** — —
+- **`PatchFile`** — —
+- **`AutoPRRequest`** — —
+- **`AutoPRResult`** — —
 - **`CaseCreate`** — —
 - **`CaseUpdate`** — —
 - **`DecisionPayload`** — —
 - **`FeedbackPayload`** — —
 - **`EventPayload`** — —
+- **`MCPResource`** — MCP Resource definition.
+- **`MCPTool`** — MCP Tool definition.
+- **`MCPResourceResponse`** — MCP resource content response.
+- **`MCPToolRequest`** — MCP tool invocation request.
 
 ### Functions
 
 - `lifespan(app)` — —
-- `get_sample_projects()` — Return list of sample projects for scanning.
 - `get_db()` — Get database session for dependency injection.
 - `init_db()` — Initialize database with all tables.
+- `get_sample_projects()` — Return list of sample projects for scanning.
 - `get_celery_app()` — Get configured Celery application instance.
 - `run_scheduled_scan(repo, token, webhook_url)` — Execute a full audit pipeline for *repo* (scheduled, no HTTP context).
+- `generate_fix_id(repo, proposal_type)` — Generate a unique fix ID for tracking.
 - `get_adapter_for_event(event, token)` — Factory function - get appropriate adapter for event provider.
 - `process_pr_event(event, provider)` — Process pull request event - audit repo and comment results.
 - `process_push_event(event, provider)` — Process push event - trigger analysis if main branch.
@@ -249,21 +253,21 @@ www/
 - `calculate_health_score(stats, complexity, duplication, quality)` — Calculate 0-100 health score from metrics.
 - `score_to_grade(score)` — Convert score to letter grade.
 - `generate_recommendations(complexity, duplication, quality)` — Generate actionable recommendations based on metrics.
-- `create_connect_account(email, country)` — Create a Stripe Express Connect account for a publisher.
-- `create_onboarding_link(account_id)` — Return onboarding URL for publisher to complete KYC.
-- `get_account_status(account_id)` — Return payouts_enabled, charges_enabled, requirements.
-- `transfer_revenue(amount_cents, account_id, metadata)` — Transfer publisher share (70%) to their Connect account.
 - `count_code_stats(repo_path)` — Count source files and lines.
 - `analyze_complexity(repo_path)` — Analyze code complexity using Python (no external tools).
 - `analyze_duplication(repo_path)` — Analyze code duplication using Python (no external tools).
 - `analyze_quality(repo_path)` — Analyze code quality using Python (no external tools).
 - `analyze_repo(repo, commit_sha, config)` — Analyze a repository and return health metrics.
 - `run_tool(name, args, fallback)` — Run a semcod tool, return JSON result or fallback.
+- `create_connect_account(email, country)` — Create a Stripe Express Connect account for a publisher.
+- `create_onboarding_link(account_id)` — Return onboarding URL for publisher to complete KYC.
+- `get_account_status(account_id)` — Return payouts_enabled, charges_enabled, requirements.
+- `transfer_revenue(amount_cents, account_id, metadata)` — Transfer publisher share (70%) to their Connect account.
 - `get_installation_token(installation_id)` — Get GitHub App installation access token using JWT.
 - `get_or_create_tenant(db, provider, provider_user_id, login)` — Get existing tenant or create new one.
 - `get_tenant_by_id(db, tenant_id)` — Get tenant by ID.
 - `update_tenant_plan(db, tenant_id, plan, billing_customer_id)` — Update tenant's billing plan.
-- `get_connection()` — Get database connection based on DB_TYPE.
+- `init_db()` — Initialize the database and create tables.
 - `convert_query(query)` — Convert query placeholders based on DB_TYPE.
 - `execute_query(cursor, query, params)` — Execute query with automatic placeholder conversion.
 - `upsert_user(github_id, login, name, avatar_url)` — Create or update a user. Returns the user dict.
@@ -272,16 +276,12 @@ www/
 - `get_subscription(user_id)` — Get active subscription for a user. Returns None if not found (treat as free).
 - `upsert_subscription(user_id, plan, stripe_customer_id, stripe_subscription_id)` — Create or update subscription for a user.
 - `increment_scan_count(user_id)` — Increment scans_this_week counter. Resets if a new week has started. Returns new count.
-- `get_connection()` — Get database connection based on DB_TYPE.
-- `init_db()` — Initialize the database and create tables.
-- `get_connection()` — Get database connection based on DB_TYPE.
-- `get_or_create_tenant(provider, provider_user_id, login, name)` — Get existing tenant or create new one.
-- `get_tenant_by_id(tenant_id)` — Get tenant by ID.
-- `update_tenant_plan(tenant_id, plan, billing_customer_id, billing_subscription_id)` — Update tenant's billing plan.
-- `get_connection()` — Get database connection based on DB_TYPE.
 - `queue_event(event_id, event_type, provider, repo_full_name)` — Queue a new event for processing.
 - `get_pending_events(limit)` — Get pending events for processing.
 - `update_event_status(event_id, status, error_message)` — Update event processing status.
+- `get_or_create_tenant(provider, provider_user_id, login, name)` — Get existing tenant or create new one.
+- `get_tenant_by_id(tenant_id)` — Get tenant by ID.
+- `update_tenant_plan(tenant_id, plan, billing_customer_id, billing_subscription_id)` — Update tenant's billing plan.
 - `upsert_user(db, github_id, login, name)` — Create or update a user. Returns the user dict.
 - `get_user_by_github_id(db, github_id)` — Get user by GitHub ID.
 - `get_user_by_id(db, user_id)` — Get user by internal ID.
@@ -297,7 +297,6 @@ www/
 - `upsert_recommendation_feedback(db, case_id, recommendation_id, payload)` — —
 - `get_feedback_for_case(db, case_id)` — —
 - `get_benchmark_summary(db)` — —
-- `get_connection()` — Get database connection based on DB_TYPE.
 - `create_installation(tenant_id, repository_id, apps, webhook_id)` — Create app installation for a repository.
 - `get_installation(tenant_id, repository_id)` — Get installation by tenant and repository.
 - `get_tenant_installations(tenant_id)` — Get all installations for a tenant.
@@ -311,7 +310,6 @@ www/
 - `get_tenant_installations(db, tenant_id)` — Get all installations for a tenant.
 - `delete_installation(db, tenant_id, repository_id)` — Delete installation (soft delete - set inactive).
 - `update_installation_scan(db, tenant_id, repository_id, score)` — Update last scan info for installation.
-- `get_connection()` — Get database connection based on DB_TYPE.
 - `save_scan(scan_data)` — Save a scan to the database.
 - `get_recent_scans(limit)` — Get recent scans from the database.
 - `get_repo_scans(repo, limit)` — Get scans for a specific repository ordered by date ascending.
@@ -320,6 +318,10 @@ www/
 - `get_audit_result(audit_id)` — Get audit result from database.
 - `save_badge_cache(repo, badge_data)` — Save badge cache to database.
 - `get_badge_cache(repo)` — Get badge cache from database.
+- `get_connection()` — Get database connection based on DB_TYPE.
+- `get_or_create_repository(tenant_id, provider, repo_provider_id, name)` — Get existing repository or create new one for tenant.
+- `get_tenant_repositories(tenant_id)` — Get all repositories for a tenant.
+- `get_repository_by_full_name(tenant_id, provider, full_name)` — Get repository by tenant + provider + full_name.
 - `save_scan(db, scan_data)` — Save a scan to the database.
 - `get_recent_scans(db, limit)` — Get recent scans from the database.
 - `get_repo_scans(db, repo, limit)` — Get scans for a specific repository ordered by date ascending.
@@ -328,19 +330,11 @@ www/
 - `get_audit_result(db, audit_id)` — Get audit result from database.
 - `save_badge_cache(db, repo, badge_data)` — Save badge cache to database.
 - `get_badge_cache(db, repo)` — Get badge cache from database.
-- `get_connection()` — Get database connection based on DB_TYPE.
-- `get_or_create_repository(tenant_id, provider, repo_provider_id, name)` — Get existing repository or create new one for tenant.
-- `get_tenant_repositories(tenant_id)` — Get all repositories for a tenant.
-- `get_repository_by_full_name(tenant_id, provider, full_name)` — Get repository by tenant + provider + full_name.
-- `get_usage_tracker()` — Get singleton usage tracker.
-- `get_stripe_billing()` — Get singleton Stripe billing.
-- `get_url()` — Get DB URL from env, fallback to alembic.ini.
-- `run_migrations_offline()` — Run migrations in 'offline' mode (generates SQL without a connection).
-- `run_migrations_online()` — Run migrations in 'online' mode (requires live DB connection).
 - `queue_event(db, event_id, event_type, provider)` — Queue a new event for processing.
 - `get_pending_events(db, limit)` — Get pending events for processing.
 - `update_event_status(db, event_id, status, error_message)` — Update event processing status.
-- `shared_task(fn)` — Drop-in replacement for celery.shared_task with no broker dependency.
+- `get_usage_tracker()` — Get singleton usage tracker.
+- `get_stripe_billing()` — Get singleton Stripe billing.
 - `save_scan(scan_data)` — —
 - `get_recent_scans(limit)` — —
 - `get_repo_scans(repo, limit)` — —
@@ -378,14 +372,18 @@ www/
 - `upsert_recommendation_feedback(case_id, recommendation_id, payload)` — —
 - `get_feedback_for_case(case_id)` — —
 - `get_benchmark_summary()` — —
+- `get_url()` — Get DB URL from env, fallback to alembic.ini.
+- `run_migrations_offline()` — Run migrations in 'offline' mode (generates SQL without a connection).
+- `run_migrations_online()` — Run migrations in 'online' mode (requires live DB connection).
+- `shared_task(fn)` — Drop-in replacement for celery.shared_task with no broker dependency.
 - `sync_mirror_task(self, mirror_id, source_repo, source_provider)` — Sync mirror from source to Gitea asynchronously.
 - `schedule_periodic_mirrors()` — Schedule periodic sync for all active mirrors.
-- `upgrade()` — —
-- `downgrade()` — —
 - `check_health_regression(repo, previous_score, new_score, threshold)` — Check if health score regressed and create issue if needed.
 - `check_score_and_notify(repo, previous_score, new_score, tenant_id)` — Check if score improved after auto-fix and send notifications.
 - `create_auto_pr(self, repo, base_branch, patches)` — Create automated PR with fixes asynchronously.
 - `create_auto_fix_pr(self, repo, base_branch, files)` — Create automated PR with fixes asynchronously.
+- `upgrade()` — —
+- `downgrade()` — —
 - `scan_sample_projects()` — Scan all sample projects and save to database.
 - `run_audit(self, repo, commit_sha, config)` — Run code audit on a repository asynchronously.
 - `process_pr_event(self, event_dict)` — Process pull request event asynchronously.
@@ -401,17 +399,16 @@ www/
 - `on_pr_comment(event, context)` — Handle PR comment commands.
 - `get_adapter_for_event(event, token)` — Factory function - get appropriate adapter for event provider.
 - `parse_gitea_event(payload)` — Parse Gitea webhook payload into unified Event.
+- `parse_github_event(payload)` — Parse GitHub webhook payload into unified Event.
 - `parse_gitlab_event(payload)` — Parse GitLab webhook payload into unified Event.
 - `health_check()` — Health check endpoint with cache stats.
 - `get_domain_config()` — Return the configured domain from environment.
-- `parse_github_event(payload)` — Parse GitHub webhook payload into unified Event.
 - `github_webhook(request)` — Handle GitHub webhook events.
 - `create_session_token(user_id)` — —
 - `decode_session_token(token)` — —
 - `get_current_user(credentials)` — —
 - `github_oauth_start()` — Step 1: Redirect user to GitHub OAuth.
 - `github_oauth_callback(code)` — Step 2: Exchange code for token, fetch profile, create user, issue JWT.
-- `demo_login()` — Demo login: create a demo user and return JWT session token.
 - `get_me(user)` — —
 - `logout()` — —
 - `list_repos(user)` — List user's repos for audit selection.
@@ -457,17 +454,66 @@ www/
 - `register_publisher(request, user)` — Create a Stripe Express Connect account for this publisher.
 - `connect_status(account_id, user)` — Return Connect account status (payouts_enabled, requirements).
 - `trigger_payout(request, user)` — Transfer revenue share to a publisher's Connect account.
+- `create_mirror(request, user)` — Create new mirror from GitHub/GitLab to local Gitea.
+- `sync_mirror(request, user)` — Sync existing mirror with latest changes from source.
+- `list_mirrors(user)` — List all mirrors for current user.
+- `get_mirror(mirror_id, user)` — Get mirror by ID.
+- `delete_mirror(mirror_id, user)` — Delete mirror.
+- `create_auto_pr(body, user)` — Apply LLM-generated patches to a repository and create a GitHub PR.
 - `get_billing_status(user)` — Get current billing status and usage.
 - `list_billing_plans()` — List available billing plans.
+- `post_case(body)` — —
+- `list_cases()` — —
+- `get_case(case_id)` — —
+- `patch_case(case_id, body)` — —
+- `post_decision(case_id, body)` — —
+- `post_feedback(case_id, recommendation_id, body)` — —
+- `list_feedback(case_id)` — —
+- `post_event(case_id, body)` — —
+- `list_events(case_id)` — —
+- `summary()` — —
+- `export_json()` — —
+- `export_csv()` — —
+- `mcp_server_info()` — Get MCP server information.
 - `mcp_list_resources()` — List all available MCP resources.
 - `mcp_get_resource(uri)` — Get content of a specific MCP resource by URI.
+- `PUBLIC_URL()` — —
 - `mcp_list_tools()` — List all available MCP tools.
 - `mcp_invoke_tool(request)` — Invoke an MCP tool with the provided arguments.
-- `mcp_server_info()` — Get MCP server information.
 - `API()` — —
 - `gradeColor()` — —
-- `PUBLIC_URL()` — —
-- `create_auto_pr(body, user)` — Apply LLM-generated patches to a repository and create a GitHub PR.
+- `useSessionCallbackBootstrap()` — —
+- `searchParams()` — —
+- `session()` — —
+- `useSessionProfile()` — —
+- `getOAuthStartUrl()` — —
+- `confirmAuthFlow()` — —
+- `logoutSession()` — —
+- `useScanAnimation()` — —
+- `timers()` — —
+- `done()` — —
+- `useAuditPolling()` — —
+- `pollCount()` — —
+- `MAX_POLLS()` — —
+- `poll()` — —
+- `data()` — —
+- `interval()` — —
+- `shouldStop()` — —
+- `useSession()` — —
+- `startOAuth()` — —
+- `confirmAuth()` — —
+- `clearSession()` — —
+- `useBenchmarkState()` — —
+- `safeTrack()` — —
+- `useBenchmarkTracking()` — —
+- `prevPhase()` — —
+- `trackedResultEntry()` — —
+- `startedAt()` — —
+- `prev()` — —
+- `elapsed()` — —
+- `trackExport()` — —
+- `trackRecommendationOpened()` — —
+- `trackDecision()` — —
 - `authHeaders()` — —
 - `fetchMe()` — —
 - `res()` — —
@@ -475,7 +521,6 @@ www/
 - `fetchRepos()` — —
 - `startAudit()` — —
 - `fetchAudit()` — —
-- `demoLogin()` — —
 - `fetchBillingStatus()` — —
 - `createCheckoutSession()` — —
 - `analyzePublicRepo()` — —
@@ -498,40 +543,14 @@ www/
 - `trackBenchmarkEvent()` — —
 - `fetchBenchmarkSummary()` — —
 - `downloadBenchmarkExport()` — —
-- `useSessionCallbackBootstrap()` — —
-- `searchParams()` — —
+- `useRepoList()` — —
+- `useAppState()` — —
 - `session()` — —
-- `useSessionProfile()` — —
-- `getOAuthStartUrl()` — —
-- `confirmAuthFlow()` — —
-- `startDemoSession()` — —
-- `data()` — —
-- `logoutSession()` — —
-- `useScanAnimation()` — —
-- `timers()` — —
-- `done()` — —
-- `useAuditPolling()` — —
-- `pollCount()` — —
-- `MAX_POLLS()` — —
-- `poll()` — —
-- `data()` — —
-- `interval()` — —
-- `shouldStop()` — —
-- `create_mirror(request, user)` — Create new mirror from GitHub/GitLab to local Gitea.
-- `sync_mirror(request, user)` — Sync existing mirror with latest changes from source.
-- `list_mirrors(user)` — List all mirrors for current user.
-- `get_mirror(mirror_id, user)` — Get mirror by ID.
-- `delete_mirror(mirror_id, user)` — Delete mirror.
-- `safeTrack()` — —
-- `useBenchmarkTracking()` — —
-- `prevPhase()` — —
-- `trackedResultEntry()` — —
-- `startedAt()` — —
-- `prev()` — —
-- `elapsed()` — —
-- `trackExport()` — —
-- `trackRecommendationOpened()` — —
-- `trackDecision()` — —
+- `billing()` — —
+- `audit()` — —
+- `benchmark()` — —
+- `reset()` — —
+- `doLogout()` — —
 - `VALID_TABS()` — —
 - `VALID_PHASES()` — —
 - `parseRepositoryReference()` — —
@@ -540,15 +559,17 @@ www/
 - `parts()` — —
 - `createSelectedRepo()` — —
 - `parsed()` — —
-- `useHashBootstrap()` — —
-- `hash()` — —
+- `parseHashState()` — —
 - `params()` — —
-- `tabParam()` — —
-- `phaseParam()` — —
-- `repoParam()` — —
-- `sandboxMode()` — —
+- `tab()` — —
+- `phase()` — —
+- `repo()` — —
+- `sandbox()` — —
+- `audit()` — —
+- `restoreAuditFromHash()` — —
+- `useHashBootstrap()` — —
+- `state()` — —
 - `repoData()` — —
-- `auditParam()` — —
 - `useHashSync()` — —
 - `useAuditActions()` — —
 - `startAudit()` — —
@@ -557,24 +578,26 @@ www/
 - `url()` — —
 - `repoData()` — —
 - `resetAudit()` — —
-- `useAppState()` — —
-- `demoUser()` — —
-- `reset()` — —
-- `startOAuth()` — —
-- `confirmAuth()` — —
-- `startDemoLogin()` — —
-- `doLogout()` — —
 - `useBilling()` — —
 - `refreshBilling()` — —
 - `checkScanAllowed()` — —
 - `openCheckout()` — —
 - `dismissPaywall()` — —
+- `Header()` — —
+- `tabBtn()` — —
+- `LanguageBar()` — —
+- `total()` — —
+- `entries()` — —
 - `loadData()` — —
 - `toggleApp()` — —
 - `handleRepoSelect()` — —
 - `isRepoInstalled()` — —
-- `Header()` — —
-- `tabBtn()` — —
+- `MetricCard()` — —
+- `ProgressSteps()` — —
+- `currentIdx()` — —
+- `stepIdx()` — —
+- `done()` — —
+- `active()` — —
 - `recommendationLabel()` — —
 - `recommendationLine()` — —
 - `markdownRecommendationLine()` — —
@@ -596,15 +619,6 @@ www/
 - `handleDownloadMarkdown()` — —
 - `handleDownloadToon()` — —
 - `handleGenericDownload()` — —
-- `LanguageBar()` — —
-- `total()` — —
-- `entries()` — —
-- `MetricCard()` — —
-- `ProgressSteps()` — —
-- `currentIdx()` — —
-- `stepIdx()` — —
-- `done()` — —
-- `active()` — —
 - `RecommendationCard()` — —
 - `GradeCircle()` — —
 - `color()` — —
@@ -612,56 +626,57 @@ www/
 - `circ()` — —
 - `targetOffset()` — —
 - `t()` — —
-- `PlanCard()` — —
-- `PaywallModal()` — —
 - `loadPreview()` — —
 - `result()` — —
 - `formatComment()` — —
 - `getSeverityIcon()` — —
+- `PlanCard()` — —
+- `PaywallModal()` — —
 - `GitHubIcon()` — —
 - `GitLabIcon()` — —
 - `GiteaIcon()` — —
 - `ShareButtons()` — —
 - `handleShare()` — —
 - `shareUrls()` — —
-- `isPro()` — —
-- `getAppIcon()` — —
-- `getTriggerIcon()` — —
-- `handleSubmit()` — —
 - `checkStatus()` — —
 - `result()` — —
 - `handleInstall()` — —
 - `handleUninstall()` — —
-- `ScoreSelect()` — —
+- `isPro()` — —
+- `getAppIcon()` — —
+- `getTriggerIcon()` — —
 - `handleSubmit()` — —
 - `caseId()` — —
 - `setCaseId()` — —
 - `handleCreate()` — —
+- `ScoreSelect()` — —
+- `handleSubmit()` — —
 - `AuthPhase()` — —
 - `handleLogin()` — —
-- `handleDemoLogin()` — —
-- `data()` — —
 - `ScanningPhase()` — —
-- `ReposPhase()` — —
 - `ErrorResult()` — —
-- `ResultRecommendations()` — —
+- `ReposPhase()` — —
 - `ResultMetrics()` — —
-- `LandingPhase()` — —
-- `fetchRecentScans()` — —
-- `response()` — —
-- `data()` — —
-- `formatDate()` — —
-- `date()` — —
+- `ResultRecommendations()` — —
 - `DownloadButtons()` — —
 - `active()` — —
-- `ResultHeader()` — —
-- `ResultTabPanel()` — —
 - `ResultPhase()` — —
 - `data()` — —
 - `repoName()` — —
 - `activeContent()` — —
 - `handleCopy()` — —
 - `handleDownload()` — —
+- `ResultHeader()` — —
+- `ResultTabPanel()` — —
+- `LandingPhase()` — —
+- `fetchRecentScans()` — —
+- `response()` — —
+- `data()` — —
+- `formatDate()` — —
+- `date()` — —
+- `TrendTab()` — —
+- `repoName()` — —
+- `history()` — —
 - `fetchRecentScans()` — —
 - `response()` — —
 - `data()` — —
@@ -670,18 +685,42 @@ www/
 - `getPrimaryLanguage()` — —
 - `openRecentScanRepository()` — —
 - `openRecentScanAudit()` — —
-- `PRBotTab()` — —
 - `RepoTab()` — —
-- `TrendTab()` — —
-- `repoName()` — —
-- `history()` — —
+- `TrendEmptyState()` — —
+- `TrendHeader()` — —
+- `DaySelector()` — —
+- `DayButton()` — —
+- `TrendLoadingState()` — —
+- `TrendErrorState()` — —
+- `TrendContent()` — —
 - `latest()` — —
 - `prev()` — —
 - `delta()` — —
 - `directionColor()` — —
+- `getDirectionColor()` — —
+- `TrendSummaryCards()` — —
+- `TrendChartContainer()` — —
+- `PRBotTab()` — —
 - `TrendSummaryCard()` — —
 - `sign()` — —
 - `deltaColor()` — —
+- `SectionHeader()` — —
+- `BillingSection()` — —
+- `plan()` — —
+- `planColor()` — —
+- `handleBillingPortal()` — —
+- `getPlanColor()` — —
+- `BillingPortalButton()` — —
+- `SchedulesSection()` — —
+- `handleDelete()` — —
+- `AddScheduleButton()` — —
+- `SchedulesList()` — —
+- `SettingsTab()` — —
+- `loadSchedules()` — —
+- `AddScheduleForm()` — —
+- `handleSubmit()` — —
+- `MarketplaceTab()` — —
+- `provider()` — —
 - `LanguageBadge()` — —
 - `language()` — —
 - `ScanMetrics()` — —
@@ -689,8 +728,6 @@ www/
 - `RecentScansEmptyState()` — —
 - `RecentScansHeader()` — —
 - `RecentScansBadgeInfo()` — —
-- `AddScheduleForm()` — —
-- `handleSubmit()` — —
 - `BadgeSVG()` — —
 - `color()` — —
 - `labelW()` — —
@@ -698,18 +735,10 @@ www/
 - `valueW()` — —
 - `BadgeTab()` — —
 - `badgeUrl()` — —
-- `MarketplaceTab()` — —
-- `provider()` — —
 - `RecentScansTab()` — —
-- `SectionHeader()` — —
-- `SettingsTab()` — —
-- `loadSchedules()` — —
-- `handleDelete()` — —
-- `handleBillingPortal()` — —
-- `plan()` — —
-- `planColor()` — —
 - `ScheduleRow()` — —
 - `handleDelete()` — —
+- `input()` — —
 - `generateShareText()` — —
 - `grade()` — —
 - `score()` — —
@@ -727,13 +756,21 @@ www/
 - `x()` — —
 - `y()` — —
 - `points()` — —
-- `input()` — —
 - `recentSection()` — —
 - `isVisible()` — —
 - `scanCards()` — —
 - `count()` — —
 - `scanCard()` — —
 - `viewButton()` — —
+- `twitterButton()` — —
+- `linkedinButton()` — —
+- `blueskyButton()` — —
+- `anyVisible()` — —
+- `shareButtons()` — —
+- `count()` — —
+- `recentSection()` — —
+- `isVisible()` — —
+- `baseURL()` — —
 - `response()` — —
 - `data()` — —
 - `scan()` — —
@@ -756,15 +793,44 @@ www/
 - `exp()` — —
 - `exportBody()` — —
 - `dup()` — —
+- `API()` — —
+- `infoRes()` — —
+- `info()` — —
+- `resourcesRes()` — —
+- `resources()` — —
+- `toolsRes()` — —
+- `tools()` — —
+- `toolNames()` — —
+- `invokeRes()` — —
+- `invokeBody()` — —
+- `create()` — —
+- `patch()` — —
+- `decision()` — —
+- `feedback()` — —
+- `event()` — —
+- `exp()` — —
+- `exportBody()` — —
+- `res()` — —
+- `ct()` — —
+- `dup()` — —
+- `API()` — —
+- `res()` — —
+- `ct()` — —
+- `body()` — —
+- `errorText()` — —
+- `marketplaceContent()` — —
+- `found()` — —
+- `el()` — —
+- `pricingText()` — —
+- `hasPricing()` — —
+- `auditTab()` — —
+- `badgeTab()` — —
+- `marketTab()` — —
+- `jsonErrors()` — —
+- `url()` — —
 - `input()` — —
-- `twitterButton()` — —
-- `linkedinButton()` — —
-- `blueskyButton()` — —
-- `anyVisible()` — —
-- `shareButtons()` — —
-- `count()` — —
-- `recentSection()` — —
-- `isVisible()` — —
+- `FRONTEND_URL()` — —
+- `MOCK_GITHUB_URL()` — —
 - `currentUrl()` — —
 - `recentScansSection()` — —
 - `isVisible()` — —
@@ -774,7 +840,50 @@ www/
 - `linkedinVisible()` — —
 - `recentTab()` — —
 - `isTabVisible()` — —
+- `FRONTEND_URL()` — —
+- `MOCK_GITHUB_URL()` — —
+- `res()` — —
+- `loginElement()` — —
+- `element()` — —
+- `currentUrl()` — —
+- `userBtn()` — —
+- `isLoggedIn()` — —
+- `content()` — —
+- `testOAuthFlow()` — —
+- `loginClicked()` — —
+- `userButtonClicked()` — —
+- `attemptLogin()` — —
+- `attemptUserLogin()` — —
+- `checkLoginStatus()` — —
+- `FRONTEND_URL()` — —
+- `MOCK_GITHUB_URL()` — —
+- `BACKEND_URL()` — —
+- `res()` — —
+- `body()` — —
+- `issueRes()` — —
+- `tokenRes()` — —
+- `tokenBody()` — —
+- `userRes()` — —
+- `user()` — —
+- `reposRes()` — —
+- `repos()` — —
+- `loginBtn()` — —
+- `userBtn()` — —
 - `input()` — —
+- `FRONTEND_URL()` — —
+- `MOCK_GITHUB_URL()` — —
+- `BACKEND_URL()` — —
+- `res()` — —
+- `body()` — —
+- `issueRes()` — —
+- `tokenRes()` — —
+- `tokenBody()` — —
+- `userRes()` — —
+- `user()` — —
+- `reposRes()` — —
+- `repos()` — —
+- `loginBtn()` — —
+- `userBtn()` — —
 - `skipInCI()` — —
 - `recentSection()` — —
 - `isVisible()` — —
@@ -786,6 +895,13 @@ www/
 - `count()` — —
 - `demoButton()` — —
 - `isVisible()` — —
+- `skipInCI()` — —
+- `response()` — —
+- `data()` — —
+- `scan()` — —
+- `listResponse()` — —
+- `listData()` — —
+- `repo()` — —
 - `input()` — —
 - `sandboxBadge()` — —
 - `hasSandbox()` — —
@@ -796,13 +912,6 @@ www/
 - `heading()` — —
 - `isVisible()` — —
 - `recentTab()` — —
-- `skipInCI()` — —
-- `response()` — —
-- `data()` — —
-- `scan()` — —
-- `listResponse()` — —
-- `listData()` — —
-- `repo()` — —
 - `input()` — —
 - `reportVisible()` — —
 - `noScansMessage()` — —
@@ -818,16 +927,6 @@ www/
 - `blueskyVisible()` — —
 - `recentSection()` — —
 - `isVisible()` — —
-- `currentUrl()` — —
-- `recentScansSection()` — —
-- `isVisible()` — —
-- `twitterButton()` — —
-- `linkedinButton()` — —
-- `twitterVisible()` — —
-- `linkedinVisible()` — —
-- `recentTab()` — —
-- `isTabVisible()` — —
-- `fn()` — —
 - `tabButton()` — —
 - `element()` — —
 - `isVisible()` — —
@@ -839,22 +938,36 @@ www/
 - `avatarVisible()` — —
 - `demoIndicator()` — —
 - `demoVisible()` — —
-- `post_case(body)` — —
-- `list_cases()` — —
-- `get_case(case_id)` — —
-- `patch_case(case_id, body)` — —
-- `post_decision(case_id, body)` — —
-- `post_feedback(case_id, recommendation_id, body)` — —
-- `list_feedback(case_id)` — —
-- `post_event(case_id, body)` — —
-- `list_events(case_id)` — —
-- `summary()` — —
-- `export_json()` — —
-- `export_csv()` — —
+- `currentUrl()` — —
+- `recentScansSection()` — —
+- `isVisible()` — —
+- `twitterButton()` — —
+- `linkedinButton()` — —
+- `twitterVisible()` — —
+- `linkedinVisible()` — —
+- `recentTab()` — —
+- `isTabVisible()` — —
+- `fn()` — —
+- `get_mock_user()` — Get mock user configuration from environment variables.
+- `authorize(client_id, redirect_uri, scope, state)` — Show a simple login page that lets testers pick a user.
+- `issue_code(request)` — Internal endpoint: register an auth code.
+- `access_token(request)` — Exchange code for access token (mimics GitHub).
+- `get_user(authorization)` — —
+- `get_repos(authorization, per_page, page, sort)` — —
+- `health()` — —
+- `authorize(client_id, redirect_uri, scope, state)` — Show a simple login page that lets testers pick a user.
+- `issue_code(request)` — Internal endpoint: register an auth code.
+- `access_token(request)` — Exchange code for access token (mimics GitHub).
+- `get_user(authorization)` — —
+- `get_repos(authorization, per_page, page, sort)` — —
+- `health()` — —
 
 
 ## Project Structure
 
+📄 `TODO.github-login-sim.spec` (16 functions)
+📄 `TODO.run-sim`
+📄 `TODO.server` (7 functions)
 📦 `backend.adapters` (1 functions)
 📄 `backend.adapters.base` (19 functions, 1 classes)
 📄 `backend.adapters.gitea` (21 functions, 1 classes)
@@ -877,18 +990,19 @@ www/
 📄 `backend.db_models` (1 functions, 13 classes)
 📦 `backend.db_module`
 📄 `backend.db_module.benchmark_orm` (11 functions)
-📄 `backend.db_module.events` (4 functions)
+📄 `backend.db_module.db_connection` (1 functions)
+📄 `backend.db_module.events` (3 functions)
 📄 `backend.db_module.events_orm` (3 functions)
-📄 `backend.db_module.installations` (6 functions)
+📄 `backend.db_module.installations` (5 functions)
 📄 `backend.db_module.installations_orm` (5 functions)
-📄 `backend.db_module.repositories` (4 functions)
+📄 `backend.db_module.repositories` (3 functions)
 📄 `backend.db_module.repositories_orm` (3 functions)
-📄 `backend.db_module.scans` (9 functions)
+📄 `backend.db_module.scans` (8 functions)
 📄 `backend.db_module.scans_orm` (8 functions)
-📄 `backend.db_module.schema` (2 functions)
-📄 `backend.db_module.tenants` (4 functions)
+📄 `backend.db_module.schema` (1 functions)
+📄 `backend.db_module.tenants` (3 functions)
 📄 `backend.db_module.tenants_orm` (3 functions)
-📄 `backend.db_module.users` (9 functions)
+📄 `backend.db_module.users` (8 functions)
 📄 `backend.db_module.users_orm` (6 functions)
 📄 `backend.db_module.wrappers` (37 functions)
 📄 `backend.db_session` (3 functions)
@@ -896,8 +1010,8 @@ www/
 📄 `backend.events.models` (5 functions, 3 classes)
 📄 `backend.quality_gate` (12 functions, 3 classes)
 📄 `backend.routers.audit` (8 functions)
-📄 `backend.routers.auth` (9 functions)
-📄 `backend.routers.autopr` (12 functions, 3 classes)
+📄 `backend.routers.auth` (8 functions)
+📄 `backend.routers.autopr` (2 functions, 3 classes)
 📄 `backend.routers.badge` (4 functions)
 📄 `backend.routers.benchmark` (12 functions, 5 classes)
 📄 `backend.routers.billing` (12 functions, 2 classes)
@@ -926,6 +1040,7 @@ www/
 📄 `backend.server` (1 functions)
 📄 `backend.services.analyzer` (13 functions)
 📄 `backend.services.autofix` (8 functions, 4 classes)
+📄 `backend.services.autopr_helpers` (11 functions, 3 classes)
 📄 `backend.services.billing` (16 functions, 3 classes)
 📄 `backend.services.github_client` (1 functions)
 📄 `backend.services.mirror` (11 functions, 1 classes)
@@ -955,17 +1070,22 @@ www/
 📄 `e2e.specs.scan-workflow.spec` (9 functions)
 📄 `e2e.specs.smoke.spec` (2 functions)
 📄 `e2e.specs.social-sharing.spec` (33 functions)
+📄 `frontend.cypress.e2e.oauth-login.cy` (2 functions)
 📄 `frontend.e2e.audit.spec`
 📄 `frontend.e2e.badge.spec` (1 functions)
 📄 `frontend.e2e.benchmark.spec` (18 functions)
-📄 `frontend.e2e.metrics.spec` (13 functions)
+📄 `frontend.e2e.github-login-sim.spec` (16 functions)
+📄 `frontend.e2e.gui-login-enhanced.spec` (18 functions)
+📄 `frontend.e2e.marketplace-flow.spec` (20 functions)
+📄 `frontend.e2e.metrics.spec` (14 functions)
 📄 `frontend.e2e.recent-scans.spec` (8 functions)
 📄 `frontend.e2e.scan-workflow.spec` (9 functions)
 📄 `frontend.e2e.smoke.spec` (1 functions)
 📄 `frontend.e2e.social-sharing.spec` (10 functions)
+📄 `frontend.e2e.system-integration.spec` (27 functions)
 📄 `frontend.playwright.config`
 📄 `frontend.src.App`
-📄 `frontend.src.api` (55 functions)
+📄 `frontend.src.api` (53 functions)
 📦 `frontend.src.components`
 📄 `frontend.src.components.AppCard` (3 functions)
 📄 `frontend.src.components.GradeCircle` (6 functions)
@@ -984,7 +1104,7 @@ www/
 📄 `frontend.src.components.benchmark.BenchmarkReviewPanel` (3 functions)
 📄 `frontend.src.components.benchmark.RecommendationFeedbackForm` (2 functions)
 📦 `frontend.src.components.phases`
-📄 `frontend.src.components.phases.AuthPhase` (4 functions)
+📄 `frontend.src.components.phases.AuthPhase` (2 functions)
 📄 `frontend.src.components.phases.LandingPhase` (6 functions)
 📄 `frontend.src.components.phases.ReposPhase` (1 functions)
 📄 `frontend.src.components.phases.ScanningPhase` (1 functions)
@@ -1004,10 +1124,12 @@ www/
 📄 `frontend.src.components.tabs.RecentScansTab.parts` (7 functions)
 📄 `frontend.src.components.tabs.RepoTab` (1 functions)
 📄 `frontend.src.components.tabs.ScheduleRow` (2 functions)
-📄 `frontend.src.components.tabs.SettingsTab` (7 functions)
+📄 `frontend.src.components.tabs.SettingsTab` (2 functions)
+📄 `frontend.src.components.tabs.SettingsTab.parts` (11 functions)
 📄 `frontend.src.components.tabs.TrendChart` (9 functions)
 📄 `frontend.src.components.tabs.TrendSummaryCard` (3 functions)
-📄 `frontend.src.components.tabs.TrendTab` (7 functions)
+📄 `frontend.src.components.tabs.TrendTab` (3 functions)
+📄 `frontend.src.components.tabs.TrendTab.parts` (14 functions)
 📄 `frontend.src.components.tabs.recentScansHelpers` (8 functions)
 📦 `frontend.src.components.ui`
 📄 `frontend.src.components.ui.GradeCircle`
@@ -1018,22 +1140,26 @@ www/
 📄 `frontend.src.constants` (2 functions)
 📄 `frontend.src.hooks.useAppState` (7 functions)
 📄 `frontend.src.hooks.useAuditActions` (8 functions)
-📄 `frontend.src.hooks.useAuth` (9 functions)
+📄 `frontend.src.hooks.useAuth` (7 functions)
+📄 `frontend.src.hooks.useBenchmarkState` (1 functions)
 📄 `frontend.src.hooks.useBenchmarkTracking` (10 functions)
 📄 `frontend.src.hooks.useBilling` (5 functions)
 📄 `frontend.src.hooks.useDownloads` (21 functions)
 📄 `frontend.src.hooks.usePolling` (10 functions)
-📄 `frontend.src.hooks.useUrlState` (19 functions)
+📄 `frontend.src.hooks.useRepoList` (1 functions)
+📄 `frontend.src.hooks.useSession` (4 functions)
+📄 `frontend.src.hooks.useUrlState` (21 functions)
 📄 `frontend.src.main`
 📄 `frontend.src.utils.share` (8 functions)
 📄 `frontend.vite.config`
+📄 `mock-github.server` (8 functions)
 📄 `project`
+📄 `run-sim`
 📄 `traefik.generate-certs`
 
 ## Requirements
 
-- Python >= >=3.8
-- fastapi >=0.110.0- httpx >=0.27.0- PyJWT >=2.8.0- goal >=2.1.0- costs >=0.1.20- pfix >=0.1.60
+- axios ^1.15.0
 
 ## Contributing
 

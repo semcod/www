@@ -1,19 +1,21 @@
 flowchart TD
+    TODO__server["TODO.server<br/>7 funcs"]
     backend__adapters["backend.adapters<br/>88 funcs"]
     backend__apps["backend.apps<br/>49 funcs"]
-    backend__db_module["backend.db_module<br/>114 funcs"]
+    backend__db_module["backend.db_module<br/>108 funcs"]
     backend__db_session["backend.db_session<br/>3 funcs"]
-    backend__routers["backend.routers<br/>130 funcs"]
+    backend__routers["backend.routers<br/>119 funcs"]
     backend__sample_projects["backend.sample_projects<br/>1 funcs"]
     backend__scheduler["backend.scheduler<br/>16 funcs"]
     backend__scripts["backend.scripts<br/>1 funcs"]
     backend__server["backend.server<br/>1 funcs"]
-    backend__services["backend.services<br/>66 funcs"]
+    backend__services["backend.services<br/>77 funcs"]
     backend__worker["backend.worker<br/>22 funcs"]
-    frontend__e2e["frontend.e2e<br/>47 funcs"]
-    frontend__src["frontend.src<br/>257 funcs"]
-    backend__routers ==>|69| backend__db_module
-    backend__routers ==>|35| backend__services
+    frontend__e2e["frontend.e2e<br/>112 funcs"]
+    frontend__src["frontend.src<br/>276 funcs"]
+    mock_github__server["mock-github.server<br/>8 funcs"]
+    backend__routers ==>|68| backend__db_module
+    backend__routers ==>|45| backend__services
     backend__scheduler ==>|8| backend__services
     backend__services -->|3| backend__adapters
     backend__worker -->|3| backend__services
@@ -21,8 +23,12 @@ flowchart TD
     backend__scheduler -->|2| backend__db_module
     backend__services -->|2| backend__db_module
     backend__routers -->|2| backend__apps
+    TODO__server -->|2| frontend__src
+    mock_github__server -->|2| frontend__src
     backend__db_session -->|1| frontend__src
     backend__worker -->|1| backend__db_module
     backend__scripts -->|1| backend__sample_projects
     backend__scripts -->|1| backend__routers
     backend__apps -->|1| frontend__e2e
+    TODO__server -->|1| frontend__e2e
+    mock_github__server -->|1| frontend__e2e

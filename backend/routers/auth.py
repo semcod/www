@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import RedirectResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-from config import APP_URL, FRONTEND_URL, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_SCOPE, SECRET_KEY, SESSION_EXPIRE_HOURS, REPOS_PER_PAGE, GITHUB_OAUTH_AUTHORIZE_URL, GITHUB_OAUTH_TOKEN_URL, GITHUB_API_BASE_URL
+from config import APP_URL, FRONTEND_URL, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_SCOPE, SECRET_KEY, SESSION_EXPIRE_HOURS, REPOS_PER_PAGE, GITHUB_OAUTH_AUTHORIZE_URL, GITHUB_OAUTH_TOKEN_URL, GITHUB_API_BASE_URL, GITEA_CLIENT_ID, GITEA_CLIENT_SECRET, GITEA_OAUTH_AUTHORIZE_URL, GITEA_OAUTH_TOKEN_URL, GITEA_API_BASE_URL
 from database import upsert_user, get_user_by_id
 
 router = APIRouter()
@@ -101,6 +101,68 @@ async def github_oauth_callback(code: str):
     return RedirectResponse(f"{FRONTEND_URL}/audit?session={session_token}")
 
 
+
+
+@router.get("/auth/gitea")
+async def gitea_oauth_start():
+    """Step 1: Redirect user to Gitea OAuth."""
+    if not GITEA_CLIENT_ID or not GITEA_OAUTH_AUTHORIZE_URL:
+        raise HTTPException(501, "Gitea OAuth not configured")
+    from urllib.parse import urlencode
+    params = urlencode({
+        "client_id": GITEA_CLIENT_ID,
+        "redirect_uri": f"{APP_URL}/auth/callback/gitea",
+        "response_type": "code",
+        "scope": "repo",
+    })
+    return RedirectResponse(f"{GITEA_OAUTH_AUTHORIZE_URL}?{params}")
+
+
+@router.get("/auth/callback/gitea")
+async def gitea_oauth_callback(code: str):
+    """Step 2: Exchange code for token, fetch profile, create user, issue JWT."""
+    if not GITEA_CLIENT_ID or not GITEA_OAUTH_TOKEN_URL:
+        raise HTTPException(501, "Gitea OAuth not configured")
+
+    async with httpx.AsyncClient() as client:
+        token_resp = await client.post(
+            GITEA_OAUTH_TOKEN_URL,
+            json={
+                "client_id": GITEA_CLIENT_ID,
+                "client_secret": GITEA_CLIENT_SECRET,
+                "code": code,
+                "grant_type": "authorization_code",
+                "redirect_uri": f"{APP_URL}/auth/callback/gitea",
+            },
+            headers={"Accept": "application/json"},
+        )
+        token_data = token_resp.json()
+
+    gitea_token = token_data.get("access_token")
+    if not gitea_token:
+        raise HTTPException(400, "Gitea OAuth failed")
+
+    async with httpx.AsyncClient() as client:
+        profile_resp = await client.get(
+            f"{GITEA_API_BASE_URL}/api/v1/user",
+            headers={"Authorization": f"token {gitea_token}"},
+        )
+    profile = profile_resp.json()
+
+    gitea_id = profile.get("id")
+    if not gitea_id:
+        raise HTTPException(400, "Failed to fetch Gitea profile")
+
+    user = upsert_user(
+        github_id=gitea_id,
+        login=profile.get("login", ""),
+        name=profile.get("full_name", "") or profile.get("login", ""),
+        avatar_url=profile.get("avatar_url", ""),
+        github_token=gitea_token,
+    )
+
+    session_token = create_session_token(user["id"])
+    return RedirectResponse(f"{FRONTEND_URL}/audit?session={session_token}")
 
 
 @router.get("/api/me")

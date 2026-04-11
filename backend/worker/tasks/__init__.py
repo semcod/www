@@ -19,6 +19,13 @@ from .marketplace import (
     sync_mirror_task,
     schedule_periodic_mirrors,
 )
+from .redsl import (
+    task_redsl_analyze,
+    task_redsl_refactor,
+    task_redsl_health_check,
+    task_redsl_scheduled_quality_check,
+    task_redsl_scheduled_auto_refactor,
+)
 
 # Re-export all tasks for backward compatibility
 __all__ = [
@@ -34,4 +41,9 @@ __all__ = [
     "check_score_and_notify",
     "sync_mirror_task",
     "schedule_periodic_mirrors",
+    "task_redsl_analyze",
+    "task_redsl_refactor",
+    "task_redsl_health_check",
+    "task_redsl_scheduled_quality_check",
+    "task_redsl_scheduled_auto_refactor",
 ]

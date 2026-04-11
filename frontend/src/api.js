@@ -248,3 +248,56 @@ export async function fetchBenchmarkSummary() {
 export function downloadBenchmarkExport(format) {
   window.open(`${API}/api/benchmark/export.${format}`, "_blank");
 }
+
+
+// ─── ReDSL ────────────────────────────────────────────────────────────────────
+
+export async function getRedslStatus() {
+  const res = await fetch(`${API}/api/redsl/status`);
+  if (!res.ok) throw new Error("Failed to check reDSL status");
+  return res.json();
+}
+
+export async function redslAnalyze(projectPath, projectToon = null) {
+  const res = await fetch(`${API}/api/redsl/analyze`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ project_path: projectPath, project_toon: projectToon }),
+  });
+  if (!res.ok) throw new Error("Failed to run reDSL analysis");
+  return res.json();
+}
+
+export async function redslHealth(projectPath) {
+  const res = await fetch(`${API}/api/redsl/health`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ project_path: projectPath }),
+  });
+  if (!res.ok) throw new Error("Failed to get reDSL health score");
+  return res.json();
+}
+
+export async function redslRefactor(projectPath, maxActions = 10, dryRun = true) {
+  const res = await fetch(`${API}/api/redsl/refactor`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ project_path: projectPath, max_actions: maxActions, dry_run: dryRun }),
+  });
+  if (!res.ok) throw new Error("Failed to run reDSL refactor");
+  return res.json();
+}
+
+export async function redslDecide(projectPath) {
+  const res = await fetch(`${API}/api/redsl/decide`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ project_path: projectPath }),
+  });
+  if (!res.ok) throw new Error("Failed to run reDSL decide");
+  return res.json();
+}
+
+export function redslBadgeUrl(owner, repo) {
+  return `${API}/api/redsl/badge/${owner}/${repo}`;
+}

@@ -3,25 +3,8 @@
 import sqlite3
 from datetime import datetime, timezone
 from typing import Dict, Optional
-from config import DB_PATH, DB_TYPE, DATABASE_URL
-
-# Try to use psycopg2 for PostgreSQL if available
-try:
-    import psycopg2
-    from psycopg2.extras import RealDictCursor
-    USE_POSTGRES = (DB_TYPE == "postgresql")
-except ImportError:
-    USE_POSTGRES = False
-
-
-def get_connection():
-    """Get database connection based on DB_TYPE."""
-    if USE_POSTGRES and DATABASE_URL:
-        return psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
-    else:
-        conn = sqlite3.connect(DB_PATH, timeout=30.0)
-        conn.row_factory = sqlite3.Row
-        return conn
+from config import DB_PATH
+from .db_connection import get_connection, USE_POSTGRES
 
 
 def convert_query(query: str) -> str:

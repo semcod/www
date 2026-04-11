@@ -93,6 +93,10 @@ def create_benchmark_event(db: Session, case_id: str, payload: Dict) -> Dict:
     db.add(ev)
     db.commit()
     db.refresh(ev)
+    return _event_to_dict(ev)
+
+
+def _event_to_dict(ev: BenchmarkEvent) -> Dict:
     return {
         "id": ev.id,
         "case_id": ev.case_id,
@@ -108,18 +112,7 @@ def get_benchmark_events(db: Session, case_id: str) -> List[Dict]:
     rows = db.execute(
         select(BenchmarkEvent).where(BenchmarkEvent.case_id == case_id).order_by(BenchmarkEvent.created_at.asc())
     ).scalars().all()
-    return [
-        {
-            "id": r.id,
-            "case_id": r.case_id,
-            "audit_id": r.audit_id,
-            "event_name": r.event_name,
-            "event_value": r.event_value,
-            "metadata": json.loads(r.metadata_json or "{}"),
-            "created_at": r.created_at.isoformat() if r.created_at else None,
-        }
-        for r in rows
-    ]
+    return [_event_to_dict(r) for r in rows]
 
 
 # ─── RecommendationFeedback ───────────────────────────────────────────────────
@@ -133,28 +126,39 @@ def upsert_recommendation_feedback(db: Session, case_id: str, recommendation_id:
     ).scalar_one_or_none()
 
     if row:
-        for k in ("accepted", "novelty_score", "usefulness_score", "accuracy_score",
-                  "actionability_score", "business_value_score", "notes"):
-            if k in payload and payload[k] is not None:
-                setattr(row, k, payload[k])
+        _update_feedback_fields(row, payload)
     else:
-        row = RecommendationFeedback(
-            case_id=case_id,
-            audit_id=payload.get("audit_id"),
-            recommendation_id=recommendation_id,
-            accepted=payload.get("accepted"),
-            novelty_score=payload.get("novelty_score"),
-            usefulness_score=payload.get("usefulness_score"),
-            accuracy_score=payload.get("accuracy_score"),
-            actionability_score=payload.get("actionability_score"),
-            business_value_score=payload.get("business_value_score"),
-            notes=payload.get("notes", ""),
-        )
+        row = _build_feedback_row(case_id, recommendation_id, payload)
         db.add(row)
 
     db.commit()
     db.refresh(row)
     return _feedback_to_dict(row)
+
+
+_FEEDBACK_FIELDS = ("accepted", "novelty_score", "usefulness_score", "accuracy_score",
+                    "actionability_score", "business_value_score", "notes")
+
+
+def _update_feedback_fields(row: RecommendationFeedback, payload: Dict) -> None:
+    for k in _FEEDBACK_FIELDS:
+        if k in payload and payload[k] is not None:
+            setattr(row, k, payload[k])
+
+
+def _build_feedback_row(case_id: str, recommendation_id: str, payload: Dict) -> RecommendationFeedback:
+    return RecommendationFeedback(
+        case_id=case_id,
+        audit_id=payload.get("audit_id"),
+        recommendation_id=recommendation_id,
+        accepted=payload.get("accepted"),
+        novelty_score=payload.get("novelty_score"),
+        usefulness_score=payload.get("usefulness_score"),
+        accuracy_score=payload.get("accuracy_score"),
+        actionability_score=payload.get("actionability_score"),
+        business_value_score=payload.get("business_value_score"),
+        notes=payload.get("notes", ""),
+    )
 
 
 def get_feedback_for_case(db: Session, case_id: str) -> List[Dict]:
@@ -193,15 +197,23 @@ def get_benchmark_summary(db: Session) -> Dict:
     ).scalar() or 0
 
     feedback_rows = db.execute(select(RecommendationFeedback)).scalars().all()
+    fb_stats = _compute_feedback_stats(feedback_rows)
+
+    return {
+        "total_cases": total,
+        "pr_conversion_rate": round(pr_candidates / total, 3) if total else 0,
+        "deployment_decision_rate": round(deployment_decisions / total, 3) if total else 0,
+        **fb_stats,
+    }
+
+
+def _compute_feedback_stats(feedback_rows: list) -> Dict:
     total_fb = len(feedback_rows)
     accepted = sum(1 for f in feedback_rows if f.accepted)
     novelty_scores = [f.novelty_score for f in feedback_rows if f.novelty_score is not None]
     novel_high = sum(1 for s in novelty_scores if s >= 2)
 
     return {
-        "total_cases": total,
-        "pr_conversion_rate": round(pr_candidates / total, 3) if total else 0,
-        "deployment_decision_rate": round(deployment_decisions / total, 3) if total else 0,
         "total_feedback": total_fb,
         "recommendation_acceptance_rate": round(accepted / total_fb, 3) if total_fb else 0,
         "novel_actionable_finding_rate": round(novel_high / len(novelty_scores), 3) if novelty_scores else 0,

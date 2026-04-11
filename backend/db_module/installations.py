@@ -1,31 +1,11 @@
-from config import DB_PATH, DB_TYPE, DATABASE_URL
-
-# Try to use psycopg2 for PostgreSQL if available
-try:
-    import psycopg2
-    from psycopg2.extras import RealDictCursor
-    USE_POSTGRES = (DB_TYPE == "postgresql")
-except ImportError:
-    USE_POSTGRES = False
-
-
-def get_connection():
-    """Get database connection based on DB_TYPE."""
-    if USE_POSTGRES and DATABASE_URL:
-        return psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
-    else:
-        import sqlite3
-        conn = sqlite3.connect(DB_PATH, timeout=30.0)
-        conn.row_factory = sqlite3.Row  # Enable dict-like access for SQLite
-        return conn
-
 """Installation database operations."""
 
 import sqlite3
 import json
+from config import DB_PATH
+from .db_connection import get_connection, USE_POSTGRES
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
-from config import DB_PATH
 
 
 def create_installation(tenant_id: int, repository_id: int, apps: List[str],

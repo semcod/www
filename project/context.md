@@ -3,18 +3,18 @@
 ## Overview
 
 - **Project**: /home/tom/github/semcod/www
-- **Primary Language**: python
-- **Languages**: python: 87, javascript: 85, shell: 2
+- **Primary Language**: javascript
+- **Languages**: javascript: 96, python: 91, shell: 4
 - **Analysis Mode**: static
-- **Total Functions**: 883
-- **Total Classes**: 70
-- **Modules**: 174
-- **Entry Points**: 677
+- **Total Functions**: 992
+- **Total Classes**: 73
+- **Modules**: 191
+- **Entry Points**: 788
 
 ## Architecture by Module
 
 ### frontend.src.api
-- **Functions**: 55
+- **Functions**: 53
 - **File**: `api.js`
 
 ### backend.db_module.wrappers
@@ -24,6 +24,10 @@
 ### e2e.specs.social-sharing.spec
 - **Functions**: 33
 - **File**: `social-sharing.spec.js`
+
+### frontend.e2e.system-integration.spec
+- **Functions**: 27
+- **File**: `system-integration.spec.js`
 
 ### backend.adapters.github
 - **Functions**: 22
@@ -40,27 +44,51 @@
 - **Classes**: 1
 - **File**: `gitea.py`
 
+### frontend.src.hooks.useUrlState
+- **Functions**: 21
+- **File**: `useUrlState.js`
+
 ### frontend.src.hooks.useDownloads
 - **Functions**: 21
 - **File**: `useDownloads.js`
+
+### frontend.e2e.marketplace-flow.spec
+- **Functions**: 20
+- **File**: `marketplace-flow.spec.js`
 
 ### backend.adapters.base
 - **Functions**: 19
 - **Classes**: 1
 - **File**: `base.py`
 
-### frontend.src.hooks.useUrlState
-- **Functions**: 19
-- **File**: `useUrlState.js`
-
 ### frontend.e2e.benchmark.spec
 - **Functions**: 18
 - **File**: `benchmark.spec.js`
+
+### frontend.e2e.gui-login-enhanced.spec
+- **Functions**: 18
+- **File**: `gui-login-enhanced.spec.js`
 
 ### backend.services.billing
 - **Functions**: 16
 - **Classes**: 3
 - **File**: `billing.py`
+
+### frontend.e2e.github-login-sim.spec
+- **Functions**: 16
+- **File**: `github-login-sim.spec.js`
+
+### TODO.github-login-sim.spec
+- **Functions**: 16
+- **File**: `github-login-sim.spec.js`
+
+### frontend.src.components.tabs.TrendTab.parts
+- **Functions**: 14
+- **File**: `TrendTab.parts.jsx`
+
+### frontend.e2e.metrics.spec
+- **Functions**: 14
+- **File**: `metrics.spec.js`
 
 ### e2e.specs.metrics.spec
 - **Functions**: 14
@@ -69,39 +97,6 @@
 ### backend.services.analyzer
 - **Functions**: 13
 - **File**: `analyzer.py`
-
-### backend.apps.base
-- **Functions**: 13
-- **Classes**: 3
-- **File**: `base.py`
-
-### frontend.e2e.metrics.spec
-- **Functions**: 13
-- **File**: `metrics.spec.js`
-
-### e2e.specs.gui-views.spec
-- **Functions**: 13
-- **File**: `gui-views.spec.js`
-
-### backend.quality_gate
-- **Functions**: 12
-- **Classes**: 3
-- **File**: `quality_gate.py`
-
-### backend.routers.billing
-- **Functions**: 12
-- **Classes**: 2
-- **File**: `billing.py`
-
-### backend.routers.autopr
-- **Functions**: 12
-- **Classes**: 3
-- **File**: `autopr.py`
-
-### backend.routers.benchmark
-- **Functions**: 12
-- **Classes**: 5
-- **File**: `benchmark.py`
 
 ## Key Entry Points
 
@@ -132,17 +127,11 @@ Response format:
         "g
 - **Calls**: router.get, backend.db_module.scans.get_recent_scans, backend.db_module.scans.get_total_scan_count, formatted_scans.append, HTTPException, None.lower, scan.get, backend.routers.metrics._utc_now_iso
 
-### backend.routers.autopr.create_auto_pr
-> Apply LLM-generated patches to a repository and create a GitHub PR.
+### frontend.e2e.gui-login-enhanced.spec.FRONTEND_URL
+- **Calls**: frontend.e2e.gui-login-enhanced.spec.describe, frontend.e2e.gui-login-enhanced.spec.beforeAll, frontend.e2e.gui-login-enhanced.spec.get, frontend.e2e.gui-login-enhanced.spec.expect, frontend.e2e.gui-login-enhanced.spec.ok, frontend.e2e.gui-login-enhanced.spec.toBeTruthy, frontend.e2e.gui-login-enhanced.spec.test, frontend.e2e.gui-login-enhanced.spec.testOAuthFlow
 
-Flow:
-  1. Create branch feat/semcod-fix-{id}
-  2. Commit each patch file
-  3. Ch
-- **Calls**: router.post, Depends, user.get, backend.db_module.scans.get_repo_scans, HTTPException, None.hexdigest, backend.routers.autopr._score_improved, backend.routers.autopr._build_pr_body
-
-### frontend.src.hooks.useAppState.useAppState
-- **Calls**: frontend.src.hooks.useAppState.useState, frontend.src.hooks.useAppState.getItem, frontend.src.hooks.useAppState.useBilling, frontend.src.hooks.useAppState.useAuditActions, frontend.src.hooks.useAppState.callback, frontend.src.hooks.useAppState.useSessionCallbackBootstrap, frontend.src.hooks.useAppState.useSessionProfile, frontend.src.hooks.useAppState.useHashBootstrap
+### frontend.e2e.gui-login-enhanced.spec.MOCK_GITHUB_URL
+- **Calls**: frontend.e2e.gui-login-enhanced.spec.describe, frontend.e2e.gui-login-enhanced.spec.beforeAll, frontend.e2e.gui-login-enhanced.spec.get, frontend.e2e.gui-login-enhanced.spec.expect, frontend.e2e.gui-login-enhanced.spec.ok, frontend.e2e.gui-login-enhanced.spec.toBeTruthy, frontend.e2e.gui-login-enhanced.spec.test, frontend.e2e.gui-login-enhanced.spec.testOAuthFlow
 
 ### backend.services.mirror.MirrorService.sync_mirror
 > Sync mirror by pulling latest changes from source and pushing to Gitea.
@@ -171,6 +160,24 @@ Flow:
 4. Comment results
 - **Calls**: backend.worker._celery_stub.shared_task, Event, backend.worker.tasks.scan._get_token_for_provider, backend.services.webhook_service.get_adapter_for_event, asyncio.run, asyncio.run, backend.worker.tasks.scan._format_pr_comment, asyncio.run
 
+### frontend.e2e.github-login-sim.spec.FRONTEND_URL
+- **Calls**: frontend.e2e.github-login-sim.spec.describe, frontend.e2e.github-login-sim.spec.beforeAll, frontend.e2e.github-login-sim.spec.get, frontend.e2e.github-login-sim.spec.expect, frontend.e2e.github-login-sim.spec.ok, frontend.e2e.github-login-sim.spec.toBeTruthy, frontend.e2e.github-login-sim.spec.json, frontend.e2e.github-login-sim.spec.toBe
+
+### frontend.e2e.github-login-sim.spec.MOCK_GITHUB_URL
+- **Calls**: frontend.e2e.github-login-sim.spec.describe, frontend.e2e.github-login-sim.spec.beforeAll, frontend.e2e.github-login-sim.spec.get, frontend.e2e.github-login-sim.spec.expect, frontend.e2e.github-login-sim.spec.ok, frontend.e2e.github-login-sim.spec.toBeTruthy, frontend.e2e.github-login-sim.spec.json, frontend.e2e.github-login-sim.spec.toBe
+
+### frontend.e2e.github-login-sim.spec.BACKEND_URL
+- **Calls**: frontend.e2e.github-login-sim.spec.describe, frontend.e2e.github-login-sim.spec.beforeAll, frontend.e2e.github-login-sim.spec.get, frontend.e2e.github-login-sim.spec.expect, frontend.e2e.github-login-sim.spec.ok, frontend.e2e.github-login-sim.spec.toBeTruthy, frontend.e2e.github-login-sim.spec.json, frontend.e2e.github-login-sim.spec.toBe
+
+### TODO.github-login-sim.spec.FRONTEND_URL
+- **Calls**: TODO.github-login-sim.spec.describe, TODO.github-login-sim.spec.beforeAll, TODO.github-login-sim.spec.get, TODO.github-login-sim.spec.expect, TODO.github-login-sim.spec.ok, TODO.github-login-sim.spec.toBeTruthy, TODO.github-login-sim.spec.json, TODO.github-login-sim.spec.toBe
+
+### TODO.github-login-sim.spec.MOCK_GITHUB_URL
+- **Calls**: TODO.github-login-sim.spec.describe, TODO.github-login-sim.spec.beforeAll, TODO.github-login-sim.spec.get, TODO.github-login-sim.spec.expect, TODO.github-login-sim.spec.ok, TODO.github-login-sim.spec.toBeTruthy, TODO.github-login-sim.spec.json, TODO.github-login-sim.spec.toBe
+
+### TODO.github-login-sim.spec.BACKEND_URL
+- **Calls**: TODO.github-login-sim.spec.describe, TODO.github-login-sim.spec.beforeAll, TODO.github-login-sim.spec.get, TODO.github-login-sim.spec.expect, TODO.github-login-sim.spec.ok, TODO.github-login-sim.spec.toBeTruthy, TODO.github-login-sim.spec.json, TODO.github-login-sim.spec.toBe
+
 ### backend.routers.marketplace.publish.install_app
 > Install Semcod app on a repository.
 
@@ -180,6 +187,15 @@ This:
 3. Stores installation in DB
 4. Sets up webhook on the pr
 - **Calls**: router.post, Depends, str, backend.db_module.tenants_orm.get_or_create_tenant, request.repo.split, backend.db_module.repositories_orm.get_or_create_repository, backend.db_module.installations.create_installation, InstallResponse
+
+### backend.routers.autopr.create_auto_pr
+> Apply LLM-generated patches to a repository and create a GitHub PR.
+
+Flow:
+  1. Create branch feat/semcod-fix-{id}
+  2. Commit each patch file
+  3. Ch
+- **Calls**: router.post, Depends, user.get, backend.services.autopr_helpers.generate_fix_id, backend.db_module.scans.get_repo_scans, HTTPException, backend.routers.autopr._score_improved, PRCreator.build_pr_body
 
 ### backend.worker.tasks.autopr.create_auto_pr
 > Create automated PR with fixes asynchronously.
@@ -206,7 +222,7 @@ Flow:
 
 ### backend.db_module.schema.init_db
 > Initialize the database and create tables.
-- **Calls**: backend.db_module.schema.get_connection, conn.cursor, cursor.execute, cursor.execute, cursor.execute, cursor.execute, cursor.execute, cursor.execute
+- **Calls**: backend.db_module.db_connection.get_connection, conn.cursor, cursor.execute, cursor.execute, cursor.execute, cursor.execute, cursor.execute, cursor.execute
 
 ### backend.routers.audit.run_audit
 > Run one-click audit on a repo. Requires authentication.
@@ -222,7 +238,7 @@ Flow:
 
 ### backend.db_module.repositories.get_or_create_repository
 > Get existing repository or create new one for tenant.
-- **Calls**: backend.db_module.repositories.get_connection, conn.cursor, cursor.execute, cursor.fetchone, None.isoformat, None.join, cursor.execute, conn.commit
+- **Calls**: backend.db_module.db_connection.get_connection, conn.cursor, cursor.execute, cursor.fetchone, None.isoformat, None.join, cursor.execute, conn.commit
 
 ### backend.routers.webhook.github_webhook
 > Handle GitHub webhook events.
@@ -236,37 +252,6 @@ Useful for dashboards and monitoring.
 ### backend.routers.marketplace.publish.get_app_status
 > Get installation status and last scan results for a repo.
 - **Calls**: router.get, Depends, str, backend.db_module.tenants_orm.get_or_create_tenant, backend.db_module.repositories_orm.get_repository_by_full_name, backend.db_module.installations.get_installation, AppStatusResponse, AppStatusResponse
-
-### backend.routers.marketplace.billing.get_billing_status
-> Get current billing status and usage.
-- **Calls**: router.get, Depends, str, backend.db_module.tenants_orm.get_or_create_tenant, backend.services.billing.get_usage_tracker, datetime.now, usage_tracker.get_usage_report, tenant.get
-
-### backend.db_module.tenants.get_or_create_tenant
-> Get existing tenant or create new one.
-- **Calls**: backend.db_module.tenants.get_connection, conn.cursor, cursor.execute, cursor.fetchone, None.isoformat, cursor.execute, conn.commit, cursor.execute
-
-### backend.routers.marketplace.deploy.trigger_auto_fix
-> Trigger auto-fix PR generation for a repository.
-- **Calls**: router.post, Depends, backend.routers.marketplace.deploy._get_user_token, backend.routers.marketplace.deploy._get_provider_user_id, backend.db_module.tenants_orm.get_or_create_tenant, create_auto_fix_pr.delay, AutoFixResponse, HTTPException
-
-### frontend.src.hooks.useUrlState.useHashBootstrap
-- **Calls**: frontend.src.hooks.useUrlState.useEffect, frontend.src.hooks.useUrlState.slice, frontend.src.hooks.useUrlState.URLSearchParams, frontend.src.hooks.useUrlState.get, frontend.src.hooks.useUrlState.has, frontend.src.hooks.useUrlState.setTab, frontend.src.hooks.useUrlState.setPhase, frontend.src.hooks.useUrlState.setRepoUrl
-
-### backend.adapters.gitlab.GitLabAdapter.get_pr_diff
-> Get MR diff content from GitLab.
-
-Uses merge requests changes API and formats as unified diff.
-- **Calls**: self._get_project_path, resp.json, data.get, None.join, httpx.AsyncClient, HTTPException, HTTPException, change.get
-
-### backend.routers.marketplace.browse.preview_pr_comment
-> Generate preview of PR comment for a repository.
-
-This endpoint simulates analysis on a sample diff to show
-users what the bot would comment before th
-- **Calls**: router.post, Depends, backend.apps.registry.get_registry, Event, AppContext, registry.process_event, results.items, backend.routers.marketplace.browse._format_preview_comment
-
-### frontend.src.components.phases.LandingPhase.LandingPhase
-- **Calls**: frontend.src.components.phases.LandingPhase.useState, frontend.src.components.phases.LandingPhase.useEffect, frontend.src.components.phases.LandingPhase.fetchRecentScans, frontend.src.components.phases.LandingPhase.fetch, frontend.src.components.phases.LandingPhase.json, frontend.src.components.phases.LandingPhase.setRecentScans, frontend.src.components.phases.LandingPhase.error, frontend.src.components.phases.LandingPhase.Date
 
 ## Process Flows
 
@@ -293,28 +278,26 @@ scan_sample_projects [backend.scripts.scan_samples]
 analyze_repo [backend.routers.audit]
   └─> _schedule_background_task
   └─ →> save_audit_result
-      └─> get_connection
+      └─ →> get_connection
 ```
 
 ### Flow 5: get_standard_metrics
 ```
 get_standard_metrics [backend.routers.metrics]
   └─ →> get_recent_scans
-      └─> get_connection
+      └─ →> get_connection
   └─ →> get_total_scan_count
-      └─> get_connection
+      └─ →> get_connection
 ```
 
-### Flow 6: create_auto_pr
+### Flow 6: FRONTEND_URL
 ```
-create_auto_pr [backend.routers.autopr]
-  └─ →> get_repo_scans
-      └─> get_connection
+FRONTEND_URL [frontend.e2e.gui-login-enhanced.spec]
 ```
 
-### Flow 7: useAppState
+### Flow 7: MOCK_GITHUB_URL
 ```
-useAppState [frontend.src.hooks.useAppState]
+MOCK_GITHUB_URL [frontend.e2e.gui-login-enhanced.spec]
 ```
 
 ### Flow 8: sync_mirror
@@ -432,13 +415,6 @@ Detects:
 - **Methods**: 5
 - **Key Methods**: backend.worker._celery_stub._StubTask.__init__, backend.worker._celery_stub._StubTask.__call__, backend.worker._celery_stub._StubTask.run, backend.worker._celery_stub._StubTask.delay, backend.worker._celery_stub._StubTask.retry
 
-### backend.events.models.Event
-> Unified event representation across all git platforms.
-
-This class normalizes events from GitHub, Gi
-- **Methods**: 5
-- **Key Methods**: backend.events.models.Event.is_pr_event, backend.events.models.Event.is_push_event, backend.events.models.Event.is_comment_event, backend.events.models.Event.get_pr_url, backend.events.models.Event.get_clone_url
-
 ### backend.apps.security.pipeline.SecurityApp
 > Security vulnerability scanner.
 
@@ -449,28 +425,36 @@ Detects:
 - **Key Methods**: backend.apps.security.pipeline.SecurityApp.__init__, backend.apps.security.pipeline.SecurityApp.run_pipeline, backend.apps.security.pipeline.SecurityApp._get_recommendations, backend.apps.security.pipeline.SecurityApp.get_triggers, backend.apps.security.pipeline.SecurityApp.get_actions
 - **Inherits**: AppBase
 
+### backend.events.models.Event
+> Unified event representation across all git platforms.
+
+This class normalizes events from GitHub, Gi
+- **Methods**: 5
+- **Key Methods**: backend.events.models.Event.is_pr_event, backend.events.models.Event.is_push_event, backend.events.models.Event.is_comment_event, backend.events.models.Event.get_pr_url, backend.events.models.Event.get_clone_url
+
+### backend.services.autopr_helpers.PRCreator
+> Creates GitHub PRs and issues.
+- **Methods**: 4
+- **Key Methods**: backend.services.autopr_helpers.PRCreator.create_pr, backend.services.autopr_helpers.PRCreator.create_issue, backend.services.autopr_helpers.PRCreator.build_pr_body, backend.services.autopr_helpers.PRCreator.build_issue_body
+
+### backend.services.autopr_helpers.BranchManager
+> Manages GitHub branch operations.
+- **Methods**: 3
+- **Key Methods**: backend.services.autopr_helpers.BranchManager.get_default_branch, backend.services.autopr_helpers.BranchManager.get_ref_sha, backend.services.autopr_helpers.BranchManager.create_branch
+
 ### backend.services.autofix.AutoFixService
 > Service for creating auto-fix PRs.
 - **Methods**: 3
 - **Key Methods**: backend.services.autofix.AutoFixService.__init__, backend.services.autofix.AutoFixService.create_auto_fix_pr, backend.services.autofix.AutoFixService.check_score_improvement
 
+### backend.services.autopr_helpers.PatchApplier
+> Applies patches to files in a GitHub repository.
+- **Methods**: 2
+- **Key Methods**: backend.services.autopr_helpers.PatchApplier.get_file_sha, backend.services.autopr_helpers.PatchApplier.commit_file
+
 ### backend.quality_gate.FileResult
 - **Methods**: 2
 - **Key Methods**: backend.quality_gate.FileResult.max_cc, backend.quality_gate.FileResult.mean_cc
-
-### backend.apps.base.AppResult
-> Standard result format for all apps.
-- **Methods**: 1
-- **Key Methods**: backend.apps.base.AppResult.__post_init__
-
-### backend.apps.base.AppContext
-> Context passed to apps during execution.
-- **Methods**: 1
-- **Key Methods**: backend.apps.base.AppContext.__post_init__
-
-### backend.db_models.Base
-- **Methods**: 0
-- **Inherits**: DeclarativeBase
 
 ## Data Transformation Functions
 
@@ -499,13 +483,13 @@ Key functions that process and transform data:
 ### backend.quality_gate._parse_args
 - **Output to**: len, Path, len, Path, len
 
-### backend.services.autofix.PatchGenerator._parse_diff_original
-> Extract original file content from diff.
-- **Output to**: diff_text.split, line.startswith, lines.append, line.startswith, line.startswith
-
 ### backend.services.analyzer._process_file_for_duplication
 > Process a single file and update line occurrences. Returns total lines processed.
 - **Output to**: file_path.read_text, content.splitlines, backend.services.analyzer._should_skip_line, line.strip, line_occurrences.get
+
+### backend.services.autofix.PatchGenerator._parse_diff_original
+> Extract original file content from diff.
+- **Output to**: diff_text.split, line.startswith, lines.append, line.startswith, line.startswith
 
 ### backend.db_module.users.convert_query
 > Convert query placeholders based on DB_TYPE.
@@ -546,13 +530,13 @@ Return
 > Parse Gitea webhook payload into unified Event.
 - **Output to**: backend.adapters.gitea_events._detect_gitea_event_type, payload.get, repo_data.get, payload.get, pr_data.get
 
-### backend.adapters.github.parse_github_event
-> Parse GitHub webhook payload into unified Event.
-- **Output to**: backend.adapters.github._detect_github_event_type, None.get, payload.get, pr_data.get, payload.get
-
 ### backend.adapters.gitlab_events.parse_gitlab_event
 > Parse GitLab webhook payload into unified Event.
 - **Output to**: backend.adapters.gitlab_events._detect_gitlab_event_type, payload.get, project.get, payload.get, mr_data.get
+
+### backend.adapters.github.parse_github_event
+> Parse GitHub webhook payload into unified Event.
+- **Output to**: backend.adapters.github._detect_github_event_type, None.get, payload.get, pr_data.get, payload.get
 
 ### backend.routers.auth.decode_session_token
 - **Output to**: jwt.decode, HTTPException, HTTPException
@@ -572,11 +556,11 @@ Return
 
 ### frontend.src.hooks.useUrlState.parsed
 
+### frontend.src.hooks.useUrlState.parseHashState
+- **Output to**: frontend.src.hooks.useUrlState.URLSearchParams, frontend.src.hooks.useUrlState.get, frontend.src.hooks.useUrlState.has
+
 ### frontend.src.components.Preview.formatComment
 - **Output to**: frontend.src.components.Preview.replace
-
-### frontend.src.components.phases.LandingPhase.formatDate
-- **Output to**: frontend.src.components.phases.LandingPhase.Date, frontend.src.components.phases.LandingPhase.toLocaleDateString
 
 ## Public API Surface
 
@@ -590,16 +574,23 @@ Functions exposed as public API (no underscore prefix):
 - `backend.adapters.github.parse_github_event` - 29 calls
 - `backend.routers.audit.analyze_repo` - 29 calls
 - `backend.routers.metrics.get_standard_metrics` - 28 calls
-- `backend.routers.autopr.create_auto_pr` - 28 calls
-- `frontend.src.hooks.useAppState.useAppState` - 27 calls
+- `frontend.e2e.gui-login-enhanced.spec.FRONTEND_URL` - 27 calls
+- `frontend.e2e.gui-login-enhanced.spec.MOCK_GITHUB_URL` - 27 calls
 - `backend.services.mirror.MirrorService.sync_mirror` - 26 calls
 - `backend.quality_gate.main` - 26 calls
 - `backend.db_module.benchmark_orm.get_benchmark_summary` - 26 calls
 - `backend.services.mirror.MirrorService.create_mirror` - 25 calls
 - `backend.worker.tasks.scan.process_pr_event` - 25 calls
 - `backend.adapters.gitlab_events.parse_gitlab_event` - 25 calls
+- `frontend.e2e.github-login-sim.spec.FRONTEND_URL` - 25 calls
+- `frontend.e2e.github-login-sim.spec.MOCK_GITHUB_URL` - 25 calls
+- `frontend.e2e.github-login-sim.spec.BACKEND_URL` - 25 calls
+- `TODO.github-login-sim.spec.FRONTEND_URL` - 25 calls
+- `TODO.github-login-sim.spec.MOCK_GITHUB_URL` - 25 calls
+- `TODO.github-login-sim.spec.BACKEND_URL` - 25 calls
 - `backend.adapters.gitea_events.parse_gitea_event` - 24 calls
 - `backend.routers.marketplace.publish.install_app` - 24 calls
+- `backend.routers.autopr.create_auto_pr` - 24 calls
 - `backend.worker.tasks.autopr.create_auto_pr` - 23 calls
 - `backend.routers.trend.get_scan_diff` - 23 calls
 - `backend.services.autofix.AutoFixService.create_auto_fix_pr` - 22 calls
@@ -613,15 +604,8 @@ Functions exposed as public API (no underscore prefix):
 - `backend.routers.metrics.get_metrics_summary` - 17 calls
 - `backend.routers.marketplace.publish.get_app_status` - 17 calls
 - `backend.routers.marketplace.billing.get_billing_status` - 17 calls
+- `frontend.src.hooks.useAppState.useAppState` - 17 calls
 - `backend.services.analyzer.analyze_complexity` - 16 calls
-- `backend.db_module.tenants.get_or_create_tenant` - 16 calls
-- `backend.routers.marketplace.deploy.trigger_auto_fix` - 16 calls
-- `frontend.src.hooks.useUrlState.useHashBootstrap` - 16 calls
-- `backend.db_module.benchmark_orm.create_benchmark_case` - 15 calls
-- `backend.adapters.gitlab.GitLabAdapter.get_pr_diff` - 15 calls
-- `backend.routers.marketplace.browse.preview_pr_comment` - 15 calls
-- `frontend.src.components.phases.LandingPhase.LandingPhase` - 15 calls
-- `frontend.src.components.tabs.SettingsTab.SettingsTab` - 15 calls
 
 ## System Interactions
 
@@ -649,16 +633,16 @@ graph TD
     get_standard_metrics --> get_total_scan_count
     get_standard_metrics --> append
     get_standard_metrics --> HTTPException
-    create_auto_pr --> post
-    create_auto_pr --> Depends
-    create_auto_pr --> get
-    create_auto_pr --> get_repo_scans
-    create_auto_pr --> HTTPException
-    useAppState --> useState
-    useAppState --> getItem
-    useAppState --> useBilling
-    useAppState --> useAuditActions
-    useAppState --> callback
+    FRONTEND_URL --> describe
+    FRONTEND_URL --> beforeAll
+    FRONTEND_URL --> get
+    FRONTEND_URL --> expect
+    FRONTEND_URL --> ok
+    MOCK_GITHUB_URL --> describe
+    MOCK_GITHUB_URL --> beforeAll
+    MOCK_GITHUB_URL --> get
+    MOCK_GITHUB_URL --> expect
+    MOCK_GITHUB_URL --> ok
 ```
 
 ## Reverse Engineering Guidelines

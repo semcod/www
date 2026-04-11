@@ -42,17 +42,27 @@ class TestAuditLifecycle:
         finally:
             _clear_auth(app)
 
-    def test_list_repos_returns_demo_repos(self, client):
+    def test_list_repos_returns_repo_list(self, client):
         from server import app
-        _override_auth(app)
+        _override_auth(app, user={"id": 1, "login": "test-user", "name": "Test", "avatar_url": "", "github_token": "ghp_test"})
         try:
-            resp = client.get("/api/repos")
-            assert resp.status_code == 200
-            repos = resp.json()
-            assert isinstance(repos, list)
-            assert len(repos) >= 1
-            names = [r["full_name"] for r in repos]
-            assert "acme/backend-api" in names
+            # Mock httpx.AsyncClient to return test repos
+            class MockResponse:
+                def json(self):
+                    return [
+                        {"full_name": "test/repo1", "name": "repo1", "private": False, "language": "Python", "stargazers_count": 42, "size": 100, "default_branch": "main"},
+                        {"full_name": "test/repo2", "name": "repo2", "private": True, "language": "TypeScript", "stargazers_count": 10, "size": 200, "default_branch": "main"},
+                    ]
+            mock_response = MockResponse()
+            with patch("httpx.AsyncClient") as mock_client:
+                mock_client.return_value.__aenter__.return_value.get.return_value = mock_response
+                resp = client.get("/api/repos")
+                assert resp.status_code == 200
+                repos = resp.json()
+                assert isinstance(repos, list)
+                assert len(repos) >= 1
+                names = [r["full_name"] for r in repos]
+                assert "test/repo1" in names
         finally:
             _clear_auth(app)
 

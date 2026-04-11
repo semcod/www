@@ -93,7 +93,7 @@ async def get_recent_scans_api(limit: int = 100):
 
 @router.post("/api/analyze")
 async def analyze_repo(request: Request):
-    """Analyze any public repository by URL (sandbox mode)."""
+    """Analyze any public repository by URL (sandbox mode). Supports file:// for local repos."""
     body = await request.json()
     repo_url = body.get("repo_url", "")
     sandbox = body.get("sandbox", False)
@@ -101,25 +101,53 @@ async def analyze_repo(request: Request):
     if not repo_url:
         raise HTTPException(400, "repo_url required")
 
-    # Parse owner/repo from URL
-    match = (
-        re.search(r"github\.com/([^/]+)/([^/\.]+)", repo_url)
-        or re.search(r"gitlab\.com/([^/]+)/([^/\.]+)", repo_url)
-        or re.search(r"bitbucket\.org/([^/]+)/([^/\.]+)", repo_url)
-    )
+    # Initialize actual_repo_url (defaults to repo_url)
+    actual_repo_url = repo_url
 
-    if not match:
-        ssh_match = re.search(r":([^/]+)/([^/\.]+)\.?", repo_url)
-        if ssh_match:
-            match = ssh_match
+    # Support local:/ paths for mounted volume repositories
+    if repo_url.startswith("local:/"):
+        # Extract repo name from local path for audit_id
+        import os
+        path = repo_url.replace("local:/", "/local-repos/")
+        repo_name = os.path.basename(path)
+        owner = "local"
+        repo = repo_name
+        # Use the actual mounted path for git clone
+        actual_repo_url = path
+        audit_id = hashlib.sha256(
+            f"local/{repo_name}-{_utc_now_iso()}".encode()
+        ).hexdigest()[:12]
+    elif repo_url.startswith("file://"):
+        # Extract repo name from file path for audit_id
+        import os
+        path = repo_url.replace("file://", "")
+        repo_name = os.path.basename(path.rstrip("/.git"))
+        owner = "local"
+        repo = repo_name
+        actual_repo_url = path
+        audit_id = hashlib.sha256(
+            f"local/{repo_name}-{_utc_now_iso()}".encode()
+        ).hexdigest()[:12]
+    else:
+        # Parse owner/repo from URL
+        match = (
+            re.search(r"github\.com/([^/]+)/([^/\.]+)", repo_url)
+            or re.search(r"gitlab\.com/([^/]+)/([^/\.]+)", repo_url)
+            or re.search(r"bitbucket\.org/([^/]+)/([^/\.]+)", repo_url)
+        )
 
-    if not match:
-        raise HTTPException(400, "Could not parse owner/repo from URL")
+        if not match:
+            ssh_match = re.search(r":([^/]+)/([^/\.]+)\.?", repo_url)
+            if ssh_match:
+                match = ssh_match
 
-    owner, repo = match.group(1), match.group(2)
-    audit_id = hashlib.sha256(
-        f"{owner}/{repo}-{_utc_now_iso()}".encode()
-    ).hexdigest()[:12]
+        if not match:
+            raise HTTPException(400, "Could not parse owner/repo from URL")
+
+        owner, repo = match.group(1), match.group(2)
+        audit_id = hashlib.sha256(
+            f"{owner}/{repo}-{_utc_now_iso()}".encode()
+        ).hexdigest()[:12]
 
     benchmark_meta = {
         "case_id": body.get("case_id"),
@@ -140,7 +168,8 @@ async def analyze_repo(request: Request):
         **{k: v for k, v in benchmark_meta.items() if v is not None},
     })
 
-    _schedule_background_task(_run_sandbox_analysis(audit_id, repo_url, f"{owner}/{repo}"))
+    # Use actual_repo_url for local repos, otherwise repo_url
+    _schedule_background_task(_run_sandbox_analysis(audit_id, actual_repo_url, f"{owner}/{repo}"))
     return {"audit_id": audit_id, "status": "running", "sandbox": True, **{k: v for k, v in benchmark_meta.items() if v is not None}}
 
 
@@ -255,24 +284,39 @@ async def _run_sandbox_analysis(audit_id: str, repo_url: str, repo: str):
     workdir = Path(tempfile.mkdtemp(prefix="semcod-sandbox-"))
 
     try:
-        proc = await asyncio.create_subprocess_exec(
-            "git",
-            "clone",
-            "--depth=1",
-            repo_url,
-            str(workdir / "repo"),
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-        await proc.wait()
+        # Check if this is a local path (starts with /local-repos/)
+        if repo_url.startswith("/local-repos/"):
+            # Copy files directly instead of git clone
+            source_path = Path(repo_url)
+            if source_path.exists():
+                shutil.copytree(source_path, workdir / "repo")
+            else:
+                save_audit_result(audit_id, {
+                    "status": "error",
+                    "error": f"Local repository not found: {repo_url}",
+                    "repo": repo,
+                })
+                return
+        else:
+            # Use git clone for remote repos
+            proc = await asyncio.create_subprocess_exec(
+                "git",
+                "clone",
+                "--depth=1",
+                repo_url,
+                str(workdir / "repo"),
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+            await proc.wait()
 
-        if proc.returncode != 0:
-            save_audit_result(audit_id, {
-                "status": "error",
-                "error": "Failed to clone repository. Ensure it's public.",
-                "repo": repo,
-            })
-            return
+            if proc.returncode != 0:
+                save_audit_result(audit_id, {
+                    "status": "error",
+                    "error": "Failed to clone repository. Ensure it's public.",
+                    "repo": repo,
+                })
+                return
 
         repo_path = workdir / "repo"
         stats = await count_code_stats(repo_path)

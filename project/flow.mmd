@@ -8,26 +8,27 @@ flowchart TD
         backend__db_session__get_db["get_db"]
         backend__db_session__init_db["init_db"]
         backend__worker__get_celery_app["get_celery_app"]
-        backend__scheduler__scan_job__run_scheduled_scan("run_scheduled_scan CC=8")
         backend__db_models___utcnow["_utcnow"]
-        backend__services__mirror__MirrorService__create_mirror["create_mirror"]
-        backend__services__mirror__MirrorService__sync_mirror["sync_mirror"]
-        backend__services__mirror__MirrorService___get_source_adapter["_get_source_adapter"]
-        backend__services__mirror__MirrorService___get_clone_url["_get_clone_url"]
-        backend__services__mirror__MirrorService___get_gitea_clone_url["_get_gitea_clone_url"]
-        backend__services__mirror__MirrorService___create_gitea_repo["_create_gitea_repo"]
-        backend__services__mirror__MirrorService___setup_ci_cd["_setup_ci_cd"]
-        backend__services__mirror__MirrorService___generate_workflow["_generate_workflow"]
-        backend__services__mirror__MirrorService___get_latest_commit["_get_latest_commit"]
-        ...["+648 more"]
+        backend__scheduler__scan_job__run_scheduled_scan("run_scheduled_scan CC=8")
+        backend__services__autopr_helpers__BranchManager__get_default_branch["get_default_branch"]
+        backend__services__autopr_helpers__BranchManager__get_ref_sha["get_ref_sha"]
+        backend__services__autopr_helpers__BranchManager__create_branch["create_branch"]
+        backend__services__autopr_helpers__PatchApplier__get_file_sha["get_file_sha"]
+        backend__services__autopr_helpers__PatchApplier__commit_file["commit_file"]
+        backend__services__autopr_helpers__PRCreator__create_pr["create_pr"]
+        backend__services__autopr_helpers__PRCreator__create_issue["create_issue"]
+        backend__services__autopr_helpers__PRCreator__build_pr_body["build_pr_body"]
+        backend__services__autopr_helpers__PRCreator__build_issue_body["build_issue_body"]
+        ...["+758 more"]
     end
 
     subgraph Exporters
         frontend__src__api__downloadBenchmarkExport["downloadBenchmarkExport"]
         frontend__src__hooks__useBenchmarkTracking__trackExport["trackExport"]
         frontend__e2e__benchmark__spec__exportBody["exportBody"]
+        frontend__e2e__system_integration__spec__exportBody["exportBody"]
         backend__routers__benchmark__export_json["export_json"]
         backend__routers__benchmark__export_csv["export_csv"]
     end
 
-    class backend__server__lifespan,backend__db_session__get_db,backend__db_session__init_db,backend__worker__get_celery_app,backend__db_models___utcnow,backend__services__mirror__MirrorService__create_mirror,backend__services__mirror__MirrorService__sync_mirror,backend__services__mirror__MirrorService___get_source_adapter,backend__services__mirror__MirrorService___get_clone_url,backend__services__mirror__MirrorService___get_gitea_clone_url entry
+    class backend__server__lifespan,backend__db_session__get_db,backend__db_session__init_db,backend__worker__get_celery_app,backend__db_models___utcnow,backend__services__autopr_helpers__BranchManager__get_default_branch,backend__services__autopr_helpers__BranchManager__get_ref_sha,backend__services__autopr_helpers__BranchManager__create_branch,backend__services__autopr_helpers__PatchApplier__get_file_sha,backend__services__autopr_helpers__PatchApplier__commit_file entry
