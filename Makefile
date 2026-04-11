@@ -1,4 +1,4 @@
-.PHONY: help install dev dev-demo build docker-up docker-down clean venv certs quality quality-baseline pre-commit-install test-e2e-frontend
+.PHONY: help install dev build docker-up docker-down clean venv certs quality quality-baseline pre-commit-install test-e2e-frontend
 
 VENV_DIR = backend/.venv
 PYTHON = $(VENV_DIR)/bin/python
@@ -15,7 +15,6 @@ help:
 	@echo "  Środowisko deweloperskie:"
 	@echo "    make install       - Instaluje zależności (backend + frontend)"
 	@echo "    make dev           - Uruchamia backend + frontend (http)"
-	@echo "    make dev-demo      - Uruchamia backend z DEMO_MODE + frontend"
 	@echo "    make dev-backend   - Tylko backend (port $(BACKEND_PORT))"
 	@echo "    make dev-frontend  - Tylko frontend (port $(FRONTEND_PORT))"
 	@echo ""
@@ -33,7 +32,6 @@ help:
 	@echo "    make test-backend  - Testy backendu (pytest)"
 	@echo "    make test-e2e      - Testy E2E (Playwright headless)"
 	@echo "    make test-e2e-ui   - Testy E2E z Playwright UI"
-	@echo "    make test-demo     - Testy demo login (wymaga dev-demo)"
 	@echo ""
 	@echo "  Inne:"
 	@echo "    make clean              - Czyści zainstalowane zależności"
@@ -58,33 +56,22 @@ install: venv
 # Środowisko deweloperskie - obie usługi (w tle)
 dev:
 	@echo "=== Uruchamianie backendu (port $(BACKEND_PORT)) ==="
-	@cd backend && $(UVICORN) server:app --reload --port $(BACKEND_PORT) &
+	@cd backend && APP_URL=http://localhost:$(BACKEND_PORT) FRONTEND_URL=http://localhost:$(FRONTEND_PORT) $(UVICORN) server:app --reload --port $(BACKEND_PORT) &
 	@sleep 2
 	@echo "=== Uruchamianie frontendu (port $(FRONTEND_PORT)) ==="
-	@cd frontend && npm run dev -- --port $(FRONTEND_PORT) &
+	@cd frontend && VITE_API_URL=http://localhost:$(BACKEND_PORT) npm run dev -- --port $(FRONTEND_PORT) &
 	@echo "=== Usługi uruchomione ==="
 	@echo "Backend:  http://localhost:$(BACKEND_PORT)"
 	@echo "Frontend: http://localhost:$(FRONTEND_PORT)"
 
-# Środowisko deweloperskie z DEMO_MODE (logowanie bez GitHub)
-dev-demo:
-	@echo "=== Uruchamianie backendu z DEMO_MODE (port $(BACKEND_PORT)) ==="
-	@cd backend && DEMO_MODE=1 APP_URL=http://localhost:$(BACKEND_PORT) FRONTEND_URL=http://localhost:$(FRONTEND_PORT) $(UVICORN) server:app --reload --port $(BACKEND_PORT) &
-	@sleep 2
-	@echo "=== Uruchamianie frontendu (port $(FRONTEND_PORT)) ==="
-	@cd frontend && npm run dev -- --port $(FRONTEND_PORT) &
-	@echo "=== Usługi uruchomione (DEMO_MODE) ==="
-	@echo "Backend:  http://localhost:$(BACKEND_PORT)"
-	@echo "Frontend: http://localhost:$(FRONTEND_PORT)"
-	@echo "Demo login: kliknij 'Demo Login' na stronie"
 
 # Tylko backend
 dev-backend:
-	cd backend && $(UVICORN) server:app --reload --port $(BACKEND_PORT)
+	cd backend && APP_URL=http://localhost:$(BACKEND_PORT) FRONTEND_URL=http://localhost:$(FRONTEND_PORT) $(UVICORN) server:app --reload --port $(BACKEND_PORT)
 
 # Tylko frontend
 dev-frontend:
-	cd frontend && npm run dev -- --port $(FRONTEND_PORT)
+	cd frontend && VITE_API_URL=http://localhost:$(BACKEND_PORT) npm run dev -- --port $(FRONTEND_PORT)
 
 # Budowanie frontendu
 build:
@@ -99,7 +86,7 @@ docker-up: certs
 	docker compose up -d
 	@echo "=== Usługi Docker uruchomione ==="
 	@echo "App:      https://semcod.localhost"
-	@echo "Demo login: kliknij 'Demo Login' na stronie"
+	@echo "GitHub OAuth: kliknij 'Connect GitHub →' na stronie"
 
 docker-down:
 	docker compose down
@@ -138,9 +125,6 @@ test-e2e-frontend:
 	@echo "=== Uruchamianie testów E2E (frontend/e2e, Vite dev server) ==="
 	cd frontend && npx playwright test --config=playwright.config.js
 
-test-demo:
-	@echo "=== Uruchamianie testów demo login (wymaga make dev-demo) ==="
-	cd e2e && BASE_URL=http://localhost:$(FRONTEND_PORT) npx playwright test demo-login --headed
 
 # Quality gate
 quality:

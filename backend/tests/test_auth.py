@@ -146,21 +146,3 @@ def test_api_logout_returns_success():
     assert response.json()["message"] == "Logged out"
 
 
-def test_demo_login_returns_session_when_enabled(monkeypatch):
-    monkeypatch.setattr(auth_module, "DEMO_MODE", True)
-
-    response = client.post("/auth/demo")
-
-    assert response.status_code == 200
-    data = response.json()
-    assert "session" in data
-    assert len(data["session"]) > 0
-    assert data["user"]["login"] == "demo-user"
-
-
-def test_demo_login_returns_403_when_disabled(monkeypatch):
-    monkeypatch.setattr(auth_module, "DEMO_MODE", False)
-
-    response = client.post("/auth/demo")
-
-    assert response.status_code == 403

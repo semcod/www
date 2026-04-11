@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import RedirectResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-from config import APP_URL, FRONTEND_URL, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_SCOPE, SECRET_KEY, SESSION_EXPIRE_HOURS, DEMO_MODE, REPOS_PER_PAGE, GITHUB_OAUTH_AUTHORIZE_URL, GITHUB_OAUTH_TOKEN_URL, GITHUB_API_BASE_URL
+from config import APP_URL, FRONTEND_URL, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_SCOPE, SECRET_KEY, SESSION_EXPIRE_HOURS, REPOS_PER_PAGE, GITHUB_OAUTH_AUTHORIZE_URL, GITHUB_OAUTH_TOKEN_URL, GITHUB_API_BASE_URL
 from database import upsert_user, get_user_by_id
 
 router = APIRouter()
@@ -101,26 +101,6 @@ async def github_oauth_callback(code: str):
     return RedirectResponse(f"{FRONTEND_URL}/audit?session={session_token}")
 
 
-@router.post("/auth/demo")
-async def demo_login():
-    """Demo login: create a demo user and return JWT session token.
-    Only available when DEMO_MODE=1 is set.
-    """
-    if not DEMO_MODE:
-        raise HTTPException(403, "Demo mode not enabled")
-
-    import os
-    demo_token = os.getenv("GITHUB_TOKEN", os.getenv("GITHUB_CLIENT_SECRET", ""))
-
-    user = upsert_user(
-        github_id=0,
-        login="demo-user",
-        name="Demo User",
-        avatar_url="https://avatars.githubusercontent.com/u/0?v=4",
-        github_token=demo_token,
-    )
-    session_token = create_session_token(user["id"])
-    return {"session": session_token, "user": {"login": user["login"], "name": user["name"], "avatar_url": user["avatar_url"]}}
 
 
 @router.get("/api/me")
@@ -142,44 +122,7 @@ async def logout():
 async def list_repos(user: dict = Depends(get_current_user)):
     """List user's repos for audit selection."""
     if not user.get('github_token'):
-        # Return demo repos for demo mode
-        if user.get('login') == 'demo-user':
-            return [
-                {
-                    "full_name": "acme/backend-api",
-                    "name": "backend-api",
-                    "html_url": "https://github.com/acme/backend-api",
-                    "clone_url": "https://github.com/acme/backend-api.git",
-                    "language": "Python",
-                    "stars": 42,
-                    "size_kb": 1250,
-                    "private": False,
-                    "default_branch": "main",
-                },
-                {
-                    "full_name": "acme/frontend-app",
-                    "name": "frontend-app",
-                    "html_url": "https://github.com/acme/frontend-app",
-                    "clone_url": "https://github.com/acme/frontend-app.git",
-                    "language": "JavaScript",
-                    "stars": 28,
-                    "size_kb": 890,
-                    "private": False,
-                    "default_branch": "main",
-                },
-                {
-                    "full_name": "acme/data-pipeline",
-                    "name": "data-pipeline",
-                    "html_url": "https://github.com/acme/data-pipeline",
-                    "clone_url": "https://github.com/acme/data-pipeline.git",
-                    "language": "Python",
-                    "stars": 15,
-                    "size_kb": 2100,
-                    "private": False,
-                    "default_branch": "main",
-                },
-            ]
-        return []
+        raise HTTPException(status_code=401, detail="GitHub token required")
     
     async with httpx.AsyncClient() as client:
         resp = await client.get(

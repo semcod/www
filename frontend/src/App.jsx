@@ -17,7 +17,7 @@ export default function App() {
     repoUrl, setRepoUrl,
     isSandbox,
     sessionToken, user,
-    reset, startOAuth, confirmAuth, startAudit, startSandbox, startDemoLogin, doLogout,
+    reset, startOAuth, confirmAuth, startAudit, startSandbox, doLogout,
     billingStatus, paywallVisible, checkoutLoading, openCheckout, dismissPaywall,
     benchmarkCaseId, setBenchmarkCaseId,
   } = useAppState();
@@ -43,8 +43,7 @@ export default function App() {
               <LandingPhase
                 key={`landing-${Date.now()}`}
                 startOAuth={startOAuth}
-                startDemoLogin={startDemoLogin}
-                repoUrl={repoUrl}
+                                repoUrl={repoUrl}
                 setRepoUrl={setRepoUrl}
                 startSandbox={startSandbox}
               />

@@ -4,12 +4,12 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 5173,
+    port: 5174,
     proxy: {
-      '/api': 'http://localhost:9000',
-      '/auth': 'http://localhost:9000',
-      '/webhook': 'http://localhost:9000',
-      '/badge': 'http://localhost:9000',
+      '/api': 'http://localhost:8200',
+      '/auth': 'http://localhost:8200',
+      '/webhook': 'http://localhost:8200',
+      '/badge': 'http://localhost:8200',
     },
   },
 })

@@ -77,11 +77,8 @@ async def trigger_auto_fix(
     """Trigger auto-fix PR generation for a repository."""
     from database import get_or_create_tenant
     from services.billing import get_usage_tracker, BillingEventType
-    from config import DEMO_MODE
-
     token = _get_user_token(user)
-    # Skip token check for demo mode
-    if not token and not (DEMO_MODE and user.get("login") == "demo-user"):
+    if not token:
         raise HTTPException(401, "Git provider token required")
 
     # Get tenant
@@ -92,14 +89,12 @@ async def trigger_auto_fix(
         login=user.get("login", ""),
     )
 
-    # Check billing (skip for demo mode)
-    reason = "Demo mode: billing skipped"
-    if not (DEMO_MODE and user.get("login") == "demo-user"):
-        usage_tracker = get_usage_tracker()
-        can_execute, reason = _check_billing_limit(tenant["id"], usage_tracker, BillingEventType.AUTOFIX_RUN)
+    # Check billing
+    usage_tracker = get_usage_tracker()
+    can_execute, reason = _check_billing_limit(tenant["id"], usage_tracker, BillingEventType.AUTOFIX_RUN)
 
-        if not can_execute:
-            raise HTTPException(402, reason)
+    if not can_execute:
+        raise HTTPException(402, reason)
 
         # Record usage
         _record_billing_usage(

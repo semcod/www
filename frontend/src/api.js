@@ -47,14 +47,6 @@ export async function fetchAudit(auditId) {
   return res.json();
 }
 
-export async function demoLogin() {
-  const res = await fetch(`${API}/auth/demo`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-  });
-  if (!res.ok) throw new Error("Demo login failed");
-  return res.json();
-}
 
 export async function fetchBillingStatus(sessionToken) {
   const res = await fetch(`${API}/api/billing/status`, {

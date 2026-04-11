@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { DEMO_AUDIT } from "../../../constants";
 import { ResultHeader } from "./ResultHeader";
 import { ResultMetrics } from "./ResultMetrics";
 import { ResultRecommendations } from "./ResultRecommendations";
@@ -10,7 +9,7 @@ import { useBenchmarkTracking } from "../../../hooks/useBenchmarkTracking";
 import BenchmarkReviewPanel from "../../benchmark/BenchmarkReviewPanel";
 
 export function ResultPhase({ audit, selectedRepo, isSandbox, reset, benchmarkCaseId, setBenchmarkCaseId }) {
-  const data = audit || DEMO_AUDIT;
+  const data = audit || { error: "No audit data available" };
   const repoName = selectedRepo?.full_name || selectedRepo?.name || "unknown/repo";
   const [activeTab, setActiveTab] = useState(null);
 

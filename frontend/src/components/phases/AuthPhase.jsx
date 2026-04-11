@@ -1,21 +1,8 @@
 import { C, API } from "../../constants";
-import { demoLogin } from "../../api";
 
 export function AuthPhase() {
   const handleLogin = () => {
     window.location.href = `${API}/auth/github`;
-  };
-
-  const handleDemoLogin = async () => {
-    try {
-      const data = await demoLogin();
-      if (data.session) {
-        localStorage.setItem("semcod_session", data.session);
-        window.location.reload();
-      }
-    } catch (e) {
-      // Demo mode not available
-    }
   };
 
   return (
@@ -47,14 +34,6 @@ export function AuthPhase() {
         fontFamily: "inherit", width: "100%",
       }}>
         Continue with GitHub →
-      </button>
-
-      <button onClick={handleDemoLogin} style={{
-        background: "transparent", color: C.fg3, border: `1px solid ${C.border}`, borderRadius: 10,
-        padding: "12px 24px", fontSize: 13, fontWeight: 600, cursor: "pointer",
-        fontFamily: "inherit", width: "100%", marginTop: 12,
-      }}>
-        Or try Demo Mode (no GitHub needed)
       </button>
     </div>
   );

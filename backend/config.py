@@ -20,7 +20,6 @@ HOST = os.getenv("HOST", "0.0.0.0")
 PORT = int(os.getenv("PORT", "9000"))
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-change-me")
 SESSION_EXPIRE_HOURS = int(os.getenv("SESSION_EXPIRE_HOURS", "168"))
-DEMO_MODE = os.getenv("DEMO_MODE", "0") == "1"
 
 # Database configuration - use PostgreSQL if available, fallback to SQLite
 DATABASE_URL = os.getenv("DATABASE_URL", "")
@@ -34,7 +33,11 @@ else:
 
 SCAN_HISTORY_LIMIT = int(os.getenv("SCAN_HISTORY_LIMIT", "100"))
 REPOS_PER_PAGE = int(os.getenv("REPOS_PER_PAGE", "30"))
-CORS_ORIGINS = [o.strip() for o in os.getenv("CORS_ORIGINS", f"{FRONTEND_URL},https://semcod.com").split(",") if o.strip()]
+# Dynamic CORS configuration for development and production
+default_origins = f"{FRONTEND_URL},https://semcod.com"
+if "localhost" in FRONTEND_URL or "127.0.0.1" in FRONTEND_URL:
+    default_origins += ",http://localhost:3000,http://localhost:5174,http://127.0.0.1:3000,http://127.0.0.1:5174"
+CORS_ORIGINS = [o.strip() for o in os.getenv("CORS_ORIGINS", default_origins).split(",") if o.strip()]
 LARGE_FILE_THRESHOLD = int(os.getenv("LARGE_FILE_THRESHOLD", "300"))
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
 STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")

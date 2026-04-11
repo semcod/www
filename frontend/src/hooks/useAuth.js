@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { fetchMe, demoLogin, logout as logoutRequest } from "../api.js";
-import { DEMO_REPOS, API } from "../constants.js";
+import { fetchMe, logout as logoutRequest } from "../api.js";
+import { API } from "../constants.js";
 
 export function useSessionCallbackBootstrap(setSessionToken, sessionKey) {
   useEffect(() => {
@@ -38,31 +38,10 @@ export function getOAuthStartUrl() {
   return `${API}/auth/github`;
 }
 
-export function confirmAuthFlow(sessionToken, setRepos, setPhase) {
-  if (sessionToken) {
-    setPhase("repos");
-    return;
-  }
-
-  setRepos(DEMO_REPOS);
+export function confirmAuthFlow(sessionToken, setPhase) {
   setPhase("repos");
 }
 
-export async function startDemoSession(setSessionToken, setRepos, setPhase, sessionKey) {
-  try {
-    const data = await demoLogin();
-    if (!data.session) {
-      return;
-    }
-
-    setSessionToken(data.session);
-    localStorage.setItem(sessionKey, data.session);
-    localStorage.setItem("semcod_demo_user", "1");
-    setRepos(DEMO_REPOS);
-    setPhase("repos");
-  } catch (error) {
-  }
-}
 
 export async function logoutSession(sessionToken, sessionKey, setSessionToken, setUser, reset) {
   if (sessionToken) {
@@ -73,7 +52,6 @@ export async function logoutSession(sessionToken, sessionKey, setSessionToken, s
   }
 
   localStorage.removeItem(sessionKey);
-  localStorage.removeItem("semcod_demo_user");
   setSessionToken(null);
   setUser(null);
   reset();

@@ -6,11 +6,9 @@ import {
   useSessionProfile,
   getOAuthStartUrl,
   confirmAuthFlow,
-  startDemoSession,
   logoutSession
 } from "./useAuth.js";
 import { fetchRepos } from "../api.js";
-import { DEMO_REPOS } from "../constants.js";
 import { useBilling } from "./useBilling.js";
 import { useAuditActions } from "./useAuditActions.js";
 import { useBenchmarkTracking } from "./useBenchmarkTracking.js";
@@ -76,22 +74,15 @@ export function useAppState() {
       return;
     }
 
-    // Skip API call for demo users - use DEMO_REPOS directly
-    const demoUser = localStorage.getItem("semcod_demo_user");
-    if (demoUser === "1") {
-      setRepos(DEMO_REPOS);
-      return;
-    }
-
     fetchRepos(sessionToken)
       .then(setRepos)
-      .catch(() => setRepos(DEMO_REPOS));
+      .catch(() => setRepos([]));
   }, [phase, sessionToken, setRepos]);
 
   // Scan animation
   useScanAnimation(phase, auditId, setScanProgress, setScanLabel, setAudit, setPhase);
 
-  // Poll for analysis results (real API for sandbox, demo otherwise)
+  // Poll for analysis results
   useAuditPolling(phase, auditId, setAudit, setPhase);
 
   useBenchmarkTracking({
@@ -114,13 +105,10 @@ export function useAppState() {
   }, []);
 
   const confirmAuth = useCallback(() => {
-    confirmAuthFlow(sessionToken, setRepos, setPhase);
-  }, [sessionToken, setRepos, setPhase]);
+    confirmAuthFlow(sessionToken, setPhase);
+  }, [sessionToken, setPhase]);
 
-  const startDemoLogin = useCallback(() => {
-    startDemoSession(setSessionToken, setRepos, setPhase, SESSION_KEY);
-  }, [setSessionToken, setRepos, setPhase]);
-
+  
   const doLogout = useCallback(() => {
     logoutSession(sessionToken, SESSION_KEY, setSessionToken, setUser, reset);
   }, [sessionToken, setSessionToken, setUser, reset]);
@@ -138,7 +126,7 @@ export function useAppState() {
     repoUrl, setRepoUrl,
     isSandbox, setIsSandbox,
     auditId, setAuditId,
-    reset, startOAuth, confirmAuth, startAudit, startSandbox, startDemoLogin, doLogout,
+    reset, startOAuth, confirmAuth, startAudit, startSandbox, doLogout,
     billingStatus, paywallVisible, checkoutLoading, openCheckout, dismissPaywall, refreshBilling,
     benchmarkMode, setBenchmarkMode,
     benchmarkCaseId, setBenchmarkCaseId,

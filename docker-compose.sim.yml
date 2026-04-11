@@ -1,0 +1,58 @@
+# docker-compose.sim.yml
+# Usage: docker compose -f docker-compose.yml -f docker-compose.sim.yml up -d
+#
+# This adds a mock GitHub OAuth server and overrides backend env vars
+# so the OAuth flow goes through the simulator instead of real GitHub.
+
+version: "3.9"
+
+services:
+  mock-github:
+    build:
+      context: ./mock-github
+      dockerfile: Dockerfile
+    ports:
+      - "4010:4010"
+    environment:
+      - FRONTEND_URL=http://frontend:3000
+      - BACKEND_URL=http://backend:8000
+      # Mock configuration from .env
+      - MOCK_GITHUB_CLIENT_ID=${MOCK_GITHUB_CLIENT_ID}
+      - MOCK_GITHUB_CLIENT_SECRET=${MOCK_GITHUB_CLIENT_SECRET}
+      - MOCK_GITHUB_APP_ID=${MOCK_GITHUB_APP_ID}
+      - MOCK_GITHUB_WEBHOOK_SECRET=${MOCK_GITHUB_WEBHOOK_SECRET}
+      # Mock user configuration from .env
+      - MOCK_USER_LOGIN=${MOCK_USER_LOGIN}
+      - MOCK_USER_NAME=${MOCK_USER_NAME}
+      - MOCK_USER_EMAIL=${MOCK_USER_EMAIL}
+      - MOCK_USER_ID=${MOCK_USER_ID}
+      - MOCK_USER_BIO=${MOCK_USER_BIO}
+      - MOCK_USER_COMPANY=${MOCK_USER_COMPANY}
+      - MOCK_USER_LOCATION=${MOCK_USER_LOCATION}
+      - MOCK_USER_AVATAR_URL=${MOCK_USER_AVATAR_URL}
+      - MOCK_USER_PUBLIC_REPOS=${MOCK_USER_PUBLIC_REPOS}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:4010/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  backend:
+    environment:
+      # Override GitHub OAuth URLs → point to mock server
+      # Use localhost for browser redirects, mock-github for backend-to-backend calls
+      - GITHUB_OAUTH_AUTHORIZE_URL=http://localhost:4010/login/oauth/authorize
+      - GITHUB_OAUTH_TOKEN_URL=http://mock-github:4010/login/oauth/access_token
+      - GITHUB_API_BASE_URL=http://mock-github:4010
+      # Mock credentials from .env
+      - GITHUB_CLIENT_ID=${MOCK_GITHUB_CLIENT_ID}
+      - GITHUB_CLIENT_SECRET=${MOCK_GITHUB_CLIENT_SECRET}
+      - GITHUB_APP_ID=${MOCK_GITHUB_APP_ID}
+      - GITHUB_WEBHOOK_SECRET=${MOCK_GITHUB_WEBHOOK_SECRET}
+      # Frontend URL for redirects
+      - FRONTEND_URL=http://localhost:3000
+      - APP_URL=http://localhost:8003
+    depends_on:
+      mock-github:
+        condition: service_healthy

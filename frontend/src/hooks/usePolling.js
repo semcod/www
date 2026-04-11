@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { fetchAudit } from "../api.js";
-import { DEMO_AUDIT } from "../constants.js";
 
 const SCAN_STEPS = [
   { p: 8, t: 300, l: "⏳ Cloning repository..." },
@@ -30,8 +29,8 @@ export function useScanAnimation(phase, auditId, setScanProgress, setScanLabel, 
 
     if (!auditId) {
       done = setTimeout(() => {
-        setAudit(DEMO_AUDIT);
-        setPhase("value");
+        setAudit({ error: "No audit ID provided" });
+        setPhase("result");
       }, 4500);
     }
 
