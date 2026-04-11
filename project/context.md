@@ -4,26 +4,26 @@
 
 - **Project**: /home/tom/github/semcod/www
 - **Primary Language**: python
-- **Languages**: python: 85, javascript: 79, shell: 2
+- **Languages**: python: 87, javascript: 85, shell: 2
 - **Analysis Mode**: static
-- **Total Functions**: 809
-- **Total Classes**: 62
-- **Modules**: 166
-- **Entry Points**: 619
+- **Total Functions**: 883
+- **Total Classes**: 70
+- **Modules**: 174
+- **Entry Points**: 677
 
 ## Architecture by Module
 
 ### frontend.src.api
-- **Functions**: 42
+- **Functions**: 55
 - **File**: `api.js`
+
+### backend.db_module.wrappers
+- **Functions**: 37
+- **File**: `wrappers.py`
 
 ### e2e.specs.social-sharing.spec
 - **Functions**: 33
 - **File**: `social-sharing.spec.js`
-
-### backend.db_module.wrappers
-- **Functions**: 28
-- **File**: `wrappers.py`
 
 ### backend.adapters.github
 - **Functions**: 22
@@ -52,6 +52,10 @@
 ### frontend.src.hooks.useUrlState
 - **Functions**: 19
 - **File**: `useUrlState.js`
+
+### frontend.e2e.benchmark.spec
+- **Functions**: 18
+- **File**: `benchmark.spec.js`
 
 ### backend.services.billing
 - **Functions**: 16
@@ -84,25 +88,20 @@
 - **Classes**: 3
 - **File**: `quality_gate.py`
 
-### backend.routers.autopr
-- **Functions**: 12
-- **Classes**: 3
-- **File**: `autopr.py`
-
 ### backend.routers.billing
 - **Functions**: 12
 - **Classes**: 2
 - **File**: `billing.py`
 
-### backend.services.mirror
-- **Functions**: 11
-- **Classes**: 1
-- **File**: `mirror.py`
+### backend.routers.autopr
+- **Functions**: 12
+- **Classes**: 3
+- **File**: `autopr.py`
 
-### backend.scheduler.cron
-- **Functions**: 11
-- **Classes**: 2
-- **File**: `cron.py`
+### backend.routers.benchmark
+- **Functions**: 12
+- **Classes**: 5
+- **File**: `benchmark.py`
 
 ## Key Entry Points
 
@@ -112,12 +111,16 @@ Main execution flows into the system:
 - **Calls**: op.get_bind, sa.inspect, set, op.create_table, op.create_index, op.create_table, op.create_table, op.create_index
 
 ### backend.db_module.scans_orm.save_audit_result
-> Save audit result to database.
-- **Calls**: None.first, db.commit, audit_data.get, audit_data.get, audit_data.get, audit_data.get, audit_data.get, audit_data.get
+> Save audit result to database. Merges benchmark meta into audit_meta JSON.
+- **Calls**: None.first, db.commit, audit_data.get, audit_data.get, audit_data.get, audit_data.get, audit_data.get, json.dumps
 
 ### backend.scripts.scan_samples.scan_sample_projects
 > Scan all sample projects and save to database.
 - **Calls**: backend.sample_projects.get_sample_projects, print, print, enumerate, print, print, print, sum
+
+### backend.routers.audit.analyze_repo
+> Analyze any public repository by URL (sandbox mode).
+- **Calls**: router.post, body.get, body.get, backend.db_module.scans.save_audit_result, backend.routers.audit._schedule_background_task, request.json, HTTPException, re.search
 
 ### backend.routers.metrics.get_standard_metrics
 > Get standardized metrics for recent scans.
@@ -138,15 +141,15 @@ Flow:
   3. Ch
 - **Calls**: router.post, Depends, user.get, backend.db_module.scans.get_repo_scans, HTTPException, None.hexdigest, backend.routers.autopr._score_improved, backend.routers.autopr._build_pr_body
 
+### frontend.src.hooks.useAppState.useAppState
+- **Calls**: frontend.src.hooks.useAppState.useState, frontend.src.hooks.useAppState.getItem, frontend.src.hooks.useAppState.useBilling, frontend.src.hooks.useAppState.useAuditActions, frontend.src.hooks.useAppState.callback, frontend.src.hooks.useAppState.useSessionCallbackBootstrap, frontend.src.hooks.useAppState.useSessionProfile, frontend.src.hooks.useAppState.useHashBootstrap
+
 ### backend.services.mirror.MirrorService.sync_mirror
 > Sync mirror by pulling latest changes from source and pushing to Gitea.
 - **Calls**: config.source_repo.replace, tempfile.TemporaryDirectory, Path, self._get_source_adapter, GiteaAdapter, subprocess.run, subprocess.run, subprocess.run
 
 ### backend.quality_gate.main
 - **Calls**: backend.quality_gate._parse_args, print, backend.quality_gate.collect_results, backend.quality_gate.build_snapshot, print, print, print, print
-
-### frontend.src.hooks.useAppState.useAppState
-- **Calls**: frontend.src.hooks.useAppState.useState, frontend.src.hooks.useAppState.getItem, frontend.src.hooks.useAppState.useBilling, frontend.src.hooks.useAppState.useAuditActions, frontend.src.hooks.useAppState.callback, frontend.src.hooks.useAppState.useSessionCallbackBootstrap, frontend.src.hooks.useAppState.useSessionProfile, frontend.src.hooks.useAppState.useHashBootstrap
 
 ### backend.services.mirror.MirrorService.create_mirror
 > Create new mirror by cloning source repo to Gitea.
@@ -205,9 +208,9 @@ Flow:
 > Initialize the database and create tables.
 - **Calls**: backend.db_module.schema.get_connection, conn.cursor, cursor.execute, cursor.execute, cursor.execute, cursor.execute, cursor.execute, cursor.execute
 
-### backend.routers.audit.analyze_repo
-> Analyze any public repository by URL (sandbox mode).
-- **Calls**: router.post, body.get, body.get, backend.db_module.scans.save_audit_result, backend.routers.audit._schedule_background_task, request.json, HTTPException, re.search
+### backend.routers.audit.run_audit
+> Run one-click audit on a repo. Requires authentication.
+- **Calls**: router.post, Depends, backend.db_module.scans.save_audit_result, backend.routers.audit._schedule_background_task, request.json, None.hexdigest, body.get, body.get
 
 ### backend.adapters.gitlab.GitLabAdapter.get_pr_files
 > Get list of files changed in MR.
@@ -265,9 +268,6 @@ users what the bot would comment before th
 ### frontend.src.components.phases.LandingPhase.LandingPhase
 - **Calls**: frontend.src.components.phases.LandingPhase.useState, frontend.src.components.phases.LandingPhase.useEffect, frontend.src.components.phases.LandingPhase.fetchRecentScans, frontend.src.components.phases.LandingPhase.fetch, frontend.src.components.phases.LandingPhase.json, frontend.src.components.phases.LandingPhase.setRecentScans, frontend.src.components.phases.LandingPhase.error, frontend.src.components.phases.LandingPhase.Date
 
-### frontend.src.components.tabs.SettingsTab.SettingsTab
-- **Calls**: frontend.src.components.tabs.SettingsTab.useState, frontend.src.components.tabs.SettingsTab.setLoadingSchedules, frontend.src.components.tabs.SettingsTab.fetchSchedules, frontend.src.components.tabs.SettingsTab.then, frontend.src.components.tabs.SettingsTab.setSchedules, frontend.src.components.tabs.SettingsTab.finally, frontend.src.components.tabs.SettingsTab.useEffect, frontend.src.components.tabs.SettingsTab.loadSchedules
-
 ## Process Flows
 
 Key execution flows identified:
@@ -288,7 +288,15 @@ scan_sample_projects [backend.scripts.scan_samples]
   └─ →> get_sample_projects
 ```
 
-### Flow 4: get_standard_metrics
+### Flow 4: analyze_repo
+```
+analyze_repo [backend.routers.audit]
+  └─> _schedule_background_task
+  └─ →> save_audit_result
+      └─> get_connection
+```
+
+### Flow 5: get_standard_metrics
 ```
 get_standard_metrics [backend.routers.metrics]
   └─ →> get_recent_scans
@@ -297,19 +305,24 @@ get_standard_metrics [backend.routers.metrics]
       └─> get_connection
 ```
 
-### Flow 5: create_auto_pr
+### Flow 6: create_auto_pr
 ```
 create_auto_pr [backend.routers.autopr]
   └─ →> get_repo_scans
       └─> get_connection
 ```
 
-### Flow 6: sync_mirror
+### Flow 7: useAppState
+```
+useAppState [frontend.src.hooks.useAppState]
+```
+
+### Flow 8: sync_mirror
 ```
 sync_mirror [backend.services.mirror.MirrorService]
 ```
 
-### Flow 7: main
+### Flow 9: main
 ```
 main [backend.quality_gate]
   └─> _parse_args
@@ -318,22 +331,9 @@ main [backend.quality_gate]
       └─> analyze_file
 ```
 
-### Flow 8: useAppState
-```
-useAppState [frontend.src.hooks.useAppState]
-```
-
-### Flow 9: create_mirror
+### Flow 10: create_mirror
 ```
 create_mirror [backend.services.mirror.MirrorService]
-```
-
-### Flow 10: process_pr_event
-```
-process_pr_event [backend.worker.tasks.scan]
-  └─> _get_token_for_provider
-  └─ →> shared_task
-  └─ →> get_adapter_for_event
 ```
 
 ## Key Classes
@@ -432,6 +432,13 @@ Detects:
 - **Methods**: 5
 - **Key Methods**: backend.worker._celery_stub._StubTask.__init__, backend.worker._celery_stub._StubTask.__call__, backend.worker._celery_stub._StubTask.run, backend.worker._celery_stub._StubTask.delay, backend.worker._celery_stub._StubTask.retry
 
+### backend.events.models.Event
+> Unified event representation across all git platforms.
+
+This class normalizes events from GitHub, Gi
+- **Methods**: 5
+- **Key Methods**: backend.events.models.Event.is_pr_event, backend.events.models.Event.is_push_event, backend.events.models.Event.is_comment_event, backend.events.models.Event.get_pr_url, backend.events.models.Event.get_clone_url
+
 ### backend.apps.security.pipeline.SecurityApp
 > Security vulnerability scanner.
 
@@ -441,13 +448,6 @@ Detects:
 - **Methods**: 5
 - **Key Methods**: backend.apps.security.pipeline.SecurityApp.__init__, backend.apps.security.pipeline.SecurityApp.run_pipeline, backend.apps.security.pipeline.SecurityApp._get_recommendations, backend.apps.security.pipeline.SecurityApp.get_triggers, backend.apps.security.pipeline.SecurityApp.get_actions
 - **Inherits**: AppBase
-
-### backend.events.models.Event
-> Unified event representation across all git platforms.
-
-This class normalizes events from GitHub, Gi
-- **Methods**: 5
-- **Key Methods**: backend.events.models.Event.is_pr_event, backend.events.models.Event.is_push_event, backend.events.models.Event.is_comment_event, backend.events.models.Event.get_pr_url, backend.events.models.Event.get_clone_url
 
 ### backend.services.autofix.AutoFixService
 > Service for creating auto-fix PRs.
@@ -496,12 +496,12 @@ Key functions that process and transform data:
 > Parse Gitea webhook payload into Event.
 - **Output to**: backend.adapters.gitea_events.parse_gitea_event
 
+### backend.quality_gate._parse_args
+- **Output to**: len, Path, len, Path, len
+
 ### backend.services.autofix.PatchGenerator._parse_diff_original
 > Extract original file content from diff.
 - **Output to**: diff_text.split, line.startswith, lines.append, line.startswith, line.startswith
-
-### backend.quality_gate._parse_args
-- **Output to**: len, Path, len, Path, len
 
 ### backend.services.analyzer._process_file_for_duplication
 > Process a single file and update line occurrences. Returns total lines processed.
@@ -546,13 +546,13 @@ Return
 > Parse Gitea webhook payload into unified Event.
 - **Output to**: backend.adapters.gitea_events._detect_gitea_event_type, payload.get, repo_data.get, payload.get, pr_data.get
 
-### backend.adapters.gitlab_events.parse_gitlab_event
-> Parse GitLab webhook payload into unified Event.
-- **Output to**: backend.adapters.gitlab_events._detect_gitlab_event_type, payload.get, project.get, payload.get, mr_data.get
-
 ### backend.adapters.github.parse_github_event
 > Parse GitHub webhook payload into unified Event.
 - **Output to**: backend.adapters.github._detect_github_event_type, None.get, payload.get, pr_data.get, payload.get
+
+### backend.adapters.gitlab_events.parse_gitlab_event
+> Parse GitLab webhook payload into unified Event.
+- **Output to**: backend.adapters.gitlab_events._detect_gitlab_event_type, payload.get, project.get, payload.get, mr_data.get
 
 ### backend.routers.auth.decode_session_token
 - **Output to**: jwt.decode, HTTPException, HTTPException
@@ -583,16 +583,18 @@ Return
 Functions exposed as public API (no underscore prefix):
 
 - `backend.alembic.versions.0001_initial_schema.upgrade` - 148 calls
+- `backend.db_module.scans_orm.save_audit_result` - 38 calls
 - `backend.scheduler.scan_job.run_scheduled_scan` - 33 calls
 - `backend.db_module.scans.save_audit_result` - 32 calls
-- `backend.db_module.scans_orm.save_audit_result` - 32 calls
 - `backend.scripts.scan_samples.scan_sample_projects` - 30 calls
 - `backend.adapters.github.parse_github_event` - 29 calls
+- `backend.routers.audit.analyze_repo` - 29 calls
 - `backend.routers.metrics.get_standard_metrics` - 28 calls
 - `backend.routers.autopr.create_auto_pr` - 28 calls
+- `frontend.src.hooks.useAppState.useAppState` - 27 calls
 - `backend.services.mirror.MirrorService.sync_mirror` - 26 calls
 - `backend.quality_gate.main` - 26 calls
-- `frontend.src.hooks.useAppState.useAppState` - 26 calls
+- `backend.db_module.benchmark_orm.get_benchmark_summary` - 26 calls
 - `backend.services.mirror.MirrorService.create_mirror` - 25 calls
 - `backend.worker.tasks.scan.process_pr_event` - 25 calls
 - `backend.adapters.gitlab_events.parse_gitlab_event` - 25 calls
@@ -602,7 +604,8 @@ Functions exposed as public API (no underscore prefix):
 - `backend.routers.trend.get_scan_diff` - 23 calls
 - `backend.services.autofix.AutoFixService.create_auto_fix_pr` - 22 calls
 - `backend.db_module.schema.init_db` - 21 calls
-- `backend.routers.audit.analyze_repo` - 20 calls
+- `backend.routers.audit.run_audit` - 20 calls
+- `backend.db_module.benchmark_orm.upsert_recommendation_feedback` - 18 calls
 - `backend.adapters.gitlab.GitLabAdapter.get_pr_files` - 18 calls
 - `backend.routers.auth.github_oauth_callback` - 18 calls
 - `backend.db_module.repositories.get_or_create_repository` - 17 calls
@@ -614,14 +617,11 @@ Functions exposed as public API (no underscore prefix):
 - `backend.db_module.tenants.get_or_create_tenant` - 16 calls
 - `backend.routers.marketplace.deploy.trigger_auto_fix` - 16 calls
 - `frontend.src.hooks.useUrlState.useHashBootstrap` - 16 calls
+- `backend.db_module.benchmark_orm.create_benchmark_case` - 15 calls
 - `backend.adapters.gitlab.GitLabAdapter.get_pr_diff` - 15 calls
 - `backend.routers.marketplace.browse.preview_pr_comment` - 15 calls
 - `frontend.src.components.phases.LandingPhase.LandingPhase` - 15 calls
 - `frontend.src.components.tabs.SettingsTab.SettingsTab` - 15 calls
-- `backend.db_module.users.increment_scan_count` - 14 calls
-- `backend.db_module.installations.create_installation` - 14 calls
-- `backend.db_module.repositories_orm.get_or_create_repository` - 14 calls
-- `backend.db_module.scans.save_badge_cache` - 14 calls
 
 ## System Interactions
 
@@ -640,6 +640,10 @@ graph TD
     scan_sample_projects --> get_sample_projects
     scan_sample_projects --> print
     scan_sample_projects --> enumerate
+    analyze_repo --> post
+    analyze_repo --> get
+    analyze_repo --> save_audit_result
+    analyze_repo --> _schedule_background
     get_standard_metrics --> get
     get_standard_metrics --> get_recent_scans
     get_standard_metrics --> get_total_scan_count
@@ -650,15 +654,11 @@ graph TD
     create_auto_pr --> get
     create_auto_pr --> get_repo_scans
     create_auto_pr --> HTTPException
-    sync_mirror --> replace
-    sync_mirror --> TemporaryDirectory
-    sync_mirror --> Path
-    sync_mirror --> _get_source_adapter
-    sync_mirror --> GiteaAdapter
-    main --> _parse_args
-    main --> print
-    main --> collect_results
-    main --> build_snapshot
+    useAppState --> useState
+    useAppState --> getItem
+    useAppState --> useBilling
+    useAppState --> useAuditActions
+    useAppState --> callback
 ```
 
 ## Reverse Engineering Guidelines

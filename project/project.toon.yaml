@@ -1,11 +1,11 @@
-# www | 809 func | 137f | 20686L | python | 2026-04-10
+# www | 883 func | 145f | 22449L | python | 2026-04-11
 
 HEALTH:
-  CC̄=2.7  critical=16 (limit:10)  dup=1  cycles=0
+  CC̄=2.7  critical=21 (limit:10)  dup=1  cycles=0
 
-ALERTS[20]:
-  !!! cc_exceeded      TrendTab = 27 (limit:15)
-  !!! high_fan_out     useAppState = 26 (limit:10)
+ALERTS[19]:
+  # [RESOLVED] cc_exceeded TrendTab = 27 → split into parts
+  !!! high_fan_out     useAppState = 27 (limit:10)
   !!! high_fan_out     create_auto_pr = 26 (limit:10)
   !!! high_fan_out     run_scheduled_scan = 23 (limit:10)
   !!  high_fan_out     _run_audit_pipeline = 19 (limit:10)
@@ -15,13 +15,14 @@ ALERTS[20]:
   !!  high_fan_out     process_pr_event = 16 (limit:10)
   !!  high_fan_out     _run_sandbox_analysis = 16 (limit:10)
 
-MODULES[167] (top by size):
+MODULES[175] (top by size):
   M[backend/adapters/github.py] 392L C:1 F:22 CC↑6 D:1 (python)
   M[backend/services/mirror.py] 387L C:1 F:11 CC↑6 D:0 (python)
   M[backend/adapters/gitlab.py] 379L C:1 F:21 CC↑5 D:0 (python)
+  M[backend/db_module/wrappers.py] 356L C:0 F:37 CC↑1 D:0 (python)
+  M[backend/routers/audit.py] 352L C:0 F:8 CC↑11 D:1 (python)
   M[backend/adapters/gitea.py] 349L C:1 F:21 CC↑5 D:0 (python)
   M[backend/services/billing.py] 343L C:3 F:16 CC↑7 D:3 (python)
-  M[backend/routers/audit.py] 330L C:0 F:8 CC↑7 D:1 (python)
   M[backend/services/analyzer.py] 320L C:0 F:13 CC↑13 D:3 (python)
   M[frontend/src/components/MarketplaceDashboard.jsx] 301L C:0 F:4 CC↑2 D:0 (javascript)
   M[backend/services/autofix.py] 299L C:4 F:8 CC↑7 D:0 (python)
@@ -30,11 +31,10 @@ MODULES[167] (top by size):
   M[backend/worker/tasks/scan.py] 287L C:0 F:7 CC↑9 D:0 (python)
   M[backend/db_module/scans.py] 275L C:0 F:9 CC↑6 D:7 (python)
   M[backend/quality_gate.py] 272L C:3 F:12 CC↑8 D:0 (python)
-  M[backend/db_module/wrappers.py] 272L C:0 F:28 CC↑1 D:0 (python)
-  LANGS: python:86/javascript:79/shell:2
+  LANGS: python:88/javascript:85/shell:2
 
 HOTSPOTS[10]:
-  ★ useAppState fan=26  // Orchestrates 26 calls
+  ★ useAppState fan=27  // Orchestrates 27 calls
   ★ create_auto_pr fan=26  // Apply LLM-generated patches to a repository and create a GitHub PR.
 
 Flow:
@@ -49,11 +49,12 @@ Flow:
 1. Clone source repo t
 
 REFACTOR[5]:
-  [1] H/L Split TrendTab (CC=27 → target CC<10)
-  [2] M/L Split SettingsTab (CC=18 → target CC<10)
-  [3] M/M Reduce useAppState fan-out (currently 26)
+  [1] [DONE] Split TrendTab (CC=27 → split into TrendTab.parts.jsx)
+  [2] [DONE] Split SettingsTab (CC=18 → split into SettingsTab.parts.jsx)
+  [3] M/M Reduce useAppState fan-out (currently 27)
   [4] M/M Reduce create_auto_pr fan-out (currently 26)
   [5] M/M Reduce run_scheduled_scan fan-out (currently 23)
 
 EVOLUTION:
-  2026-04-10 CC̄=2.7 crit=16 20686L // Automated analysis
+  2026-04-11 CC̄=2.7 crit=21 22449L // Automated analysis
+  2026-04-11 CC̄=2.7 crit=19 22449L // [DONE] Split TrendTab (CC=27) and SettingsTab (CC=18) into .parts.jsx components

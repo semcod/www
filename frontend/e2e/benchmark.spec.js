@@ -41,7 +41,7 @@ test.describe('Benchmark Review Panel', () => {
 });
 
 test.describe('Benchmark API integration', () => {
-  const API = process.env.API_URL || 'http://localhost:9000';
+  const API = process.env.API_URL || 'http://localhost:8003';
 
   test('summary endpoint returns expected shape', async ({ request }) => {
     const res = await request.get(`${API}/api/benchmark/summary`);

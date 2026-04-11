@@ -280,6 +280,99 @@ test_endpoint "Post feedback for non-existent case" "POST" "/api/benchmark/cases
 test_endpoint "Post event for non-existent case" "POST" "/api/benchmark/cases/NONEXISTENT/events" '{"event_name":"test"}' "404" ""
 echo ""
 
+# 22. Nginx Proxy Content Validation (via frontend port)
+echo "=== Nginx Proxy Content Validation ==="
+echo "Testing API calls through frontend (port 3000) return JSON, not HTML..."
+
+test_content_type() {
+    local name="$1"
+    local url="$2"
+    local expected_ct="$3"
+    local auth="$4"
+
+    echo -n "  $name... "
+    if [ -n "$auth" ]; then
+        ct=$(curl -s -o /dev/null -w "%{content_type}" "$FRONTEND_URL$url" -H "Authorization: Bearer $auth")
+    else
+        ct=$(curl -s -o /dev/null -w "%{content_type}" "$FRONTEND_URL$url")
+    fi
+
+    if echo "$ct" | grep -qi "$expected_ct"; then
+        echo -e "${GREEN}PASS${NC} ($ct)"
+        ((pass_count++))
+        return 0
+    else
+        echo -e "${RED}FAIL${NC} (expected $expected_ct, got $ct)"
+        ((fail_count++))
+        return 1
+    fi
+}
+
+test_not_html() {
+    local name="$1"
+    local url="$2"
+    local auth="$3"
+
+    echo -n "  $name (not HTML)... "
+    if [ -n "$auth" ]; then
+        body=$(curl -s "$FRONTEND_URL$url" -H "Authorization: Bearer $auth" | head -c 200)
+    else
+        body=$(curl -s "$FRONTEND_URL$url" | head -c 200)
+    fi
+
+    if echo "$body" | grep -qi "<!DOCTYPE"; then
+        echo -e "${RED}FAIL${NC} (received HTML instead of JSON)"
+        ((fail_count++))
+        return 1
+    else
+        echo -e "${GREEN}PASS${NC}"
+        ((pass_count++))
+        return 0
+    fi
+}
+
+# Content-Type checks via frontend proxy
+test_content_type "GET /api/health → JSON" "/api/health" "json"
+test_content_type "GET /api/apps → JSON" "/api/apps" "json"
+test_content_type "GET /api/billing/plans → JSON" "/api/billing/plans" "json"
+test_content_type "GET /mcp/info → JSON" "/mcp/info" "json"
+test_content_type "GET /badge/*.svg → SVG" "/badge/test.svg" "svg"
+test_content_type "GET /api/benchmark/export.csv → CSV" "/api/benchmark/export.csv" "csv"
+
+# Ensure API endpoints via frontend do NOT return HTML (the original bug)
+test_not_html "GET /api/health" "/api/health"
+test_not_html "GET /api/apps" "/api/apps"
+test_not_html "POST /auth/demo" "/auth/demo"
+test_not_html "GET /mcp/tools" "/mcp/tools"
+test_not_html "GET /api/benchmark/summary" "/api/benchmark/summary"
+echo ""
+
+# 23. Multi-step flow through frontend proxy
+echo "=== Multi-step Flow via Frontend Proxy ==="
+echo -n "  Demo login via frontend... "
+PROXY_AUTH=$(curl -s -X POST "$FRONTEND_URL/auth/demo")
+PROXY_TOKEN=$(echo "$PROXY_AUTH" | jq -r '.session // empty')
+if [ -n "$PROXY_TOKEN" ]; then
+    echo -e "${GREEN}PASS${NC}"
+    ((pass_count++))
+else
+    echo -e "${YELLOW}SKIP${NC} (DEMO_MODE may be off)"
+fi
+
+if [ -n "$PROXY_TOKEN" ]; then
+    echo -n "  List repos via frontend proxy... "
+    REPOS_CT=$(curl -s -o /dev/null -w "%{content_type}" "$FRONTEND_URL/api/repos" -H "Authorization: Bearer $PROXY_TOKEN")
+    REPOS_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$FRONTEND_URL/api/repos" -H "Authorization: Bearer $PROXY_TOKEN")
+    if [ "$REPOS_CODE" = "200" ] && echo "$REPOS_CT" | grep -qi "json"; then
+        echo -e "${GREEN}PASS${NC} ($REPOS_CODE, $REPOS_CT)"
+        ((pass_count++))
+    else
+        echo -e "${RED}FAIL${NC} ($REPOS_CODE, $REPOS_CT)"
+        ((fail_count++))
+    fi
+fi
+echo ""
+
 # Summary
 echo "=========================================="
 echo "Test Summary"

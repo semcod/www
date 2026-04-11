@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import RedirectResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-from config import APP_URL, FRONTEND_URL, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_SCOPE, SECRET_KEY, SESSION_EXPIRE_HOURS, DEMO_MODE, REPOS_PER_PAGE
+from config import APP_URL, FRONTEND_URL, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_SCOPE, SECRET_KEY, SESSION_EXPIRE_HOURS, DEMO_MODE, REPOS_PER_PAGE, GITHUB_OAUTH_AUTHORIZE_URL, GITHUB_OAUTH_TOKEN_URL, GITHUB_API_BASE_URL
 from database import upsert_user, get_user_by_id
 
 router = APIRouter()
@@ -48,7 +48,7 @@ async def github_oauth_start():
     """Step 1: Redirect user to GitHub OAuth."""
     scope = GITHUB_OAUTH_SCOPE
     url = (
-        f"https://github.com/login/oauth/authorize"
+        f"{GITHUB_OAUTH_AUTHORIZE_URL}"
         f"?client_id={GITHUB_CLIENT_ID}"
         f"&scope={scope}"
         f"&redirect_uri={APP_URL}/auth/callback"
@@ -61,7 +61,7 @@ async def github_oauth_callback(code: str):
     """Step 2: Exchange code for token, fetch profile, create user, issue JWT."""
     async with httpx.AsyncClient() as client:
         token_resp = await client.post(
-            "https://github.com/login/oauth/access_token",
+            GITHUB_OAUTH_TOKEN_URL,
             json={
                 "client_id": GITHUB_CLIENT_ID,
                 "client_secret": GITHUB_CLIENT_SECRET,
@@ -77,7 +77,7 @@ async def github_oauth_callback(code: str):
 
     async with httpx.AsyncClient() as client:
         profile_resp = await client.get(
-            "https://api.github.com/user",
+            f"{GITHUB_API_BASE_URL}/user",
             headers={
                 "Authorization": f"Bearer {github_token}",
                 "Accept": "application/vnd.github+json",
@@ -183,7 +183,7 @@ async def list_repos(user: dict = Depends(get_current_user)):
     
     async with httpx.AsyncClient() as client:
         resp = await client.get(
-            "https://api.github.com/user/repos",
+            f"{GITHUB_API_BASE_URL}/user/repos",
             params={"sort": "updated", "per_page": REPOS_PER_PAGE, "type": "owner"},
             headers={
                 "Authorization": f"Bearer {user['github_token']}",

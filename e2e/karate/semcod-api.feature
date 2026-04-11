@@ -417,3 +417,91 @@ Feature: Semcod API E2E Tests
     And request { event_name: 'test' }
     When method post
     Then status 404
+
+  # ==================== Content-Type Validation ====================
+
+  Scenario: Health endpoint returns JSON content-type
+    Given path '/api/health'
+    When method get
+    Then status 200
+    And match responseHeaders['Content-Type'] contains 'application/json'
+
+  Scenario: Apps endpoint returns JSON content-type
+    Given path '/api/apps'
+    When method get
+    Then status 200
+    And match responseHeaders['Content-Type'] contains 'application/json'
+
+  Scenario: Billing plans endpoint returns JSON content-type
+    Given path '/api/billing/plans'
+    When method get
+    Then status 200
+    And match responseHeaders['Content-Type'] contains 'application/json'
+
+  Scenario: MCP info returns JSON content-type
+    Given path '/mcp/info'
+    When method get
+    Then status 200
+    And match responseHeaders['Content-Type'] contains 'application/json'
+
+  Scenario: Benchmark summary returns JSON content-type
+    Given path '/api/benchmark/summary'
+    When method get
+    Then status 200
+    And match responseHeaders['Content-Type'] contains 'application/json'
+
+  Scenario: Badge SVG returns correct content-type
+    Given path '/badge/test-repo.svg'
+    When method get
+    Then status 200
+    And match responseHeaders['Content-Type'] contains 'image/svg+xml'
+
+  Scenario: Benchmark CSV export returns correct content-type
+    Given path '/api/benchmark/export.csv'
+    When method get
+    Then status 200
+    And match responseHeaders['Content-Type'] contains 'text/csv'
+
+  # ==================== Marketplace Install Flow ====================
+
+  Scenario: Marketplace install → status → uninstall flow (authenticated)
+    Given path '/auth/demo'
+    When method post
+    Then status 200
+    * def token = response.session
+
+    Given path '/api/install'
+    And header Authorization = 'Bearer ' + token
+    And request { repo: 'karate-test/repo', provider: 'github', apps: ['audit'] }
+    When method post
+    Then status 200
+    And match response.status == 'installed'
+
+    Given path '/api/apps/status'
+    And header Authorization = 'Bearer ' + token
+    And param repo = 'karate-test/repo'
+    And param provider = 'github'
+    When method get
+    Then status 200
+    And match response.installed == true
+
+  # ==================== Multi-step MCP Flow ====================
+
+  Scenario: MCP end-to-end: list tools → invoke analyze → check status
+    Given path '/mcp/tools'
+    When method get
+    Then status 200
+    * def tools = response
+    * def analyzeExists = karate.filter(tools, function(x){ return x.name == 'analyze_public_repo' })
+    * assert analyzeExists.length > 0
+
+    Given path '/mcp/tools/invoke'
+    And request { name: 'analyze_public_repo', arguments: { repo_url: 'https://github.com/acme/backend-api' } }
+    When method post
+    Then status 200
+    * def auditId = response.audit_id
+
+    Given path '/mcp/tools/invoke'
+    And request { name: 'get_scan_status', arguments: { audit_id: '#(auditId)' } }
+    When method post
+    Then status 200

@@ -1,9 +1,9 @@
-# vallm batch | 309f | 74✓ 50⚠ 85✗ | 2026-04-10
+# vallm batch | 321f | 78✓ 54⚠ 88✗ | 2026-04-11
 
 SUMMARY:
-  scanned: 309  passed: 74 (23.9%)  warnings: 50  errors: 85  unsupported: 107
+  scanned: 321  passed: 78 (24.3%)  warnings: 54  errors: 88  unsupported: 109
 
-WARNINGS[50]{path,score}:
+WARNINGS[54]{path,score}:
   frontend/src/hooks/useDownloads.js,0.67
     issues[1]{rule,severity,message,line}:
       js.import.resolvable,warning,Module 'react' not found,1
@@ -54,6 +54,15 @@ WARNINGS[50]{path,score}:
     issues[1]{rule,severity,message,line}:
       syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
   frontend/src/components/ShareButtons.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/components/benchmark/BenchmarkDecisionPanel.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/components/benchmark/BenchmarkReviewPanel.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/components/benchmark/RecommendationFeedbackForm.jsx,0.78
     issues[1]{rule,severity,message,line}:
       syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
   frontend/src/components/phases/AuthPhase.jsx,0.78
@@ -137,6 +146,9 @@ WARNINGS[50]{path,score}:
   frontend/src/main.jsx,0.78
     issues[1]{rule,severity,message,line}:
       syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/hooks/useBenchmarkTracking.js,0.83
+    issues[1]{rule,severity,message,line}:
+      js.import.resolvable,warning,Module 'react' not found,1
   frontend/src/hooks/useBilling.js,0.83
     issues[1]{rule,severity,message,line}:
       js.import.resolvable,warning,Module 'react' not found,1
@@ -159,7 +171,7 @@ WARNINGS[50]{path,score}:
     issues[1]{rule,severity,message,line}:
       js.import.resolvable,warning,Module 'react' not found,1
 
-ERRORS[85]{path,score}:
+ERRORS[88]{path,score}:
   backend/database.py,0.57
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'db_module' not found,7
@@ -208,7 +220,7 @@ ERRORS[85]{path,score}:
       python.import.resolvable,error,Module 'pytest' not found,3
       python.import.resolvable,error,Module 'services.scoring' not found,6
   backend/server.py,0.59
-    issues[20]{rule,severity,message,line}:
+    issues[21]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'fastapi' not found,11
       python.import.resolvable,error,Module 'fastapi.middleware.cors' not found,12
       python.import.resolvable,error,Module 'config' not found,14
@@ -227,8 +239,9 @@ ERRORS[85]{path,score}:
       python.import.resolvable,error,Module 'routers.marketplace' not found,27
       python.import.resolvable,error,Module 'routers.webhook_v2' not found,28
       python.import.resolvable,error,Module 'routers.mirror' not found,29
-      python.import.resolvable,error,Module 'uvicorn' not found,72
-      python.import.resolvable,error,Module 'config' not found,73
+      python.import.resolvable,error,Module 'routers.benchmark' not found,30
+      python.import.resolvable,error,Module 'uvicorn' not found,74
+      python.import.resolvable,error,Module 'config' not found,75
   backend/routers/marketplace/publish.py,0.61
     issues[11]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'fastapi' not found,3
@@ -369,6 +382,10 @@ ERRORS[85]{path,score}:
       python.import.resolvable,error,Module 'fastapi.security' not found,6
       python.import.resolvable,error,Module 'config' not found,8
       python.import.resolvable,error,Module 'database' not found,9
+  tests/backend/test_benchmark.py,0.71
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,3
+      python.import.resolvable,error,Module 'services.scoring' not found,96
   backend/services/billing.py,0.73
     issues[7]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'config' not found,7
@@ -383,11 +400,6 @@ ERRORS[85]{path,score}:
       python.import.resolvable,error,Module 'sqlalchemy' not found,5
       python.import.resolvable,error,Module 'alembic' not found,6
       python.import.resolvable,error,Module 'db_models' not found,14
-  backend/db_module/scans_orm.py,0.74
-    issues[3]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'sqlalchemy' not found,5
-      python.import.resolvable,error,Module 'sqlalchemy.orm' not found,6
-      python.import.resolvable,error,Module 'db_models' not found,8
   backend/routers/mcp/resources.py,0.74
     issues[3]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'fastapi' not found,2
@@ -457,10 +469,20 @@ ERRORS[85]{path,score}:
   backend/db_module/__init__.py,0.79
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'db_session' not found,3
+  backend/db_module/benchmark_orm.py,0.79
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'sqlalchemy' not found,6
+      python.import.resolvable,error,Module 'sqlalchemy.orm' not found,7
+      python.import.resolvable,error,Module 'db_models' not found,9
   backend/db_module/repositories_orm.py,0.79
     issues[2]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'sqlalchemy.orm' not found,5
       python.import.resolvable,error,Module 'db_models' not found,7
+  backend/db_module/scans_orm.py,0.79
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'sqlalchemy' not found,5
+      python.import.resolvable,error,Module 'sqlalchemy.orm' not found,6
+      python.import.resolvable,error,Module 'db_models' not found,8
   backend/db_module/schema.py,0.79
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'config' not found,4
@@ -526,6 +548,11 @@ ERRORS[85]{path,score}:
       python.import.resolvable,error,Module 'services.scoring' not found,16
       python.import.resolvable,error,Module 'services.scan_service' not found,17
       python.import.resolvable,error,Module 'routers.auth' not found,18
+  backend/routers/benchmark.py,0.82
+    issues[3]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'fastapi' not found,6
+      python.import.resolvable,error,Module 'fastapi.responses' not found,7
+      python.import.resolvable,error,Module 'db_module' not found,10
   backend/routers/mcp/tools.py,0.82
     issues[3]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'fastapi' not found,4
@@ -625,16 +652,16 @@ ERRORS[85]{path,score}:
   backend/adapters/__init__.py,0.93
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'events.models' not found,2
-  backend/db_module/wrappers.py,0.94
-    issues[1]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'db_session' not found,2
   backend/routers/marketplace/__init__.py,0.94
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'fastapi' not found,2
+  backend/db_module/wrappers.py,0.95
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'db_session' not found,2
 
 UNSUPPORTED[5]{bucket,count}:
   *.md,74
   Dockerfile*,2
   *.txt,2
   *.yml,5
-  other,24
+  other,26

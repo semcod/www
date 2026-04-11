@@ -1,7 +1,7 @@
 <!-- code2docs:start --># www
 
-![version](https://img.shields.io/badge/version-0.1.0-blue) ![python](https://img.shields.io/badge/python-%3E%3D3.8-blue) ![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey) ![functions](https://img.shields.io/badge/functions-809-green)
-> **809** functions | **62** classes | **167** files | CC̄ = 2.7
+![version](https://img.shields.io/badge/version-0.1.0-blue) ![python](https://img.shields.io/badge/python-%3E%3D3.8-blue) ![coverage](https://img.shields.io/badge/coverage-unknown-lightgrey) ![functions](https://img.shields.io/badge/functions-883-green)
+> **883** functions | **70** classes | **175** files | CC̄ = 2.7
 
 > Auto-generated project documentation from source code analysis.
 
@@ -146,7 +146,7 @@ Content outside the markers is preserved when regenerating. Enable this with `sy
 
 ```
 www/
-├── project    ├── generate-certs    ├── config    ├── server    ├── store    ├── database    ├── sample_projects    ├── db_session    ├── worker/    ├── db_models        ├── scan_job        ├── webhook_service        ├── mirror        ├── autofix    ├── quality_gate        ├── analyzer        ├── stripe_connect        ├── scan_service        ├── scoring        ├── mirror_models        ├── tenants_orm        ├── users        ├── schema        ├── github_client        ├── tenants        ├── events    ├── db_module/        ├── users_orm        ├── installations        ├── repositories_orm        ├── billing        ├── installations_orm        ├── scans        ├── repositories        ├── scans_orm        ├── events_orm        ├── env        ├── wrappers        ├── _celery_stub            ├── maintenance            ├── marketplace        ├── tasks/            ├── autopr            ├── 0001_initial_schema    ├── events/        ├── scan_samples            ├── scan        ├── loader        ├── registry    ├── apps/            ├── pipeline        ├── base            ├── hooks            ├── pipeline            ├── pipeline    ├── adapters/        ├── base        ├── gitea_events        ├── gitlab        ├── gitea        ├── gitlab_events        ├── system        ├── models        ├── webhook        ├── github        ├── auth        ├── trend        ├── metrics        ├── badge        ├── webhook_v2        ├── report        ├── audit        ├── cron        ├── marketplace/            ├── deploy            ├── publish            ├── models            ├── browse            ├── connect            ├── billing            ├── resources            ├── tools        ├── mcp/            ├── models        ├── config        ├── config        ├── constants        ├── config        ├── api        ├── App        ├── main            ├── usePolling            ├── useAuth            ├── useUrlState            ├── useAppState            ├── useAuditActions            ├── useDownloads            ├── useBilling            ├── MarketplaceDashboard            ├── Header            ├── LanguageBar            ├── ProgressSteps            ├── MetricCard            ├── RecommendationCard            ├── PaywallModal            ├── GradeCircle            ├── Preview            ├── LoginMultiPlatform        ├── components/            ├── ShareButtons            ├── AppCard            ├── InstallButton                ├── AuthPhase                ├── LandingPhase            ├── phases/                ├── ScanningPhase                ├── ReposPhase                    ├── ErrorResult                    ├── ResultMetrics                    ├── ResultRecommendations                    ├── index/                    ├── DownloadButtons                    ├── ResultHeader                    ├── ResultTabPanel                ├── LanguageBar                ├── MetricCard                ├── RecommendationCard                ├── GradeCircle            ├── ui/                ├── TrendTab                ├── PRBotTab                ├── recentScansHelpers                ├── RepoTab                    ├── parts                ├── TrendSummaryCard                ├── BadgeTab            ├── tabs/                ├── AddScheduleForm                ├── SettingsTab                ├── MarketplaceTab                ├── RecentScansTab                ├── ScheduleRow                ├── TrendChart            ├── share            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec        ├── config            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec        ├── autopr        ├── mirror        ├── billing```
+    ├── generate-certs├── project    ├── store    ├── server    ├── config    ├── database    ├── sample_projects    ├── db_session    ├── worker/        ├── scan_job    ├── db_models        ├── webhook_service        ├── mirror    ├── quality_gate        ├── scoring        ├── autofix        ├── stripe_connect        ├── scan_service        ├── analyzer        ├── github_client        ├── tenants_orm        ├── mirror_models        ├── users        ├── schema        ├── tenants        ├── events        ├── users_orm    ├── db_module/        ├── benchmark_orm        ├── installations        ├── repositories_orm        ├── installations_orm        ├── scans        ├── scans_orm        ├── repositories        ├── billing        ├── env        ├── events_orm        ├── _celery_stub        ├── wrappers            ├── marketplace            ├── 0001_initial_schema            ├── maintenance        ├── tasks/            ├── autopr    ├── events/        ├── scan_samples            ├── scan        ├── loader        ├── registry    ├── apps/            ├── pipeline            ├── hooks        ├── base            ├── pipeline        ├── base            ├── pipeline    ├── adapters/        ├── gitea_events        ├── gitlab        ├── gitea        ├── gitlab_events        ├── system        ├── models        ├── github        ├── webhook        ├── auth        ├── trend        ├── metrics        ├── badge        ├── cron        ├── webhook_v2        ├── report        ├── audit        ├── billing        ├── marketplace/            ├── deploy            ├── publish            ├── models            ├── browse            ├── connect            ├── billing            ├── resources            ├── tools        ├── mcp/            ├── models        ├── config        ├── config        ├── constants        ├── config        ├── autopr        ├── App        ├── main        ├── api            ├── useAuth            ├── usePolling        ├── mirror            ├── useBenchmarkTracking            ├── useUrlState            ├── useAuditActions            ├── useAppState            ├── useBilling            ├── MarketplaceDashboard            ├── Header            ├── useDownloads            ├── LanguageBar            ├── MetricCard            ├── ProgressSteps            ├── RecommendationCard            ├── GradeCircle            ├── PaywallModal            ├── Preview        ├── components/            ├── LoginMultiPlatform            ├── ShareButtons            ├── AppCard                ├── BenchmarkDecisionPanel            ├── InstallButton                ├── RecommendationFeedbackForm                ├── BenchmarkReviewPanel            ├── phases/                ├── AuthPhase                ├── ScanningPhase                ├── ReposPhase                    ├── ErrorResult                    ├── ResultRecommendations                    ├── ResultMetrics                ├── LandingPhase                    ├── DownloadButtons                    ├── ResultHeader                    ├── ResultTabPanel                    ├── index/                ├── LanguageBar                ├── MetricCard                ├── RecommendationCard                ├── GradeCircle            ├── ui/                ├── recentScansHelpers                ├── PRBotTab                ├── RepoTab                ├── TrendTab                ├── TrendSummaryCard            ├── tabs/                    ├── parts                ├── AddScheduleForm                ├── BadgeTab                ├── MarketplaceTab                ├── RecentScansTab                ├── SettingsTab                ├── ScheduleRow            ├── share                ├── TrendChart            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec        ├── config            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec        ├── karate-config            ├── spec        ├── benchmark```
 
 ## API Overview
 
@@ -162,14 +162,17 @@ www/
 - **`Event`** — —
 - **`AuditResult`** — —
 - **`BadgeCache`** — —
+- **`BenchmarkCase`** — —
+- **`BenchmarkEvent`** — —
+- **`RecommendationFeedback`** — —
 - **`MirrorService`** — Service for mirroring repos to local Gitea.
+- **`FunctionResult`** — —
+- **`FileResult`** — —
+- **`Violation`** — —
 - **`Patch`** — Represents a single file patch.
 - **`FixResult`** — Result of applying auto-fix.
 - **`PatchGenerator`** — Generates patches for common code issues.
 - **`AutoFixService`** — Service for creating auto-fix PRs.
-- **`FunctionResult`** — —
-- **`FileResult`** — —
-- **`Violation`** — —
 - **`MirrorConfig`** — Configuration for repo mirror.
 - **`MirrorStatus`** — Status of mirror operation.
 - **`BillingEventType`** — —
@@ -181,8 +184,8 @@ www/
 - **`AppContext`** — Context passed to apps during execution.
 - **`AppBase`** — Base class for all marketplace apps.
 - **`AuditApp`** — Main code quality audit app.
-- **`PerformanceApp`** — Performance bottleneck analyzer.
 - **`GitProvider`** — Abstract base class for git platform integrations.
+- **`PerformanceApp`** — Performance bottleneck analyzer.
 - **`GitLabAdapter`** — GitLab API implementation of GitProvider.
 - **`GiteaAdapter`** — Gitea API implementation of GitProvider.
 - **`EventType`** — Supported event types across all platforms.
@@ -191,6 +194,8 @@ www/
 - **`GitHubAdapter`** — GitHub API implementation of GitProvider.
 - **`ScheduleCreate`** — —
 - **`ScheduleOut`** — —
+- **`CheckoutRequest`** — —
+- **`BillingStatus`** — —
 - **`PreviewRequest`** — —
 - **`PreviewResponse`** — —
 - **`InstallRequest`** — —
@@ -211,8 +216,11 @@ www/
 - **`SyncMirrorRequest`** — —
 - **`MirrorResponse`** — —
 - **`MirrorInfo`** — —
-- **`CheckoutRequest`** — —
-- **`BillingStatus`** — —
+- **`CaseCreate`** — —
+- **`CaseUpdate`** — —
+- **`DecisionPayload`** — —
+- **`FeedbackPayload`** — —
+- **`EventPayload`** — —
 
 ### Functions
 
@@ -238,19 +246,20 @@ www/
 - `check_critical_delta(results, baseline)` — —
 - `build_snapshot(results)` — —
 - `main()` — —
+- `calculate_health_score(stats, complexity, duplication, quality)` — Calculate 0-100 health score from metrics.
+- `score_to_grade(score)` — Convert score to letter grade.
+- `generate_recommendations(complexity, duplication, quality)` — Generate actionable recommendations based on metrics.
+- `create_connect_account(email, country)` — Create a Stripe Express Connect account for a publisher.
+- `create_onboarding_link(account_id)` — Return onboarding URL for publisher to complete KYC.
+- `get_account_status(account_id)` — Return payouts_enabled, charges_enabled, requirements.
+- `transfer_revenue(amount_cents, account_id, metadata)` — Transfer publisher share (70%) to their Connect account.
 - `count_code_stats(repo_path)` — Count source files and lines.
 - `analyze_complexity(repo_path)` — Analyze code complexity using Python (no external tools).
 - `analyze_duplication(repo_path)` — Analyze code duplication using Python (no external tools).
 - `analyze_quality(repo_path)` — Analyze code quality using Python (no external tools).
 - `analyze_repo(repo, commit_sha, config)` — Analyze a repository and return health metrics.
 - `run_tool(name, args, fallback)` — Run a semcod tool, return JSON result or fallback.
-- `create_connect_account(email, country)` — Create a Stripe Express Connect account for a publisher.
-- `create_onboarding_link(account_id)` — Return onboarding URL for publisher to complete KYC.
-- `get_account_status(account_id)` — Return payouts_enabled, charges_enabled, requirements.
-- `transfer_revenue(amount_cents, account_id, metadata)` — Transfer publisher share (70%) to their Connect account.
-- `calculate_health_score(stats, complexity, duplication, quality)` — Calculate 0-100 health score from metrics.
-- `score_to_grade(score)` — Convert score to letter grade.
-- `generate_recommendations(complexity, duplication, quality)` — Generate actionable recommendations based on metrics.
+- `get_installation_token(installation_id)` — Get GitHub App installation access token using JWT.
 - `get_or_create_tenant(db, provider, provider_user_id, login)` — Get existing tenant or create new one.
 - `get_tenant_by_id(db, tenant_id)` — Get tenant by ID.
 - `update_tenant_plan(db, tenant_id, plan, billing_customer_id)` — Update tenant's billing plan.
@@ -265,7 +274,6 @@ www/
 - `increment_scan_count(user_id)` — Increment scans_this_week counter. Resets if a new week has started. Returns new count.
 - `get_connection()` — Get database connection based on DB_TYPE.
 - `init_db()` — Initialize the database and create tables.
-- `get_installation_token(installation_id)` — Get GitHub App installation access token using JWT.
 - `get_connection()` — Get database connection based on DB_TYPE.
 - `get_or_create_tenant(provider, provider_user_id, login, name)` — Get existing tenant or create new one.
 - `get_tenant_by_id(tenant_id)` — Get tenant by ID.
@@ -280,6 +288,15 @@ www/
 - `get_subscription(db, user_id)` — Get active subscription for a user. Returns None if not found (treat as free).
 - `upsert_subscription(db, user_id, plan, stripe_customer_id)` — Create or update subscription for a user.
 - `increment_scan_count(db, user_id)` — Increment scans_this_week counter. Resets if a new week has started. Returns new count.
+- `create_benchmark_case(db, payload)` — —
+- `get_benchmark_cases(db)` — —
+- `get_benchmark_case(db, case_id)` — —
+- `update_benchmark_case(db, case_id, updates)` — —
+- `create_benchmark_event(db, case_id, payload)` — —
+- `get_benchmark_events(db, case_id)` — —
+- `upsert_recommendation_feedback(db, case_id, recommendation_id, payload)` — —
+- `get_feedback_for_case(db, case_id)` — —
+- `get_benchmark_summary(db)` — —
 - `get_connection()` — Get database connection based on DB_TYPE.
 - `create_installation(tenant_id, repository_id, apps, webhook_id)` — Create app installation for a repository.
 - `get_installation(tenant_id, repository_id)` — Get installation by tenant and repository.
@@ -289,8 +306,6 @@ www/
 - `get_or_create_repository(db, tenant_id, provider, repo_provider_id)` — Get existing repository or create new one for tenant.
 - `get_tenant_repositories(db, tenant_id)` — Get all repositories for a tenant.
 - `get_repository_by_full_name(db, tenant_id, provider, full_name)` — Get repository by tenant + provider + full_name.
-- `get_usage_tracker()` — Get singleton usage tracker.
-- `get_stripe_billing()` — Get singleton Stripe billing.
 - `create_installation(db, tenant_id, repository_id, apps)` — Create app installation for a repository.
 - `get_installation(db, tenant_id, repository_id)` — Get installation by tenant and repository.
 - `get_tenant_installations(db, tenant_id)` — Get all installations for a tenant.
@@ -305,24 +320,27 @@ www/
 - `get_audit_result(audit_id)` — Get audit result from database.
 - `save_badge_cache(repo, badge_data)` — Save badge cache to database.
 - `get_badge_cache(repo)` — Get badge cache from database.
-- `get_connection()` — Get database connection based on DB_TYPE.
-- `get_or_create_repository(tenant_id, provider, repo_provider_id, name)` — Get existing repository or create new one for tenant.
-- `get_tenant_repositories(tenant_id)` — Get all repositories for a tenant.
-- `get_repository_by_full_name(tenant_id, provider, full_name)` — Get repository by tenant + provider + full_name.
 - `save_scan(db, scan_data)` — Save a scan to the database.
 - `get_recent_scans(db, limit)` — Get recent scans from the database.
 - `get_repo_scans(db, repo, limit)` — Get scans for a specific repository ordered by date ascending.
 - `get_total_scan_count(db)` — Get total number of scans in the database.
-- `save_audit_result(db, audit_id, audit_data)` — Save audit result to database.
+- `save_audit_result(db, audit_id, audit_data)` — Save audit result to database. Merges benchmark meta into audit_meta JSON.
 - `get_audit_result(db, audit_id)` — Get audit result from database.
 - `save_badge_cache(db, repo, badge_data)` — Save badge cache to database.
 - `get_badge_cache(db, repo)` — Get badge cache from database.
-- `queue_event(db, event_id, event_type, provider)` — Queue a new event for processing.
-- `get_pending_events(db, limit)` — Get pending events for processing.
-- `update_event_status(db, event_id, status, error_message)` — Update event processing status.
+- `get_connection()` — Get database connection based on DB_TYPE.
+- `get_or_create_repository(tenant_id, provider, repo_provider_id, name)` — Get existing repository or create new one for tenant.
+- `get_tenant_repositories(tenant_id)` — Get all repositories for a tenant.
+- `get_repository_by_full_name(tenant_id, provider, full_name)` — Get repository by tenant + provider + full_name.
+- `get_usage_tracker()` — Get singleton usage tracker.
+- `get_stripe_billing()` — Get singleton Stripe billing.
 - `get_url()` — Get DB URL from env, fallback to alembic.ini.
 - `run_migrations_offline()` — Run migrations in 'offline' mode (generates SQL without a connection).
 - `run_migrations_online()` — Run migrations in 'online' mode (requires live DB connection).
+- `queue_event(db, event_id, event_type, provider)` — Queue a new event for processing.
+- `get_pending_events(db, limit)` — Get pending events for processing.
+- `update_event_status(db, event_id, status, error_message)` — Update event processing status.
+- `shared_task(fn)` — Drop-in replacement for celery.shared_task with no broker dependency.
 - `save_scan(scan_data)` — —
 - `get_recent_scans(limit)` — —
 - `get_repo_scans(repo, limit)` — —
@@ -351,15 +369,23 @@ www/
 - `queue_event(event_id, event_type, provider, repo_full_name)` — —
 - `get_pending_events(limit)` — —
 - `update_event_status(event_id, status, error_message)` — —
-- `shared_task(fn)` — Drop-in replacement for celery.shared_task with no broker dependency.
-- `check_health_regression(repo, previous_score, new_score, threshold)` — Check if health score regressed and create issue if needed.
-- `check_score_and_notify(repo, previous_score, new_score, tenant_id)` — Check if score improved after auto-fix and send notifications.
+- `create_benchmark_case(payload)` — —
+- `get_benchmark_cases()` — —
+- `get_benchmark_case(case_id)` — —
+- `update_benchmark_case(case_id, updates)` — —
+- `create_benchmark_event(case_id, payload)` — —
+- `get_benchmark_events(case_id)` — —
+- `upsert_recommendation_feedback(case_id, recommendation_id, payload)` — —
+- `get_feedback_for_case(case_id)` — —
+- `get_benchmark_summary()` — —
 - `sync_mirror_task(self, mirror_id, source_repo, source_provider)` — Sync mirror from source to Gitea asynchronously.
 - `schedule_periodic_mirrors()` — Schedule periodic sync for all active mirrors.
-- `create_auto_pr(self, repo, base_branch, patches)` — Create automated PR with fixes asynchronously.
-- `create_auto_fix_pr(self, repo, base_branch, files)` — Create automated PR with fixes asynchronously.
 - `upgrade()` — —
 - `downgrade()` — —
+- `check_health_regression(repo, previous_score, new_score, threshold)` — Check if health score regressed and create issue if needed.
+- `check_score_and_notify(repo, previous_score, new_score, tenant_id)` — Check if score improved after auto-fix and send notifications.
+- `create_auto_pr(self, repo, base_branch, patches)` — Create automated PR with fixes asynchronously.
+- `create_auto_fix_pr(self, repo, base_branch, files)` — Create automated PR with fixes asynchronously.
 - `scan_sample_projects()` — Scan all sample projects and save to database.
 - `run_audit(self, repo, commit_sha, config)` — Run code audit on a repository asynchronously.
 - `process_pr_event(self, event_dict)` — Process pull request event asynchronously.
@@ -378,8 +404,8 @@ www/
 - `parse_gitlab_event(payload)` — Parse GitLab webhook payload into unified Event.
 - `health_check()` — Health check endpoint with cache stats.
 - `get_domain_config()` — Return the configured domain from environment.
-- `github_webhook(request)` — Handle GitHub webhook events.
 - `parse_github_event(payload)` — Parse GitHub webhook payload into unified Event.
+- `github_webhook(request)` — Handle GitHub webhook events.
 - `create_session_token(user_id)` — —
 - `decode_session_token(token)` — —
 - `get_current_user(credentials)` — —
@@ -399,14 +425,6 @@ www/
 - `download_project_prompt_markdown()` — Download the project prompt as markdown format.
 - `health_badge(repo_slug, style)` — Generate SVG badge with code health score.
 - `scan_count_badge()` — Generate SVG badge showing total number of scans performed.
-- `github_webhook(request)` — Handle GitHub webhook events using unified adapter system.
-- `gitlab_webhook(request)` — Handle GitLab webhook events.
-- `gitea_webhook(request)` — Handle Gitea webhook events.
-- `report_page(owner, repo)` — Redirect to frontend report page.
-- `run_audit(request, user)` — Run one-click audit on a repo. Requires authentication.
-- `get_audit_result_endpoint(audit_id)` — Poll audit status and results.
-- `get_recent_scans_api(limit)` — Get list of recent scans with metrics.
-- `analyze_repo(request)` — Analyze any public repository by URL (sandbox mode).
 - `get_scheduler()` — —
 - `start_scheduler()` — —
 - `stop_scheduler()` — —
@@ -415,6 +433,20 @@ www/
 - `get_schedule(owner, repo)` — Get schedule details for a specific repository.
 - `update_schedule(owner, repo, body)` — Update interval or webhook for an existing schedule.
 - `delete_schedule(owner, repo)` — Remove a scheduled scan.
+- `github_webhook(request)` — Handle GitHub webhook events using unified adapter system.
+- `gitlab_webhook(request)` — Handle GitLab webhook events.
+- `gitea_webhook(request)` — Handle Gitea webhook events.
+- `report_page(owner, repo)` — Redirect to frontend report page.
+- `run_audit(request, user)` — Run one-click audit on a repo. Requires authentication.
+- `get_audit_result_endpoint(audit_id)` — Poll audit status and results.
+- `get_recent_scans_api(limit)` — Get list of recent scans with metrics.
+- `analyze_repo(request)` — Analyze any public repository by URL (sandbox mode).
+- `list_plans()` — Return available plans and pricing (no auth required).
+- `billing_status(user)` — Return current plan, limits, and scan usage for the authenticated user.
+- `create_checkout(body, user)` — Create a Stripe Checkout session.
+- `billing_portal(user)` — Create a Stripe Customer Portal session.
+- `stripe_webhook(request)` — Handle Stripe webhook events.
+- `check_scan_allowed(user_id)` — Raise HTTP 402 if the user has hit their weekly scan limit.
 - `trigger_auto_fix(request, user)` — Trigger auto-fix PR generation for a repository.
 - `install_app(request, user)` — Install Semcod app on a repository.
 - `uninstall_app(repo, provider, user)` — Remove Semcod app from a repository.
@@ -435,6 +467,7 @@ www/
 - `API()` — —
 - `gradeColor()` — —
 - `PUBLIC_URL()` — —
+- `create_auto_pr(body, user)` — Apply LLM-generated patches to a repository and create a GitHub PR.
 - `authHeaders()` — —
 - `fetchMe()` — —
 - `res()` — —
@@ -458,6 +491,22 @@ www/
 - `fetchBillingPortal()` — —
 - `getApps()` — —
 - `getAppStatus()` — —
+- `createBenchmarkCase()` — —
+- `updateBenchmarkCase()` — —
+- `submitRecommendationFeedback()` — —
+- `submitBenchmarkDecision()` — —
+- `trackBenchmarkEvent()` — —
+- `fetchBenchmarkSummary()` — —
+- `downloadBenchmarkExport()` — —
+- `useSessionCallbackBootstrap()` — —
+- `searchParams()` — —
+- `session()` — —
+- `useSessionProfile()` — —
+- `getOAuthStartUrl()` — —
+- `confirmAuthFlow()` — —
+- `startDemoSession()` — —
+- `data()` — —
+- `logoutSession()` — —
 - `useScanAnimation()` — —
 - `timers()` — —
 - `done()` — —
@@ -468,15 +517,21 @@ www/
 - `data()` — —
 - `interval()` — —
 - `shouldStop()` — —
-- `useSessionCallbackBootstrap()` — —
-- `searchParams()` — —
-- `session()` — —
-- `useSessionProfile()` — —
-- `getOAuthStartUrl()` — —
-- `confirmAuthFlow()` — —
-- `startDemoSession()` — —
-- `data()` — —
-- `logoutSession()` — —
+- `create_mirror(request, user)` — Create new mirror from GitHub/GitLab to local Gitea.
+- `sync_mirror(request, user)` — Sync existing mirror with latest changes from source.
+- `list_mirrors(user)` — List all mirrors for current user.
+- `get_mirror(mirror_id, user)` — Get mirror by ID.
+- `delete_mirror(mirror_id, user)` — Delete mirror.
+- `safeTrack()` — —
+- `useBenchmarkTracking()` — —
+- `prevPhase()` — —
+- `trackedResultEntry()` — —
+- `startedAt()` — —
+- `prev()` — —
+- `elapsed()` — —
+- `trackExport()` — —
+- `trackRecommendationOpened()` — —
+- `trackDecision()` — —
 - `VALID_TABS()` — —
 - `VALID_PHASES()` — —
 - `parseRepositoryReference()` — —
@@ -495,13 +550,6 @@ www/
 - `repoData()` — —
 - `auditParam()` — —
 - `useHashSync()` — —
-- `useAppState()` — —
-- `demoUser()` — —
-- `reset()` — —
-- `startOAuth()` — —
-- `confirmAuth()` — —
-- `startDemoLogin()` — —
-- `doLogout()` — —
 - `useAuditActions()` — —
 - `startAudit()` — —
 - `data()` — —
@@ -509,6 +557,24 @@ www/
 - `url()` — —
 - `repoData()` — —
 - `resetAudit()` — —
+- `useAppState()` — —
+- `demoUser()` — —
+- `reset()` — —
+- `startOAuth()` — —
+- `confirmAuth()` — —
+- `startDemoLogin()` — —
+- `doLogout()` — —
+- `useBilling()` — —
+- `refreshBilling()` — —
+- `checkScanAllowed()` — —
+- `openCheckout()` — —
+- `dismissPaywall()` — —
+- `loadData()` — —
+- `toggleApp()` — —
+- `handleRepoSelect()` — —
+- `isRepoInstalled()` — —
+- `Header()` — —
+- `tabBtn()` — —
 - `recommendationLabel()` — —
 - `recommendationLine()` — —
 - `markdownRecommendationLine()` — —
@@ -530,35 +596,24 @@ www/
 - `handleDownloadMarkdown()` — —
 - `handleDownloadToon()` — —
 - `handleGenericDownload()` — —
-- `useBilling()` — —
-- `refreshBilling()` — —
-- `checkScanAllowed()` — —
-- `openCheckout()` — —
-- `dismissPaywall()` — —
-- `loadData()` — —
-- `toggleApp()` — —
-- `handleRepoSelect()` — —
-- `isRepoInstalled()` — —
-- `Header()` — —
-- `tabBtn()` — —
 - `LanguageBar()` — —
 - `total()` — —
 - `entries()` — —
+- `MetricCard()` — —
 - `ProgressSteps()` — —
 - `currentIdx()` — —
 - `stepIdx()` — —
 - `done()` — —
 - `active()` — —
-- `MetricCard()` — —
 - `RecommendationCard()` — —
-- `PlanCard()` — —
-- `PaywallModal()` — —
 - `GradeCircle()` — —
 - `color()` — —
 - `r()` — —
 - `circ()` — —
 - `targetOffset()` — —
 - `t()` — —
+- `PlanCard()` — —
+- `PaywallModal()` — —
 - `loadPreview()` — —
 - `result()` — —
 - `formatComment()` — —
@@ -572,43 +627,41 @@ www/
 - `isPro()` — —
 - `getAppIcon()` — —
 - `getTriggerIcon()` — —
+- `handleSubmit()` — —
 - `checkStatus()` — —
 - `result()` — —
 - `handleInstall()` — —
 - `handleUninstall()` — —
+- `ScoreSelect()` — —
+- `handleSubmit()` — —
+- `caseId()` — —
+- `setCaseId()` — —
+- `handleCreate()` — —
 - `AuthPhase()` — —
 - `handleLogin()` — —
 - `handleDemoLogin()` — —
 - `data()` — —
+- `ScanningPhase()` — —
+- `ReposPhase()` — —
+- `ErrorResult()` — —
+- `ResultRecommendations()` — —
+- `ResultMetrics()` — —
 - `LandingPhase()` — —
 - `fetchRecentScans()` — —
 - `response()` — —
 - `data()` — —
 - `formatDate()` — —
 - `date()` — —
-- `ScanningPhase()` — —
-- `ReposPhase()` — —
-- `ErrorResult()` — —
-- `ResultMetrics()` — —
-- `ResultRecommendations()` — —
+- `DownloadButtons()` — —
+- `active()` — —
+- `ResultHeader()` — —
+- `ResultTabPanel()` — —
 - `ResultPhase()` — —
 - `data()` — —
 - `repoName()` — —
 - `activeContent()` — —
 - `handleCopy()` — —
 - `handleDownload()` — —
-- `DownloadButtons()` — —
-- `active()` — —
-- `ResultHeader()` — —
-- `ResultTabPanel()` — —
-- `TrendTab()` — —
-- `repoName()` — —
-- `history()` — —
-- `latest()` — —
-- `prev()` — —
-- `delta()` — —
-- `directionColor()` — —
-- `PRBotTab()` — —
 - `fetchRecentScans()` — —
 - `response()` — —
 - `data()` — —
@@ -617,7 +670,18 @@ www/
 - `getPrimaryLanguage()` — —
 - `openRecentScanRepository()` — —
 - `openRecentScanAudit()` — —
+- `PRBotTab()` — —
 - `RepoTab()` — —
+- `TrendTab()` — —
+- `repoName()` — —
+- `history()` — —
+- `latest()` — —
+- `prev()` — —
+- `delta()` — —
+- `directionColor()` — —
+- `TrendSummaryCard()` — —
+- `sign()` — —
+- `deltaColor()` — —
 - `LanguageBadge()` — —
 - `language()` — —
 - `ScanMetrics()` — —
@@ -625,9 +689,8 @@ www/
 - `RecentScansEmptyState()` — —
 - `RecentScansHeader()` — —
 - `RecentScansBadgeInfo()` — —
-- `TrendSummaryCard()` — —
-- `sign()` — —
-- `deltaColor()` — —
+- `AddScheduleForm()` — —
+- `handleSubmit()` — —
 - `BadgeSVG()` — —
 - `color()` — —
 - `labelW()` — —
@@ -635,8 +698,9 @@ www/
 - `valueW()` — —
 - `BadgeTab()` — —
 - `badgeUrl()` — —
-- `AddScheduleForm()` — —
-- `handleSubmit()` — —
+- `MarketplaceTab()` — —
+- `provider()` — —
+- `RecentScansTab()` — —
 - `SectionHeader()` — —
 - `SettingsTab()` — —
 - `loadSchedules()` — —
@@ -644,11 +708,16 @@ www/
 - `handleBillingPortal()` — —
 - `plan()` — —
 - `planColor()` — —
-- `MarketplaceTab()` — —
-- `provider()` — —
-- `RecentScansTab()` — —
 - `ScheduleRow()` — —
 - `handleDelete()` — —
+- `generateShareText()` — —
+- `grade()` — —
+- `score()` — —
+- `files()` — —
+- `lines()` — —
+- `getShareUrls()` — —
+- `text()` — —
+- `url()` — —
 - `TrendChart()` — —
 - `W()` — —
 - `scores()` — —
@@ -658,14 +727,6 @@ www/
 - `x()` — —
 - `y()` — —
 - `points()` — —
-- `generateShareText()` — —
-- `grade()` — —
-- `score()` — —
-- `files()` — —
-- `lines()` — —
-- `getShareUrls()` — —
-- `text()` — —
-- `url()` — —
 - `input()` — —
 - `recentSection()` — —
 - `isVisible()` — —
@@ -679,6 +740,23 @@ www/
 - `listResponse()` — —
 - `listData()` — —
 - `repo()` — —
+- `toggle()` — —
+- `btn()` — —
+- `sourceSelect()` — —
+- `API()` — —
+- `res()` — —
+- `body()` — —
+- `create()` — —
+- `patch()` — —
+- `decision()` — —
+- `feedback()` — —
+- `event()` — —
+- `list()` — —
+- `events()` — —
+- `exp()` — —
+- `exportBody()` — —
+- `dup()` — —
+- `input()` — —
 - `twitterButton()` — —
 - `linkedinButton()` — —
 - `blueskyButton()` — —
@@ -687,7 +765,6 @@ www/
 - `count()` — —
 - `recentSection()` — —
 - `isVisible()` — —
-- `input()` — —
 - `currentUrl()` — —
 - `recentScansSection()` — —
 - `isVisible()` — —
@@ -705,6 +782,20 @@ www/
 - `count()` — —
 - `scanCard()` — —
 - `viewButton()` — —
+- `repoButtons()` — —
+- `count()` — —
+- `demoButton()` — —
+- `isVisible()` — —
+- `input()` — —
+- `sandboxBadge()` — —
+- `hasSandbox()` — —
+- `baseUrl()` — —
+- `response()` — —
+- `data()` — —
+- `scan()` — —
+- `heading()` — —
+- `isVisible()` — —
+- `recentTab()` — —
 - `skipInCI()` — —
 - `response()` — —
 - `data()` — —
@@ -712,10 +803,8 @@ www/
 - `listResponse()` — —
 - `listData()` — —
 - `repo()` — —
-- `repoButtons()` — —
-- `count()` — —
-- `demoButton()` — —
-- `isVisible()` — —
+- `input()` — —
+- `reportVisible()` — —
 - `noScansMessage()` — —
 - `hasNoScans()` — —
 - `scanCard()` — —
@@ -729,18 +818,16 @@ www/
 - `blueskyVisible()` — —
 - `recentSection()` — —
 - `isVisible()` — —
-- `input()` — —
-- `sandboxBadge()` — —
-- `hasSandbox()` — —
-- `baseUrl()` — —
-- `response()` — —
-- `data()` — —
-- `scan()` — —
-- `heading()` — —
+- `currentUrl()` — —
+- `recentScansSection()` — —
 - `isVisible()` — —
+- `twitterButton()` — —
+- `linkedinButton()` — —
+- `twitterVisible()` — —
+- `linkedinVisible()` — —
 - `recentTab()` — —
-- `input()` — —
-- `reportVisible()` — —
+- `isTabVisible()` — —
+- `fn()` — —
 - `tabButton()` — —
 - `element()` — —
 - `isVisible()` — —
@@ -752,27 +839,18 @@ www/
 - `avatarVisible()` — —
 - `demoIndicator()` — —
 - `demoVisible()` — —
-- `currentUrl()` — —
-- `recentScansSection()` — —
-- `isVisible()` — —
-- `twitterButton()` — —
-- `linkedinButton()` — —
-- `twitterVisible()` — —
-- `linkedinVisible()` — —
-- `recentTab()` — —
-- `isTabVisible()` — —
-- `create_auto_pr(body, user)` — Apply LLM-generated patches to a repository and create a GitHub PR.
-- `create_mirror(request, user)` — Create new mirror from GitHub/GitLab to local Gitea.
-- `sync_mirror(request, user)` — Sync existing mirror with latest changes from source.
-- `list_mirrors(user)` — List all mirrors for current user.
-- `get_mirror(mirror_id, user)` — Get mirror by ID.
-- `delete_mirror(mirror_id, user)` — Delete mirror.
-- `list_plans()` — Return available plans and pricing (no auth required).
-- `billing_status(user)` — Return current plan, limits, and scan usage for the authenticated user.
-- `create_checkout(body, user)` — Create a Stripe Checkout session.
-- `billing_portal(user)` — Create a Stripe Customer Portal session.
-- `stripe_webhook(request)` — Handle Stripe webhook events.
-- `check_scan_allowed(user_id)` — Raise HTTP 402 if the user has hit their weekly scan limit.
+- `post_case(body)` — —
+- `list_cases()` — —
+- `get_case(case_id)` — —
+- `patch_case(case_id, body)` — —
+- `post_decision(case_id, body)` — —
+- `post_feedback(case_id, recommendation_id, body)` — —
+- `list_feedback(case_id)` — —
+- `post_event(case_id, body)` — —
+- `list_events(case_id)` — —
+- `summary()` — —
+- `export_json()` — —
+- `export_csv()` — —
 
 
 ## Project Structure
@@ -796,8 +874,9 @@ www/
 📄 `backend.apps.security.pipeline` (5 functions, 1 classes)
 📄 `backend.config`
 📄 `backend.database`
-📄 `backend.db_models` (1 functions, 10 classes)
+📄 `backend.db_models` (1 functions, 13 classes)
 📦 `backend.db_module`
+📄 `backend.db_module.benchmark_orm` (11 functions)
 📄 `backend.db_module.events` (4 functions)
 📄 `backend.db_module.events_orm` (3 functions)
 📄 `backend.db_module.installations` (6 functions)
@@ -811,8 +890,8 @@ www/
 📄 `backend.db_module.tenants_orm` (3 functions)
 📄 `backend.db_module.users` (9 functions)
 📄 `backend.db_module.users_orm` (6 functions)
-📄 `backend.db_module.wrappers` (28 functions)
-📄 `backend.db_session` (2 functions)
+📄 `backend.db_module.wrappers` (37 functions)
+📄 `backend.db_session` (3 functions)
 📦 `backend.events`
 📄 `backend.events.models` (5 functions, 3 classes)
 📄 `backend.quality_gate` (12 functions, 3 classes)
@@ -820,6 +899,7 @@ www/
 📄 `backend.routers.auth` (9 functions)
 📄 `backend.routers.autopr` (12 functions, 3 classes)
 📄 `backend.routers.badge` (4 functions)
+📄 `backend.routers.benchmark` (12 functions, 5 classes)
 📄 `backend.routers.billing` (12 functions, 2 classes)
 📦 `backend.routers.marketplace`
 📄 `backend.routers.marketplace.billing` (2 functions)
@@ -851,7 +931,7 @@ www/
 📄 `backend.services.mirror` (11 functions, 1 classes)
 📄 `backend.services.mirror_models` (2 classes)
 📄 `backend.services.scan_service`
-📄 `backend.services.scoring` (3 functions)
+📄 `backend.services.scoring` (4 functions)
 📄 `backend.services.stripe_connect` (5 functions)
 📄 `backend.services.webhook_service` (8 functions)
 📄 `backend.store`
@@ -862,6 +942,7 @@ www/
 📄 `backend.worker.tasks.maintenance` (2 functions)
 📄 `backend.worker.tasks.marketplace` (3 functions)
 📄 `backend.worker.tasks.scan` (7 functions)
+📄 `e2e.karate.karate-config` (1 functions)
 📄 `e2e.playwright.config`
 📄 `e2e.specs.audit.spec` (1 functions)
 📄 `e2e.specs.badge.spec` (1 functions)
@@ -876,6 +957,7 @@ www/
 📄 `e2e.specs.social-sharing.spec` (33 functions)
 📄 `frontend.e2e.audit.spec`
 📄 `frontend.e2e.badge.spec` (1 functions)
+📄 `frontend.e2e.benchmark.spec` (18 functions)
 📄 `frontend.e2e.metrics.spec` (13 functions)
 📄 `frontend.e2e.recent-scans.spec` (8 functions)
 📄 `frontend.e2e.scan-workflow.spec` (9 functions)
@@ -883,7 +965,7 @@ www/
 📄 `frontend.e2e.social-sharing.spec` (10 functions)
 📄 `frontend.playwright.config`
 📄 `frontend.src.App`
-📄 `frontend.src.api` (42 functions)
+📄 `frontend.src.api` (55 functions)
 📦 `frontend.src.components`
 📄 `frontend.src.components.AppCard` (3 functions)
 📄 `frontend.src.components.GradeCircle` (6 functions)
@@ -898,6 +980,9 @@ www/
 📄 `frontend.src.components.ProgressSteps` (5 functions)
 📄 `frontend.src.components.RecommendationCard` (1 functions)
 📄 `frontend.src.components.ShareButtons` (3 functions)
+📄 `frontend.src.components.benchmark.BenchmarkDecisionPanel` (1 functions)
+📄 `frontend.src.components.benchmark.BenchmarkReviewPanel` (3 functions)
+📄 `frontend.src.components.benchmark.RecommendationFeedbackForm` (2 functions)
 📦 `frontend.src.components.phases`
 📄 `frontend.src.components.phases.AuthPhase` (4 functions)
 📄 `frontend.src.components.phases.LandingPhase` (6 functions)
@@ -934,6 +1019,7 @@ www/
 📄 `frontend.src.hooks.useAppState` (7 functions)
 📄 `frontend.src.hooks.useAuditActions` (8 functions)
 📄 `frontend.src.hooks.useAuth` (9 functions)
+📄 `frontend.src.hooks.useBenchmarkTracking` (10 functions)
 📄 `frontend.src.hooks.useBilling` (5 functions)
 📄 `frontend.src.hooks.useDownloads` (21 functions)
 📄 `frontend.src.hooks.usePolling` (10 functions)

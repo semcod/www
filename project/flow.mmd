@@ -8,6 +8,7 @@ flowchart TD
         backend__db_session__get_db["get_db"]
         backend__db_session__init_db["init_db"]
         backend__worker__get_celery_app["get_celery_app"]
+        backend__scheduler__scan_job__run_scheduled_scan("run_scheduled_scan CC=8")
         backend__db_models___utcnow["_utcnow"]
         backend__services__mirror__MirrorService__create_mirror["create_mirror"]
         backend__services__mirror__MirrorService__sync_mirror["sync_mirror"]
@@ -18,11 +19,15 @@ flowchart TD
         backend__services__mirror__MirrorService___setup_ci_cd["_setup_ci_cd"]
         backend__services__mirror__MirrorService___generate_workflow["_generate_workflow"]
         backend__services__mirror__MirrorService___get_latest_commit["_get_latest_commit"]
-        backend__services__mirror__MirrorService___get_commit_count["_get_commit_count"]
-        ...["+595 more"]
+        ...["+648 more"]
     end
 
     subgraph Exporters
+        frontend__src__api__downloadBenchmarkExport["downloadBenchmarkExport"]
+        frontend__src__hooks__useBenchmarkTracking__trackExport["trackExport"]
+        frontend__e2e__benchmark__spec__exportBody["exportBody"]
+        backend__routers__benchmark__export_json["export_json"]
+        backend__routers__benchmark__export_csv["export_csv"]
     end
 
     class backend__server__lifespan,backend__db_session__get_db,backend__db_session__init_db,backend__worker__get_celery_app,backend__db_models___utcnow,backend__services__mirror__MirrorService__create_mirror,backend__services__mirror__MirrorService__sync_mirror,backend__services__mirror__MirrorService___get_source_adapter,backend__services__mirror__MirrorService___get_clone_url,backend__services__mirror__MirrorService___get_gitea_clone_url entry
