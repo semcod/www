@@ -334,22 +334,47 @@ echo "✔ Ticket stworzony: ${TICKET_ID}"
 
 # ── 5. Przetwórz ticket przez reDSL ────────────────────────────────────────
 echo ""
-if [ "$DRY_RUN" = "true" ]; then
-  echo "── reDSL: dry-run (podgląd bez zmian) ──"
+if [ "$APPLY" = "true" ]; then
+  # For --apply: call /cycle directly (modifies files via LLM)
+  # Skip backend /process which would also call /cycle and create history conflicts
+  echo "── reDSL: /cycle (realne zmiany kodu) ──"
+
+  LLM_MODEL="${LLM_MODEL:-openrouter/openai/gpt-4o-mini}"
+  CYCLE_RESP=$(curl -s --max-time 300 -X POST "${REDSL_URL}/cycle" \
+    -H "Content-Type: application/json" \
+    -d "{\"project_dir\":\"/tmp/${REPO_SLUG}\",\"max_actions\":3,\"clear_history\":true,\"llm_model\":\"${LLM_MODEL}\"}" 2>/dev/null)
+
+  PROCESS_STATUS=$(echo "$CYCLE_RESP" | python3 -c "import sys,json; d=json.load(sys.stdin); print('analyzed' if d.get('proposals_applied',0) > 0 or d.get('files_modified') else 'no_changes')" 2>/dev/null)
+  DECISIONS_COUNT=$(echo "$CYCLE_RESP" | python3 -c "import sys,json; print(json.load(sys.stdin).get('decisions_count',0))" 2>/dev/null)
+  APPLIED_COUNT=$(echo "$CYCLE_RESP" | python3 -c "import sys,json; print(json.load(sys.stdin).get('proposals_applied',0))" 2>/dev/null)
+  FILES_MODIFIED_LIST=$(echo "$CYCLE_RESP" | python3 -c "
+import sys,json
+data = json.load(sys.stdin)
+for f in data.get('files_modified', []):
+    print(f'  → {f}')
+" 2>/dev/null)
+
+  echo "  Decyzje: ${DECISIONS_COUNT} | Applied: ${APPLIED_COUNT}"
+  [ -n "$FILES_MODIFIED_LIST" ] && echo "  Pliki:" && echo "$FILES_MODIFIED_LIST"
+
+  # Update ticket via backend
+  FILES_JSON=$(echo "$CYCLE_RESP" | python3 -c "import sys,json; print(json.dumps(json.load(sys.stdin).get('files_modified',[])))" 2>/dev/null)
+  semcod PATCH "/api/tickets/${TICKET_ID}" "{\"status\":\"analyzed\",\"files_modified\":${FILES_JSON}}" >/dev/null 2>&1 || true
+
 else
-  echo "── reDSL: refaktoryzacja (apply) ──"
-fi
+  # Dry-run: use backend /process (no file modifications)
+  echo "── reDSL: dry-run (podgląd bez zmian) ──"
 
-PROCESS_RESP=$(semcod POST "/api/tickets/${TICKET_ID}/process" "{
-  \"project_path\": \"/tmp/${REPO_SLUG}\",
-  \"max_actions\": 10,
-  \"dry_run\": ${DRY_RUN},
-  \"auto_create_pr\": false
-}")
+  PROCESS_RESP=$(semcod POST "/api/tickets/${TICKET_ID}/process" "{
+    \"project_path\": \"/tmp/${REPO_SLUG}\",
+    \"max_actions\": 10,
+    \"dry_run\": true,
+    \"auto_create_pr\": false
+  }")
 
-PROCESS_STATUS=$(echo "$PROCESS_RESP" | python3 -c "import sys,json; print(json.load(sys.stdin).get('status',''))" 2>/dev/null)
-DECISIONS_COUNT=$(echo "$PROCESS_RESP" | python3 -c "import sys,json; print(json.load(sys.stdin).get('decisions_count',0))" 2>/dev/null)
-FILES_MODIFIED=$(echo "$PROCESS_RESP" | python3 -c "
+  PROCESS_STATUS=$(echo "$PROCESS_RESP" | python3 -c "import sys,json; print(json.load(sys.stdin).get('status',''))" 2>/dev/null)
+  DECISIONS_COUNT=$(echo "$PROCESS_RESP" | python3 -c "import sys,json; print(json.load(sys.stdin).get('decisions_count',0))" 2>/dev/null)
+  FILES_MODIFIED_LIST=$(echo "$PROCESS_RESP" | python3 -c "
 import sys,json
 data = json.load(sys.stdin)
 files = data.get('files_modified', [])
@@ -360,104 +385,76 @@ if len(unique) > 10:
     print(f'  ... i {len(unique)-10} więcej')
 " 2>/dev/null)
 
-echo "  Status: ${PROCESS_STATUS}"
-echo "  Decyzje: ${DECISIONS_COUNT}"
-[ -n "$FILES_MODIFIED" ] && echo "  Pliki:" && echo "$FILES_MODIFIED"
+  echo "  Status: ${PROCESS_STATUS}"
+  echo "  Decyzje: ${DECISIONS_COUNT}"
+  [ -n "$FILES_MODIFIED_LIST" ] && echo "  Pliki:" && echo "$FILES_MODIFIED_LIST"
+fi
 
 # ── 6. Jeśli --apply, stwórz PR z realnymi zmianami z kontenera ────────────
-if [ "$APPLY" = "true" ] && [ "${DECISIONS_COUNT:-0}" -gt 0 ]; then
+if [ "$APPLY" = "true" ] && [ "${APPLIED_COUNT:-0}" -gt 0 ]; then
   echo ""
-  echo "── reDSL: run_cycle (realne zmiany kodu) ──"
+  echo "── Tworzenie PR ──"
 
-  # Clear reDSL history to avoid duplicate decision blocks
-  docker exec www-redsl-1 bash -c "rm -rf /app/.redsl/history.jsonl /tmp/refactor_memory/chroma.sqlite3" 2>/dev/null
+  # Export diff as patch from container (files already modified by /cycle in step 5)
+  PATCH_FILE="${TMPDIR}/redsl-patch-${TICKET_ID}.diff"
+  docker exec www-redsl-1 bash -c "cd /tmp/${REPO_SLUG} && git diff" > "${PATCH_FILE}" 2>/dev/null
 
-  # Use run_cycle which actually modifies files via LLM (not plan-only /refactor)
-  LLM_MODEL="${LLM_MODEL:-openrouter/openai/gpt-4o-mini}"
-  CYCLE_OUTPUT=$(docker exec -e LLM_MODEL="${LLM_MODEL}" www-redsl-1 python3 -c "
-import os, sys
-os.environ['LLM_MODEL'] = '${LLM_MODEL}'
-from redsl.orchestrator import RefactorOrchestrator
-from redsl.config import AgentConfig
-config = AgentConfig.from_env()
-config.llm.model = '${LLM_MODEL}'
-config.refactor.dry_run = False
-config.refactor.reflection_rounds = 1
-orch = RefactorOrchestrator(config)
-from pathlib import Path
-report = orch.run_cycle(Path('/tmp/${REPO_SLUG}'), max_actions=3)
-print(f'Applied: {report.proposals_applied}')
-print(f'Rejected: {report.proposals_rejected}')
-for e in report.errors[:3]:
-    print(f'Error: {e[:200]}')
-" 2>&1)
+  # Create branch, apply patch, push, create PR via gh on host
+  BRANCH="redsl/quality-${TICKET_ID:0:12}"
+  CLONE_DIR="${TMPDIR}/redsl-pr-${TICKET_ID}"
 
-  APPLIED_COUNT=$(echo "$CYCLE_OUTPUT" | grep "Applied:" | awk '{print $2}')
-  echo "  $CYCLE_OUTPUT" | grep -E "^(Applied|Rejected|Error):"
+  rm -rf "${CLONE_DIR}" 2>/dev/null
+  gh repo clone "${REPO}" "${CLONE_DIR}" -- --depth=1 2>/dev/null
+  cd "${CLONE_DIR}" 2>/dev/null || true
+  git checkout -b "${BRANCH}" 2>/dev/null
 
-  # Check if reDSL actually modified files in the container
-  CHANGED_FILES=$(docker exec www-redsl-1 bash -c "cd /tmp/${REPO_SLUG} && git diff --name-only && git diff --name-only --diff-filter=A && git ls-files --others --exclude-standard" 2>/dev/null)
-
-  if [ -n "$CHANGED_FILES" ]; then
-    echo ""
-    echo "  Zmodyfikowane pliki w kontenerze:"
-    echo "$CHANGED_FILES" | while read f; do echo "    → $f"; done
-
-    # Export diff as patch from container
-    PATCH_FILE="${TMPDIR}/redsl-patch-${TICKET_ID}.diff"
-    docker exec www-redsl-1 bash -c "cd /tmp/${REPO_SLUG} && git diff HEAD && git diff --cached && echo '---newfiles---' && for f in \$(git ls-files --others --exclude-standard); do echo '--- /dev/null'; echo '+++ b/\$f'; cat \"\$f\"; done" > "${PATCH_FILE}" 2>/dev/null
-
-    # Create branch, apply patch, push, create PR via gh on host
-    BRANCH="redsl/quality-${TICKET_ID:0:12}"
-    CLONE_DIR="${TMPDIR}/redsl-pr-${TICKET_ID}"
-
-    rm -rf "${CLONE_DIR}" 2>/dev/null
-    gh repo clone "${REPO}" "${CLONE_DIR}" -- --depth=1 2>/dev/null
-    cd "${CLONE_DIR}" 2>/dev/null || true
-    git checkout -b "${BRANCH}" 2>/dev/null
-
-    # Apply the patch
-    if git apply "${PATCH_FILE}" 2>/dev/null; then
-      git add -A 2>/dev/null
-      git commit -m "refactor: ${TITLE} (ticket ${TICKET_ID})
+  # Apply the patch
+  if git apply "${PATCH_FILE}" 2>/dev/null; then
+    git add -A 2>/dev/null
+    git commit -m "refactor: ${TITLE} (ticket ${TICKET_ID})
 
 ReDSL auto-refactoring: ${TOP_ACTION} on ${TOP_TARGET}
-Applied: ${APPLIED_COUNT:-?} proposals" 2>/dev/null
-      git push origin "${BRANCH}" 2>/dev/null
+Applied: ${APPLIED_COUNT} proposals" 2>/dev/null
+    git push origin "${BRANCH}" 2>/dev/null
 
-      PR_URL=$(gh pr create --repo "${REPO}" --head "${BRANCH}" --base main \
-        --title "refactor: ${TITLE}" \
-        --body "Automated quality improvement by reDSL.
+    FILES_MODIFIED=$(echo "$CYCLE_RESP" | python3 -c "
+import sys,json
+for f in json.load(sys.stdin).get('files_modified', []):
+    print(f)
+" 2>/dev/null)
+
+    PR_URL=$(gh pr create --repo "${REPO}" --head "${BRANCH}" --base main \
+      --title "refactor: ${TITLE}" \
+      --body "Automated quality improvement by reDSL.
 
 Ticket: ${TICKET_ID}
 Priority: ${PRIORITY}
 Decisions: ${DECISIONS_COUNT}
-Applied: ${APPLIED_COUNT:-?}
+Applied: ${APPLIED_COUNT}
 
 ## Modified files
-$(echo "$CHANGED_FILES" | while read f; do echo "- \`$f\`"; done)
+$(echo "$FILES_MODIFIED" | while read f; do echo "- \`$f\`"; done)
 
 ---
 *Generated by [Semcod](https://semcod.com) reDSL engine*" 2>&1) || true
 
-      if echo "$PR_URL" | grep -q 'github.com'; then
-        echo "✔ PR stworzony: ${PR_URL}"
-        semcod PATCH "/api/tickets/${TICKET_ID}" "{\"status\":\"pr_created\",\"pr_url\":\"${PR_URL}\"}" >/dev/null 2>&1 || true
-      else
-        echo "✘ PR nie stworzony: ${PR_URL}"
-      fi
+    if echo "$PR_URL" | grep -q 'github.com'; then
+      echo "✔ PR stworzony: ${PR_URL}"
+      semcod PATCH "/api/tickets/${TICKET_ID}" "{\"status\":\"pr_created\",\"pr_url\":\"${PR_URL}\"}" >/dev/null 2>&1 || true
     else
-      echo "  ⚠ Patch nie aplikuje się czysto — tworzę ticket z opisem"
-      semcod PATCH "/api/tickets/${TICKET_ID}" "{\"status\":\"analyzed\"}" >/dev/null 2>&1 || true
+      echo "✘ PR nie stworzony: ${PR_URL}"
     fi
-
-    # Cleanup
-    rm -rf "${CLONE_DIR}" "${PATCH_FILE}" 2>/dev/null
   else
-    echo "  ⚠ reDSL nie zmodyfikował plików (brak LLM lub brak decyzji)"
-    echo "  Tworzę ticket z opisem refaktoryzacji do ręcznego wykonania"
+    echo "  ⚠ Patch nie aplikuje się czysto — tworzę ticket z opisem"
     semcod PATCH "/api/tickets/${TICKET_ID}" "{\"status\":\"analyzed\"}" >/dev/null 2>&1 || true
   fi
+
+  # Cleanup
+  rm -rf "${CLONE_DIR}" "${PATCH_FILE}" 2>/dev/null
+elif [ "$APPLY" = "true" ] && [ "${APPLIED_COUNT:-0}" -eq 0 ]; then
+  echo ""
+  echo "  ⚠ reDSL nie zmodyfikował plików (brak LLM lub brak decyzji)"
+  semcod PATCH "/api/tickets/${TICKET_ID}" "{\"status\":\"analyzed\"}" >/dev/null 2>&1 || true
 fi
 
 # ── Podsumowanie ──────────────────────────────────────────────────────────

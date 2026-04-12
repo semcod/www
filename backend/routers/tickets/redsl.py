@@ -73,35 +73,43 @@ async def process_ticket_with_redsl(
                 error="reDSL engine is not running"
             )
         
-        # Step 1: Decide — evaluate DSL rules for the project
-        decisions = await redsl.decide(project_path=data.project_path)
-        
-        if not decisions:
-            update_ticket(db, ticket_id, {"status": "open"})  # Reset to open
-            return RedslAutoPRResponse(
-                status="no_targets",
-                ticket_id=ticket_id,
-                error="No target files identified for this ticket"
+        # Decide + Apply
+        if data.dry_run:
+            # Dry run — just evaluate DSL rules, no file modifications
+            decide_result = await redsl.decide(project_path=data.project_path)
+            decisions = decide_result.get("decisions", []) if isinstance(decide_result, dict) else decide_result
+
+            if not decisions:
+                update_ticket(db, ticket_id, {"status": "open"})
+                return RedslAutoPRResponse(
+                    status="no_targets",
+                    ticket_id=ticket_id,
+                    error="No target files identified for this ticket"
+                )
+
+            applied = decisions
+            modified_files = [d.get("target_path", "") for d in applied if d.get("target_path")]
+        else:
+            # Real refactoring via /cycle endpoint (decide + apply in one call)
+            # Note: we skip /decide first because it writes history that blocks /cycle
+            cycle_result = await redsl.cycle(
+                project_path=data.project_path,
+                max_actions=data.max_actions,
+                clear_history=True,
             )
-        
-        # Step 2: Refactor — apply changes
-        refactor_result = await redsl.refactor(
-            project_path=data.project_path,
-            max_actions=data.max_actions,
-            dry_run=data.dry_run,
-        )
-        
-        applied = refactor_result.get("refactoring_plan", {}).get("decisions", [])
-        if not applied and not data.dry_run:
-            update_ticket(db, ticket_id, {"status": "open"})
-            return RedslAutoPRResponse(
-                status="no_changes",
-                ticket_id=ticket_id,
-                error="No refactoring decisions made"
-            )
-        
-        # Collect modified files from decisions
-        modified_files = [d.get("target_path", "") for d in applied if d.get("target_path")]
+            applied = cycle_result.get("decisions", [])
+            modified_files = cycle_result.get("files_modified", [])
+            decisions_count = cycle_result.get("decisions_count", 0) or len(modified_files)
+
+            if cycle_result.get("proposals_applied", 0) == 0 and not modified_files:
+                update_ticket(db, ticket_id, {"status": "open"})
+                return RedslAutoPRResponse(
+                    status="no_changes",
+                    ticket_id=ticket_id,
+                    decisions_count=decisions_count,
+                    error="No refactoring changes applied"
+                )
+
         update_ticket_redsl_results(db, ticket_id, applied, modified_files)
         
         # Step 3: Create PR (if not dry_run)
@@ -122,15 +130,15 @@ async def process_ticket_with_redsl(
             return RedslAutoPRResponse(
                 status="processing",
                 ticket_id=ticket_id,
-                decisions_count=len(applied),
+                decisions_count=decisions_count if not data.dry_run else len(applied),
                 files_modified=modified_files,
             )
-        
+
         # Dry run — just return analysis
         return RedslAutoPRResponse(
             status="dry_run" if data.dry_run else "analyzed",
             ticket_id=ticket_id,
-            decisions_count=len(applied),
+            decisions_count=len(applied) if data.dry_run else decisions_count,
             files_modified=modified_files,
         )
         

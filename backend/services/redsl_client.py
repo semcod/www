@@ -70,6 +70,47 @@ class RedslClient:
             resp.raise_for_status()
             return resp.json()
 
+    async def cycle(
+        self,
+        project_path: str,
+        max_actions: int = 3,
+        clear_history: bool = True,
+        llm_model: str | None = None,
+    ) -> dict[str, Any]:
+        """Run a full refactoring cycle — actually modifies files on disk via LLM.
+
+        Unlike refactor() which only returns a plan, this endpoint:
+        1. Analyzes project metrics
+        2. Evaluates DSL rules → decisions
+        3. Calls LLM to generate code transformations
+        4. Writes modified files to disk
+        5. Returns report with proposals_applied and files_modified
+        """
+        payload: dict[str, Any] = {
+            "project_dir": project_path,
+            "max_actions": max_actions,
+            "clear_history": clear_history,
+        }
+        if llm_model:
+            payload["llm_model"] = llm_model
+        async with httpx.AsyncClient(timeout=300) as client:
+            resp = await client.post(
+                f"{self.base_url}/cycle",
+                json=payload,
+            )
+            resp.raise_for_status()
+            return resp.json()
+
+    async def clear_history(self, project_path: str) -> dict[str, Any]:
+        """Clear decision history for a project — removes duplicate decision blocks."""
+        async with httpx.AsyncClient(timeout=10) as client:
+            resp = await client.post(
+                f"{self.base_url}/history/clear",
+                params={"project_dir": project_path},
+            )
+            resp.raise_for_status()
+            return resp.json()
+
     async def health_score(self, project_path: str) -> dict[str, Any]:
         """Get unified health score — returns grade, score, dimensions."""
         async with httpx.AsyncClient(timeout=60) as client:
