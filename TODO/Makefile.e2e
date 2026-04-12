@@ -1,0 +1,60 @@
+# ── PostgreSQL Migration ─────────────────────────────────────────
+
+pg-migrate:
+	@echo "🐘 Running Alembic migrations..."
+	docker compose exec backend alembic upgrade head
+	@echo "✅ Migrations applied"
+
+pg-validate:
+	bash e2e/test-pg-migration.sh
+
+pg-reset:
+	docker compose down -v
+	docker compose up -d db
+	@sleep 3
+	docker compose exec backend alembic upgrade head
+	docker compose up -d
+	@echo "✅ PG reset complete"
+
+pg-shell:
+	docker compose exec db psql -U semcod -d semcod
+
+# ── E2E Test Matrix ──────────────────────────────────────────────
+
+# Mode 1: Mock GitHub (CI, fast, isolated)
+e2e-mock:
+	docker compose -f docker-compose.yml -f docker-compose.sim.yml up -d
+	@sleep 5
+	GIT_PROVIDER=mock npx playwright test e2e/specs/user-journey.spec.js --project=chromium
+	docker compose -f docker-compose.yml -f docker-compose.sim.yml down
+
+# Mode 2: Gitea (dev, offline, real git)
+e2e-gitea: gitea-cycle
+
+# Mode 3: GitHub read-only via gh (safe, repeatable)
+e2e-github:
+	bash e2e/github-real.sh
+
+# Mode 3b: GitHub with write (branch + commit, no PR)
+e2e-github-write:
+	bash e2e/github-real.sh --write
+
+# Mode 3c: GitHub full (branch + commit + PR, auto-closes)
+e2e-github-full:
+	bash e2e/github-real.sh --write --pr
+
+# Mode 3d: GitHub + reDSL apply
+e2e-github-apply:
+	bash e2e/github-real.sh --write --pr --apply
+
+# Mode 4: Playwright browser (mock)
+e2e-browser:
+	GIT_PROVIDER=mock npx playwright test e2e/specs/user-journey.spec.js --headed
+
+# Mode 4b: Playwright browser (gitea)
+e2e-browser-gitea:
+	GIT_PROVIDER=gitea npx playwright test e2e/specs/user-journey.spec.js --headed
+
+# All safe modes
+e2e-all: e2e-mock e2e-github e2e-browser
+	@echo "✅ All E2E modes passed"

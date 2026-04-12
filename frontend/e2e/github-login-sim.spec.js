@@ -117,9 +117,10 @@ test.describe("GitHub OAuth Login Simulation — tom-sapletta-com", () => {
     // Should redirect back to frontend with session
     await page.waitForURL(`${FRONTEND_URL}/**`, { timeout: 10000 });
 
-    // Verify user is logged in
-    await expect(
-      page.locator('text=tom-sapletta-com, text=Tom Sapletta, [data-testid="user-name"]')
-    ).toBeVisible({ timeout: 5000 });
+    // Verify user is logged in — check for Logout button or username (may wrap across lines)
+    const loggedIn = page.getByRole('button', { name: /Logout/i })
+      .or(page.getByText(/tom.*sapletta/i))
+      .or(page.locator('[data-testid="user-name"]'));
+    await expect(loggedIn.first()).toBeVisible({ timeout: 5000 });
   });
 });

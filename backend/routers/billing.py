@@ -252,14 +252,13 @@ def _handle_subscription_deleted(subscription: dict) -> None:
 
 def _find_sub_by_customer(customer_id: str) -> dict | None:
     """Lookup subscription row by stripe_customer_id."""
-    import sqlite3, json
-    from config import DB_PATH
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM subscriptions WHERE stripe_customer_id = ?", (customer_id,))
-    row = cursor.fetchone()
-    conn.close()
+    from db_session import engine
+    from sqlalchemy import text
+    with engine.connect() as conn:
+        row = conn.execute(
+            text("SELECT * FROM subscriptions WHERE stripe_customer_id = :cid"),
+            {"cid": customer_id}
+        ).mappings().fetchone()
     return dict(row) if row else None
 
 

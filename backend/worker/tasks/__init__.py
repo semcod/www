@@ -26,6 +26,9 @@ from .redsl import (
     task_redsl_scheduled_quality_check,
     task_redsl_scheduled_auto_refactor,
 )
+from .quality_loop import (
+    task_on_push_quality_loop,
+)
 
 # Re-export all tasks for backward compatibility
 __all__ = [
@@ -46,4 +49,5 @@ __all__ = [
     "task_redsl_health_check",
     "task_redsl_scheduled_quality_check",
     "task_redsl_scheduled_auto_refactor",
+    "task_on_push_quality_loop",
 ]

@@ -44,6 +44,7 @@ export function Header({ tab, setTab, reset, user, doLogout }) {
           {tabBtn("prbot", "PR Bot")}
           {tabBtn("repo", "Repo")}
           {tabBtn("badge", "Badge")}
+          {tabBtn("ecosystem", "Ecosystem")}
           {tabBtn("marketplace", "Marketplace")}
           {user && (
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginLeft: 16, paddingLeft: 16, borderLeft: `1px solid ${C.border}` }}>

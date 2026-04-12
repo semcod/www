@@ -34,6 +34,7 @@ try:
         analyze_diff,
         create_auto_pr,
         check_health_regression,
+        task_on_push_quality_loop,
     )
 
 except ImportError:  # celery not installed (e.g. test environment without Redis)
@@ -46,6 +47,7 @@ except ImportError:  # celery not installed (e.g. test environment without Redis
         analyze_diff,
         create_auto_pr,
         check_health_regression,
+        task_on_push_quality_loop,
     )
 
 __all__ = [
@@ -56,4 +58,5 @@ __all__ = [
     "analyze_diff",
     "create_auto_pr",
     "check_health_regression",
+    "task_on_push_quality_loop",
 ]

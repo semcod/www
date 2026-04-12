@@ -13,12 +13,14 @@ if DB_TYPE == "postgresql" and DATABASE_URL:
 else:
     db_url = f"sqlite:///{DB_PATH}"
 
-# Create engine
+# Create engine with appropriate settings per backend
+_is_pg = "postgresql" in db_url
 engine = create_engine(
     db_url,
     echo=False,
-    # SQLite-specific settings
-    connect_args={"check_same_thread": False} if DB_TYPE == "sqlite" else {},
+    pool_pre_ping=True,
+    **({"pool_size": 10, "max_overflow": 20} if _is_pg else {}),
+    connect_args={} if _is_pg else {"check_same_thread": False},
 )
 
 # Create session factory
@@ -37,11 +39,26 @@ def get_db() -> Session:
 def init_db():
     """Initialize database with all tables."""
     from db_models import Base
-    Base.metadata.create_all(bind=engine)
-    _run_migrations()
+    if not _is_pg:
+        Base.metadata.create_all(bind=engine)
+    _run_alembic_migrations()
+    _run_additive_migrations()
 
 
-def _run_migrations():
+def _run_alembic_migrations():
+    """Run Alembic migrations (handles PG schema creation)."""
+    try:
+        from alembic.config import Config
+        from alembic import command
+        cfg = Config("alembic.ini")
+        cfg.set_main_option("sqlalchemy.url", db_url)
+        command.upgrade(cfg, "head")
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).debug("Alembic migration skipped: %s", e)
+
+
+def _run_additive_migrations():
     """Apply additive schema migrations for existing databases."""
     migrations = [
         "ALTER TABLE audit_results ADD COLUMN audit_meta TEXT DEFAULT '{}'",

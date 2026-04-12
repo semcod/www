@@ -7,6 +7,7 @@ flowchart TD
         backend__server__lifespan["lifespan"]
         backend__db_session__init_db["init_db"]
         backend__worker__get_celery_app["get_celery_app"]
+        backend__scheduler__scan_job__run_scheduled_scan["run_scheduled_scan"]
         backend__db_models___utcnow["_utcnow"]
         backend__services__autopr_helpers__BranchManager__get_default_branch["get_default_branch"]
         backend__services__autopr_helpers__BranchManager__get_ref_sha["get_ref_sha"]
@@ -18,8 +19,7 @@ flowchart TD
         backend__services__autopr_helpers__PRCreator__build_pr_body["build_pr_body"]
         backend__services__autopr_helpers__PRCreator__build_issue_body["build_issue_body"]
         backend__services__mirror__MirrorService__create_mirror["create_mirror"]
-        backend__services__mirror__MirrorService__sync_mirror["sync_mirror"]
-        ...["+882 more"]
+        ...["+833 more"]
     end
 
     subgraph Exporters

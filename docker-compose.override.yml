@@ -20,11 +20,16 @@ services:
 
   backend:
     environment:
-      - APP_URL=http://nvidia:8003
-      - FRONTEND_URL=http://nvidia:3000
-      - CORS_ORIGINS=http://nvidia:3000,https://semcod.localhost,https://semcod.com
+      - APP_URL=http://localhost:8003
+      - FRONTEND_URL=http://localhost:3000
+      - CORS_ORIGINS=http://localhost:3000,http://nvidia:3000,https://semcod.localhost,https://semcod.com
       - DEMO_MODE=1
       - SECRET_KEY=dev-secret-change-me
+      - GITHUB_OAUTH_AUTHORIZE_URL=http://localhost:4010/login/oauth/authorize
+      - GITHUB_OAUTH_TOKEN_URL=http://mock-github:4010/login/oauth/access_token
+      - GITHUB_API_BASE_URL=http://mock-github:4010
+      - GITHUB_CLIENT_ID=${MOCK_GITHUB_CLIENT_ID}
+      - GITHUB_CLIENT_SECRET=${MOCK_GITHUB_CLIENT_SECRET}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=PathPrefix(`/api/`) || PathPrefix(`/auth/`) || PathPrefix(`/webhook/`) || PathPrefix(`/badge/`) || PathPrefix(`/report/`) || PathPrefix(`/mcp/`)"

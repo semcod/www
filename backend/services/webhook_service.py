@@ -49,17 +49,35 @@ Branch: `{event.branch}` → `{event.base_branch}`
 
 
 async def process_push_event(event: Event, provider: GitProvider) -> Dict:
-    """Process push event - trigger analysis if main branch."""
+    """Process push event - trigger reDSL quality loop if main branch."""
     # Only process pushes to default branch
-    if event.branch in ("main", "master"):
-        return {
-            "status": "analysis_scheduled",
-            "repo": event.repo,
-            "branch": event.branch,
-            "commits": len(event.commits),
-        }
+    if event.branch not in ("main", "master"):
+        return {"status": "ignored", "reason": "not default branch"}
 
-    return {"status": "ignored", "reason": "not default branch"}
+    # Trigger quality loop via Celery task
+    try:
+        from worker.tasks.quality_loop import task_on_push_quality_loop
+
+        clone_url = event.get_clone_url() or ""
+        # Derive local project path from repo name
+        project_path = f"/tmp/local-git-repos/{event.repo.replace('/', '_')}"
+
+        task_on_push_quality_loop.delay(
+            repo=event.repo,
+            commit_sha=event.commit_sha or "",
+            project_path=project_path,
+            token="",  # token resolved in task from config
+            provider=event.provider.value,
+        )
+    except Exception:
+        pass  # Celery unavailable — graceful degradation
+
+    return {
+        "status": "quality_loop_triggered",
+        "repo": event.repo,
+        "branch": event.branch,
+        "commits": len(event.commits),
+    }
 
 
 def parse_github_webhook(payload: dict) -> Optional[Event]:

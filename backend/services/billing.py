@@ -38,7 +38,7 @@ class UsageTracker:
         Returns:
             Dict with usage info and cost
         """
-        from database import get_tenant_by_id, sqlite3
+        from db_module.wrappers import get_tenant_by_id
 
         tenant = get_tenant_by_id(tenant_id)
         if not tenant:
@@ -87,7 +87,7 @@ class UsageTracker:
         Returns:
             (can_execute: bool, reason: str)
         """
-        from database import get_tenant_by_id
+        from db_module.wrappers import get_tenant_by_id
 
         tenant = get_tenant_by_id(tenant_id)
         if not tenant:
@@ -116,21 +116,19 @@ class UsageTracker:
 
     def get_usage_report(self, tenant_id: int, year: int, month: int) -> Dict[str, Any]:
         """Get detailed usage report for a month."""
-        from database import sqlite3, DB_PATH
+        from db_session import engine
+        from sqlalchemy import text
 
-        conn = sqlite3.connect(DB_PATH)
-        cursor = conn.cursor()
-
-        # Get usage by type
-        cursor.execute("""
-            SELECT event_type, SUM(quantity), SUM(cost_cents)
-            FROM usage_records
-            WHERE tenant_id = ? AND strftime('%Y-%m', created_at) = ?
-            GROUP BY event_type
-        """, (tenant_id, f"{year}-{month:02d}"))
-
-        rows = cursor.fetchall()
-        conn.close()
+        month_str = f"{year}-{month:02d}"
+        with engine.connect() as conn:
+            # strftime works in SQLite; TO_CHAR/date_trunc works in PG
+            # Use LIKE for cross-DB compat
+            rows = conn.execute(text(
+                "SELECT event_type, SUM(quantity), SUM(cost_cents) "
+                "FROM usage_records "
+                "WHERE tenant_id = :tid AND CAST(created_at AS TEXT) LIKE :month "
+                "GROUP BY event_type"
+            ), {"tid": tenant_id, "month": f"{month_str}%"}).fetchall()
 
         usage_by_type = {
             row[0]: {
@@ -167,22 +165,18 @@ class UsageTracker:
         event_type: BillingEventType,
     ) -> int:
         """Get current month's usage for an event type."""
-        from database import sqlite3, DB_PATH
-
-        conn = sqlite3.connect(DB_PATH)
-        cursor = conn.cursor()
+        from db_session import engine
+        from sqlalchemy import text
 
         now = datetime.now(timezone.utc)
-        cursor.execute("""
-            SELECT COALESCE(SUM(quantity), 0)
-            FROM usage_records
-            WHERE tenant_id = ?
-              AND event_type = ?
-              AND strftime('%Y-%m', created_at) = strftime('%Y-%m', 'now')
-        """, (tenant_id, event_type.value))
-
-        result = cursor.fetchone()
-        conn.close()
+        month_prefix = now.strftime("%Y-%m")
+        with engine.connect() as conn:
+            result = conn.execute(text(
+                "SELECT COALESCE(SUM(quantity), 0) "
+                "FROM usage_records "
+                "WHERE tenant_id = :tid AND event_type = :etype "
+                "AND CAST(created_at AS TEXT) LIKE :month"
+            ), {"tid": tenant_id, "etype": event_type.value, "month": f"{month_prefix}%"}).fetchone()
 
         return result[0] if result else 0
 
@@ -195,31 +189,28 @@ class UsageTracker:
         cost_cents: int,
     ):
         """Store usage record in database."""
-        from database import sqlite3, DB_PATH
+        from db_session import engine
+        from sqlalchemy import text
 
-        conn = sqlite3.connect(DB_PATH)
-        cursor = conn.cursor()
+        with engine.connect() as conn:
+            # Create table if not exists (cross-DB)
+            conn.execute(text(
+                "CREATE TABLE IF NOT EXISTS usage_records ("
+                "id SERIAL PRIMARY KEY, "
+                "tenant_id INTEGER NOT NULL, "
+                "event_type TEXT NOT NULL, "
+                "quantity INTEGER DEFAULT 1, "
+                "cost_cents INTEGER DEFAULT 0, "
+                "metadata TEXT DEFAULT '{}', "
+                "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)"
+            ))
 
-        # Create table if not exists
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS usage_records (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                tenant_id INTEGER NOT NULL,
-                event_type TEXT NOT NULL,
-                quantity INTEGER DEFAULT 1,
-                cost_cents INTEGER DEFAULT 0,
-                metadata TEXT DEFAULT '{}',
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        """)
-
-        cursor.execute("""
-            INSERT INTO usage_records (tenant_id, event_type, quantity, cost_cents, metadata)
-            VALUES (?, ?, ?, ?, ?)
-        """, (tenant_id, event_type.value, quantity, cost_cents, json.dumps(metadata or {})))
-
-        conn.commit()
-        conn.close()
+            conn.execute(text(
+                "INSERT INTO usage_records (tenant_id, event_type, quantity, cost_cents, metadata) "
+                "VALUES (:tid, :etype, :qty, :cost, :meta)"
+            ), {"tid": tenant_id, "etype": event_type.value, "qty": quantity,
+                 "cost": cost_cents, "meta": json.dumps(metadata or {})})
+            conn.commit()
 
     def _calculate_cost(self, event_type: BillingEventType, quantity: int) -> int:
         """Calculate cost in cents for usage."""

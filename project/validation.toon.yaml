@@ -1,9 +1,9 @@
-# vallm batch | 386f | 170✓ 62⚠ 45✗ | 2026-04-12
+# vallm batch | 388f | 171✓ 61⚠ 46✗ | 2026-04-12
 
 SUMMARY:
-  scanned: 386  passed: 170 (44.0%)  warnings: 62  errors: 45  unsupported: 121
+  scanned: 388  passed: 171 (44.1%)  warnings: 61  errors: 46  unsupported: 121
 
-WARNINGS[62]{path,score}:
+WARNINGS[61]{path,score}:
   frontend/src/hooks/useDownloads.js,0.67
     issues[1]{rule,severity,message,line}:
       js.import.resolvable,warning,Module 'react' not found,1
@@ -193,12 +193,8 @@ WARNINGS[62]{path,score}:
   frontend/src/hooks/useAppState.js,0.96
     issues[1]{rule,severity,message,line}:
       js.import.resolvable,warning,Module 'react' not found,1
-  backend/routers/tickets/redsl.py,0.97
-    issues[2]{rule,severity,message,line}:
-      complexity.cyclomatic,warning,process_ticket_with_redsl has cyclomatic complexity 19 (max: 15),27
-      complexity.lizard_cc,warning,process_ticket_with_redsl: CC=19 exceeds limit 15,27
 
-ERRORS[45]{path,score}:
+ERRORS[46]{path,score}:
   tests/backend/test_mcp.py,0.57
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'pytest' not found,3
@@ -214,17 +210,6 @@ ERRORS[45]{path,score}:
       python.import.resolvable,error,Module 'selenium.webdriver.support' not found,13
       python.import.resolvable,error,Module 'selenium.webdriver.chrome.options' not found,14
       python.import.resolvable,error,Module 'selenium.webdriver.firefox.options' not found,15
-  backend/db_module/tickets_orm.py,0.72
-    issues[9]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'sqlalchemy' not found,7
-      python.import.resolvable,error,Module 'sqlalchemy.orm' not found,8
-      python.import.resolvable,error,Module 'sqlalchemy' not found,146
-      python.import.resolvable,error,Module 'sqlalchemy' not found,195
-      python.import.resolvable,error,Module 'sqlalchemy' not found,248
-      python.import.resolvable,error,Module 'sqlalchemy' not found,276
-      python.import.resolvable,error,Module 'sqlalchemy' not found,300
-      python.import.resolvable,error,Module 'sqlalchemy' not found,311
-      python.import.resolvable,error,Module 'sqlalchemy' not found,345
   tests/backend/test_metrics.py,0.79
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'pytest' not found,3
@@ -273,6 +258,10 @@ ERRORS[45]{path,score}:
   backend/db_module/tenants_orm.py,0.89
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'sqlalchemy.orm' not found,5
+  backend/db_module/tickets_orm.py,0.89
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'sqlalchemy' not found,11
+      python.import.resolvable,error,Module 'sqlalchemy.orm' not found,12
   backend/db_module/users_orm.py,0.89
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'sqlalchemy.orm' not found,5
@@ -285,6 +274,10 @@ ERRORS[45]{path,score}:
   tests/backend/test_celery.py,0.89
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'pytest' not found,3
+  backend/db_module/tickets_query.py,0.90
+    issues[2]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'sqlalchemy' not found,12
+      python.import.resolvable,error,Module 'sqlalchemy.orm' not found,13
   backend/alembic/env.py,0.91
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'sqlalchemy' not found,5

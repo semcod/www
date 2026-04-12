@@ -10,6 +10,9 @@
 
 .PHONY: help dev sim up down test e2e lint \
         gitea-up gitea-setup gitea-test gitea-down gitea-logs gitea-reset gitea-cycle \
+        pg-migrate pg-validate pg-reset pg-shell \
+        e2e-mock e2e-gitea e2e-github e2e-github-write e2e-github-full e2e-github-apply \
+        e2e-browser e2e-browser-gitea e2e-all \
         backend frontend install clean logs ps
 
 # ── Help ────────────────────────────────────────────────────────
@@ -149,3 +152,55 @@ gitea-reset:
 	docker compose -f docker-compose.yml -f docker-compose.gitea.yml down -v
 	rm -f .env.gitea
 	@echo "🗑️  Gitea data wiped"
+
+# ── PostgreSQL Migration ─────────────────────────────────────────
+
+pg-migrate:
+	@echo "🐘 Running Alembic migrations..."
+	docker compose exec backend alembic upgrade head
+	@echo "✅ Migrations applied"
+
+pg-validate:
+	bash e2e/test-pg-migration.sh
+
+pg-reset:
+	docker compose down -v
+	docker compose up -d db
+	@sleep 3
+	docker compose exec backend alembic upgrade head
+	docker compose up -d
+	@echo "✅ PG reset complete"
+
+pg-shell:
+	docker compose exec db psql -U semcod -d semcod
+
+# ── E2E Test Matrix ──────────────────────────────────────────────
+
+e2e-mock:
+	docker compose -f docker-compose.yml -f docker-compose.sim.yml up -d
+	@sleep 5
+	GIT_PROVIDER=mock npx playwright test frontend/e2e/specs/user-journey.spec.js --project=chromium
+	docker compose -f docker-compose.yml -f docker-compose.sim.yml down
+
+e2e-gitea: gitea-cycle
+
+e2e-github:
+	bash e2e/github-real.sh
+
+e2e-github-write:
+	bash e2e/github-real.sh --write
+
+e2e-github-full:
+	bash e2e/github-real.sh --write --pr
+
+e2e-github-apply:
+	bash e2e/github-real.sh --write --pr --apply
+
+e2e-browser:
+	GIT_PROVIDER=mock npx playwright test frontend/e2e/specs/user-journey.spec.js --headed
+
+e2e-browser-gitea:
+	GIT_PROVIDER=gitea npx playwright test frontend/e2e/specs/user-journey.spec.js --headed
+
+e2e-all: e2e-mock e2e-github e2e-browser
+	@echo "✅ All E2E modes passed"

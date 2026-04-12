@@ -8,6 +8,7 @@ Semcod to zautomatyzowana platforma CI/CD jakości kodu. Umożliwia deweloperom 
 
 Ten projekt służy jako **kompletna platforma SaaS do analizy jakości kodu** z następującymi scenariuszami użycia:
 
+
 ### Scenariusze Użycia (User Stories)
 
 #### 1. 🔐 **GitHub OAuth → Audit (One-click)**

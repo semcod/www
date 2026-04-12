@@ -250,6 +250,21 @@ export function downloadBenchmarkExport(format) {
 }
 
 
+// ─── Ecosystem ───────────────────────────────────────────────────────────────
+
+export async function fetchEcosystem() {
+  const res = await fetch(`${API}/api/ecosystem`);
+  if (!res.ok) throw new Error("Failed to fetch ecosystem");
+  return res.json();
+}
+
+export async function fetchProjectHistory(owner, repo, days = 30) {
+  const res = await fetch(`${API}/api/ecosystem/${owner}/${repo}/history?limit=${days}`);
+  if (!res.ok) throw new Error("Failed to fetch project history");
+  return res.json();
+}
+
+
 // ─── ReDSL ────────────────────────────────────────────────────────────────────
 
 export async function getRedslStatus() {

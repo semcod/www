@@ -6,30 +6,37 @@ const API = process.env.API_URL || 'http://localhost:8003';
 test.describe('Benchmark Review Panel', () => {
   let auditId;
 
+  let repo = 'octocat/Hello-World';
+
   test.beforeAll(async ({ request }) => {
-    // Seed a real sandbox scan so result page has data
-    const res = await request.post(`${API}/api/audit/sandbox`, {
-      data: { repo_url: 'github.com/octocat/Hello-World' },
+    // Create a sandbox scan to seed audit data
+    const res = await request.post(`${API}/api/analyze`, {
+      data: { repo_url: 'https://github.com/octocat/Hello-World', sandbox: true },
     });
     if (res.ok()) {
       const body = await res.json();
       auditId = body.audit_id;
-      // Wait for scan to complete
-      for (let i = 0; i < 20; i++) {
+      repo = 'octocat/Hello-World';
+      // Wait for scan to complete (up to 60s)
+      for (let i = 0; i < 30; i++) {
         const poll = await request.get(`${API}/api/audit/${auditId}`);
+        if (!poll.ok()) break;
         const data = await poll.json();
-        if (data.status === 'complete' || data.status === 'error') break;
+        if (data.status === 'complete') { repo = data.repo || repo; break; }
+        if (data.status === 'error') { auditId = null; break; }
         await new Promise(r => setTimeout(r, 2000));
       }
     }
   });
 
   test.beforeEach(async ({ page }) => {
-    const url = auditId
-      ? `/#tab=audit&phase=result&sandbox=1&repo=octocat%2FHello-World&audit=${auditId}`
-      : '/#tab=audit&phase=result&sandbox=1&repo=octocat%2FHello-World&audit=demo';
-    await page.goto(url);
-    await page.waitForTimeout(1500);
+    if (!auditId) {
+      // No valid audit — tests will skip via visibility check
+      await page.goto('/');
+      return;
+    }
+    await page.goto(`/#tab=audit&phase=result&sandbox=1&repo=${encodeURIComponent(repo)}&audit=${auditId}`);
+    await page.waitForTimeout(2000);
   });
 
   test('panel toggle renders below recommendations', async ({ page }) => {

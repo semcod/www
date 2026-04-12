@@ -5,7 +5,7 @@ import logging
 from datetime import datetime, timezone
 
 from config import APP_URL
-from db_module.scans import get_repo_scans, save_scan
+from db_module.wrappers import get_repo_scans, save_scan
 from services.pipeline import run_pipeline
 from store import audit_results, badge_cache, scan_history
 

@@ -30,6 +30,7 @@ from routers.mirror import router as mirror_router
 from routers.benchmark import router as benchmark_router
 from routers.redsl import router as redsl_router
 from routers.tickets import router as tickets_router
+from routers.ecosystem import router as ecosystem_router
 
 # ─── Config ───────────────────────────────────────────────────────────────────
 
@@ -70,6 +71,7 @@ app.include_router(webhook_v2_router, prefix="/v2")
 app.include_router(benchmark_router)
 app.include_router(redsl_router)
 app.include_router(tickets_router)
+app.include_router(ecosystem_router)
 
 
 # ─── Entry point ──────────────────────────────────────────────────────────────

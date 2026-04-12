@@ -2,7 +2,7 @@ import { useAppState } from "./hooks/useAppState";
 import { Header } from "./components/Header";
 import { ProgressSteps } from "./components/ProgressSteps";
 import { LandingPhase, AuthPhase, ReposPhase, ScanningPhase, ResultPhase } from "./components/phases";
-import { PRBotTab, RepoTab, BadgeTab, RecentScansTab, TrendTab, SettingsTab, MarketplaceTab } from "./components/tabs";
+import { PRBotTab, RepoTab, BadgeTab, RecentScansTab, TrendTab, SettingsTab, MarketplaceTab, EcosystemTab } from "./components/tabs";
 import { C } from "./constants";
 import { PaywallModal } from "./components/PaywallModal";
 
@@ -94,6 +94,7 @@ export default function App() {
         {tab === "trend" && <TrendTab selectedRepo={selectedRepo} sessionToken={sessionToken} />}
         {tab === "settings" && <SettingsTab sessionToken={sessionToken} billingStatus={billingStatus} />}
         {tab === "marketplace" && <MarketplaceTab sessionToken={sessionToken} user={user} />}
+        {tab === "ecosystem" && <EcosystemTab />}
       </main>
     </div>
   );

@@ -5,3 +5,4 @@ export { RecentScansTab } from "./RecentScansTab";
 export { TrendTab } from "./TrendTab";
 export { SettingsTab } from "./SettingsTab";
 export { MarketplaceTab } from "./MarketplaceTab";
+export { EcosystemTab } from "./EcosystemTab";

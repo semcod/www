@@ -22,9 +22,21 @@ async def health_badge(repo_slug: str, style: str = "flat"):
     repo = repo_slug.replace("-", "/", 1)
     cached = badge_cache.get(repo)
 
+    if not cached:
+        # Fallback: try DB-backed badge cache / latest scan
+        try:
+            from db_module.wrappers import get_badge_cache, get_repo_scans
+            cached = get_badge_cache(repo)
+            if not cached:
+                scans = get_repo_scans(repo, limit=1)
+                if scans:
+                    cached = {"score": scans[-1]["health_score"], "grade": scans[-1]["grade"]}
+        except Exception:
+            pass
+
     if cached:
-        score = cached["score"]
-        grade = cached["grade"]
+        score = cached.get("score")
+        grade = cached.get("grade", "?")
         weekly_issues = cached.get("weekly_issues")
     else:
         score = None
@@ -50,6 +62,12 @@ async def scan_count_badge():
     from store import scan_history
     
     total_scans = len(scan_history)
+    if total_scans == 0:
+        try:
+            from db_module.wrappers import get_total_scan_count
+            total_scans = get_total_scan_count()
+        except Exception:
+            pass
     svg = _generate_count_badge_svg("semcod scans", total_scans)
     return Response(
         content=svg,
