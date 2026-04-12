@@ -91,7 +91,7 @@ async def process_ticket_with_redsl(
             dry_run=data.dry_run,
         )
         
-        applied = refactor_result.get("decisions", [])
+        applied = refactor_result.get("refactoring_plan", {}).get("decisions", [])
         if not applied and not data.dry_run:
             update_ticket(db, ticket_id, {"status": "open"})
             return RedslAutoPRResponse(
@@ -101,7 +101,7 @@ async def process_ticket_with_redsl(
             )
         
         # Collect modified files from decisions
-        modified_files = [d.get("target_file", "") for d in applied if d.get("target_file")]
+        modified_files = [d.get("target_path", "") for d in applied if d.get("target_path")]
         update_ticket_redsl_results(db, ticket_id, applied, modified_files)
         
         # Step 3: Create PR (if not dry_run)

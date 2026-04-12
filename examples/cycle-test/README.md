@@ -1,23 +1,48 @@
 # Cycle Test — pełny cykl ticket → reDSL → PR
 
-Skrypty do walidacji krok po kroku całego cyklu Semcod.
+Skrypty do walidacji i uruchamiania cyklu Semcod **bez logowania w przeglądarce** — używają `gh` (który już ma token).
 
 ## Skrypty
 
 | Skrypt | Opis | Tworzy PR? |
 |--------|------|------------|
+| `quick-ticket.sh` | **Najszybszy**: stwórz ticket → reDSL → wynik | Opcjonalnie (`--apply`) |
 | `validate-steps.sh` | Sprawdza każdy endpoint API osobno | Nie — bezpieczny do powtarzania |
 | `full-cycle.sh` | Pełny cykl: auth → ticket → reDSL → PR → merge | Tak |
 
 ## Szybki start
 
-```bash
-# 1. Walidacja endpointów (bez PR)
-cd examples/cycle-test
-chmod +x validate-steps.sh full-cycle.sh
-./validate-steps.sh
+### Najprostsze: quick-ticket (jedna komenda)
 
-# 2. Pełny cykl z PR
+```bash
+cd examples/cycle-test
+chmod +x quick-ticket.sh
+
+# Podgląd refaktoryzacji (dry-run, bez zmian)
+./quick-ticket.sh "Split high-CC module"
+
+# Faktyczne zastosowanie zmian + PR
+./quick-ticket.sh "Split high-CC module" semcod/vallm --apply
+```
+
+**Nie musisz się logować w przeglądarce** — skrypt automatycznie:
+1. Pobiera token z `gh auth token`
+2. Wymienia go na sesję Semcod (`POST /auth/gh-token`)
+3. Tworzy ticket w systemie
+4. Uruchamia reDSL (decide + refactor)
+5. Opcjonalnie tworzy PR
+
+### Walidacja endpointów (bez PR)
+
+```bash
+chmod +x validate-steps.sh
+./validate-steps.sh    # 19 endpoint checks
+```
+
+### Pełny cykl z PR i merge
+
+```bash
+chmod +x full-cycle.sh
 ./full-cycle.sh
 ```
 

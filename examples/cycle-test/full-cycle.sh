@@ -98,10 +98,10 @@ DECIDE_RESP=$(curl -sf --max-time 30 -X POST "${REDSL_URL}/decide" \
   -d '{"project_dir":"/tmp/vallm"}') || true
 
 DECISIONS_COUNT=$(echo "$DECIDE_RESP" | python3 -c "
-import sys
-text = sys.stdin.read()
-# decide returns explanation string, count lines with 'Action:'
-count = text.count('Action:')
+import sys, json
+data = json.load(sys.stdin)
+text = data.get('explanation', '')
+count = sum(1 for l in text.split('\n') if 'Action:' in l)
 print(count)
 " 2>/dev/null) || true
 

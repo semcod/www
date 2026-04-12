@@ -137,7 +137,7 @@ check "POST /api/redsl/health" "" "$([ -n "$H_RESP" ] && echo 'present' || echo 
 
 # Decide
 D_RESP=$(curl -sf -X POST "${REDSL_URL}/decide" -H "Content-Type: application/json" -d '{"project_dir":"/tmp/vallm"}' 2>/dev/null) || D_RESP=""
-D_COUNT=$(echo "$D_RESP" | python3 -c "import sys; print(sys.stdin.read().count('Action:'))" 2>/dev/null) || D_COUNT=0
+D_COUNT=$(echo "$D_RESP" | python3 -c "import sys,json; data=json.load(sys.stdin); print(sum(1 for l in data.get('explanation','').split('\n') if 'Action:' in l))" 2>/dev/null) || D_COUNT=0
 check "POST /redsl/decide" "" "$([ "${D_COUNT:-0}" -gt 0 ] && echo "found_${D_COUNT}_decisions" || echo "no_decisions")"
 
 # Refactor dry-run
