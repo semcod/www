@@ -1,5 +1,44 @@
 # Plan produktowy: zmiany UI/API do zbierania KPI benchmarku
 
+## Status implementacji
+
+### Etap 1 (MVP) - ✅ Zakończony (2026-04-11)
+
+**Backend:**
+- `backend/db_models.py` — dodano modele ORM: `BenchmarkCase`, `BenchmarkEvent`, `RecommendationFeedback`
+- `backend/db_module/benchmark_orm.py` — funkcje CRUD + summary
+- `backend/db_module/wrappers.py` + `__init__.py` — eksport wrapperów z obsługą sesji
+- `backend/services/scoring.py` — stabilne `recommendation_id` (sha1[:12]) w każdej rekomendacji
+- `backend/routers/benchmark.py` — pełne REST API:
+  - `POST/GET/PATCH /api/benchmark/cases` — zarządzanie przypadkami
+  - `POST /api/benchmark/cases/{id}/decision` — decyzje PR/deployment
+  - `POST /api/benchmark/cases/{id}/recommendations/{rid}/feedback` — feedback do rekomendacji
+  - `POST /api/benchmark/cases/{id}/events` — zdarzenia produktowe
+  - `GET /api/benchmark/summary` — podsumowanie KPI
+  - `GET /api/benchmark/export.csv` i `export.json` — eksport danych
+- `backend/server.py` — router zamontowany pod `/api/benchmark`
+
+**Frontend:**
+- `frontend/src/api.js` — funkcje: `createBenchmarkCase`, `updateBenchmarkCase`, `submitRecommendationFeedback`, `submitBenchmarkDecision`, `trackBenchmarkEvent`, `fetchBenchmarkSummary`, `downloadBenchmarkExport`
+- `frontend/src/components/benchmark/BenchmarkReviewPanel.jsx` — tworzenie case + zwijany panel feedbacku per-rekomendacja
+- `frontend/src/components/benchmark/RecommendationFeedbackForm.jsx` — akceptacja/odrzucenie + 5 score (0-3) + notatki
+- `frontend/src/components/benchmark/BenchmarkDecisionPanel.jsx` — decyzja PR/deployment + przyciski eksportu CSV/JSON
+- `frontend/src/components/phases/result/index.jsx` — zintegrowany `BenchmarkReviewPanel` poniżej rekomendacji
+
+**Testy:** 193 passing (10 nowych testów benchmark w `tests/backend/test_benchmark.py`)
+
+### Etap 2 — W planie
+- Filtrowanie benchmarkowe w `RecentScansTab.jsx`
+- Dashboard summary z wykresami
+- Osobna zakładka "Benchmark" (alternatywnie rozszerzenie Recent Scans)
+
+### Etap 3 — W planie
+- Powiązanie z ticketami i PR reference
+- Approval flow
+- Automatyczne przejście z benchmark case do szkicu PR
+
+---
+
 ## Cel dokumentu
 
 Ten dokument przekłada KPI z `docs/validation-benchmark.md` na konkretne zmiany w produkcie Semcod.

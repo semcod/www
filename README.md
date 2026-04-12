@@ -11,6 +11,8 @@ Zautomatyzowany pipeline jakości kodu z GitHub OAuth — od podłączenia repo 
 - 🤖 **PR Comment Bot** - Automatic pull request analysis and comments
 - 🏆 **Code Health Badges** - Dynamic SVG badges for README files
 - 🔌 **MCP Integration** - Model Context Protocol for AI assistants
+- 📊 **Benchmark KPI MVP** - Instrumentacja do zbierania metryk benchmarkowych (cases, feedback, decisions, export)
+- 🔄 **ReDSL Integration** - Automatyczna refaktoryzacja kodu przez DSL (analyze, refactor, health score, auto-PR)
 - 🐳 **Docker Ready** - Complete containerization with mock GitHub
 - 🧪 **Comprehensive Testing** - Unit, integration, and E2E tests
 
@@ -156,6 +158,8 @@ make test-e2e
 - **Badge SVG** — `/badge/{owner-repo}.svg` → dynamiczny shields.io-style badge
 - **Scan History** — `/api/scans/recent` → SQLite + in-memory fallback
 - **MCP Server** — `/mcp/*` → Model Context Protocol dla AI
+- **Benchmark KPI** — `/api/benchmark/*` → cases, feedback, decisions, events, summary, export CSV/JSON
+- **ReDSL Engine** — `/api/redsl/*` → analyze, refactor, health score, batch-hybrid, badge generation
 - **Webhook security** — HMAC-SHA256 signature verification
 - **Mock GitHub integration** — pełne symulowanie OAuth flow dla dewelopmentu
 
@@ -190,6 +194,25 @@ make test-e2e
 | `GET /mcp/info` | GET | MCP server info |
 | `GET /mcp/resources` | GET | MCP resources list |
 | `POST /mcp/invoke` | POST | MCP tool invocation |
+| **Benchmark KPI** | | |
+| `POST /api/benchmark/cases` | POST | Create benchmark case |
+| `GET /api/benchmark/cases` | GET | List benchmark cases |
+| `GET /api/benchmark/cases/{id}` | GET | Get benchmark case |
+| `PATCH /api/benchmark/cases/{id}` | PATCH | Update benchmark case |
+| `POST /api/benchmark/cases/{id}/decision` | POST | Submit deployment decision |
+| `POST /api/benchmark/cases/{id}/recommendations/{rid}/feedback` | POST | Submit recommendation feedback |
+| `POST /api/benchmark/cases/{id}/events` | POST | Track benchmark event |
+| `GET /api/benchmark/summary` | GET | Benchmark KPI summary |
+| `GET /api/benchmark/export.json` | GET | Export benchmark data (JSON) |
+| `GET /api/benchmark/export.csv` | GET | Export benchmark data (CSV) |
+| **ReDSL** | | |
+| `GET /api/redsl/status` | GET | ReDSL engine status |
+| `POST /api/redsl/analyze` | POST | Run reDSL analysis |
+| `POST /api/redsl/health` | POST | Get project health score |
+| `POST /api/redsl/refactor` | POST | Run reDSL refactoring |
+| `POST /api/redsl/decide` | POST | Evaluate DSL rules (dry-run) |
+| `POST /api/redsl/batch-hybrid` | POST | Hybrid quality refactoring |
+| `GET /api/redsl/badge/{owner}/{repo}` | GET | SVG health badge |
 
 ## MCP Integration
 
@@ -318,7 +341,11 @@ Wszystkie ustawienia w `.env` — bez hardkodu w kodzie. Pełna lista w `.env.ex
 - [Benchmark Checklist](./docs/validation-benchmark-checklist.md) - Checklista wykonawcza
 - [Benchmark Template](./docs/validation-benchmark-template.md) - Szablon przypadków testowych
 - [Benchmark CSV Template](./docs/validation-benchmark-template.csv) - Szablon CSV do wyników
-- [KPI Product Plan](./docs/benchmark-kpi-product-plan.md) - Plan zmian UI/API
+- [KPI Product Plan](./docs/benchmark-kpi-product-plan.md) - Plan zmian UI/API (Etap 1 ✅ zakończony)
+
+### 🔄 ReDSL (Refactoring DSL)
+- [ReDSL Engine Status](./docs/03-redsl-engine-status.md) - Status silnika refaktoryzacji
+- API endpoints: `/api/redsl/*` — analyze, refactor, health, decide, batch-hybrid, badge
 
 ### 🔧 Inne
 - [REFACTORING-SUMMARY.md](./REFACTORING-SUMMARY.md) - Podsumowanie refaktoryzacji OAuth

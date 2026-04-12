@@ -36,8 +36,10 @@ services:
       - CORS_ORIGINS=http://nvidia:3000,https://semcod.com
       - DATABASE_URL=postgresql://semcod:semcod@db:5432/semcod
       - REDIS_URL=redis://redis:6379/0
+      - REDLS_URL=http://redsl:8000
     volumes:
       - ./private-key.pem:/app/private-key.pem:ro
+      - /tmp/local-git-repos:/local-repos:ro
     depends_on:
       - db
       - redis
@@ -54,6 +56,7 @@ services:
       - GITHUB_PRIVATE_KEY_PATH=/app/private-key.pem
       - REDIS_URL=redis://redis:6379/0
       - DATABASE_URL=postgresql://semcod:semcod@db:5432/semcod
+      - REDLS_URL=http://redsl:8000
     volumes:
       - ./private-key.pem:/app/private-key.pem:ro
     depends_on:
@@ -80,6 +83,22 @@ services:
       - backend
     restart: unless-stopped
 
+  redsl:
+    build: ../redsl
+    ports:
+      - "0.0.0.0:8010:8000"
+    environment:
+      - REFACTOR_DRY_RUN=false
+      - REFACTOR_AUTO_APPROVE=false
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+    volumes:
+      - /tmp/local-git-repos:/mnt/project:ro
+      - redsl_memory:/tmp/redsl_memory
+    depends_on:
+      - redis
+    restart: unless-stopped
+
 volumes:
   postgres_data:
   redis_data:
+  redsl_memory:

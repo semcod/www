@@ -4,17 +4,17 @@
 
 - **Project**: /home/tom/github/semcod/www
 - **Primary Language**: javascript
-- **Languages**: javascript: 96, python: 91, shell: 4
+- **Languages**: javascript: 97, python: 93, shell: 4
 - **Analysis Mode**: static
-- **Total Functions**: 992
-- **Total Classes**: 73
-- **Modules**: 191
-- **Entry Points**: 788
+- **Total Functions**: 1052
+- **Total Classes**: 81
+- **Modules**: 194
+- **Entry Points**: 837
 
 ## Architecture by Module
 
 ### frontend.src.api
-- **Functions**: 53
+- **Functions**: 64
 - **File**: `api.js`
 
 ### backend.db_module.wrappers
@@ -61,6 +61,14 @@
 - **Classes**: 1
 - **File**: `base.py`
 
+### e2e.gitea-oauth-cycle.spec
+- **Functions**: 19
+- **File**: `gitea-oauth-cycle.spec.js`
+
+### backend.services.analyzer
+- **Functions**: 18
+- **File**: `analyzer.py`
+
 ### frontend.e2e.benchmark.spec
 - **Functions**: 18
 - **File**: `benchmark.spec.js`
@@ -78,9 +86,9 @@
 - **Functions**: 16
 - **File**: `github-login-sim.spec.js`
 
-### TODO.github-login-sim.spec
-- **Functions**: 16
-- **File**: `github-login-sim.spec.js`
+### backend.db_module.benchmark_orm
+- **Functions**: 15
+- **File**: `benchmark_orm.py`
 
 ### frontend.src.components.tabs.TrendTab.parts
 - **Functions**: 14
@@ -90,14 +98,6 @@
 - **Functions**: 14
 - **File**: `metrics.spec.js`
 
-### e2e.specs.metrics.spec
-- **Functions**: 14
-- **File**: `metrics.spec.js`
-
-### backend.services.analyzer
-- **Functions**: 13
-- **File**: `analyzer.py`
-
 ## Key Entry Points
 
 Main execution flows into the system:
@@ -105,17 +105,31 @@ Main execution flows into the system:
 ### backend.alembic.versions.0001_initial_schema.upgrade
 - **Calls**: op.get_bind, sa.inspect, set, op.create_table, op.create_index, op.create_table, op.create_table, op.create_index
 
+### backend.routers.audit.analyze_repo
+> Analyze any public repository by URL (sandbox mode). Supports file:// for local repos.
+- **Calls**: router.post, body.get, body.get, repo_url.startswith, backend.db_module.scans.save_audit_result, backend.routers.audit._schedule_background_task, request.json, HTTPException
+
 ### backend.db_module.scans_orm.save_audit_result
 > Save audit result to database. Merges benchmark meta into audit_meta JSON.
 - **Calls**: None.first, db.commit, audit_data.get, audit_data.get, audit_data.get, audit_data.get, audit_data.get, json.dumps
+
+### backend.routers.autopr.create_redsl_auto_pr
+> Use reDSL engine to analyze and refactor a project, then create a PR.
+
+Flow:
+  1. Check reDSL engine availability
+  2. Run reDSL refactor (dry_run=Fal
+- **Calls**: router.post, Depends, user.get, RedslClient, HTTPException, redsl.health, RedslRefactorResult, refactor_result.get
 
 ### backend.scripts.scan_samples.scan_sample_projects
 > Scan all sample projects and save to database.
 - **Calls**: backend.sample_projects.get_sample_projects, print, print, enumerate, print, print, print, sum
 
-### backend.routers.audit.analyze_repo
-> Analyze any public repository by URL (sandbox mode).
-- **Calls**: router.post, body.get, body.get, backend.db_module.scans.save_audit_result, backend.routers.audit._schedule_background_task, request.json, HTTPException, re.search
+### frontend.e2e.gui-login-enhanced.spec.FRONTEND_URL
+- **Calls**: frontend.e2e.gui-login-enhanced.spec.describe, frontend.e2e.gui-login-enhanced.spec.beforeAll, frontend.e2e.gui-login-enhanced.spec.get, frontend.e2e.gui-login-enhanced.spec.expect, frontend.e2e.gui-login-enhanced.spec.ok, frontend.e2e.gui-login-enhanced.spec.toBeTruthy, frontend.e2e.gui-login-enhanced.spec.test, frontend.e2e.gui-login-enhanced.spec.testOAuthFlow
+
+### frontend.e2e.gui-login-enhanced.spec.MOCK_GITHUB_URL
+- **Calls**: frontend.e2e.gui-login-enhanced.spec.describe, frontend.e2e.gui-login-enhanced.spec.beforeAll, frontend.e2e.gui-login-enhanced.spec.get, frontend.e2e.gui-login-enhanced.spec.expect, frontend.e2e.gui-login-enhanced.spec.ok, frontend.e2e.gui-login-enhanced.spec.toBeTruthy, frontend.e2e.gui-login-enhanced.spec.test, frontend.e2e.gui-login-enhanced.spec.testOAuthFlow
 
 ### backend.routers.metrics.get_standard_metrics
 > Get standardized metrics for recent scans.
@@ -126,12 +140,6 @@ Response format:
     "meta": {
         "g
 - **Calls**: router.get, backend.db_module.scans.get_recent_scans, backend.db_module.scans.get_total_scan_count, formatted_scans.append, HTTPException, None.lower, scan.get, backend.routers.metrics._utc_now_iso
-
-### frontend.e2e.gui-login-enhanced.spec.FRONTEND_URL
-- **Calls**: frontend.e2e.gui-login-enhanced.spec.describe, frontend.e2e.gui-login-enhanced.spec.beforeAll, frontend.e2e.gui-login-enhanced.spec.get, frontend.e2e.gui-login-enhanced.spec.expect, frontend.e2e.gui-login-enhanced.spec.ok, frontend.e2e.gui-login-enhanced.spec.toBeTruthy, frontend.e2e.gui-login-enhanced.spec.test, frontend.e2e.gui-login-enhanced.spec.testOAuthFlow
-
-### frontend.e2e.gui-login-enhanced.spec.MOCK_GITHUB_URL
-- **Calls**: frontend.e2e.gui-login-enhanced.spec.describe, frontend.e2e.gui-login-enhanced.spec.beforeAll, frontend.e2e.gui-login-enhanced.spec.get, frontend.e2e.gui-login-enhanced.spec.expect, frontend.e2e.gui-login-enhanced.spec.ok, frontend.e2e.gui-login-enhanced.spec.toBeTruthy, frontend.e2e.gui-login-enhanced.spec.test, frontend.e2e.gui-login-enhanced.spec.testOAuthFlow
 
 ### backend.services.mirror.MirrorService.sync_mirror
 > Sync mirror by pulling latest changes from source and pushing to Gitea.
@@ -169,15 +177,6 @@ Flow:
 ### frontend.e2e.github-login-sim.spec.BACKEND_URL
 - **Calls**: frontend.e2e.github-login-sim.spec.describe, frontend.e2e.github-login-sim.spec.beforeAll, frontend.e2e.github-login-sim.spec.get, frontend.e2e.github-login-sim.spec.expect, frontend.e2e.github-login-sim.spec.ok, frontend.e2e.github-login-sim.spec.toBeTruthy, frontend.e2e.github-login-sim.spec.json, frontend.e2e.github-login-sim.spec.toBe
 
-### TODO.github-login-sim.spec.FRONTEND_URL
-- **Calls**: TODO.github-login-sim.spec.describe, TODO.github-login-sim.spec.beforeAll, TODO.github-login-sim.spec.get, TODO.github-login-sim.spec.expect, TODO.github-login-sim.spec.ok, TODO.github-login-sim.spec.toBeTruthy, TODO.github-login-sim.spec.json, TODO.github-login-sim.spec.toBe
-
-### TODO.github-login-sim.spec.MOCK_GITHUB_URL
-- **Calls**: TODO.github-login-sim.spec.describe, TODO.github-login-sim.spec.beforeAll, TODO.github-login-sim.spec.get, TODO.github-login-sim.spec.expect, TODO.github-login-sim.spec.ok, TODO.github-login-sim.spec.toBeTruthy, TODO.github-login-sim.spec.json, TODO.github-login-sim.spec.toBe
-
-### TODO.github-login-sim.spec.BACKEND_URL
-- **Calls**: TODO.github-login-sim.spec.describe, TODO.github-login-sim.spec.beforeAll, TODO.github-login-sim.spec.get, TODO.github-login-sim.spec.expect, TODO.github-login-sim.spec.ok, TODO.github-login-sim.spec.toBeTruthy, TODO.github-login-sim.spec.json, TODO.github-login-sim.spec.toBe
-
 ### backend.routers.marketplace.publish.install_app
 > Install Semcod app on a repository.
 
@@ -210,6 +209,15 @@ Returns delta metrics and ranked improvement proposals.
 Each auto-fixable proposal
 - **Calls**: router.get, backend.db_module.scans.get_repo_scans, None.get, None.get, None.get, None.get, None.get, None.get
 
+### e2e.gitea-oauth-cycle.spec.FRONTEND_URL
+- **Calls**: e2e.gitea-oauth-cycle.spec.describe, e2e.gitea-oauth-cycle.spec.test, e2e.gitea-oauth-cycle.spec.get, e2e.gitea-oauth-cycle.spec.expect, e2e.gitea-oauth-cycle.spec.ok, e2e.gitea-oauth-cycle.spec.toBeTruthy, e2e.gitea-oauth-cycle.spec.from, e2e.gitea-oauth-cycle.spec.toString
+
+### e2e.gitea-oauth-cycle.spec.GITEA_URL
+- **Calls**: e2e.gitea-oauth-cycle.spec.describe, e2e.gitea-oauth-cycle.spec.test, e2e.gitea-oauth-cycle.spec.get, e2e.gitea-oauth-cycle.spec.expect, e2e.gitea-oauth-cycle.spec.ok, e2e.gitea-oauth-cycle.spec.toBeTruthy, e2e.gitea-oauth-cycle.spec.from, e2e.gitea-oauth-cycle.spec.toString
+
+### e2e.gitea-oauth-cycle.spec.BACKEND_URL
+- **Calls**: e2e.gitea-oauth-cycle.spec.describe, e2e.gitea-oauth-cycle.spec.test, e2e.gitea-oauth-cycle.spec.get, e2e.gitea-oauth-cycle.spec.expect, e2e.gitea-oauth-cycle.spec.ok, e2e.gitea-oauth-cycle.spec.toBeTruthy, e2e.gitea-oauth-cycle.spec.from, e2e.gitea-oauth-cycle.spec.toString
+
 ### backend.services.autofix.AutoFixService.create_auto_fix_pr
 > Create automated PR with fixes.
 
@@ -228,6 +236,10 @@ Flow:
 > Run one-click audit on a repo. Requires authentication.
 - **Calls**: router.post, Depends, backend.db_module.scans.save_audit_result, backend.routers.audit._schedule_background_task, request.json, None.hexdigest, body.get, body.get
 
+### backend.routers.auth.gitea_oauth_callback
+> Step 2: Exchange code for token, fetch profile, create user, issue JWT.
+- **Calls**: router.get, token_data.get, profile_resp.json, profile.get, backend.db_module.users.upsert_user, backend.routers.auth.create_session_token, RedirectResponse, HTTPException
+
 ### backend.adapters.gitlab.GitLabAdapter.get_pr_files
 > Get list of files changed in MR.
 - **Calls**: self._get_project_path, resp.json, data.get, httpx.AsyncClient, HTTPException, client.get, c.get, c.get
@@ -244,15 +256,6 @@ Flow:
 > Handle GitHub webhook events.
 - **Calls**: router.post, request.headers.get, request.headers.get, json.loads, request.body, payload.get, payload.get, None.hexdigest
 
-### backend.routers.metrics.get_metrics_summary
-> Get summary statistics of all scans.
-Useful for dashboards and monitoring.
-- **Calls**: router.get, backend.db_module.scans.get_recent_scans, sum, sum, sum, len, HTTPException, grade_dist.get
-
-### backend.routers.marketplace.publish.get_app_status
-> Get installation status and last scan results for a repo.
-- **Calls**: router.get, Depends, str, backend.db_module.tenants_orm.get_or_create_tenant, backend.db_module.repositories_orm.get_repository_by_full_name, backend.db_module.installations.get_installation, AppStatusResponse, AppStatusResponse
-
 ## Process Flows
 
 Key execution flows identified:
@@ -262,32 +265,27 @@ Key execution flows identified:
 upgrade [backend.alembic.versions.0001_initial_schema]
 ```
 
-### Flow 2: save_audit_result
-```
-save_audit_result [backend.db_module.scans_orm]
-```
-
-### Flow 3: scan_sample_projects
-```
-scan_sample_projects [backend.scripts.scan_samples]
-  └─ →> get_sample_projects
-```
-
-### Flow 4: analyze_repo
+### Flow 2: analyze_repo
 ```
 analyze_repo [backend.routers.audit]
-  └─> _schedule_background_task
   └─ →> save_audit_result
       └─ →> get_connection
 ```
 
-### Flow 5: get_standard_metrics
+### Flow 3: save_audit_result
 ```
-get_standard_metrics [backend.routers.metrics]
-  └─ →> get_recent_scans
-      └─ →> get_connection
-  └─ →> get_total_scan_count
-      └─ →> get_connection
+save_audit_result [backend.db_module.scans_orm]
+```
+
+### Flow 4: create_redsl_auto_pr
+```
+create_redsl_auto_pr [backend.routers.autopr]
+```
+
+### Flow 5: scan_sample_projects
+```
+scan_sample_projects [backend.scripts.scan_samples]
+  └─ →> get_sample_projects
 ```
 
 ### Flow 6: FRONTEND_URL
@@ -300,23 +298,27 @@ FRONTEND_URL [frontend.e2e.gui-login-enhanced.spec]
 MOCK_GITHUB_URL [frontend.e2e.gui-login-enhanced.spec]
 ```
 
-### Flow 8: sync_mirror
+### Flow 8: get_standard_metrics
+```
+get_standard_metrics [backend.routers.metrics]
+  └─ →> get_recent_scans
+      └─ →> get_connection
+  └─ →> get_total_scan_count
+      └─ →> get_connection
+```
+
+### Flow 9: sync_mirror
 ```
 sync_mirror [backend.services.mirror.MirrorService]
 ```
 
-### Flow 9: main
+### Flow 10: main
 ```
 main [backend.quality_gate]
   └─> _parse_args
   └─> collect_results
       └─> _should_exclude
       └─> analyze_file
-```
-
-### Flow 10: create_mirror
-```
-create_mirror [backend.services.mirror.MirrorService]
 ```
 
 ## Key Classes
@@ -389,6 +391,11 @@ Analyzes:
 - **Key Methods**: backend.apps.audit.pipeline.AuditApp.__init__, backend.apps.audit.pipeline.AuditApp.run_pipeline, backend.apps.audit.pipeline.AuditApp._detect_issues, backend.apps.audit.pipeline.AuditApp._calculate_score, backend.apps.audit.pipeline.AuditApp._generate_recommendations, backend.apps.audit.pipeline.AuditApp.get_triggers, backend.apps.audit.pipeline.AuditApp.get_actions, backend.apps.audit.pipeline.AuditApp._score_to_grade
 - **Inherits**: AppBase
 
+### backend.services.redsl_client.RedslClient
+> HTTP client for the reDSL refactoring engine.
+- **Methods**: 7
+- **Key Methods**: backend.services.redsl_client.RedslClient.__init__, backend.services.redsl_client.RedslClient.analyze, backend.services.redsl_client.RedslClient.decide, backend.services.redsl_client.RedslClient.refactor, backend.services.redsl_client.RedslClient.batch_hybrid, backend.services.redsl_client.RedslClient.health_score, backend.services.redsl_client.RedslClient.health
+
 ### backend.apps.performance.pipeline.PerformanceApp
 > Performance bottleneck analyzer.
 
@@ -451,10 +458,6 @@ This class normalizes events from GitHub, Gi
 > Applies patches to files in a GitHub repository.
 - **Methods**: 2
 - **Key Methods**: backend.services.autopr_helpers.PatchApplier.get_file_sha, backend.services.autopr_helpers.PatchApplier.commit_file
-
-### backend.quality_gate.FileResult
-- **Methods**: 2
-- **Key Methods**: backend.quality_gate.FileResult.max_cc, backend.quality_gate.FileResult.mean_cc
 
 ## Data Transformation Functions
 
@@ -567,36 +570,37 @@ Return
 Functions exposed as public API (no underscore prefix):
 
 - `backend.alembic.versions.0001_initial_schema.upgrade` - 148 calls
+- `backend.routers.audit.analyze_repo` - 44 calls
 - `backend.db_module.scans_orm.save_audit_result` - 38 calls
+- `backend.routers.autopr.create_redsl_auto_pr` - 34 calls
 - `backend.scheduler.scan_job.run_scheduled_scan` - 33 calls
 - `backend.db_module.scans.save_audit_result` - 32 calls
 - `backend.scripts.scan_samples.scan_sample_projects` - 30 calls
 - `backend.adapters.github.parse_github_event` - 29 calls
-- `backend.routers.audit.analyze_repo` - 29 calls
+- `frontend.e2e.gui-login-enhanced.spec.FRONTEND_URL` - 29 calls
+- `frontend.e2e.gui-login-enhanced.spec.MOCK_GITHUB_URL` - 29 calls
 - `backend.routers.metrics.get_standard_metrics` - 28 calls
-- `frontend.e2e.gui-login-enhanced.spec.FRONTEND_URL` - 27 calls
-- `frontend.e2e.gui-login-enhanced.spec.MOCK_GITHUB_URL` - 27 calls
 - `backend.services.mirror.MirrorService.sync_mirror` - 26 calls
 - `backend.quality_gate.main` - 26 calls
-- `backend.db_module.benchmark_orm.get_benchmark_summary` - 26 calls
 - `backend.services.mirror.MirrorService.create_mirror` - 25 calls
 - `backend.worker.tasks.scan.process_pr_event` - 25 calls
 - `backend.adapters.gitlab_events.parse_gitlab_event` - 25 calls
 - `frontend.e2e.github-login-sim.spec.FRONTEND_URL` - 25 calls
 - `frontend.e2e.github-login-sim.spec.MOCK_GITHUB_URL` - 25 calls
 - `frontend.e2e.github-login-sim.spec.BACKEND_URL` - 25 calls
-- `TODO.github-login-sim.spec.FRONTEND_URL` - 25 calls
-- `TODO.github-login-sim.spec.MOCK_GITHUB_URL` - 25 calls
-- `TODO.github-login-sim.spec.BACKEND_URL` - 25 calls
 - `backend.adapters.gitea_events.parse_gitea_event` - 24 calls
 - `backend.routers.marketplace.publish.install_app` - 24 calls
 - `backend.routers.autopr.create_auto_pr` - 24 calls
 - `backend.worker.tasks.autopr.create_auto_pr` - 23 calls
 - `backend.routers.trend.get_scan_diff` - 23 calls
+- `e2e.gitea-oauth-cycle.spec.FRONTEND_URL` - 23 calls
+- `e2e.gitea-oauth-cycle.spec.GITEA_URL` - 23 calls
+- `e2e.gitea-oauth-cycle.spec.BACKEND_URL` - 23 calls
 - `backend.services.autofix.AutoFixService.create_auto_fix_pr` - 22 calls
 - `backend.db_module.schema.init_db` - 21 calls
+- `backend.db_module.benchmark_orm.get_benchmark_summary` - 21 calls
 - `backend.routers.audit.run_audit` - 20 calls
-- `backend.db_module.benchmark_orm.upsert_recommendation_feedback` - 18 calls
+- `backend.routers.auth.gitea_oauth_callback` - 19 calls
 - `backend.adapters.gitlab.GitLabAdapter.get_pr_files` - 18 calls
 - `backend.routers.auth.github_oauth_callback` - 18 calls
 - `backend.db_module.repositories.get_or_create_repository` - 17 calls
@@ -605,7 +609,6 @@ Functions exposed as public API (no underscore prefix):
 - `backend.routers.marketplace.publish.get_app_status` - 17 calls
 - `backend.routers.marketplace.billing.get_billing_status` - 17 calls
 - `frontend.src.hooks.useAppState.useAppState` - 17 calls
-- `backend.services.analyzer.analyze_complexity` - 16 calls
 
 ## System Interactions
 
@@ -618,21 +621,21 @@ graph TD
     upgrade --> set
     upgrade --> create_table
     upgrade --> create_index
+    analyze_repo --> post
+    analyze_repo --> get
+    analyze_repo --> startswith
+    analyze_repo --> save_audit_result
     save_audit_result --> first
     save_audit_result --> commit
     save_audit_result --> get
+    create_redsl_auto_pr --> post
+    create_redsl_auto_pr --> Depends
+    create_redsl_auto_pr --> get
+    create_redsl_auto_pr --> RedslClient
+    create_redsl_auto_pr --> HTTPException
     scan_sample_projects --> get_sample_projects
     scan_sample_projects --> print
     scan_sample_projects --> enumerate
-    analyze_repo --> post
-    analyze_repo --> get
-    analyze_repo --> save_audit_result
-    analyze_repo --> _schedule_background
-    get_standard_metrics --> get
-    get_standard_metrics --> get_recent_scans
-    get_standard_metrics --> get_total_scan_count
-    get_standard_metrics --> append
-    get_standard_metrics --> HTTPException
     FRONTEND_URL --> describe
     FRONTEND_URL --> beforeAll
     FRONTEND_URL --> get

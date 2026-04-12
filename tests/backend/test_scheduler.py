@@ -8,6 +8,14 @@ from unittest.mock import AsyncMock, MagicMock, patch
 pytestmark = [pytest.mark.fast, pytest.mark.unit]
 
 
+@pytest.fixture(autouse=True)
+def _clear_schedules():
+    """Clear scheduler singleton state before each test."""
+    from scheduler.cron import _schedules
+    _schedules.clear()
+    yield
+
+
 # ─── Schedule API ─────────────────────────────────────────────────────────────
 
 class TestScheduleAPI:

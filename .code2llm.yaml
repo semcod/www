@@ -44,7 +44,12 @@ output:
     - "**/build/**"
     - "**/*.spec.js"
     - "**/*.test.js"
+    - "**/*.cy.js"
     - "**/e2e/**"
+    - "**/tests/api/**"
+    - "**/TODO/**"
+    - "**/frontend/cypress/**"
+    - "**/test-results/**"
 
 metrics:
   # Adjust CC calculation for React components with heavy styling

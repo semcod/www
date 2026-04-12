@@ -163,7 +163,7 @@ async def get_metrics_summary() -> Dict:
         raise HTTPException(500, f"Failed to retrieve summary: {str(e)}")
 
 
-@router.get("/api/metrics/repository/{repo_path}")
+@router.get("/api/metrics/repository/{repo_path:path}")
 async def get_repository_metrics(repo_path: str) -> Dict:
     """
     Get metrics for a specific repository.

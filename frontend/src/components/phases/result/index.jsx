@@ -7,6 +7,7 @@ import { ResultTabPanel } from "./ResultTabPanel";
 import { useDownloads, getResultTabContent } from "../../../hooks/useDownloads";
 import { useBenchmarkTracking } from "../../../hooks/useBenchmarkTracking";
 import BenchmarkReviewPanel from "../../benchmark/BenchmarkReviewPanel";
+import { RedslHealthCard } from "../../RedslHealthCard";
 
 export function ResultPhase({ audit, selectedRepo, isSandbox, reset, benchmarkCaseId, setBenchmarkCaseId }) {
   const data = audit || { error: "No audit data available" };
@@ -59,6 +60,7 @@ export function ResultPhase({ audit, selectedRepo, isSandbox, reset, benchmarkCa
           <ResultMetrics data={data} />
           <ResultRecommendations recommendations={data.recommendations} />
           <BenchmarkReviewPanel auditId={data.audit_id} repo={repoName} recommendations={data.recommendations || []} benchmarkCaseId={benchmarkCaseId} setBenchmarkCaseId={setBenchmarkCaseId} trackRecommendationOpened={trackRecommendationOpened} trackDecision={trackDecision} />
+          <RedslHealthCard projectPath={repoName} repo={repoName} />
         </>
       )}
     </div>

@@ -1,143 +1,44 @@
-.PHONY: help install dev build docker-up docker-down clean venv certs quality quality-baseline pre-commit-install test-e2e-frontend
+# Makefile — Gitea local development cycle
+# Place in www/ alongside existing docker-compose.yml
 
-VENV_DIR = backend/.venv
-PYTHON = $(VENV_DIR)/bin/python
-PIP = $(VENV_DIR)/bin/pip
-UVICORN = ./$(VENV_DIR)/bin/uvicorn
+.PHONY: gitea-up gitea-setup gitea-test gitea-down gitea-logs gitea-reset
 
-BACKEND_PORT = 8200
-FRONTEND_PORT = 5174
+# Start full stack with Gitea
+gitea-up:
+	docker compose -f docker-compose.yml -f docker-compose.gitea.yml up -d
+	@echo ""
+	@echo "⏳ Waiting for Gitea to be ready..."
+	@for i in $$(seq 1 30); do \
+		curl -sf http://localhost:3100/api/v1/version >/dev/null 2>&1 && break; \
+		sleep 2; \
+	done
+	@echo "✅ Stack ready — run 'make gitea-setup' next"
 
-# Domyślny target
-help:
-	@echo "Dostępne komendy:"
-	@echo ""
-	@echo "  Środowisko deweloperskie:"
-	@echo "    make install       - Instaluje zależności (backend + frontend)"
-	@echo "    make dev           - Uruchamia backend + frontend (http)"
-	@echo "    make dev-backend   - Tylko backend (port $(BACKEND_PORT))"
-	@echo "    make dev-frontend  - Tylko frontend (port $(FRONTEND_PORT))"
-	@echo ""
-	@echo "  Docker + HTTPS (Traefik):"
-	@echo "    make certs         - Generuje self-signed certyfikaty dla semcod.localhost"
-	@echo "    make docker-up     - Uruchamia Docker Compose + Traefik HTTPS"
-	@echo "    make docker-down   - Zatrzymuje kontenery Docker"
-	@echo ""
-	@echo "  Budowanie:"
-	@echo "    make build         - Buduje frontend do produkcji"
-	@echo ""
-	@echo "  Testy:"
-	@echo "    make test          - Uruchamia wszystkie testy"
-	@echo "    make test-fast     - Tylko szybkie testy unit (~2s)"
-	@echo "    make test-backend  - Testy backendu (pytest)"
-	@echo "    make test-e2e      - Testy E2E (Playwright headless)"
-	@echo "    make test-e2e-ui   - Testy E2E z Playwright UI"
-	@echo ""
-	@echo "  Inne:"
-	@echo "    make clean              - Czyści zainstalowane zależności"
-	@echo ""
-	@echo "  Jakość kodu:"
-	@echo "    make quality            - Uruchamia quality gate (CC, file size)"
-	@echo "    make quality-baseline   - Zapisuje aktualny snapshot jako baseline"
-	@echo "    make pre-commit-install - Instaluje pre-commit hook"
+# Provision Gitea with user, repos, webhooks
+gitea-setup:
+	bash scripts/setup-gitea.sh
 
-# Tworzenie wirtualnego środowiska Python
-venv:
-	@echo "=== Tworzenie wirtualnego środowiska Python ==="
-	cd backend && python3 -m venv .venv
+# Run full developer cycle test
+gitea-test:
+	bash scripts/test-full-cycle.sh
 
-# Instalacja zależności
-install: venv
-	@echo "=== Instalacja backend (Python) ==="
-	./$(PIP) install -r backend/requirements.txt
-	@echo "=== Instalacja frontend (Node.js) ==="
-	cd frontend && npm install
-
-# Środowisko deweloperskie - obie usługi (w tle)
-dev:
-	@echo "=== Uruchamianie backendu (port $(BACKEND_PORT)) ==="
-	@cd backend && APP_URL=http://localhost:$(BACKEND_PORT) FRONTEND_URL=http://localhost:$(FRONTEND_PORT) $(UVICORN) server:app --reload --port $(BACKEND_PORT) &
+# All-in-one: start + setup + test
+gitea-cycle: gitea-up
+	@sleep 5
+	$(MAKE) gitea-setup
 	@sleep 2
-	@echo "=== Uruchamianie frontendu (port $(FRONTEND_PORT)) ==="
-	@cd frontend && VITE_API_URL=http://localhost:$(BACKEND_PORT) npm run dev -- --port $(FRONTEND_PORT) &
-	@echo "=== Usługi uruchomione ==="
-	@echo "Backend:  http://localhost:$(BACKEND_PORT)"
-	@echo "Frontend: http://localhost:$(FRONTEND_PORT)"
+	$(MAKE) gitea-test
 
+# Stop everything
+gitea-down:
+	docker compose -f docker-compose.yml -f docker-compose.gitea.yml down
 
-# Tylko backend
-dev-backend:
-	cd backend && APP_URL=http://localhost:$(BACKEND_PORT) FRONTEND_URL=http://localhost:$(FRONTEND_PORT) $(UVICORN) server:app --reload --port $(BACKEND_PORT)
+# Logs
+gitea-logs:
+	docker compose -f docker-compose.yml -f docker-compose.gitea.yml logs -f gitea backend
 
-# Tylko frontend
-dev-frontend:
-	cd frontend && VITE_API_URL=http://localhost:$(BACKEND_PORT) npm run dev -- --port $(FRONTEND_PORT)
-
-# Budowanie frontendu
-build:
-	cd frontend && npm run build
-
-# Self-signed certyfikaty dla lokalnego HTTPS
-certs:
-	@./traefik/generate-certs.sh
-
-# Docker Compose z Traefik HTTPS
-docker-up: certs
-	docker compose up -d
-	@echo "=== Usługi Docker uruchomione ==="
-	@echo "App:      https://semcod.localhost"
-	@echo "GitHub OAuth: kliknij 'Connect GitHub →' na stronie"
-
-docker-down:
-	docker compose down
-
-# Czyszczenie
-clean:
-	@echo "=== Czyszczenie frontend ==="
-	cd frontend && rm -rf node_modules dist
-	@echo "=== Czyszczenie backend (opcjonalne) ==="
-	cd backend && find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
-	@echo "=== Czyszczenie e2e ==="
-	cd e2e && rm -rf test-results node_modules 2>/dev/null || true
-
-# Testy
-test: test-backend test-e2e
-	@echo "=== Wszystkie testy zakończone ==="
-
-test-fast:
-	@echo "=== Uruchamianie SZYBKICH testów (tylko unit/fast) ==="
-	cd backend && python3 -m pytest ../tests/backend/ -v -m "fast or unit" --tb=line -q
-	@echo "=== Szybkie testy zakończone (~2s) ==="
-
-test-backend:
-	@echo "=== Uruchamianie testów backendu ==="
-	cd backend && python3 -m pytest ../tests/backend/ -v
-
-test-e2e:
-	@echo "=== Uruchamianie testów E2E (wymaga uruchomionego frontendu) ==="
-	cd e2e && BASE_URL=http://localhost:$(FRONTEND_PORT) npx playwright test
-
-test-e2e-ui:
-	@echo "=== Uruchamianie testów E2E w trybie UI ==="
-	cd e2e && BASE_URL=http://localhost:$(FRONTEND_PORT) npx playwright test --ui --headed
-
-test-e2e-frontend:
-	@echo "=== Uruchamianie testów E2E (frontend/e2e, Vite dev server) ==="
-	cd frontend && npx playwright test --config=playwright.config.js
-
-
-# Quality gate
-quality:
-	@echo "=== Quality Gate ==="
-	python3 backend/quality_gate.py --baseline .quality-baseline.json
-
-quality-baseline:
-	@echo "=== Zapisuję baseline jakości ==="
-	python3 backend/quality_gate.py --save-baseline .quality-baseline.json
-	@echo "=== Baseline zapisany w .quality-baseline.json ==="
-
-pre-commit-install:
-	@echo "=== Instalacja pre-commit hook ==="
-	@printf '#!/bin/sh\npython3 backend/quality_gate.py --baseline .quality-baseline.json || { echo "Quality gate failed - commit rejected."; exit 1; }\n' > .git/hooks/pre-commit
-	chmod +x .git/hooks/pre-commit
-	@echo "=== pre-commit hook zainstalowany ==="
+# Full reset (delete volumes)
+gitea-reset:
+	docker compose -f docker-compose.yml -f docker-compose.gitea.yml down -v
+	rm -f .env.gitea
+	@echo "🗑️  Gitea data wiped"

@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Benchmark KPI MVP (Etap 1)** — pełna instrumentacja do zbierania metryk benchmarkowych
+  - Nowe modele ORM: `BenchmarkCase`, `BenchmarkEvent`, `RecommendationFeedback`
+  - Router `/api/benchmark` z endpointami: cases, feedback, decisions, events, summary, export (CSV/JSON)
+  - Komponenty frontendowe: `BenchmarkReviewPanel`, `RecommendationFeedbackForm`, `BenchmarkDecisionPanel`
+  - Stabilne `recommendation_id` (sha1[:12]) w każdej rekomendacji
+  - 10 nowych testów w `tests/backend/test_benchmark.py`
+- **ReDSL Integration** — integracja z silnikiem refaktoryzacji DSL
+  - Router `/api/redsl` z endpointami: status, analyze, health, refactor, decide, batch-hybrid
+  - Endpoint badge `/api/redsl/badge/{owner}/{repo}` — generowanie SVG badge z health score
+  - Klient HTTP `RedslClient` w `backend/services/redsl_client.py`
+  - Taski Celery: `task_redsl_analyze`, `task_redsl_refactor`, `task_redsl_health_check`
+  - Scheduler APScheduler: godzinne quality check + tygodniowe auto-refactor
+  - Komponent frontendowy: `RedslHealthCard.jsx` — dashboard widget z oceną i badge
+
 ### Fixed
 - Sandbox/guest scans now persist to SQLite (were only in-memory, lost on restart)
 - `_run_audit_pipeline` and `_run_sandbox_analysis` now call `save_scan()` after completion

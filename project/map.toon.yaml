@@ -1,17 +1,14 @@
-# www | 191f 20434L | shell:4,python:91,javascript:96 | 2026-04-11
-# stats: 992 func | 0 cls | 191 mod | CC̄=2.7 | critical:2 | cycles:0
-# alerts[5]: CC FRONTEND_URL=33; CC MOCK_GITHUB_URL=33; fan-out FRONTEND_URL=27; fan-out MOCK_GITHUB_URL=27; fan-out BACKEND_URL=25
-# hotspots[5]: FRONTEND_URL fan=27; MOCK_GITHUB_URL fan=27; FRONTEND_URL fan=25; MOCK_GITHUB_URL fan=25; BACKEND_URL fan=25
+# www | 194f 21619L | shell:4,python:93,javascript:97 | 2026-04-12
+# stats: 1052 func | 0 cls | 194 mod | CC̄=2.7 | critical:3 | cycles:0
+# alerts[5]: CC FRONTEND_URL=33; CC MOCK_GITHUB_URL=33; fan-out FRONTEND_URL=29; fan-out MOCK_GITHUB_URL=29; fan-out create_redsl_auto_pr=28
+# hotspots[5]: FRONTEND_URL fan=29; MOCK_GITHUB_URL fan=29; create_redsl_auto_pr fan=28; FRONTEND_URL fan=25; MOCK_GITHUB_URL fan=25
 # evolution: CC̄ 2.7→2.7 (flat 0.0)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[191]:
-  TODO/github-login-sim.spec.js,114
-  TODO/run-sim.sh,40
-  TODO/server.py,208
+M[194]:
   backend/adapters/__init__.py,34
   backend/adapters/base.py,155
   backend/adapters/gitea.py,349
-  backend/adapters/gitea_events.py,60
+  backend/adapters/gitea_events.py,69
   backend/adapters/github.py,392
   backend/adapters/gitlab.py,379
   backend/adapters/gitlab_events.py,70
@@ -25,11 +22,11 @@ M[191]:
   backend/apps/performance/pipeline.py,110
   backend/apps/registry.py,183
   backend/apps/security/pipeline.py,115
-  backend/config.py,76
+  backend/config.py,88
   backend/database.py,72
   backend/db_models.py,222
   backend/db_module/__init__.py,92
-  backend/db_module/benchmark_orm.py,208
+  backend/db_module/benchmark_orm.py,220
   backend/db_module/db_connection.py,26
   backend/db_module/events.py,70
   backend/db_module/events_orm.py,87
@@ -49,9 +46,9 @@ M[191]:
   backend/events/__init__.py,4
   backend/events/models.py,100
   backend/quality_gate.py,272
-  backend/routers/audit.py,352
-  backend/routers/auth.py,149
-  backend/routers/autopr.py,148
+  backend/routers/audit.py,396
+  backend/routers/auth.py,211
+  backend/routers/autopr.py,306
   backend/routers/badge.py,139
   backend/routers/benchmark.py,192
   backend/routers/billing.py,291
@@ -68,23 +65,25 @@ M[191]:
   backend/routers/mcp/tools.py,198
   backend/routers/metrics.py,257
   backend/routers/mirror.py,236
+  backend/routers/redsl.py,207
   backend/routers/report.py,14
   backend/routers/system.py,34
   backend/routers/trend.py,250
   backend/routers/webhook.py,257
-  backend/routers/webhook_v2.py,127
+  backend/routers/webhook_v2.py,128
   backend/sample_projects.py,72
-  backend/scheduler/cron.py,183
+  backend/scheduler/cron.py,213
   backend/scheduler/scan_job.py,164
   backend/scripts/scan_samples.py,74
-  backend/server.py,76
-  backend/services/analyzer.py,320
+  backend/server.py,78
+  backend/services/analyzer.py,344
   backend/services/autofix.py,299
   backend/services/autopr_helpers.py,179
   backend/services/billing.py,343
   backend/services/github_client.py,37
   backend/services/mirror.py,387
   backend/services/mirror_models.py,27
+  backend/services/redsl_client.py,90
   backend/services/scan_service.py,26
   backend/services/scoring.py,119
   backend/services/stripe_connect.py,74
@@ -92,11 +91,13 @@ M[191]:
   backend/store.py,3
   backend/worker/__init__.py,59
   backend/worker/_celery_stub.py,37
-  backend/worker/tasks/__init__.py,37
+  backend/worker/tasks/__init__.py,49
   backend/worker/tasks/autopr.py,183
   backend/worker/tasks/maintenance.py,78
   backend/worker/tasks/marketplace.py,126
+  backend/worker/tasks/redsl.py,153
   backend/worker/tasks/scan.py,287
+  e2e/gitea-oauth-cycle.spec.js,125
   e2e/karate/karate-config.js,9
   e2e/playwright.config.js,24
   e2e/specs/audit.spec.js,48
@@ -125,8 +126,8 @@ M[191]:
   frontend/e2e/system-integration.spec.js,193
   frontend/playwright.config.js,22
   frontend/src/App.jsx,100
-  frontend/src/api.js,250
-  frontend/src/components/index.js,4
+  frontend/src/api.js,303
+  frontend/src/components/index.js,5
   frontend/src/components/AppCard.jsx,160
   frontend/src/components/GradeCircle.jsx,33
   frontend/src/components/Header.jsx,62
@@ -139,6 +140,7 @@ M[191]:
   frontend/src/components/Preview.jsx,195
   frontend/src/components/ProgressSteps.jsx,47
   frontend/src/components/RecommendationCard.jsx,48
+  frontend/src/components/RedslHealthCard.jsx,133
   frontend/src/components/ShareButtons.jsx,51
   frontend/src/components/benchmark/BenchmarkDecisionPanel.jsx,149
   frontend/src/components/benchmark/BenchmarkReviewPanel.jsx,149
@@ -154,7 +156,7 @@ M[191]:
   frontend/src/components/phases/result/ResultMetrics.jsx,19
   frontend/src/components/phases/result/ResultRecommendations.jsx,14
   frontend/src/components/phases/result/ResultTabPanel.jsx,69
-  frontend/src/components/phases/result/index.jsx,66
+  frontend/src/components/phases/result/index.jsx,68
   frontend/src/components/tabs/index.js,7
   frontend/src/components/tabs/AddScheduleForm.jsx,49
   frontend/src/components/tabs/BadgeTab.jsx,109
@@ -195,6 +197,7 @@ M[191]:
   mock-github/server.py,216
   project.sh,35
   run-sim.sh,40
+  scripts/setup-gitea.sh,417
   traefik/generate-certs.sh,27
 D:
   frontend/e2e/gui-login-enhanced.spec.js:
@@ -218,63 +221,29 @@ D:
     attemptUserLogin()
     element()
     checkLoginStatus()
-  backend/db_module/benchmark_orm.py:
-    e: create_benchmark_case,get_benchmark_cases,get_benchmark_case,update_benchmark_case,_case_to_dict,create_benchmark_event,get_benchmark_events,upsert_recommendation_feedback,get_feedback_for_case,_feedback_to_dict,get_benchmark_summary
-    create_benchmark_case(db;payload)
-    get_benchmark_cases(db)
-    get_benchmark_case(db;case_id)
-    update_benchmark_case(db;case_id;updates)
-    _case_to_dict(c)
-    create_benchmark_event(db;case_id;payload)
-    get_benchmark_events(db;case_id)
-    upsert_recommendation_feedback(db;case_id;recommendation_id;payload)
-    get_feedback_for_case(db;case_id)
-    _feedback_to_dict(f)
-    get_benchmark_summary(db)
+  frontend/src/components/RedslHealthCard.jsx:
+    i: ../api,../constants,./GradeCircle,react
+    e: MetricRow,ok,RedslHealthCard,handleRefactor,result,h,grade,score
+    MetricRow()
+    ok()
+    RedslHealthCard()
+    handleRefactor()
+    result()
+    h()
+    grade()
+    score()
   frontend/src/components/tabs/TrendTab.jsx:
     i: ../../api,react
     e: TrendTab,repoName,history
     TrendTab()
     repoName()
     history()
-  backend/services/analyzer.py:
-    e: count_code_stats,analyze_complexity,_should_skip_line,_process_file_for_duplication,analyze_duplication,_should_skip_file,_check_todo_fixme,_check_long_lines,_check_missing_docstrings,_analyze_file_quality,analyze_quality,analyze_repo,run_tool
-    count_code_stats(repo_path)
-    analyze_complexity(repo_path)
-    _should_skip_line(line)
-    _process_file_for_duplication(file_path;line_occurrences)
-    analyze_duplication(repo_path)
-    _should_skip_file(file_path)
-    _check_todo_fixme(content)
-    _check_long_lines(lines;max_length)
-    _check_missing_docstrings(content)
-    _analyze_file_quality(file_path)
-    analyze_quality(repo_path)
-    analyze_repo(repo;commit_sha;config)
-    run_tool(name;args;fallback)
   backend/apps/security/pipeline.py:
     e: SecurityApp
     SecurityApp(AppBase): __init__(1),run_pipeline(1),_get_recommendations(1),get_triggers(0),get_actions(0)  # Security vulnerability scanner.
 
 Detects:
 - Hardcoded secret...
-  frontend/src/components/ProgressSteps.jsx:
-    i: ../constants
-    e: ProgressSteps,currentIdx,stepIdx,done,active
-    ProgressSteps()
-    currentIdx()
-    stepIdx()
-    done()
-    active()
-  frontend/src/components/phases/result/index.jsx:
-    i: ../../../hooks/useBenchmarkTracking,../../../hooks/useDownloads,../../benchmark/BenchmarkReviewPanel,./ErrorResult,./ResultHeader,./ResultMetrics,./ResultRecommendations,./ResultTabPanel,react
-    e: ResultPhase,data,repoName,activeContent,handleCopy,handleDownload
-    ResultPhase()
-    data()
-    repoName()
-    activeContent()
-    handleCopy()
-    handleDownload()
   backend/routers/audit.py:
     e: _utc_now_iso,_schedule_background_task,run_audit,get_audit_result_endpoint,get_recent_scans_api,analyze_repo,_run_audit_pipeline,_run_sandbox_analysis
     _utc_now_iso()
@@ -285,6 +254,34 @@ Detects:
     analyze_repo(request)
     _run_audit_pipeline(audit_id;repo;token)
     _run_sandbox_analysis(audit_id;repo_url;repo)
+  frontend/src/components/ProgressSteps.jsx:
+    i: ../constants
+    e: ProgressSteps,currentIdx,stepIdx,done,active
+    ProgressSteps()
+    currentIdx()
+    stepIdx()
+    done()
+    active()
+  frontend/src/components/phases/result/index.jsx:
+    i: ../../../hooks/useBenchmarkTracking,../../../hooks/useDownloads,../../RedslHealthCard,../../benchmark/BenchmarkReviewPanel,./ErrorResult,./ResultHeader,./ResultMetrics,./ResultRecommendations,./ResultTabPanel,react
+    e: ResultPhase,data,repoName,activeContent,handleCopy,handleDownload
+    ResultPhase()
+    data()
+    repoName()
+    activeContent()
+    handleCopy()
+    handleDownload()
+  backend/routers/autopr.py:
+    e: PatchFile,AutoPRRequest,AutoPRResult,RedslRefactorRequest,RedslRefactorResult,_score_improved,create_auto_pr,create_redsl_auto_pr,_build_redsl_pr_body
+    PatchFile(BaseModel):
+    AutoPRRequest(BaseModel):
+    AutoPRResult(BaseModel):
+    RedslRefactorRequest(BaseModel):
+    RedslRefactorResult(BaseModel):
+    _score_improved(repo;min_delta)
+    create_auto_pr(body;user)
+    create_redsl_auto_pr(body;user)
+    _build_redsl_pr_body(proposal_type;fix_id;decisions;files)
   frontend/src/hooks/useBenchmarkTracking.js:
     i: ../api,react
     e: safeTrack,useBenchmarkTracking,prevPhase,trackedResultEntry,startedAt,prev,elapsed,trackExport,trackRecommendationOpened,trackDecision
@@ -350,13 +347,6 @@ Detects:
     e: PlanCard,PaywallModal
     PlanCard()
     PaywallModal()
-  backend/routers/autopr.py:
-    e: PatchFile,AutoPRRequest,AutoPRResult,_score_improved,create_auto_pr
-    PatchFile(BaseModel):
-    AutoPRRequest(BaseModel):
-    AutoPRResult(BaseModel):
-    _score_improved(repo;min_delta)
-    create_auto_pr(body;user)
   e2e/specs/social-sharing.spec.js:
     i: @playwright/test
     e: noScansMessage,hasNoScans,scanCard,hasScan,shareTab,twitterButton,linkedinButton,blueskyButton,twitterVisible,linkedinVisible,blueskyVisible,noScansMessage,hasNoScans,scanCard,hasScan,shareTab,twitterButton,linkedinButton,blueskyButton,twitterVisible,linkedinVisible,blueskyVisible,recentSection,isVisible,scanCard,hasScan,shareTab,twitterButton,linkedinButton,blueskyButton,twitterVisible,linkedinVisible,blueskyVisible
@@ -399,6 +389,23 @@ Detects:
     calculate_health_score(stats;complexity;duplication;quality)
     score_to_grade(score)
     generate_recommendations(complexity;duplication;quality)
+  backend/db_module/benchmark_orm.py:
+    e: create_benchmark_case,get_benchmark_cases,get_benchmark_case,update_benchmark_case,_case_to_dict,create_benchmark_event,_event_to_dict,get_benchmark_events,upsert_recommendation_feedback,_update_feedback_fields,_build_feedback_row,get_feedback_for_case,_feedback_to_dict,get_benchmark_summary,_compute_feedback_stats
+    create_benchmark_case(db;payload)
+    get_benchmark_cases(db)
+    get_benchmark_case(db;case_id)
+    update_benchmark_case(db;case_id;updates)
+    _case_to_dict(c)
+    create_benchmark_event(db;case_id;payload)
+    _event_to_dict(ev)
+    get_benchmark_events(db;case_id)
+    upsert_recommendation_feedback(db;case_id;recommendation_id;payload)
+    _update_feedback_fields(row;payload)
+    _build_feedback_row(case_id;recommendation_id;payload)
+    get_feedback_for_case(db;case_id)
+    _feedback_to_dict(f)
+    get_benchmark_summary(db)
+    _compute_feedback_stats(feedback_rows)
   backend/worker/tasks/scan.py:
     e: run_audit,process_pr_event,process_push_event,analyze_diff,_get_token_for_provider,_analyze_diff,_format_pr_comment
     run_audit(repo;commit_sha;config)
@@ -428,17 +435,6 @@ Detects:
     preview_pr_comment(request;user)
     list_apps()
     _format_preview_comment(repo;score;issues)
-  backend/routers/mcp/resources.py:
-    e: _utc_now_iso,_summarize_scan,_build_metrics_summary,_get_scans_list,_get_scan_detail,_get_metrics_summary,_get_badge_status,mcp_list_resources,mcp_get_resource
-    _utc_now_iso()
-    _summarize_scan(scan)
-    _build_metrics_summary(scans)
-    _get_scans_list()
-    _get_scan_detail(audit_id)
-    _get_metrics_summary()
-    _get_badge_status(repo_slug)
-    mcp_list_resources()
-    mcp_get_resource(uri)
   frontend/src/hooks/usePolling.js:
     i: ../api.js,react
     e: useScanAnimation,timers,done,useAuditPolling,pollCount,MAX_POLLS,poll,data,interval,shouldStop
@@ -456,6 +452,17 @@ Detects:
     i: ../../../constants,./DownloadButtons
     e: ResultHeader
     ResultHeader()
+  backend/routers/mcp/resources.py:
+    e: _utc_now_iso,_summarize_scan,_build_metrics_summary,_get_scans_list,_get_scan_detail,_get_metrics_summary,_get_badge_status,mcp_list_resources,mcp_get_resource
+    _utc_now_iso()
+    _summarize_scan(scan)
+    _build_metrics_summary(scans)
+    _get_scans_list()
+    _get_scan_detail(audit_id)
+    _get_metrics_summary()
+    _get_badge_status(repo_slug)
+    mcp_list_resources()
+    mcp_get_resource(uri)
   backend/scheduler/scan_job.py:
     e: _utc_now_iso,_build_audit_id,_detect_degradation,_fire_alert,run_scheduled_scan
     _utc_now_iso()
@@ -480,6 +487,26 @@ Detects:
     build_snapshot(results)
     _parse_args()
     main()
+  backend/services/analyzer.py:
+    e: count_code_stats,_count_patterns,_estimate_file_complexity,_analyze_file_complexity,analyze_complexity,_should_skip_line,_process_file_for_duplication,analyze_duplication,_should_skip_file,_check_todo_fixme,_check_long_lines,_check_missing_docstrings,_analyze_file_quality,analyze_quality,analyze_repo,_run_builtin_tool,_run_external_tool,run_tool
+    count_code_stats(repo_path)
+    _count_patterns(content;patterns)
+    _estimate_file_complexity(lines)
+    _analyze_file_complexity(file_path)
+    analyze_complexity(repo_path)
+    _should_skip_line(line)
+    _process_file_for_duplication(file_path;line_occurrences)
+    analyze_duplication(repo_path)
+    _should_skip_file(file_path)
+    _check_todo_fixme(content)
+    _check_long_lines(lines;max_length)
+    _check_missing_docstrings(content)
+    _analyze_file_quality(file_path)
+    analyze_quality(repo_path)
+    analyze_repo(repo;commit_sha;config)
+    _run_builtin_tool(name;repo_path)
+    _run_external_tool(name;args)
+    run_tool(name;args;fallback)
   backend/apps/registry.py:
     e: AppRegistry,get_registry
     AppRegistry: __init__(0),initialize(0),get_app(1),get_apps_for_event(1),process_event(1),list_apps(0),get_app_manifest(1),_event_to_trigger(0)  # Central registry for all marketplace apps.
@@ -549,6 +576,28 @@ Handles:
     handleDelete()
     AddScheduleButton()
     SchedulesList()
+  e2e/gitea-oauth-cycle.spec.js:
+    i: @playwright/test
+    e: FRONTEND_URL,GITEA_URL,BACKEND_URL,ver,repos,body,data,branchRes,fileRes,fileSha,newContent,commitRes,prRes,pr,diffRes,diff,res,res,ct
+    FRONTEND_URL()
+    GITEA_URL()
+    BACKEND_URL()
+    ver()
+    repos()
+    body()
+    data()
+    branchRes()
+    fileRes()
+    fileSha()
+    newContent()
+    commitRes()
+    prRes()
+    pr()
+    diffRes()
+    diff()
+    res()
+    res()
+    ct()
   backend/services/autofix.py:
     e: Patch,FixResult,PatchGenerator,AutoFixService
     Patch:  # Represents a single file patch...
@@ -611,6 +660,20 @@ Analyzes:
     valueW()
     BadgeTab()
     badgeUrl()
+  backend/routers/redsl.py:
+    e: AnalyzeRequest,RefactorRequest,AutoPrRequest,get_status,analyze,get_health,run_refactor,run_decide,run_batch_hybrid,health_badge,_score_to_grade,_make_badge_svg
+    AnalyzeRequest(BaseModel):
+    RefactorRequest(BaseModel):
+    AutoPrRequest(BaseModel):
+    get_status()
+    analyze(body;bg)
+    get_health(body)
+    run_refactor(body;bg)
+    run_decide(body)
+    run_batch_hybrid(project_path;max_changes)
+    health_badge(owner;repo)
+    _score_to_grade(score)
+    _make_badge_svg(label;value;color)
   backend/services/mirror.py:
     e: MirrorService
     MirrorService: __init__(4),create_mirror(2),sync_mirror(1),_get_source_adapter(1),_get_clone_url(2),_get_gitea_clone_url(1),_create_gitea_repo(3),_setup_ci_cd(3),_generate_workflow(1),_get_latest_commit(1),_get_commit_count(1)  # Service for mirroring repos to local Gitea...
@@ -657,11 +720,27 @@ Analyzes:
 
 Apps must implement:
 -...
+  backend/adapters/gitea_events.py:
+    e: parse_gitea_event,_detect_gitea_event_type
+    parse_gitea_event(payload;gitea_event_header)
+    _detect_gitea_event_type(payload;gitea_event_header)
   backend/adapters/github.py:
     e: GitHubAdapter,parse_github_event,_detect_github_event_type
     GitHubAdapter(GitProvider): __init__(2),get_api_headers(0),comment_on_pr(3),update_pr_description(3),create_pr(5),close_pr(3),create_branch(3),delete_branch(2),commit_file(6),get_default_branch(1),get_ref_sha(2),get_file_sha(3),get_pr_diff(2),get_pr_files(2),get_file_content(3),create_issue(4),comment_on_issue(3),create_check_run(6),update_check_run(5),verify_webhook_signature(3)  # GitHub API implementation of GitProvider...
     parse_github_event(payload)
     _detect_github_event_type(payload)
+  backend/routers/auth.py:
+    e: create_session_token,decode_session_token,get_current_user,github_oauth_start,github_oauth_callback,gitea_oauth_start,gitea_oauth_callback,get_me,logout,list_repos
+    create_session_token(user_id)
+    decode_session_token(token)
+    get_current_user(credentials)
+    github_oauth_start()
+    github_oauth_callback(code)
+    gitea_oauth_start()
+    gitea_oauth_callback(code)
+    get_me(user)
+    logout()
+    list_repos(user)
   backend/routers/trend.py:
     e: _utc_now_iso,_parse_completed,_trend_direction,_filter_by_days,_build_diff_proposals,get_repo_trend,compare_repo_trend,get_scan_diff
     _utc_now_iso()
@@ -706,15 +785,6 @@ Apps must implement:
     jsonErrors()
     url()
     ct()
-  TODO/server.py:
-    e: authorize,issue_code,access_token,_get_user,get_user,get_repos,health
-    authorize(client_id;redirect_uri;scope;state;login)
-    issue_code(request)
-    access_token(request)
-    _get_user(authorization)
-    get_user(authorization)
-    get_repos(authorization;per_page;page;sort)
-    health()
   mock-github/server.py:
     e: get_mock_user,authorize,issue_code,access_token,_get_user,get_user,get_repos,health
     get_mock_user()
@@ -739,7 +809,7 @@ Apps must implement:
     process_push_event(event;provider)
     parse_github_webhook(payload)
     parse_gitlab_webhook(payload)
-    parse_gitea_webhook(payload)
+    parse_gitea_webhook(payload;gitea_event_header)
     verify_github_signature(body;signature;secret)
     verify_gitea_signature(body;signature;secret)
   backend/db_module/users.py:
@@ -767,16 +837,22 @@ Apps must implement:
     create_auto_pr(repo;base_branch;patches;proposal_type;llm_prompt;token;provider_type)
     create_auto_fix_pr(repo;base_branch;files;issues;proposal_type;provider_type;tenant_id)
     _get_token_for_provider(provider)
+  backend/worker/tasks/redsl.py:
+    e: task_redsl_analyze,task_redsl_refactor,task_redsl_health_check,task_redsl_scheduled_quality_check,task_redsl_scheduled_auto_refactor,_get_loop,_save_analysis,_get_repos_below_threshold
+    task_redsl_analyze(project_path;repo)
+    task_redsl_refactor(project_path;max_actions)
+    task_redsl_health_check(project_path)
+    task_redsl_scheduled_quality_check()
+    task_redsl_scheduled_auto_refactor()
+    _get_loop()
+    _save_analysis(repo;result)
+    _get_repos_below_threshold(threshold)
   backend/scripts/scan_samples.py:
     e: scan_sample_projects
     scan_sample_projects()
   backend/adapters/__init__.py:
     e: get_adapter_for_event
     get_adapter_for_event(event;token)
-  backend/adapters/gitea_events.py:
-    e: parse_gitea_event,_detect_gitea_event_type
-    parse_gitea_event(payload)
-    _detect_gitea_event_type(payload)
   backend/adapters/gitlab.py:
     e: GitLabAdapter
     GitLabAdapter(GitProvider): __init__(2),get_api_headers(0),_get_project_path(1),comment_on_pr(3),update_pr_description(3),create_pr(5),close_pr(3),create_branch(3),delete_branch(2),commit_file(6),get_default_branch(1),get_ref_sha(2),get_file_sha(3),get_pr_diff(2),get_pr_files(2),get_file_content(3),create_issue(4),comment_on_issue(3),create_check_run(6),update_check_run(5),verify_webhook_signature(3)  # GitLab API implementation of GitProvider...
@@ -907,16 +983,25 @@ Gitea API is compa...
     Event: is_pr_event(0),is_push_event(0),is_comment_event(0),get_pr_url(0),get_clone_url(0)  # Unified event representation across all git platforms.
 
 This...
-  backend/routers/auth.py:
-    e: create_session_token,decode_session_token,get_current_user,github_oauth_start,github_oauth_callback,get_me,logout,list_repos
-    create_session_token(user_id)
-    decode_session_token(token)
-    get_current_user(credentials)
-    github_oauth_start()
-    github_oauth_callback(code)
-    get_me(user)
-    logout()
-    list_repos(user)
+  backend/routers/benchmark.py:
+    e: CaseCreate,CaseUpdate,DecisionPayload,FeedbackPayload,EventPayload,post_case,list_cases,get_case,patch_case,post_decision,post_feedback,list_feedback,post_event,list_events,summary,export_json,export_csv
+    CaseCreate(BaseModel):
+    CaseUpdate(BaseModel):
+    DecisionPayload(BaseModel):
+    FeedbackPayload(BaseModel):
+    EventPayload(BaseModel):
+    post_case(body)
+    list_cases()
+    get_case(case_id)
+    patch_case(case_id;body)
+    post_decision(case_id;body)
+    post_feedback(case_id;recommendation_id;body)
+    list_feedback(case_id)
+    post_event(case_id;body)
+    list_events(case_id)
+    summary()
+    export_json()
+    export_csv()
   backend/routers/webhook_v2.py:
     e: github_webhook,gitlab_webhook,gitea_webhook,_route_event,_get_token_for_provider
     github_webhook(request)
@@ -998,25 +1083,6 @@ This...
     userRes()
     loginBtn()
     userBtn()
-  TODO/github-login-sim.spec.js:
-    i: @playwright/test
-    e: FRONTEND_URL,MOCK_GITHUB_URL,BACKEND_URL,res,body,issueRes,tokenRes,tokenBody,userRes,user,reposRes,repos,tokenRes,userRes,loginBtn,userBtn
-    FRONTEND_URL()
-    MOCK_GITHUB_URL()
-    BACKEND_URL()
-    res()
-    body()
-    issueRes()
-    tokenRes()
-    tokenBody()
-    userRes()
-    user()
-    reposRes()
-    repos()
-    tokenRes()
-    userRes()
-    loginBtn()
-    userBtn()
   e2e/specs/metrics.spec.js:
     i: @playwright/test
     e: skipInCI,response,data,scan,response,data,listResponse,listData,repo,response,data,response,response,data
@@ -1050,25 +1116,6 @@ This...
     avatarVisible()
     demoIndicator()
     demoVisible()
-  backend/routers/benchmark.py:
-    e: CaseCreate,CaseUpdate,DecisionPayload,FeedbackPayload,EventPayload,post_case,list_cases,get_case,patch_case,post_decision,post_feedback,list_feedback,post_event,list_events,summary,export_json,export_csv
-    CaseCreate(BaseModel):
-    CaseUpdate(BaseModel):
-    DecisionPayload(BaseModel):
-    FeedbackPayload(BaseModel):
-    EventPayload(BaseModel):
-    post_case(body)
-    list_cases()
-    get_case(case_id)
-    patch_case(case_id;body)
-    post_decision(case_id;body)
-    post_feedback(case_id;recommendation_id;body)
-    list_feedback(case_id)
-    post_event(case_id;body)
-    list_events(case_id)
-    summary()
-    export_json()
-    export_csv()
   backend/db_session.py:
     e: get_db,init_db,_run_migrations
     get_db()
@@ -1102,7 +1149,7 @@ This...
     e: on_pr_comment
     on_pr_comment(event;context)
   backend/scheduler/cron.py:
-    e: ScheduleCreate,ScheduleOut,get_scheduler,start_scheduler,stop_scheduler,_job_id,_next_run_iso,_run_scan_sync,create_schedule,list_schedules,get_schedule,update_schedule,delete_schedule
+    e: ScheduleCreate,ScheduleOut,get_scheduler,start_scheduler,stop_scheduler,_job_id,_next_run_iso,_run_scan_sync,_run_redsl_quality_check_sync,_run_redsl_auto_refactor_sync,create_schedule,list_schedules,get_schedule,update_schedule,delete_schedule
     ScheduleCreate(BaseModel):
     ScheduleOut(BaseModel):
     get_scheduler()
@@ -1111,6 +1158,8 @@ This...
     _job_id(repo)
     _next_run_iso(job_id)
     _run_scan_sync(repo;token;webhook_url)
+    _run_redsl_quality_check_sync()
+    _run_redsl_auto_refactor_sync()
     create_schedule(body)
     list_schedules()
     get_schedule(owner;repo)
@@ -1122,7 +1171,7 @@ This...
     gradeColor()
   frontend/src/api.js:
     i: ./constants
-    e: authHeaders,fetchMe,res,logout,res,fetchRepos,res,startAudit,res,fetchAudit,res,fetchBillingStatus,res,createCheckoutSession,res,analyzePublicRepo,res,loginWithProvider,getPreview,res,installApp,res,getInstallations,res,uninstallApp,res,fetchTrend,res,fetchSchedules,res,createSchedule,res,deleteSchedule,res,fetchBillingPortal,res,getApps,res,getAppStatus,res,createBenchmarkCase,res,updateBenchmarkCase,res,submitRecommendationFeedback,res,submitBenchmarkDecision,res,trackBenchmarkEvent,res,fetchBenchmarkSummary,res,downloadBenchmarkExport
+    e: authHeaders,fetchMe,res,logout,res,fetchRepos,res,startAudit,res,fetchAudit,res,fetchBillingStatus,res,createCheckoutSession,res,analyzePublicRepo,res,loginWithProvider,getPreview,res,installApp,res,getInstallations,res,uninstallApp,res,fetchTrend,res,fetchSchedules,res,createSchedule,res,deleteSchedule,res,fetchBillingPortal,res,getApps,res,getAppStatus,res,createBenchmarkCase,res,updateBenchmarkCase,res,submitRecommendationFeedback,res,submitBenchmarkDecision,res,trackBenchmarkEvent,res,fetchBenchmarkSummary,res,downloadBenchmarkExport,getRedslStatus,res,redslAnalyze,res,redslHealth,res,redslRefactor,res,redslDecide,res,redslBadgeUrl
     authHeaders()
     fetchMe()
     res()
@@ -1176,6 +1225,17 @@ This...
     fetchBenchmarkSummary()
     res()
     downloadBenchmarkExport()
+    getRedslStatus()
+    res()
+    redslAnalyze()
+    res()
+    redslHealth()
+    res()
+    redslRefactor()
+    res()
+    redslDecide()
+    res()
+    redslBadgeUrl()
   frontend/src/hooks/useAuth.js:
     i: ../api.js,../constants.js,react
     e: useSessionCallbackBootstrap,searchParams,session,useSessionProfile,getOAuthStartUrl,confirmAuthFlow,logoutSession
@@ -1225,16 +1285,16 @@ This...
     getPrimaryLanguage()
     openRecentScanRepository()
     openRecentScanAudit()
-  frontend/src/components/tabs/MarketplaceTab.jsx:
-    i: ../MarketplaceDashboard.jsx
-    e: MarketplaceTab,provider
-    MarketplaceTab()
-    provider()
   frontend/src/components/tabs/SettingsTab.jsx:
     i: ../../api,./SettingsTab.parts,react
     e: SettingsTab,loadSchedules
     SettingsTab()
     loadSchedules()
+  frontend/src/components/tabs/MarketplaceTab.jsx:
+    i: ../MarketplaceDashboard.jsx
+    e: MarketplaceTab,provider
+    MarketplaceTab()
+    provider()
   frontend/e2e/recent-scans.spec.js:
     i: @playwright/test
     e: recentSection,isVisible,scanCards,count,scanCard,count,viewButton,count
@@ -1284,6 +1344,9 @@ This...
     list_mirrors(user)
     get_mirror(mirror_id;user)
     delete_mirror(mirror_id;user)
+  backend/services/redsl_client.py:
+    e: RedslClient
+    RedslClient: __init__(1),analyze(2),decide(1),refactor(4),batch_hybrid(2),health_score(1),health(0)  # HTTP client for the reDSL refactoring engine...
   backend/services/github_client.py:
     e: get_installation_token
     get_installation_token(installation_id)
@@ -1428,9 +1491,6 @@ This...
   backend/server.py:
     e: lifespan
     lifespan(app)
-  backend/sample_projects.py:
-    e: get_sample_projects
-    get_sample_projects()
   backend/db_models.py:
     e: Base,Scan,Subscription,User,Tenant,Repository,Installation,Event,AuditResult,BadgeCache,BenchmarkCase,BenchmarkEvent,RecommendationFeedback,_utcnow
     Base(DeclarativeBase):
@@ -1447,6 +1507,9 @@ This...
     BenchmarkEvent(Base):
     RecommendationFeedback(Base):
     _utcnow()
+  backend/sample_projects.py:
+    e: get_sample_projects
+    get_sample_projects()
   backend/db_module/wrappers.py:
     e: save_scan,get_recent_scans,get_repo_scans,get_total_scan_count,save_audit_result,get_audit_result,save_badge_cache,get_badge_cache,upsert_user,get_user_by_github_id,get_user_by_id,get_subscription,upsert_subscription,increment_scan_count,get_or_create_tenant,get_tenant_by_id,update_tenant_plan,get_or_create_repository,get_tenant_repositories,get_repository_by_full_name,create_installation,get_installation,get_tenant_installations,delete_installation,update_installation_scan,queue_event,get_pending_events,update_event_status,create_benchmark_case,get_benchmark_cases,get_benchmark_case,update_benchmark_case,create_benchmark_event,get_benchmark_events,upsert_recommendation_feedback,get_feedback_for_case,get_benchmark_summary
     save_scan(scan_data)
@@ -1580,18 +1643,18 @@ Provides...
   e2e/karate/karate-config.js:
     e: fn
     fn()
+  traefik/generate-certs.sh:
   project.sh:
   run-sim.sh:
-  traefik/generate-certs.sh:
+  backend/store.py:
   backend/config.py:
   backend/database.py:
-  backend/store.py:
   backend/worker/__init__.py:
-  backend/services/scan_service.py:
   backend/services/mirror_models.py:
     e: MirrorConfig,MirrorStatus
     MirrorConfig:  # Configuration for repo mirror...
     MirrorStatus:  # Status of mirror operation...
+  backend/services/scan_service.py:
   backend/db_module/__init__.py:
   backend/worker/tasks/__init__.py:
   backend/events/__init__.py:
@@ -1630,7 +1693,21 @@ Provides...
   frontend/src/components/tabs/index.js:
   frontend/e2e/audit.spec.js:
     i: @playwright/test
-  TODO/run-sim.sh:
+  scripts/setup-gitea.sh:
+    e: DataProcessor,ApiServer,api,create_repo_with_code,__init__,process,validate,transform,validate,complex_function,constructor,listen,deploy
+    DataProcessor:
+    ApiServer:
+    api()
+    create_repo_with_code()
+    __init__()
+    process()
+    validate()
+    transform()
+    validate()
+    complex_function()
+    constructor()
+    listen()
+    deploy()
   e2e/playwright.config.js:
     i: @playwright/test
   e2e/specs/demo-login.spec.js:

@@ -276,6 +276,441 @@ Health check endpoint.
 
 ---
 
+## Benchmark KPI API
+
+### Cases
+
+#### `POST /api/benchmark/cases`
+Create a new benchmark case.
+
+**Request Body:**
+```json
+{
+  "case_id": "BM-001",
+  "repo": "owner/repo",
+  "source_type": "pr",
+  "change_type": "bugfix",
+  "baseline_detected": true,
+  "baseline_tools": ["ci", "ruff", "manual-pr-review"],
+  "pr_reference": "https://github.com/owner/repo/pull/123",
+  "benchmark_mode": true
+}
+```
+
+**Response:**
+```json
+{
+  "case_id": "BM-001",
+  "repo": "owner/repo",
+  "source_type": "pr",
+  "change_type": "bugfix",
+  "baseline_detected": true,
+  "created_at": "2026-04-11T10:00:00Z"
+}
+```
+
+---
+
+#### `GET /api/benchmark/cases`
+List all benchmark cases.
+
+**Response:**
+```json
+{
+  "cases": [
+    {
+      "case_id": "BM-001",
+      "repo": "owner/repo",
+      "source_type": "pr",
+      "change_type": "bugfix",
+      "baseline_detected": true,
+      "reviewer_verdict": "go",
+      "pr_candidate": true,
+      "deployment_candidate": true,
+      "deployment_model_selected": "hybrid",
+      "created_at": "2026-04-11T10:00:00Z"
+    }
+  ]
+}
+```
+
+---
+
+#### `GET /api/benchmark/cases/{case_id}`
+Get a specific benchmark case.
+
+**Path Parameters:**
+- `case_id` - Benchmark case ID
+
+**Response:**
+```json
+{
+  "case_id": "BM-001",
+  "repo": "owner/repo",
+  "source_type": "pr",
+  "change_type": "bugfix",
+  "baseline_detected": true,
+  "reviewer_verdict": "go",
+  "pr_candidate": true,
+  "deployment_candidate": true,
+  "deployment_model_selected": "hybrid",
+  "time_to_first_result_seconds": 45,
+  "time_to_first_useful_recommendation_seconds": 120,
+  "created_at": "2026-04-11T10:00:00Z"
+}
+```
+
+---
+
+#### `PATCH /api/benchmark/cases/{case_id}`
+Update a benchmark case.
+
+**Path Parameters:**
+- `case_id` - Benchmark case ID
+
+**Request Body:**
+```json
+{
+  "reviewer_verdict": "go",
+  "pr_candidate": true,
+  "deployment_candidate": true,
+  "deployment_model_selected": "hybrid",
+  "next_action": "prepare_pr"
+}
+```
+
+---
+
+### Decisions
+
+#### `POST /api/benchmark/cases/{case_id}/decision`
+Submit deployment decision for a case.
+
+**Path Parameters:**
+- `case_id` - Benchmark case ID
+
+**Request Body:**
+```json
+{
+  "pr_candidate": true,
+  "deployment_candidate": true,
+  "deployment_model_selected": "hybrid",
+  "reviewer_verdict": "go",
+  "next_action": "prepare_pr"
+}
+```
+
+**Response:** Updated case object
+
+---
+
+### Recommendation Feedback
+
+#### `POST /api/benchmark/cases/{case_id}/recommendations/{recommendation_id}/feedback`
+Submit feedback for a specific recommendation.
+
+**Path Parameters:**
+- `case_id` - Benchmark case ID
+- `recommendation_id` - Recommendation ID (stable sha1[:12])
+
+**Request Body:**
+```json
+{
+  "accepted": true,
+  "novelty_score": 3,
+  "usefulness_score": 3,
+  "accuracy_score": 2,
+  "actionability_score": 3,
+  "business_value_score": 2,
+  "notes": "Dobra rekomendacja, gotowa do przejścia w PR"
+}
+```
+
+**Response:**
+```json
+{
+  "id": 1,
+  "case_id": "BM-001",
+  "recommendation_id": "abc123def456",
+  "accepted": true,
+  "novelty_score": 3,
+  "usefulness_score": 3,
+  "created_at": "2026-04-11T10:05:00Z"
+}
+```
+
+---
+
+#### `GET /api/benchmark/cases/{case_id}/recommendations/feedback`
+Get all feedback for a case.
+
+**Path Parameters:**
+- `case_id` - Benchmark case ID
+
+**Response:**
+```json
+{
+  "feedback": [
+    {
+      "id": 1,
+      "recommendation_id": "abc123def456",
+      "accepted": true,
+      "novelty_score": 3,
+      "usefulness_score": 3,
+      "notes": "Dobra rekomendacja"
+    }
+  ]
+}
+```
+
+---
+
+### Events
+
+#### `POST /api/benchmark/cases/{case_id}/events`
+Track a product event.
+
+**Path Parameters:**
+- `case_id` - Benchmark case ID
+
+**Request Body:**
+```json
+{
+  "event_name": "recommendation_seen",
+  "event_value": "first_view",
+  "audit_id": "audit-123",
+  "metadata": {"recommendation_id": "abc123"}
+}
+```
+
+**Response:**
+```json
+{
+  "id": 1,
+  "case_id": "BM-001",
+  "event_name": "recommendation_seen",
+  "created_at": "2026-04-11T10:05:00Z"
+}
+```
+
+---
+
+#### `GET /api/benchmark/cases/{case_id}/events`
+Get all events for a case.
+
+**Path Parameters:**
+- `case_id` - Benchmark case ID
+
+---
+
+### Summary & Export
+
+#### `GET /api/benchmark/summary`
+Get benchmark KPI summary.
+
+**Response:**
+```json
+{
+  "total_cases": 50,
+  "novel_actionable_finding_rate": 0.75,
+  "recommendation_acceptance_rate": 0.68,
+  "false_positive_rate": 0.12,
+  "pr_conversion_rate": 0.45,
+  "deployment_decision_rate": 0.38,
+  "by_source_type": {"repo": 30, "pr": 15, "ticket": 5},
+  "by_change_type": {"bugfix": 20, "feature": 20, "refactor": 10},
+  "by_deployment_model": {"client_scm": 15, "semcod_managed": 10, "hybrid": 25}
+}
+```
+
+---
+
+#### `GET /api/benchmark/export.json`
+Export all benchmark data as JSON.
+
+**Response:**
+```json
+{
+  "cases": [...],
+  "summary": {...}
+}
+```
+
+---
+
+#### `GET /api/benchmark/export.csv`
+Export benchmark cases as CSV.
+
+**Response:** CSV file with columns:
+- `case_id`, `repo`, `source_type`, `change_type`, `baseline_detected`
+- `reviewer_verdict`, `recommendation_accepted`, `pr_candidate`
+- `deployment_candidate`, `deployment_model_selected`
+- `time_to_first_result_seconds`, `time_to_first_useful_recommendation_seconds`
+- `next_action`, `created_at`
+
+---
+
+## ReDSL API
+
+ReDSL (Refactoring DSL) integration for automated code refactoring.
+
+### Status
+
+#### `GET /api/redsl/status`
+Check if reDSL engine is available.
+
+**Response:**
+```json
+{
+  "available": true,
+  "url": "http://localhost:8000"
+}
+```
+
+---
+
+### Analysis
+
+#### `POST /api/redsl/analyze`
+Run reDSL analysis on a project.
+
+**Request Body:**
+```json
+{
+  "project_path": "/path/to/project",
+  "project_toon": "optional YAML content"
+}
+```
+
+**Response:**
+```json
+{
+  "status": "analyzed",
+  "result": {
+    "files_analyzed": 150,
+    "issues_found": 23,
+    "recommendations": [...]
+  }
+}
+```
+
+---
+
+#### `POST /api/redsl/health`
+Get unified health score for a project.
+
+**Request Body:**
+```json
+{
+  "project_path": "/path/to/project"
+}
+```
+
+**Response:**
+```json
+{
+  "health_score": 85,
+  "grade": "A",
+  "metrics": {
+    "complexity": 3.5,
+    "duplication": 0.12,
+    "quality": 0.95
+  }
+}
+```
+
+---
+
+### Refactoring
+
+#### `POST /api/redsl/refactor`
+Run reDSL refactoring on a project.
+
+**Request Body:**
+```json
+{
+  "project_path": "/path/to/project",
+  "max_actions": 10,
+  "dry_run": true
+}
+```
+
+**Response:**
+```json
+{
+  "status": "preview",
+  "result": {
+    "actions": [...],
+    "files_affected": 5
+  }
+}
+```
+
+---
+
+#### `POST /api/redsl/decide`
+Evaluate DSL rules without execution — returns decisions only.
+
+**Request Body:**
+```json
+{
+  "project_path": "/path/to/project"
+}
+```
+
+**Response:**
+```json
+{
+  "decisions": [
+    {
+      "file": "src/utils.py",
+      "action": "EXTRACT_FUNCTION",
+      "confidence": 0.92
+    }
+  ]
+}
+```
+
+---
+
+#### `POST /api/redsl/batch-hybrid`
+Run hybrid quality refactoring (no LLM needed).
+
+**Query Parameters:**
+- `project_path` - Absolute path to project
+- `max_changes` - Maximum changes (default: 30)
+
+**Response:**
+```json
+{
+  "status": "completed",
+  "result": {
+    "changes_made": 12,
+    "files_modified": 4
+  }
+}
+```
+
+---
+
+### Badge
+
+#### `GET /api/redsl/badge/{owner}/{repo}`
+Generate SVG badge with health score for README embedding.
+
+**Path Parameters:**
+- `owner` - Repository owner
+- `repo` - Repository name
+
+**Response:** SVG image
+
+**Example:**
+```markdown
+![Code Health](https://semcod.com/api/redsl/badge/owner/repo)
+```
+
+---
+
 ## MCP (Model Context Protocol)
 
 See [MCP Documentation](./MCP.md) for full details on AI assistant integration.

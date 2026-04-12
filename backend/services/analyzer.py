@@ -53,6 +53,52 @@ async def count_code_stats(repo_path: Path) -> dict:
     }
 
 
+FUNC_PATTERNS = [
+    r'def\s+\w+\s*\(',  # Python
+    r'function\s+\w+\s*\(',  # JS
+    r'fn\s+\w+\s*\(',  # Rust
+    r'func\s+\w+\s*\(',  # Go
+    r'public\s+\w+\s+\w+\s*\(',  # Java/C#
+]
+
+CLASS_PATTERNS = [
+    r'class\s+\w+',  # Python/JS
+    r'public\s+class\s+\w+',  # Java/C#
+    r'type\s+\w+\s+struct',  # Go
+    r'impl\s+\w+',  # Rust
+]
+
+
+def _count_patterns(content: str, patterns: list[str]) -> int:
+    """Count regex pattern matches in content."""
+    return sum(len(re.findall(p, content)) for p in patterns)
+
+
+def _estimate_file_complexity(lines: list[str]) -> int:
+    """Estimate cyclomatic complexity from nesting and line length."""
+    complexity = 0
+    for line in lines:
+        if line.strip().startswith(("if ", "for ", "while ", "try:", "except", "catch")):
+            complexity += 1
+        if len(line) > 100:
+            complexity += 1
+    return max(complexity, 1)
+
+
+def _analyze_file_complexity(file_path: Path) -> dict | None:
+    """Analyze a single file for complexity. Returns dict or None on error."""
+    try:
+        content = file_path.read_text(errors="ignore")
+        lines = content.splitlines()
+        return {
+            "functions": _count_patterns(content, FUNC_PATTERNS),
+            "classes": _count_patterns(content, CLASS_PATTERNS),
+            "complexity": _estimate_file_complexity(lines),
+        }
+    except Exception:
+        return None
+
+
 async def analyze_complexity(repo_path: Path) -> Dict[str, Any]:
     """Analyze code complexity using Python (no external tools)."""
     total_functions = 0
@@ -62,52 +108,17 @@ async def analyze_complexity(repo_path: Path) -> Dict[str, Any]:
 
     for ext in EXTENSIONS_MAP.keys():
         for f in repo_path.rglob(f"*{ext}"):
-            if any(
-                part.startswith(".") or part in ("node_modules", "vendor", "__pycache__")
-                for part in f.parts
-            ):
+            if _should_skip_file(f):
                 continue
 
-            try:
-                content = f.read_text(errors="ignore")
-                lines = content.splitlines()
-                
-                # Count functions (basic heuristic)
-                func_patterns = [
-                    r'def\s+\w+\s*\(',  # Python
-                    r'function\s+\w+\s*\(',  # JS
-                    r'fn\s+\w+\s*\(',  # Rust
-                    r'func\s+\w+\s*\(',  # Go
-                    r'public\s+\w+\s+\w+\s*\(',  # Java/C#
-                ]
-                functions = sum(len(re.findall(pattern, content)) for pattern in func_patterns)
-                
-                # Count classes (basic heuristic)
-                class_patterns = [
-                    r'class\s+\w+',  # Python/JS
-                    r'public\s+class\s+\w+',  # Java/C#
-                    r'type\s+\w+\s+struct',  # Go
-                    r'impl\s+\w+',  # Rust
-                ]
-                classes = sum(len(re.findall(pattern, content)) for pattern in class_patterns)
-                
-                # Estimate complexity based on nesting and line length
-                complexity = 0
-                for line in lines:
-                    # Check for nested structures
-                    if line.strip().startswith(("if ", "for ", "while ", "try:", "except", "catch")):
-                        complexity += 1
-                    # Check for long lines (complexity indicator)
-                    if len(line) > 100:
-                        complexity += 1
-                
-                total_functions += functions
-                total_classes += classes
-                total_complexity += max(complexity, 1)
-                file_count += 1
-                
-            except Exception:
+            result = _analyze_file_complexity(f)
+            if result is None:
                 continue
+
+            total_functions += result["functions"]
+            total_classes += result["classes"]
+            total_complexity += result["complexity"]
+            file_count += 1
 
     return {
         "cc_avg": total_complexity / file_count if file_count > 0 else 0,
@@ -291,22 +302,23 @@ def analyze_repo(repo: str, commit_sha: str, config: dict) -> dict:
         }
 
 
-async def run_tool(name: str, args: list[str], fallback: dict) -> dict:
-    """Run a semcod tool, return JSON result or fallback."""
-    # Try to use Python-based analysis instead of external tools
-    try:
-        repo_path = Path(args[0]) if args else None
-        if repo_path and repo_path.exists():
-            if name == "code2llm":
-                return await analyze_complexity(repo_path)
-            elif name == "redup":
-                return await analyze_duplication(repo_path)
-            elif name == "pyqual":
-                return await analyze_quality(repo_path)
-    except Exception:
-        pass
-    
-    # Fallback to external tool if Python analysis fails
+TOOL_DISPATCH = {
+    "code2llm": analyze_complexity,
+    "redup": analyze_duplication,
+    "pyqual": analyze_quality,
+}
+
+
+async def _run_builtin_tool(name: str, repo_path: Path) -> dict | None:
+    """Run built-in Python analysis tool. Returns result or None."""
+    handler = TOOL_DISPATCH.get(name)
+    if handler is None:
+        return None
+    return await handler(repo_path)
+
+
+async def _run_external_tool(name: str, args: list[str]) -> dict | None:
+    """Run external CLI tool and parse JSON output. Returns result or None."""
     try:
         proc = await asyncio.create_subprocess_exec(
             name,
@@ -317,4 +329,16 @@ async def run_tool(name: str, args: list[str], fallback: dict) -> dict:
         stdout, _ = await asyncio.wait_for(proc.communicate(), timeout=120)
         return json.loads(stdout.decode())
     except Exception:
-        return fallback
+        return None
+
+
+async def run_tool(name: str, args: list[str], fallback: dict) -> dict:
+    """Run a semcod tool, return JSON result or fallback."""
+    repo_path = Path(args[0]) if args else None
+    if repo_path and repo_path.exists():
+        result = await _run_builtin_tool(name, repo_path)
+        if result is not None:
+            return result
+
+    result = await _run_external_tool(name, args)
+    return result if result is not None else fallback
