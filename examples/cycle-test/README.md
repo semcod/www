@@ -18,19 +18,36 @@ Skrypty do walidacji i uruchamiania cyklu Semcod **bez logowania w przeglądarce
 cd examples/cycle-test
 chmod +x quick-ticket.sh
 
-# Podgląd refaktoryzacji (dry-run, bez zmian)
-./quick-ticket.sh "Split high-CC module"
+# AUTO: automatycznie wygeneruj ticket z analizy kodu + docs
+./quick-ticket.sh --auto
 
-# Faktyczne zastosowanie zmian + PR
-./quick-ticket.sh "Split high-CC module" semcod/vallm --apply
+# AUTO + PR: wygeneruj ticket i stwórz PR
+./quick-ticket.sh --auto semcod/vallm --apply
+
+# Ręczny tytuł
+./quick-ticket.sh "Split high-CC module"
 ```
 
 **Nie musisz się logować w przeglądarce** — skrypt automatycznie:
 1. Pobiera token z `gh auth token`
 2. Wymienia go na sesję Semcod (`POST /auth/gh-token`)
-3. Tworzy ticket w systemie
-4. Uruchamia reDSL (decide + refactor)
-5. Opcjonalnie tworzy PR
+3. **`--auto`**: analizuje kod (reDSL analyze + decide) + czyta `docs/*.md` → generuje najlepszy ticket
+4. Tworzy ticket w systemie
+5. Uruchamia reDSL (decide + refactor)
+6. Opcjonalnie tworzy PR (`--apply`)
+
+#### Jak działa `--auto`
+
+```
+docs/*.md ──┐
+            ├─→ python3 generator ──→ najlepszy ticket
+reDSL      ──┘    (analyze + decide)    (tytuł, opis, priorytet)
+```
+
+- **reDSL analyze**: metryki (CC̄, critical count, alerty)
+- **reDSL decide**: konkretne akcje (split_module, extract_functions, simplify_conditionals)
+- **docs/*.md**: kontekst platformy (architektura, roadmap, znane problemy)
+- **Generator**: łączy oba źródła → tytuł = `top_action: target_file`, opis z metrykami + alertami + kontekstem docs
 
 ### Walidacja endpointów (bez PR)
 
