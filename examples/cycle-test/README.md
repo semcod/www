@@ -47,7 +47,30 @@ reDSL      ──┘    (analyze + decide)    (tytuł, opis, priorytet)
 - **reDSL analyze**: metryki (CC̄, critical count, alerty)
 - **reDSL decide**: konkretne akcje (split_module, extract_functions, simplify_conditionals)
 - **docs/*.md**: kontekst platformy (architektura, roadmap, znane problemy)
-- **Generator**: łączy oba źródła → tytuł = `top_action: target_file`, opis z metrykami + alertami + kontekstem docs
+- **Generator**: łączy oba źródła → tytuł = `quality_label: target_file`, opis z metrykami + alertami + kontekstem docs
+
+#### Przykład wygenerowanego ticketu
+
+```
+Title: Split god module: src/vallm/cli/batch_processor_impl.py
+Priority: high
+
+## Problem
+File `src/vallm/cli/batch_processor_impl.py` has quality issues requiring split_module.
+Score: 1.17 (higher = more urgent)
+
+## All refactoring decisions
+1. Split god module → batch_processor_impl.py (score: 1.17)
+2. Extract high-CC functions → test_batch_toon_output.py (score: 0.85)
+3. Simplify deep nesting → batch_processor_impl.py (score: 0.85)
+```
+
+#### Uwaga o `--apply`
+
+reDSL działa w trybie **plan-only** — zwraca plan refaktoryzacji ale nie modyfikuje plików na dysku. Gdy użyjesz `--apply`:
+- Skrypt sprawdza czy reDSL faktycznie zmodyfikował pliki w kontenerze
+- Jeśli tak → tworzy PR z realnymi zmianami kodu
+- Jeśli nie → ticket dostaje status `analyzed` z opisem do ręcznego wykonania
 
 ### Walidacja endpointów (bez PR)
 

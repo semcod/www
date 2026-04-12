@@ -6,11 +6,11 @@
 # Tryby:
 #   --auto         Automatycznie wygeneruj najlepszy ticket z analizy
 #   "Tytuł"        Ręcznie podany tytuł
-#   --apply        Zastosuj refaktoryzację (bez tego: dry-run)
+#   --apply        Zastosuj refaktoryzację (commit realne zmiany w kontenerze)
 #
 # Przykłady:
 #   ./quick-ticket.sh --auto                          # auto-ticket z analizy
-#   ./quick-ticket.sh --auto semcod/vallm --apply     # auto-ticket + PR
+#   ./quick-ticket.sh --auto semcod/vallm --apply     # auto-ticket + PR z realnymi zmianami
 #   ./quick-ticket.sh "Split high-CC module"          # ręczny tytuł
 # ═══════════════════════════════════════════════════════════════════════════
 set -uo pipefail
@@ -45,7 +45,7 @@ if [ "$AUTO_MODE" = "false" ] && [ -z "$TITLE" ]; then
   echo "Użycie: ./quick-ticket.sh [--auto] [\"Tytuł\"] [repo] [--apply]"
   echo ""
   echo "  --auto    Wygeneruj ticket automatycznie z analizy kodu + docs"
-  echo "  --apply   Zastosuj refaktoryzację (bez tego: dry-run)"
+  echo "  --apply   Zastosuj refaktoryzację (commit realne zmiany)"
   echo ""
   echo "Przykłady:"
   echo "  ./quick-ticket.sh --auto                          # auto-ticket"
@@ -59,7 +59,7 @@ echo "║  Semcod Quick Ticket                                 ║"
 echo "║  Repo: ${REPO}"
 [ "$AUTO_MODE" = "true" ] && echo "║  Tryb: AUTO (analiza kodu + docs)"
 [ -n "$TITLE" ] && echo "║  Tytuł: ${TITLE}"
-echo "║  Apply: ${DRY_RUN} (use --apply to apply changes)"
+echo "║  Apply: ${DRY_RUN}"
 echo "╚══════════════════════════════════════════════════════╝"
 
 # ── 1. Auth: gh token → Semcod JWT (bez przeglądarki) ────────────────────
@@ -87,7 +87,7 @@ semcod() {
 REPO_SLUG="${REPO//\//-}"
 echo "✔ Przygotowanie repo w reDSL..."
 docker exec www-redsl-1 bash -c "[ -d /tmp/${REPO_SLUG} ] || git clone https://github.com/${REPO}.git /tmp/${REPO_SLUG}" 2>/dev/null || true
-docker exec www-redsl-1 bash -c "cd /tmp/${REPO_SLUG} && git pull" 2>/dev/null || true
+docker exec www-redsl-1 bash -c "cd /tmp/${REPO_SLUG} && git pull && git checkout -- . && git clean -fd" 2>/dev/null || true
 
 # ── 3. AUTO: Analiza kodu + docs → wygeneruj najlepszy ticket ─────────────
 if [ "$AUTO_MODE" = "true" ]; then
@@ -139,13 +139,20 @@ for line in decision_lines[:5]:
         action = parts[1].strip().split()[0] if parts[1].strip() else ""
         top_actions.append(action)
 
-# Extract target files
+# Extract targets and scores
 targets = []
+scores = []
 for line in explanation.split("\n"):
     if "Target:" in line:
         target = line.split("Target:")[-1].strip()
         if target and target != "-":
             targets.append(target)
+    if "Score:" in line:
+        score_str = line.split("Score:")[-1].strip().split()[0]
+        try:
+            scores.append(float(score_str))
+        except:
+            pass
 
 # Read docs context
 docs_dir = os.environ.get("DOCS_DIR", "")
@@ -167,27 +174,53 @@ if docs_dir and os.path.isdir(docs_dir):
 if top_actions:
     primary_action = top_actions[0]
     primary_target = targets[0] if targets else "unknown"
-    title = f"{primary_action}: {primary_target}"
+    primary_score = scores[0] if scores else 0
+
+    # Quality-focused title
+    action_labels = {
+        "split_module": "Split god module",
+        "extract_functions": "Extract high-CC functions",
+        "simplify_conditionals": "Simplify deep nesting",
+        "reduce_fan_out": "Reduce fan-out",
+        "inline_trivial": "Inline trivial wrappers",
+        "deduplicate": "Deduplicate code",
+    }
+    quality_label = action_labels.get(primary_action, primary_action)
+    title = f"{quality_label}: {primary_target}"
 
     desc_parts = [
-        "Auto-generated ticket from code analysis + docs context.",
-        "",
-        f"Project: {total_files} files, {total_lines} LOC, CC̄={avg_cc}, critical={critical}",
-        f"Top actions: {', '.join(top_actions[:3])}",
-        f"Target files: {', '.join(targets[:3])}",
+        f"Auto-generated quality improvement ticket from code analysis.",
+        f"",
+        f"## Problem",
+        f"File `{primary_target}` has quality issues requiring {primary_action}.",
+        f"Score: {primary_score:.2f} (higher = more urgent)",
     ]
+
+    # Add specific alert details for this target
+    target_alerts = [a for a in alerts if primary_target.split("/")[-1].replace(".py","") in a.get("name","")]
+    if target_alerts:
+        desc_parts.append("")
+        desc_parts.append("## Alerts for this file")
+        for a in target_alerts[:5]:
+            desc_parts.append(f"- {a.get('type','')}: {a.get('name','')} (value={a.get('value','')}, limit={a.get('limit','')})")
+
+    desc_parts.append("")
+    desc_parts.append("## Project metrics")
+    desc_parts.append(f"- Files: {total_files}, LOC: {total_lines}, CC̄: {avg_cc}, Critical: {critical}")
+
+    desc_parts.append("")
+    desc_parts.append("## All refactoring decisions")
+    for i, action in enumerate(top_actions[:5]):
+        target = targets[i] if i < len(targets) else "?"
+        score = scores[i] if i < len(scores) else 0
+        label = action_labels.get(action, action)
+        desc_parts.append(f"{i+1}. **{label}** → `{target}` (score: {score:.2f})")
 
     if docs_context:
         desc_parts.append("")
-        desc_parts.append("Platform context from docs:")
-        for line in docs_context[:5]:
-            desc_parts.append(f"  {line}")
-
-    if alerts:
-        desc_parts.append("")
-        desc_parts.append(f"Alerts ({len(alerts)}):")
-        for a in alerts[:5]:
-            desc_parts.append(f"  {a.get('type','')}: {a.get('name','')} (value={a.get('value','')}, limit={a.get('limit','')})")
+        desc_parts.append("## Platform context")
+        for line in docs_context[:3]:
+            desc_parts.append(f"- {line.strip()}")
 
     description = "\n".join(desc_parts)
 
@@ -205,6 +238,7 @@ if top_actions:
         "decisions_count": len(decision_lines),
         "top_action": primary_action,
         "top_target": primary_target,
+        "top_score": primary_score,
         "metrics": {
             "files": total_files,
             "loc": total_lines,
@@ -216,11 +250,12 @@ if top_actions:
 else:
     result = {
         "title": "No refactoring needed",
-        "description": "Project appears clean.",
+        "description": "Project appears clean — no critical issues detected.",
         "priority": "low",
         "decisions_count": 0,
         "top_action": "none",
         "top_target": "",
+        "top_score": 0,
         "metrics": {"files": total_files, "loc": total_lines, "avg_cc": avg_cc, "critical": critical, "alerts": len(alerts)}
     }
 
@@ -232,6 +267,7 @@ PYEOF
   DECISIONS_COUNT_AUTO=$(python3 -c "import json; print(json.load(open('${AUTO_GEN}')).get('decisions_count',0))" 2>/dev/null)
   TOP_ACTION=$(python3 -c "import json; print(json.load(open('${AUTO_GEN}')).get('top_action',''))" 2>/dev/null)
   TOP_TARGET=$(python3 -c "import json; print(json.load(open('${AUTO_GEN}')).get('top_target',''))" 2>/dev/null)
+  TOP_SCORE=$(python3 -c "import json; print(json.load(open('${AUTO_GEN}')).get('top_score',0))" 2>/dev/null)
 
   python3 -c "
 import json
@@ -239,7 +275,7 @@ m = json.load(open('${AUTO_GEN}')).get('metrics', {})
 print(f'  Pliki: {m.get(\"files\",0)} | LOC: {m.get(\"loc\",0)} | CC̄: {m.get(\"avg_cc\",0)} | Critical: {m.get(\"critical\",0)} | Alerty: {m.get(\"alerts\",0)}')
 " 2>/dev/null
 
-  echo "  Najlepsza akcja: ${TOP_ACTION} → ${TOP_TARGET}"
+  echo "  Najlepsza akcja: ${TOP_ACTION} → ${TOP_TARGET} (score: ${TOP_SCORE})"
   echo "  Wygenerowany tytuł: ${TITLE}"
 
   if [ "${DECISIONS_COUNT_AUTO:-0}" -eq 0 ]; then
@@ -264,12 +300,11 @@ fi
 
 # ── 4. Stwórz ticket ──────────────────────────────────────────────────────
 if [ "$AUTO_MODE" = "true" ]; then
-  DESCRIPTION=$(python3 -c "import json; print(json.load(open('${AUTO_GEN}')).get('description',''))" 2>/dev/null)
-  DESCRIPTION_ESC=$(python3 -c "import json; print(json.dumps(open('${AUTO_GEN}').read()))" 2>/dev/null | python3 -c "
-import sys, json
-data = json.loads(sys.stdin.read())
-desc = json.loads(data).get('description', '')
-print(json.dumps(desc))
+  DESCRIPTION_ESC=$(python3 -c "
+import json
+with open('${AUTO_GEN}') as f:
+    data = json.load(f)
+print(json.dumps(data.get('description', ''), ensure_ascii=False))
 " 2>/dev/null)
   TICKET_RESP=$(semcod POST "/api/tickets" "{
     \"title\": \"${TITLE}\",
@@ -329,26 +364,64 @@ echo "  Status: ${PROCESS_STATUS}"
 echo "  Decyzje: ${DECISIONS_COUNT}"
 [ -n "$FILES_MODIFIED" ] && echo "  Pliki:" && echo "$FILES_MODIFIED"
 
-# ── 6. Jeśli --apply, stwórz PR ───────────────────────────────────────────
-if [ "$DRY_RUN" = "false" ] && [ "${DECISIONS_COUNT:-0}" -gt 0 ]; then
+# ── 6. Jeśli --apply, stwórz PR z realnymi zmianami z kontenera ────────────
+if [ "$APPLY" = "true" ] && [ "${DECISIONS_COUNT:-0}" -gt 0 ]; then
   echo ""
-  echo "── Tworzenie PR ──"
+  echo "── Tworzenie PR z realnymi zmianami ──"
 
-  BRANCH="redsl/ticket-${TICKET_ID:0:12}"
-  DEFAULT_BRANCH=$(gh api "repos/${REPO}" --jq '.default_branch' 2>/dev/null) || DEFAULT_BRANCH="main"
-  SHA=$(gh api "repos/${REPO}/git/refs/heads/${DEFAULT_BRANCH}" --jq '.object.sha' 2>/dev/null)
+  # Run reDSL refactor inside container (dry_run=false) — this modifies files in /tmp/vallm
+  docker exec www-redsl-1 bash -c "
+    cd /tmp/${REPO_SLUG}
+    # Apply refactoring via reDSL CLI if available, otherwise use the API
+    python3 -c \"
+import requests, json
+resp = requests.post('http://localhost:8000/refactor', json={
+    'project_path': '/tmp/${REPO_SLUG}',
+    'max_actions': 5,
+    'dry_run': False,
+    'format': 'json'
+})
+data = resp.json()
+plan = data.get('refactoring_plan', {})
+decisions = plan.get('decisions', [])
+print(f'Applied {len(decisions)} decisions')
+for d in decisions:
+    print(f'  {d.get(\\\"action\\\")}: {d.get(\\\"target_path\\\")}')
+\" 2>/dev/null || echo 'reDSL CLI not available'
+  " 2>/dev/null || true
 
-  if [ -n "$SHA" ]; then
-    gh api "repos/${REPO}/git/refs" -f ref="refs/heads/${BRANCH}" -f sha="${SHA}" >/dev/null 2>&1 || true
-    COMMIT_FILE="redsl_change_$(date +%s).txt"
-    gh api "repos/${REPO}/contents/${COMMIT_FILE}" -X PUT \
-      -f message="redsl: automated refactoring for ticket ${TICKET_ID}" \
-      -f content="$(echo -n "ReDSL ticket ${TICKET_ID}: ${TITLE}" | base64)" \
-      -f branch="${BRANCH}" >/dev/null 2>&1 || true
+  # Check if reDSL actually modified files in the container
+  CHANGED_FILES=$(docker exec www-redsl-1 bash -c "cd /tmp/${REPO_SLUG} && git diff --name-only && git diff --name-only --diff-filter=A && git ls-files --others --exclude-standard" 2>/dev/null)
 
-    PR_URL=$(gh pr create --repo "${REPO}" --head "${BRANCH}" --base "${DEFAULT_BRANCH}" \
-      --title "redsl: ${TITLE}" \
-      --body "Automated PR by reDSL. Ticket: ${TICKET_ID}" 2>&1) || true
+  if [ -n "$CHANGED_FILES" ]; then
+    echo "  Zmodyfikowane pliki w kontenerze:"
+    echo "$CHANGED_FILES" | while read f; do echo "    → $f"; done
+
+    # Commit inside container and push
+    BRANCH="redsl/quality-${TICKET_ID:0:12}"
+    docker exec www-redsl-1 bash -c "
+      cd /tmp/${REPO_SLUG}
+      git checkout -b ${BRANCH}
+      git add -A
+      git config user.email 'redsl@semcod.com'
+      git config user.name 'reDSL Bot'
+      git commit -m 'refactor: ${TITLE} (ticket ${TICKET_ID})'
+      git push origin ${BRANCH}
+    " 2>&1 || true
+
+    PR_URL=$(gh pr create --repo "${REPO}" --head "${BRANCH}" --base main \
+      --title "refactor: ${TITLE}" \
+      --body "Automated quality improvement by reDSL.
+
+Ticket: ${TICKET_ID}
+Priority: ${PRIORITY}
+Decisions: ${DECISIONS_COUNT}
+
+## Modified files
+$(echo "$CHANGED_FILES" | while read f; do echo "- \`$f\`"; done)
+
+---
+*Generated by [Semcod](https://semcod.com) reDSL engine*" 2>&1) || true
 
     if echo "$PR_URL" | grep -q 'github.com'; then
       echo "✔ PR stworzony: ${PR_URL}"
@@ -356,6 +429,10 @@ if [ "$DRY_RUN" = "false" ] && [ "${DECISIONS_COUNT:-0}" -gt 0 ]; then
     else
       echo "✘ PR nie stworzony: ${PR_URL}"
     fi
+  else
+    echo "  ⚠ reDSL nie zmodyfikował plików (plan-only mode)"
+    echo "  Tworzę ticket z opisem refaktoryzacji do ręcznego wykonania"
+    semcod PATCH "/api/tickets/${TICKET_ID}" "{\"status\":\"analyzed\"}" >/dev/null 2>&1 || true
   fi
 fi
 
@@ -364,7 +441,8 @@ echo ""
 echo "╔══════════════════════════════════════════════════════╗"
 echo "║  Ticket: ${TICKET_ID}"
 echo "║  Tytuł: ${TITLE}"
+echo "║  Priorytet: ${PRIORITY:-medium}"
 echo "║  Status: ${PROCESS_STATUS}"
 echo "║  Decyzje: ${DECISIONS_COUNT}"
-[ "$DRY_RUN" = "true" ] && echo "║  Tip: dodaj --apply aby zastosować zmiany"
+[ "$APPLY" = "false" ] && echo "║  Tip: dodaj --apply aby zastosować zmiany"
 echo "╚══════════════════════════════════════════════════════╝"
