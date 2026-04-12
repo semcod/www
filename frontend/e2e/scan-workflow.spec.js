@@ -6,7 +6,7 @@ test.describe('Scan Workflow E2E', () => {
     
     // Enter GitHub repo URL
     await page.getByPlaceholder('github.com/owner/repo').fill('github.com/python/cpython');
-    await page.getByRole('button', { name: 'Scan' }).click();
+    await page.getByRole('button', { name: /Analyze/i }).click();
     
     // Should show scanning phase
     await expect(page.getByText(/Analyzing/i)).toBeVisible({ timeout: 10000 });
@@ -31,7 +31,7 @@ test.describe('Scan Workflow E2E', () => {
     
     // Enter GitLab repo URL
     await page.getByPlaceholder('github.com/owner/repo').fill('https://gitlab.com/gitlab-org/gitlab');
-    await page.getByRole('button', { name: 'Scan' }).click();
+    await page.getByRole('button', { name: /Analyze/i }).click();
     
     // Should show scanning phase
     await expect(page.getByText(/Analyzing/i)).toBeVisible({ timeout: 10000 });
@@ -42,7 +42,7 @@ test.describe('Scan Workflow E2E', () => {
     
     // Enter Bitbucket repo URL
     await page.getByPlaceholder('github.com/owner/repo').fill('https://bitbucket.org/atlassian/python-bitbucket');
-    await page.getByRole('button', { name: 'Scan' }).click();
+    await page.getByRole('button', { name: /Analyze/i }).click();
     
     // Should show scanning phase
     await expect(page.getByText(/Analyzing/i)).toBeVisible({ timeout: 10000 });

@@ -40,7 +40,7 @@ test.describe('Smoke Tests', () => {
     await page.goto('/');
     
     await page.getByPlaceholder('github.com/owner/repo').fill('github.com/octocat/Hello-World');
-    await page.getByRole('button', { name: 'Scan' }).click();
+    await page.getByRole('button', { name: /Analyze/i }).click();
     
     await expect(page.getByText(/Analyzing/i)).toBeVisible({ timeout: 5000 });
   });
