@@ -1,7 +1,7 @@
 """Tests for marketplace endpoints - preview, install, app listing."""
 
 import pytest
-from unittest.mock import patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 pytestmark = [pytest.mark.fast, pytest.mark.unit]
 
@@ -223,5 +223,84 @@ class TestUninstall:
             response = client.delete("/api/install?repo=owner/never&provider=github")
             assert response.status_code == 404
 
+        finally:
+            _clear_auth(app)
+
+class TestAutofixDeploy:
+    """Tests for autofix deploy endpoint — verifies billing recording after fix."""
+
+    def test_autofix_requires_auth(self, client):
+        response = client.post("/api/autofix", json={
+            "repo": "owner/repo",
+            "provider": "github",
+            "pr_id": 1,
+            "base_branch": "main",
+        })
+        assert response.status_code == 401
+
+    def test_autofix_requires_provider_token(self, client):
+        from server import app
+        _override_auth(app, {"id": 2, "login": "notoken", "github_token": ""})
+        try:
+            response = client.post("/api/autofix", json={
+                "repo": "owner/repo",
+                "provider": "github",
+                "pr_id": 1,
+                "base_branch": "main",
+            })
+            # Should fail without provider token
+            assert response.status_code in (401, 402, 422)
+        finally:
+            _clear_auth(app)
+
+    def test_autofix_billing_check_blocks_free_tier(self, client):
+        """Verify autofix checks billing — free tier should be blocked or limited."""
+        from server import app
+        _override_auth(app)
+        try:
+            with patch("routers.marketplace.deploy._check_billing_limit", return_value=(False, "Free tier: no auto-fix allowed")):
+                response = client.post("/api/autofix", json={
+                    "repo": "owner/repo",
+                    "provider": "github",
+                    "pr_id": 1,
+                    "base_branch": "main",
+                })
+                assert response.status_code == 402
+                assert "free" in response.json()["detail"].lower() or "no auto-fix" in response.json()["detail"].lower()
+        finally:
+            _clear_auth(app)
+
+    def test_autofix_billing_records_usage_when_allowed(self, client):
+        """Verify billing usage is recorded when autofix is allowed (bug fix regression test)."""
+        from server import app
+        _override_auth(app)
+        try:
+            with patch("routers.marketplace.deploy._check_billing_limit", return_value=(True, "OK")), \
+                 patch("routers.marketplace.deploy._record_billing_usage") as mock_record, \
+                 patch("routers.marketplace.deploy._handle_mirror_if_requested", new_callable=AsyncMock), \
+                 patch("services.billing.get_usage_tracker") as mock_get_tracker, \
+                 patch("database.get_or_create_tenant", return_value={"id": 1, "plan": "pro"}):
+                mock_tracker = MagicMock()
+                mock_tracker.check_can_execute.return_value = (True, "OK")
+                mock_get_tracker.return_value = mock_tracker
+
+                mock_task_result = MagicMock(id="task-123")
+                with patch("worker.tasks.create_auto_fix_pr") as mock_task:
+                    mock_task.delay = MagicMock(return_value=mock_task_result)
+
+                    response = client.post("/api/autofix", json={
+                        "repo": "owner/repo",
+                        "provider": "github",
+                        "pr_id": 1,
+                        "base_branch": "main",
+                    })
+
+                    # Should succeed (queued)
+                    assert response.status_code == 200
+                    data = response.json()
+                    assert data["status"] == "queued"
+
+                    # CRITICAL: billing usage must be recorded (was dead code before fix)
+                    mock_record.assert_called_once()
         finally:
             _clear_auth(app)

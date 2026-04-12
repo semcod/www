@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getApps, fetchRepos, getInstallations } from "../api.js";
+import { getApps, fetchRepos, getInstallations, triggerAutoFix, triggerRedslAutoPR } from "../api.js";
 import AppCard from "./AppCard.jsx";
 import Preview from "./Preview.jsx";
 import InstallButton from "./InstallButton.jsx";
@@ -12,7 +12,9 @@ export default function MarketplaceDashboard({ token, provider }) {
   const [selectedApps, setSelectedApps] = useState(["audit"]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [step, setStep] = useState("select-repo"); // select-repo, preview, install
+  const [step, setStep] = useState("select-repo"); // select-repo, preview, install, artifact
+  const [artifactStatus, setArtifactStatus] = useState(null); // null, generating, success, error
+  const [artifactResult, setArtifactResult] = useState(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -51,6 +53,42 @@ export default function MarketplaceDashboard({ token, provider }) {
     return installations.some(
       (i) => i.repo === repo.full_name && i.provider === provider
     );
+  };
+
+  const handleAutoFix = async () => {
+    if (!selectedRepo || !token) return;
+    setArtifactStatus("generating");
+    setArtifactResult(null);
+    try {
+      const result = await triggerAutoFix(
+        selectedRepo.full_name,
+        provider,
+        1,
+        selectedRepo.default_branch || "main",
+        token,
+      );
+      setArtifactResult(result);
+      setArtifactStatus(result.status === "queued" ? "success" : "error");
+    } catch (err) {
+      setArtifactStatus("error");
+    }
+  };
+
+  const handleRedslRefactor = async () => {
+    if (!selectedRepo || !token) return;
+    setArtifactStatus("generating");
+    setArtifactResult(null);
+    try {
+      const result = await triggerRedslAutoPR(
+        selectedRepo.full_name,
+        `/mnt/project/${selectedRepo.full_name.replace("/", "-")}`,
+        token,
+      );
+      setArtifactResult(result);
+      setArtifactStatus(result.status === "created" ? "success" : "error");
+    } catch (err) {
+      setArtifactStatus("error");
+    }
   };
 
   if (loading) {
@@ -138,7 +176,82 @@ export default function MarketplaceDashboard({ token, provider }) {
               provider={provider}
               token={token}
               apps={selectedApps}
+              onInstalled={() => setStep("artifact")}
             />
+            <button
+              onClick={() => setStep("artifact")}
+              style={{ ...styles.selectButton, marginTop: 12, display: "block" }}
+            >
+              Generate Artifact →
+            </button>
+          </div>
+        </div>
+      )}
+
+      {step === "artifact" && selectedRepo && (
+        <div style={styles.step}>
+          <h2 style={styles.stepTitle}>Step 3: Generate Artifact</h2>
+
+          <div style={styles.selectedRepo}>
+            <h3 style={styles.selectedRepoName}>{selectedRepo.full_name}</h3>
+            <button style={styles.backButton} onClick={() => setStep("preview")}>
+              ← Back to preview
+            </button>
+          </div>
+
+          <div style={styles.artifactSection}>
+            <p style={styles.artifactDesc}>
+              Generate an auto-fix Pull Request for your repository. Semcod will analyze the code,
+              create patches, and open a PR with improvements.
+            </p>
+
+            <div style={styles.artifactActions}>
+              <button
+                onClick={handleAutoFix}
+                disabled={artifactStatus === "generating"}
+                style={{
+                  ...styles.artifactButton,
+                  ...(artifactStatus === "generating" ? styles.artifactButtonDisabled : {}),
+                }}
+              >
+                {artifactStatus === "generating" ? "⏳ Generating..." : "🤖 Auto-fix PR"}
+              </button>
+
+              <button
+                onClick={handleRedslRefactor}
+                disabled={artifactStatus === "generating"}
+                style={{
+                  ...styles.artifactButton,
+                  ...(artifactStatus === "generating" ? styles.artifactButtonDisabled : {}),
+                  background: "linear-gradient(135deg, #00e5ff, #00e676)",
+                }}
+              >
+                {artifactStatus === "generating" ? "⏳ Refactoring..." : "🔄 reDSL Refactor PR"}
+              </button>
+            </div>
+
+            {artifactStatus === "success" && artifactResult && (
+              <div style={styles.artifactSuccess}>
+                <h4>✅ Artifact Generated</h4>
+                {artifactResult.pr_url && (
+                  <p>
+                    PR created:{" "}
+                    <a href={artifactResult.pr_url} target="_blank" rel="noopener noreferrer" style={{ color: "#0366d6" }}>
+                      {artifactResult.pr_url}
+                    </a>
+                  </p>
+                )}
+                {artifactResult.task_id && <p>Task ID: {artifactResult.task_id}</p>}
+                {artifactResult.status && <p>Status: {artifactResult.status}</p>}
+              </div>
+            )}
+
+            {artifactStatus === "error" && (
+              <div style={styles.artifactError}>
+                <h4>❌ Generation Failed</h4>
+                <p>Check your billing plan and repository access, then try again.</p>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -297,5 +410,54 @@ const styles = {
     color: "#666",
     fontSize: 13,
     borderTop: "1px solid #e1e4e8",
+  },
+  artifactSection: {
+    marginTop: 24,
+    padding: 24,
+    background: "#fff",
+    border: "1px solid #e1e4e8",
+    borderRadius: 8,
+  },
+  artifactDesc: {
+    fontSize: 14,
+    color: "#586069",
+    lineHeight: 1.6,
+    margin: "0 0 20px 0",
+  },
+  artifactActions: {
+    display: "flex",
+    gap: 12,
+    flexWrap: "wrap",
+  },
+  artifactButton: {
+    padding: "12px 24px",
+    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+    color: "#fff",
+    border: "none",
+    borderRadius: 8,
+    fontSize: 14,
+    fontWeight: 600,
+    cursor: "pointer",
+    boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)",
+  },
+  artifactButtonDisabled: {
+    opacity: 0.6,
+    cursor: "not-allowed",
+  },
+  artifactSuccess: {
+    marginTop: 20,
+    padding: 16,
+    background: "#f0fff4",
+    border: "1px solid #28a745",
+    borderRadius: 8,
+    color: "#155724",
+  },
+  artifactError: {
+    marginTop: 20,
+    padding: 16,
+    background: "#f8d7da",
+    border: "1px solid #dc3545",
+    borderRadius: 8,
+    color: "#721c24",
   },
 };

@@ -1235,6 +1235,8 @@ pytest
 - 📖 [Full Documentation](https://github.com/semcod/www/tree/main/docs) — API reference, module docs, architecture
 - 🚀 [Getting Started](https://github.com/semcod/www/blob/main/docs/getting-started.md) — Quick start guide
 - 📚 [API Reference](https://github.com/semcod/www/blob/main/docs/api.md) — Complete API documentation
+- 📊 [Benchmark KPI Product Plan](https://github.com/semcod/www/blob/main/docs/benchmark-kpi-product-plan.md) — KPI benchmark implementation plan (Etap 1 ✅)
+- 🔄 [ReDSL API](https://github.com/semcod/www/blob/main/docs/api.md#redsl-api) — ReDSL engine integration (analyze, refactor, health, badge)
 - 🔧 [Configuration](https://github.com/semcod/www/blob/main/docs/configuration.md) — Configuration options
 - 💡 [Examples](./examples) — Usage examples and code samples
 
@@ -1251,6 +1253,7 @@ pytest
 | `docs/getting-started.md` | Getting started guide | [View](./docs/getting-started.md) |
 | `docs/configuration.md` | Configuration reference | [View](./docs/configuration.md) |
 | `docs/api-changelog.md` | API change tracking | [View](./docs/api-changelog.md) |
+| `docs/benchmark-kpi-product-plan.md` | Benchmark KPI product plan & implementation status | [View](./docs/benchmark-kpi-product-plan.md) |
 | `CONTRIBUTING.md` | Contribution guidelines | [View](./CONTRIBUTING.md) |
 | `examples/` | Usage examples | [Browse](./examples) |
 | `mkdocs.yml` | MkDocs configuration | — |

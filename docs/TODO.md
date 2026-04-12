@@ -1,5 +1,28 @@
 # Semcod — TODO
 
+## ✅ Done (2026-04-12)
+
+### 🔥 Critical Bug Fixes
+- **Marketplace artifact generation fixed** — billing recording was dead code (indentation bug in deploy.py:99-105)
+- **Missing API functions added** — `triggerAutoFix()` and `triggerRedslAutoPR()` in `api.js`
+- **Step 3: Generate Artifact UI** — MarketplaceDashboard now has buttons for Auto-fix PR and reDSL Refactor PR
+
+### 🧪 Testing
+- **95 Playwright E2E tests** — 4 new spec files covering full user flow:
+  - `customer-journey.spec.js` — landing → sandbox scan → marketplace
+  - `marketplace-flow.spec.js` — apps → install → billing → autofix artifact
+  - `auth-flow.spec.js` — OAuth → repos → audit → badge
+  - `redsl-flow.spec.js` — ReDSL status → health → refactor → badge
+- **Backend marketplace tests** — 4 new tests for autofix deploy endpoint including regression test
+
+### ✨ Features Completed
+- **Marketplace 3-step flow:**
+  1. Select Repository (OAuth repo list)
+  2. Preview & Configure (apps + InstallButton + "Generate Artifact" button)
+  3. **Generate Artifact** — 🤖 Auto-fix PR / 🔄 reDSL Refactor PR
+- **ReDSL Integration** — /api/redsl/* endpoints, health score, badge
+- **Auto-PR endpoints** — `/api/autopr` (LLM patches) + `/api/autopr/redsl` (DSL refactor)
+
 ## ✅ Done (2026-04-10)
 
 - **Bug fix:** sandbox/guest scans not appearing in recent scans — `save_scan()` was missing in both pipeline functions

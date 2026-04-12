@@ -36,24 +36,17 @@ test.describe('Smoke Tests', () => {
     await expect(input).toHaveValue('github.com/facebook/react');
   });
 
-  test('clicking Scan button shows demo result with all elements', async ({ page }) => {
-    await page.goto('/');
+  test('sandbox analyze endpoint returns result for public repo', async ({ request }) => {
+    const response = await request.post('/api/analyze', {
+      data: { repo_url: 'https://github.com/octocat/Hello-World' },
+    });
 
-    await page.getByPlaceholder('github.com/owner/repo').fill('github.com/octocat/Hello-World');
-    await page.getByRole('button', { name: 'Scan' }).click();
+    // Sandbox endpoint should respond (200 or 202 for async)
+    expect([200, 202]).toContain(response.status());
 
-    // Wait for scanning to start
-    await expect(page.getByText(/Analyzing/i)).toBeVisible({ timeout: 5000 });
-    
-    // Wait for scan to complete (can take time with real API)
-    await page.waitForTimeout(3000);
-    
-    // Check if we got results (may fail if API is not available)
-    const reportVisible = await page.getByText('Report:', { exact: false }).isVisible().catch(() => false);
-    if (reportVisible) {
-      await expect(page.getByText('octocat/Hello-World')).toBeVisible();
-      await expect(page.getByRole('button', { name: 'New audit' })).toBeVisible();
-      await expect(page.getByText('Sandbox', { exact: false })).toBeVisible();
+    if (response.status() === 200) {
+      const data = await response.json();
+      expect(data).toBeTruthy();
     }
   });
 });

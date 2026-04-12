@@ -1,8 +1,43 @@
 # Semcod
 
-**One-click Audit · PR Comment Bot · Code Health Badge · MCP Integration**
+**One-click Audit · PR Comment Bot · Code Health Badge · MCP Integration · Marketplace Auto-Fix**
 
-Zautomatyzowany pipeline jakości kodu z GitHub OAuth — od podłączenia repo do badge w README w 60 sekund.
+Semcod to zautomatyzowana platforma CI/CD jakości kodu. Umożliwia deweloperom ciągły audyt repozytoriów, automatyczne komentarze w PR, oraz generowanie auto-fix Pull Requestów przez AI (reDSL). 
+
+## 🎯 **Project Purpose (Test Project)**
+
+Ten projekt służy jako **kompletna platforma SaaS do analizy jakości kodu** z następującymi scenariuszami użycia:
+
+### Scenariusze Użycia (User Stories)
+
+#### 1. 🔐 **GitHub OAuth → Audit (One-click)**
+- Użytkownik klika "Connect GitHub" → OAuth → wybiera repo → klikna "Audit"
+- System skanuje kod (code2llm → redup → pyqual → regix) i generuje raport z grade (A-F)
+- Wynik: raport z metrykami, rekomendacjami, health score
+
+#### 2. 🏆 **Sandbox Mode (bez logowania)**
+- Użytkownik wpisuje URL publicznego repo np. `https://github.com/torvalds/linux`
+- Klikna "Analyze" → system skanuje bez autoryzacji
+- Wynik: ten sam raport, ale oznaczony "Sandbox" badge
+
+#### 3. 🛒 **Marketplace → Install → Auto-fix PR (Full Flow)**
+- **Step 1**: Marketplace tab → Select Repository z listy OAuth
+- **Step 2**: Preview & Configure → Install App (webhook setup)
+- **Step 3**: **Generate Artifact** → wybiera między:
+  - 🤖 **Auto-fix PR** — patch generator (trailing whitespace, blank lines)
+  - 🔄 **reDSL Refactor PR** — 15 DSL refactor actions (SPLIT_MODULE, REDUCE_FAN_OUT, EXTRACT_FUNCTIONS)
+- System tworzy branch, commituje zmiany, otwiera PR na GitHub
+- Wynik: PR URL z auto-fixami, task_id do trackowania w Celery
+
+#### 4. 🤖 **PR Comment Bot (GitHub App)**
+- Użytkownik instaluje GitHub App na repo
+- Każdy nowy PR triggeruje webhook → analiza zmian → komentarz z metrykami
+- Wynik: automatyczny code review w PR
+
+#### 5. 🏷️ **Badge Generator**
+- Użytkownik kopiuje Markdown badge z panelu
+- Wkleja do README → dynamiczny SVG z health score
+- Wynik: `![Code Health](https://semcod.com/badge/owner-repo.svg)`
 
 ## ✅ **Current Status: Production Ready**
 
@@ -13,8 +48,9 @@ Zautomatyzowany pipeline jakości kodu z GitHub OAuth — od podłączenia repo 
 - 🔌 **MCP Integration** - Model Context Protocol for AI assistants
 - 📊 **Benchmark KPI MVP** - Instrumentacja do zbierania metryk benchmarkowych (cases, feedback, decisions, export)
 - 🔄 **ReDSL Integration** - Automatyczna refaktoryzacja kodu przez DSL (analyze, refactor, health score, auto-PR)
+- 🛒 **Marketplace Auto-Fix** — 3-step flow: select repo → install → generate artifact (PR)
 - 🐳 **Docker Ready** - Complete containerization with mock GitHub
-- 🧪 **Comprehensive Testing** - Unit, integration, and E2E tests
+- 🧪 **Comprehensive Testing** - Unit, integration, and E2E tests (95 Playwright tests)
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
 ![OAuth](https://img.shields.io/badge/OAuth-GitHub-green) ![Mock](https://img.shields.io/badge/Mock-Enabled-orange)
@@ -82,31 +118,38 @@ cp .env.example .env
 # Dla produkcji - uzupełnij GITHUB_APP_ID, GITHUB_CLIENT_ID, etc.
 ```
 
-### 2. Uruchomienie deweloperskie (rekomendowane)
+### 2. Uruchomienie deweloperskie
 
 ```bash
-# Zainstaluj zależności i uruchom obie usługi
-make install
+# Lokalnie (Vite :5174 + backend :8200)
 make dev
 
+# Lub z Docker + mock GitHub (rekomendowane)
+make sim
+
 # Usługi dostępne na:
-# Frontend: http://localhost:5174
-# Backend:  http://localhost:8200
+# Lokalnie:  Frontend http://localhost:5174, Backend http://localhost:8200
+# Docker:    Frontend http://localhost:3000, Backend http://localhost:8003, Mock GH http://localhost:4010
 ```
+
+Pełna lista komend: `make help`
 
 ### 3. Uruchomienie z Docker Compose
 
 ```bash
-# Z mock GitHub (dewelopment)
-docker compose -f docker-compose.yml -f docker-compose.sim.yml up -d
+# Z mock GitHub (dewelopment) — równoważne: make sim
+make sim
 
-# Produkcja (wymaga prawdziwych credentials GitHub)
-docker compose up -d
+# Produkcja (wymaga prawdziwych credentials GitHub) — równoważne: make up
+make up
+
+# Zatrzymanie: make down  lub  make sim-down
 
 # Dostępne na:
 # Frontend: http://localhost:3000
 # Backend:  http://localhost:8003
 # Mock GitHub: http://localhost:4010
+# ReDSL: http://localhost:8030
 ```
 
 ### 4. Produkcja VPS (Podman Quadlet)
@@ -116,11 +159,20 @@ Zobacz [quadlet/README.md](./quadlet/README.md) — systemd + Traefik + Let's En
 ### 5. Testowanie
 
 ```bash
-# Szybkie testy jednostkowe
-make test-fast
+# Testy jednostkowe backend
+make test
 
-# Pełne testy E2E (wymaga uruchomionych usług)
-make test-e2e
+# Pełne testy backend
+make test-all
+
+# E2E Playwright (wymaga make sim lub make dev)
+make e2e
+
+# E2E na lokalnym dev serwerze
+make e2e-dev
+
+# Instalacja Playwright (pierwszy raz)
+make e2e-install
 ```
 
 ---
@@ -225,41 +277,39 @@ Semcod supports [Model Context Protocol (MCP)](https://modelcontextprotocol.io/)
 
 ## 🛠️ Makefile - Najważniejsze komendy
 
+Pełna lista: `make help`
+
 ### Środowisko deweloperskie
 ```bash
-make install          # Instaluje zależności (backend + frontend)
-make dev              # Uruchom backend + frontend (http://localhost:8200/5174)
-make dev-backend      # Tylko backend (port 8200)
-make dev-frontend     # Tylko frontend (port 5174)
+make install          # Instaluje zależności (backend + frontend + e2e)
+make dev              # Lokalnie: backend :8200 + Vite :5174
+make backend          # Tylko backend (port 8200)
+make frontend         # Tylko frontend Vite (port 5174)
 ```
 
-### Docker i deployment
+### Docker + Mock GitHub
 ```bash
-make certs            # Generuje certyfikaty HTTPS dla semcod.localhost
-make docker-up        # Uruchom Docker Compose + Traefik HTTPS
-make docker-down      # Zatrzymaj kontenery Docker
-make build            # Buduje frontend do produkcji
+make sim              # Docker + mock GitHub (frontend :3000, backend :8003, mock :4010)
+make sim-down         # Zatrzymaj stack z mock GitHub
+make up               # Docker production stack
+make down             # Zatrzymaj production stack
 ```
 
 ### Testowanie
 ```bash
-make test             # Wszystkie testy
-make test-fast        # Szybkie testy jednostkowe (~2s)
-make test-backend     # Testy backendu (pytest)
-make test-e2e         # Testy E2E (Playwright headless)
-make test-e2e-ui      # Testy E2E z UI (headed)
+make test             # Backend pytest (bez slow)
+make test-all         # Pełne testy backend
+make e2e              # Playwright E2E na Docker (port 3000)
+make e2e-dev          # Playwright E2E na lokalnym dev (port 5174)
+make e2e-install      # Instaluj Playwright Chromium
 ```
 
-### Jakość kodu
+### Jakość kodu i utilities
 ```bash
-make quality          # Uruchom quality gate
-make quality-baseline # Zapisz baseline jakości
-make pre-commit-install # Instaluj pre-commit hook
-```
-
-### Czyszczenie
-```bash
-make clean            # Czyści zależności i cache
+make lint             # ruff lint + format check
+make logs             # Tail Docker logs (backend, frontend, worker)
+make ps               # Pokaż kontenery Docker
+make clean            # Czyści cache i node_modules
 ```
 
 ### Testy - szczegóły
@@ -303,8 +353,8 @@ Wszystkie ustawienia w `.env` — bez hardkodu w kodzie. Pełna lista w `.env.ex
 ### Application Configuration
 | Zmienna | Domyślnie | Opis |
 |---------|-----------|------|
-| `APP_URL` | `http://localhost:9000` | URL backendu |
-| `FRONTEND_URL` | `http://localhost:5173` | URL frontendu |
+| `APP_URL` | `http://localhost:8003` | URL backendu (Docker) / `:8200` (local) |
+| `FRONTEND_URL` | `http://localhost:3000` | URL frontendu (Docker) / `:5174` (local) |
 | `PUBLIC_URL` | `$APP_URL` | Publiczny URL |
 | `HOST` | `0.0.0.0` | Bind address |
 | `PORT` | `9000` | Port backendu |
@@ -348,9 +398,9 @@ Wszystkie ustawienia w `.env` — bez hardkodu w kodzie. Pełna lista w `.env.ex
 - API endpoints: `/api/redsl/*` — analyze, refactor, health, decide, batch-hybrid, badge
 
 ### 🔧 Inne
-- [REFACTORING-SUMMARY.md](./REFACTORING-SUMMARY.md) - Podsumowanie refaktoryzacji OAuth
-- [DEMO-REMOVAL-SUMMARY.md](./DEMO-REMOVAL-SUMMARY.md) - Usunięcie demo login
-- [FINAL-TEST-REPORT.md](./FINAL-TEST-REPORT.md) - Raport końcowych testów
+- [REFACTORING-SUMMARY.md](./docs/REFACTORING-SUMMARY.md) - Podsumowanie refaktoryzacji OAuth
+- [DEMO-REMOVAL-SUMMARY.md](./docs/DEMO-REMOVAL-SUMMARY.md) - Usunięcie demo login
+- [FINAL-TEST-REPORT.md](./docs/FINAL-TEST-REPORT.md) - Raport końcowych testów
 
 ## 🔧 **Troubleshooting**
 

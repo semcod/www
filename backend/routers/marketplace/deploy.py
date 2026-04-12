@@ -96,13 +96,13 @@ async def trigger_auto_fix(
     if not can_execute:
         raise HTTPException(402, reason)
 
-        # Record usage
-        _record_billing_usage(
-            tenant["id"],
-            usage_tracker,
-            BillingEventType.AUTOFIX_RUN,
-            {"repo": request.repo, "pr_id": request.pr_id},
-        )
+    # Record usage
+    _record_billing_usage(
+        tenant["id"],
+        usage_tracker,
+        BillingEventType.AUTOFIX_RUN,
+        {"repo": request.repo, "pr_id": request.pr_id},
+    )
 
     # Mirror to Gitea if requested
     mirror_status = await _handle_mirror_if_requested(request, user)

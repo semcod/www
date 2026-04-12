@@ -301,3 +301,40 @@ export async function redslDecide(projectPath) {
 export function redslBadgeUrl(owner, repo) {
   return `${API}/api/redsl/badge/${owner}/${repo}`;
 }
+
+
+// ─── Marketplace Auto-fix & Auto-PR ───────────────────────────────────────────
+
+export async function triggerAutoFix(repo, provider, prId, baseBranch, sessionToken, options = {}) {
+  const res = await fetch(`${API}/api/autofix`, {
+    method: "POST",
+    headers: authHeaders(sessionToken),
+    body: JSON.stringify({
+      repo,
+      provider,
+      pr_id: prId,
+      base_branch: baseBranch || "main",
+      mirror_to_gitea: options.mirrorToGitea || false,
+      gitea_target_repo: options.giteaTargetRepo || null,
+      auto_deploy: options.autoDeploy || false,
+    }),
+  });
+  if (!res.ok) throw new Error("Failed to trigger auto-fix");
+  return res.json();
+}
+
+export async function triggerRedslAutoPR(repo, projectPath, sessionToken, options = {}) {
+  const res = await fetch(`${API}/api/autopr/redsl`, {
+    method: "POST",
+    headers: authHeaders(sessionToken),
+    body: JSON.stringify({
+      repo,
+      project_path: projectPath,
+      proposal_type: options.proposalType || "redsl_refactor",
+      max_actions: options.maxActions || 10,
+      dry_run: options.dryRun || false,
+    }),
+  });
+  if (!res.ok) throw new Error("Failed to trigger reDSL auto-PR");
+  return res.json();
+}
