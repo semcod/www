@@ -1,4 +1,11 @@
-"""Session-aware wrapper functions for backward compatibility."""
+"""Session-aware wrapper functions for backward compatibility.
+
+All 37 wrappers follow the same pattern: open a session, delegate to the ORM
+function, close the session. The ``_wrap`` factory encodes that pattern once.
+Public API is identical to the original hand-written wrappers.
+"""
+from functools import wraps
+
 from db_session import SessionLocal
 from .scans_orm import (
     save_scan as save_scan_orm,
@@ -53,304 +60,61 @@ from .benchmark_orm import (
 )
 
 
-# Scan operations
-def save_scan(scan_data):
-    db = SessionLocal()
-    try:
-        return save_scan_orm(db, scan_data)
-    finally:
-        db.close()
-
-
-def get_recent_scans(limit=100):
-    db = SessionLocal()
-    try:
-        return get_recent_scans_orm(db, limit)
-    finally:
-        db.close()
-
-
-def get_repo_scans(repo, limit=100):
-    db = SessionLocal()
-    try:
-        return get_repo_scans_orm(db, repo, limit)
-    finally:
-        db.close()
-
-
-def get_total_scan_count():
-    db = SessionLocal()
-    try:
-        return get_total_scan_count_orm(db)
-    finally:
-        db.close()
-
-
-def save_audit_result(audit_id, audit_data):
-    db = SessionLocal()
-    try:
-        return save_audit_result_orm(db, audit_id, audit_data)
-    finally:
-        db.close()
-
-
-def get_audit_result(audit_id):
-    db = SessionLocal()
-    try:
-        return get_audit_result_orm(db, audit_id)
-    finally:
-        db.close()
-
-
-def save_badge_cache(repo, badge_data):
-    db = SessionLocal()
-    try:
-        return save_badge_cache_orm(db, repo, badge_data)
-    finally:
-        db.close()
-
-
-def get_badge_cache(repo):
-    db = SessionLocal()
-    try:
-        return get_badge_cache_orm(db, repo)
-    finally:
-        db.close()
-
-
-# User operations
-def upsert_user(github_id, login, name, avatar_url, github_token):
-    db = SessionLocal()
-    try:
-        return upsert_user_orm(db, github_id, login, name, avatar_url, github_token)
-    finally:
-        db.close()
-
-
-def get_user_by_github_id(github_id):
-    db = SessionLocal()
-    try:
-        return get_user_by_github_id_orm(db, github_id)
-    finally:
-        db.close()
-
-
-def get_user_by_id(user_id):
-    db = SessionLocal()
-    try:
-        return get_user_by_id_orm(db, user_id)
-    finally:
-        db.close()
-
-
-def get_subscription(user_id):
-    db = SessionLocal()
-    try:
-        return get_subscription_orm(db, user_id)
-    finally:
-        db.close()
-
-
-def upsert_subscription(user_id, plan, stripe_customer_id="", stripe_subscription_id="", status="active"):
-    db = SessionLocal()
-    try:
-        return upsert_subscription_orm(db, user_id, plan, stripe_customer_id, stripe_subscription_id, status)
-    finally:
-        db.close()
-
-
-def increment_scan_count(user_id):
-    db = SessionLocal()
-    try:
-        return increment_scan_count_orm(db, user_id)
-    finally:
-        db.close()
-
-
-# Tenant operations
-def get_or_create_tenant(provider, provider_user_id, login, name="", email="", avatar_url=""):
-    db = SessionLocal()
-    try:
-        return get_or_create_tenant_orm(db, provider, provider_user_id, login, name, email, avatar_url)
-    finally:
-        db.close()
-
-
-def get_tenant_by_id(tenant_id):
-    db = SessionLocal()
-    try:
-        return get_tenant_by_id_orm(db, tenant_id)
-    finally:
-        db.close()
-
-
-def update_tenant_plan(tenant_id, plan, billing_customer_id="", billing_subscription_id=""):
-    db = SessionLocal()
-    try:
-        return update_tenant_plan_orm(db, tenant_id, plan, billing_customer_id, billing_subscription_id)
-    finally:
-        db.close()
-
-
-# Repository operations
-def get_or_create_repository(tenant_id, provider, repo_provider_id, name, full_name, description="", private=False, default_branch="main", web_url="", clone_url=""):
-    db = SessionLocal()
-    try:
-        return get_or_create_repository_orm(db, tenant_id, provider, repo_provider_id, name, full_name, description, private, default_branch, web_url, clone_url)
-    finally:
-        db.close()
-
-
-def get_tenant_repositories(tenant_id):
-    db = SessionLocal()
-    try:
-        return get_tenant_repositories_orm(db, tenant_id)
-    finally:
-        db.close()
-
-
-def get_repository_by_full_name(tenant_id, provider, full_name):
-    db = SessionLocal()
-    try:
-        return get_repository_by_full_name_orm(db, tenant_id, provider, full_name)
-    finally:
-        db.close()
-
-
-# Installation operations
-def create_installation(tenant_id, repository_id, apps, webhook_id="", webhook_secret=""):
-    db = SessionLocal()
-    try:
-        return create_installation_orm(db, tenant_id, repository_id, apps, webhook_id, webhook_secret)
-    finally:
-        db.close()
-
-
-def get_installation(tenant_id, repository_id):
-    db = SessionLocal()
-    try:
-        return get_installation_orm(db, tenant_id, repository_id)
-    finally:
-        db.close()
-
-
-def get_tenant_installations(tenant_id):
-    db = SessionLocal()
-    try:
-        return get_tenant_installations_orm(db, tenant_id)
-    finally:
-        db.close()
-
-
-def delete_installation(tenant_id, repository_id):
-    db = SessionLocal()
-    try:
-        return delete_installation_orm(db, tenant_id, repository_id)
-    finally:
-        db.close()
-
-
-def update_installation_scan(tenant_id, repository_id, score):
-    db = SessionLocal()
-    try:
-        return update_installation_scan_orm(db, tenant_id, repository_id, score)
-    finally:
-        db.close()
-
-
-# Event operations
-def queue_event(event_id, event_type, provider, repo_full_name, pr_id, payload):
-    db = SessionLocal()
-    try:
-        return queue_event_orm(db, event_id, event_type, provider, repo_full_name, pr_id, payload)
-    finally:
-        db.close()
-
-
-def get_pending_events(limit=100):
-    db = SessionLocal()
-    try:
-        return get_pending_events_orm(db, limit)
-    finally:
-        db.close()
-
-
-def update_event_status(event_id, status, error_message=""):
-    db = SessionLocal()
-    try:
-        return update_event_status_orm(db, event_id, status, error_message)
-    finally:
-        db.close()
-
-
-# Benchmark operations
-def create_benchmark_case(payload):
-    db = SessionLocal()
-    try:
-        return create_benchmark_case_orm(db, payload)
-    finally:
-        db.close()
-
-
-def get_benchmark_cases():
-    db = SessionLocal()
-    try:
-        return get_benchmark_cases_orm(db)
-    finally:
-        db.close()
-
-
-def get_benchmark_case(case_id):
-    db = SessionLocal()
-    try:
-        return get_benchmark_case_orm(db, case_id)
-    finally:
-        db.close()
-
-
-def update_benchmark_case(case_id, updates):
-    db = SessionLocal()
-    try:
-        return update_benchmark_case_orm(db, case_id, updates)
-    finally:
-        db.close()
-
-
-def create_benchmark_event(case_id, payload):
-    db = SessionLocal()
-    try:
-        return create_benchmark_event_orm(db, case_id, payload)
-    finally:
-        db.close()
-
-
-def get_benchmark_events(case_id):
-    db = SessionLocal()
-    try:
-        return get_benchmark_events_orm(db, case_id)
-    finally:
-        db.close()
-
-
-def upsert_recommendation_feedback(case_id, recommendation_id, payload):
-    db = SessionLocal()
-    try:
-        return upsert_recommendation_feedback_orm(db, case_id, recommendation_id, payload)
-    finally:
-        db.close()
-
-
-def get_feedback_for_case(case_id):
-    db = SessionLocal()
-    try:
-        return get_feedback_for_case_orm(db, case_id)
-    finally:
-        db.close()
-
-
-def get_benchmark_summary():
-    db = SessionLocal()
-    try:
-        return get_benchmark_summary_orm(db)
-    finally:
-        db.close()
+def _wrap(orm_fn):
+    """Wrap an ORM function (db, *args) → SessionLocal-managed call."""
+    @wraps(orm_fn)
+    def wrapper(*args, **kwargs):
+        db = SessionLocal()
+        try:
+            return orm_fn(db, *args, **kwargs)
+        finally:
+            db.close()
+    wrapper.__name__ = orm_fn.__name__.removesuffix("_orm")
+    return wrapper
+
+
+# ─── Public API (identical signatures to the original hand-written wrappers) ──
+
+save_scan                   = _wrap(save_scan_orm)
+get_recent_scans            = _wrap(get_recent_scans_orm)
+get_repo_scans              = _wrap(get_repo_scans_orm)
+get_total_scan_count        = _wrap(get_total_scan_count_orm)
+save_audit_result           = _wrap(save_audit_result_orm)
+get_audit_result            = _wrap(get_audit_result_orm)
+save_badge_cache            = _wrap(save_badge_cache_orm)
+get_badge_cache             = _wrap(get_badge_cache_orm)
+
+upsert_user                 = _wrap(upsert_user_orm)
+get_user_by_github_id       = _wrap(get_user_by_github_id_orm)
+get_user_by_id              = _wrap(get_user_by_id_orm)
+get_subscription            = _wrap(get_subscription_orm)
+upsert_subscription         = _wrap(upsert_subscription_orm)
+increment_scan_count        = _wrap(increment_scan_count_orm)
+
+get_or_create_tenant        = _wrap(get_or_create_tenant_orm)
+get_tenant_by_id            = _wrap(get_tenant_by_id_orm)
+update_tenant_plan          = _wrap(update_tenant_plan_orm)
+
+get_or_create_repository    = _wrap(get_or_create_repository_orm)
+get_tenant_repositories     = _wrap(get_tenant_repositories_orm)
+get_repository_by_full_name = _wrap(get_repository_by_full_name_orm)
+
+create_installation         = _wrap(create_installation_orm)
+get_installation            = _wrap(get_installation_orm)
+get_tenant_installations    = _wrap(get_tenant_installations_orm)
+delete_installation         = _wrap(delete_installation_orm)
+update_installation_scan    = _wrap(update_installation_scan_orm)
+
+queue_event                 = _wrap(queue_event_orm)
+get_pending_events          = _wrap(get_pending_events_orm)
+update_event_status         = _wrap(update_event_status_orm)
+
+create_benchmark_case       = _wrap(create_benchmark_case_orm)
+get_benchmark_cases         = _wrap(get_benchmark_cases_orm)
+get_benchmark_case          = _wrap(get_benchmark_case_orm)
+update_benchmark_case       = _wrap(update_benchmark_case_orm)
+create_benchmark_event      = _wrap(create_benchmark_event_orm)
+get_benchmark_events        = _wrap(get_benchmark_events_orm)
+upsert_recommendation_feedback = _wrap(upsert_recommendation_feedback_orm)
+get_feedback_for_case       = _wrap(get_feedback_for_case_orm)
+get_benchmark_summary       = _wrap(get_benchmark_summary_orm)
