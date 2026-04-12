@@ -19,6 +19,10 @@ examples/
 ├── rest-api/auto-pr-example.sh    # 8 przykładów (gh + curl)
 ├── shell/auto-pr-cli.sh           # Interaktywne menu (gh + Semcod)
 ├── python-sdk/auto_pr_client.py   # Python SDK (GhClient + SemcodClient)
+├── cycle-test/                    # Pełny cykl ticket→reDSL→PR — walidacja krok po kroku
+│   ├── validate-steps.sh          # Sprawdza każdy endpoint (bez PR)
+│   ├── full-cycle.sh              # Pełny cykl z PR i merge
+│   └── README.md
 └── README.md
 ```
 
@@ -53,6 +57,18 @@ curl -s http://localhost:8003/api/redsl/status
 cd examples/python-sdk
 python3 auto_pr_client.py
 # Automatycznie używa gh token — brak ręcznego OAuth
+```
+
+### Cycle Test (walidacja krok po kroku)
+```bash
+cd examples/cycle-test
+chmod +x validate-steps.sh full-cycle.sh
+
+# Walidacja endpointów (bezpieczne, bez PR)
+./validate-steps.sh
+
+# Pełny cykl z PR i merge
+./full-cycle.sh
 ```
 
 ## 📊 Przykłady
