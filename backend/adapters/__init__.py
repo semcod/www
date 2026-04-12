@@ -1,7 +1,7 @@
 """Adapters module - multi-platform git provider support."""
 from events.models import Event, ProviderType
 
-from .base import GitProvider
+from .base import GitProvider, HttpApiProvider
 from .github import GitHubAdapter, parse_github_event
 from .gitlab import GitLabAdapter
 from .gitlab_events import parse_gitlab_event
@@ -24,6 +24,7 @@ def get_adapter_for_event(event: Event, token: str) -> GitProvider:
 
 __all__ = [
     "GitProvider",
+    "HttpApiProvider",
     "GitHubAdapter",
     "GitLabAdapter",
     "GiteaAdapter",

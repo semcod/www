@@ -186,7 +186,7 @@ class TestGitHubAdapter:
         mock_response.json.return_value = {"html_url": "https://github.com/comment/1"}
 
         with patch("httpx.AsyncClient") as mock_client:
-            mock_client.return_value.__aenter__.return_value.post = AsyncMock(
+            mock_client.return_value.__aenter__.return_value.request = AsyncMock(
                 return_value=mock_response
             )
             result = await adapter.comment_on_pr("owner/repo", 42, "Test comment")

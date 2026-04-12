@@ -1,6 +1,14 @@
 """Base interface for git providers - PR Bot abstraction."""
+from __future__ import annotations
+
+import base64
+import hashlib
+import hmac as _hmac
 from abc import ABC, abstractmethod
 from typing import Dict, List, Optional
+
+import httpx
+from fastapi import HTTPException
 
 
 class GitProvider(ABC):
@@ -14,142 +22,174 @@ class GitProvider(ABC):
         self.token = token
         self.base_url = base_url
 
-    # ─── PR Operations ──────────────────────────────────────────────────────────
 
-    @abstractmethod
+class HttpApiProvider(GitProvider):
+    """Mixin for providers whose API closely follows the GitHub REST v3 shape.
+
+    GitHub and Gitea share the same endpoint structure under /repos/{owner}/{repo}/
+    so the ~12 common methods live here. Subclasses only override the handful of
+    methods that actually differ (branch creation, diff, check-runs, etc.).
+
+    Subclasses MUST set ``self.api_base`` in ``__init__`` before use.
+    """
+
+    # ─── Low-level HTTP helper ────────────────────────────────────────────────
+
+    async def _req(
+        self,
+        method: str,
+        url: str,
+        *,
+        json: Optional[Dict] = None,
+        params: Optional[Dict] = None,
+        extra_headers: Optional[Dict] = None,
+    ) -> httpx.Response:
+        headers = {**self.get_api_headers(), **(extra_headers or {})}
+        async with httpx.AsyncClient() as client:
+            return await client.request(
+                method, url, headers=headers, json=json, params=params
+            )
+
+    # ─── PR Operations ────────────────────────────────────────────────────────
+
     async def comment_on_pr(self, repo: str, pr_id: int, text: str) -> str:
-        """Post a comment on a pull request. Returns comment URL."""
-        pass
+        url = f"{self.api_base}/repos/{repo}/issues/{pr_id}/comments"
+        resp = await self._req("POST", url, json={"body": text})
+        if resp.status_code != 201:
+            raise HTTPException(500, f"Failed to comment: {resp.text}")
+        return resp.json().get("html_url", "")
 
-    @abstractmethod
     async def update_pr_description(self, repo: str, pr_id: int, description: str) -> bool:
-        """Update PR description/body."""
-        pass
+        url = f"{self.api_base}/repos/{repo}/pulls/{pr_id}"
+        resp = await self._req("PATCH", url, json={"body": description})
+        return resp.status_code == 200
 
-    @abstractmethod
     async def create_pr(
-        self,
-        repo: str,
-        title: str,
-        body: str,
-        head_branch: str,
-        base_branch: str,
+        self, repo: str, title: str, body: str, head_branch: str, base_branch: str,
     ) -> str:
-        """Create a new pull request. Returns PR URL."""
-        pass
+        url = f"{self.api_base}/repos/{repo}/pulls"
+        resp = await self._req("POST", url, json={
+            "title": title, "body": body, "head": head_branch, "base": base_branch,
+        })
+        if resp.status_code != 201:
+            raise HTTPException(500, f"Failed to create PR: {resp.text}")
+        return resp.json()["html_url"]
 
-    @abstractmethod
     async def close_pr(self, repo: str, pr_id: int, comment: Optional[str] = None) -> bool:
-        """Close a pull request with optional comment."""
-        pass
+        if comment:
+            await self.comment_on_pr(repo, pr_id, comment)
+        url = f"{self.api_base}/repos/{repo}/pulls/{pr_id}"
+        resp = await self._req("PATCH", url, json={"state": "closed"})
+        return resp.status_code == 200
 
-    # ─── Branch & Commit Operations ─────────────────────────────────────────────
+    # ─── Commit & Content Operations ──────────────────────────────────────────
 
-    @abstractmethod
-    async def create_branch(self, repo: str, branch: str, from_sha: str) -> str:
-        """Create a new branch. Returns branch ref."""
-        pass
-
-    @abstractmethod
-    async def delete_branch(self, repo: str, branch: str) -> bool:
-        """Delete a branch."""
-        pass
-
-    @abstractmethod
     async def commit_file(
-        self,
-        repo: str,
-        path: str,
-        content: str,
-        branch: str,
-        message: str,
+        self, repo: str, path: str, content: str, branch: str, message: str,
         file_sha: Optional[str] = None,
     ) -> str:
-        """Commit a single file. Returns commit SHA."""
-        pass
+        encoded = base64.b64encode(content.encode()).decode()
+        body: Dict = {"message": message, "content": encoded, "branch": branch}
+        if file_sha:
+            body["sha"] = file_sha
+        url = f"{self.api_base}/repos/{repo}/contents/{path}"
+        resp = await self._req("PUT", url, json=body)
+        if resp.status_code not in (200, 201):
+            raise HTTPException(500, f"Failed to commit {path}: {resp.text}")
+        return resp.json()["commit"]["sha"]
 
-    @abstractmethod
     async def get_default_branch(self, repo: str) -> str:
-        """Get repository default branch name."""
-        pass
+        url = f"{self.api_base}/repos/{repo}"
+        resp = await self._req("GET", url)
+        if resp.status_code != 200:
+            raise HTTPException(422, f"Cannot access repo {repo}: {resp.text}")
+        return resp.json().get("default_branch", "main")
 
-    @abstractmethod
-    async def get_ref_sha(self, repo: str, ref: str) -> str:
-        """Get SHA for a branch or tag ref."""
-        pass
-
-    @abstractmethod
     async def get_file_sha(self, repo: str, path: str, ref: str) -> Optional[str]:
-        """Get SHA of existing file (for updates). None if file doesn't exist."""
-        pass
+        url = f"{self.api_base}/repos/{repo}/contents/{path}"
+        resp = await self._req("GET", url, params={"ref": ref})
+        if resp.status_code == 404:
+            return None
+        if resp.status_code != 200:
+            raise HTTPException(422, f"Cannot read {path}: {resp.text}")
+        return resp.json().get("sha")
 
-    # ─── Diff & Content ─────────────────────────────────────────────────────────
-
-    @abstractmethod
-    async def get_pr_diff(self, repo: str, pr_id: int) -> str:
-        """Get diff content of a pull request."""
-        pass
-
-    @abstractmethod
     async def get_file_content(self, repo: str, path: str, ref: str) -> Optional[str]:
-        """Get file content at specific ref."""
-        pass
+        url = f"{self.api_base}/repos/{repo}/contents/{path}"
+        resp = await self._req("GET", url, params={"ref": ref})
+        if resp.status_code == 404:
+            return None
+        if resp.status_code != 200:
+            raise HTTPException(422, f"Cannot read {path}: {resp.text}")
+        return base64.b64decode(resp.json().get("content", "")).decode()
 
-    # ─── Issue Operations ───────────────────────────────────────────────────────
+    # ─── Issue Operations ─────────────────────────────────────────────────────
 
-    @abstractmethod
     async def create_issue(self, repo: str, title: str, body: str, labels: List[str]) -> str:
-        """Create an issue. Returns issue URL."""
-        pass
+        url = f"{self.api_base}/repos/{repo}/issues"
+        resp = await self._req("POST", url, json={"title": title, "body": body, "labels": labels})
+        if resp.status_code != 201:
+            raise HTTPException(500, f"Failed to create issue: {resp.text}")
+        return resp.json()["html_url"]
 
-    @abstractmethod
     async def comment_on_issue(self, repo: str, issue_id: int, text: str) -> str:
-        """Post a comment on an issue."""
-        pass
+        return await self.comment_on_pr(repo, issue_id, text)
 
-    # ─── Check Runs / Status ────────────────────────────────────────────────────
+    # ─── PR Files ─────────────────────────────────────────────────────────────
 
-    @abstractmethod
-    async def create_check_run(
-        self,
-        repo: str,
-        name: str,
-        head_sha: str,
-        status: str,
-        conclusion: Optional[str] = None,
-        output: Optional[Dict] = None,
-    ) -> str:
-        """Create a check run (GitHub) or pipeline status (GitLab)."""
-        pass
+    async def get_pr_files(self, repo: str, pr_id: int) -> list:
+        url = f"{self.api_base}/repos/{repo}/pulls/{pr_id}/files"
+        resp = await self._req("GET", url)
+        if resp.status_code != 200:
+            raise HTTPException(422, f"Cannot get PR files: {resp.text}")
+        return [
+            {
+                "filename": f.get("filename"),
+                "status": f.get("status"),
+                "additions": f.get("additions", 0),
+                "deletions": f.get("deletions", 0),
+                "changes": f.get("changes", 0),
+                "patch": f.get("patch"),
+                "previous_filename": f.get("previous_filename"),
+            }
+            for f in resp.json()
+        ]
 
-    @abstractmethod
-    async def update_check_run(
-        self,
-        repo: str,
-        check_run_id: str,
-        status: str,
-        conclusion: Optional[str] = None,
-        output: Optional[Dict] = None,
-    ) -> bool:
-        """Update an existing check run."""
-        pass
+    # ─── Webhook Verification ─────────────────────────────────────────────────
 
-    # ─── Webhook Verification ───────────────────────────────────────────────────
-
-    @abstractmethod
     def verify_webhook_signature(self, body: bytes, signature: str, secret: str) -> bool:
-        """Verify webhook signature from this provider."""
-        pass
+        expected = _hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
+        return _hmac.compare_digest(signature, expected)
 
-    # ─── Utility ───────────────────────────────────────────────────────────────
+    # ─── Stubs for provider-specific methods ─────────────────────────────────
 
     @abstractmethod
-    def get_api_headers(self) -> Dict[str, str]:
-        """Get headers for API requests to this provider."""
-        pass
+    def get_api_headers(self) -> Dict[str, str]: ...
 
     @property
     @abstractmethod
-    def provider_name(self) -> str:
-        """Return provider name identifier."""
-        pass
+    def provider_name(self) -> str: ...
+
+    @abstractmethod
+    async def create_branch(self, repo: str, branch: str, from_sha: str) -> str: ...
+
+    @abstractmethod
+    async def delete_branch(self, repo: str, branch: str) -> bool: ...
+
+    @abstractmethod
+    async def get_ref_sha(self, repo: str, ref: str) -> str: ...
+
+    @abstractmethod
+    async def get_pr_diff(self, repo: str, pr_id: int) -> str: ...
+
+    @abstractmethod
+    async def create_check_run(
+        self, repo: str, name: str, head_sha: str, status: str,
+        conclusion: Optional[str] = None, output: Optional[Dict] = None,
+    ) -> str: ...
+
+    @abstractmethod
+    async def update_check_run(
+        self, repo: str, check_run_id: str, status: str,
+        conclusion: Optional[str] = None, output: Optional[Dict] = None,
+    ) -> bool: ...
