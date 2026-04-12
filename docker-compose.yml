@@ -87,6 +87,8 @@ services:
     build: ../redsl
     ports:
       - "0.0.0.0:8030:8000"
+    env_file:
+      - .env
     environment:
       - REFACTOR_DRY_RUN=false
       - REFACTOR_AUTO_APPROVE=false
