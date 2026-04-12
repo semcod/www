@@ -2,6 +2,22 @@
 
 from db_session import SessionLocal, init_db as init_orm_db
 
+# Import tickets ORM (direct ORM functions)
+from .tickets_orm import (
+    create_ticket,
+    get_tickets_by_tenant,
+    get_ticket,
+    update_ticket,
+    delete_ticket,
+    get_tickets_by_repo,
+    get_ticket_stats,
+    search_tickets,
+    get_tickets_requiring_action,
+    update_ticket_pr_info,
+    update_ticket_redsl_results,
+    mark_ticket_error,
+)
+
 # Import wrapper functions (session-aware, backward compatible)
 from .wrappers import (
     save_scan,
@@ -86,6 +102,19 @@ __all__ = [
     "upsert_recommendation_feedback",
     "get_feedback_for_case",
     "get_benchmark_summary",
+    # Tickets
+    "create_ticket",
+    "get_tickets_by_tenant",
+    "get_ticket",
+    "update_ticket",
+    "delete_ticket",
+    "get_tickets_by_repo",
+    "get_ticket_stats",
+    "search_tickets",
+    "get_tickets_requiring_action",
+    "update_ticket_pr_info",
+    "update_ticket_redsl_results",
+    "mark_ticket_error",
 ]
 
 # Initialize database on import

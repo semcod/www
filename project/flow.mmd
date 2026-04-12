@@ -5,7 +5,6 @@ flowchart TD
 
     subgraph Core
         backend__server__lifespan["lifespan"]
-        backend__db_session__get_db["get_db"]
         backend__db_session__init_db["init_db"]
         backend__worker__get_celery_app["get_celery_app"]
         backend__db_models___utcnow["_utcnow"]
@@ -19,7 +18,8 @@ flowchart TD
         backend__services__autopr_helpers__PRCreator__build_pr_body["build_pr_body"]
         backend__services__autopr_helpers__PRCreator__build_issue_body["build_issue_body"]
         backend__services__mirror__MirrorService__create_mirror["create_mirror"]
-        ...["+796 more"]
+        backend__services__mirror__MirrorService__sync_mirror["sync_mirror"]
+        ...["+880 more"]
     end
 
     subgraph Exporters
@@ -31,4 +31,4 @@ flowchart TD
         frontend__e2e__system_integration__spec__exportBody["exportBody"]
     end
 
-    class backend__server__lifespan,backend__db_session__get_db,backend__db_session__init_db,backend__worker__get_celery_app,backend__db_models___utcnow,backend__services__autopr_helpers__BranchManager__get_default_branch,backend__services__autopr_helpers__BranchManager__get_ref_sha,backend__services__autopr_helpers__BranchManager__create_branch,backend__services__autopr_helpers__PatchApplier__get_file_sha,backend__services__autopr_helpers__PatchApplier__commit_file entry
+    class backend__server__lifespan,backend__db_session__init_db,backend__worker__get_celery_app,backend__db_models___utcnow,backend__services__autopr_helpers__BranchManager__get_default_branch,backend__services__autopr_helpers__BranchManager__get_ref_sha,backend__services__autopr_helpers__BranchManager__create_branch,backend__services__autopr_helpers__PatchApplier__get_file_sha,backend__services__autopr_helpers__PatchApplier__commit_file,backend__services__autopr_helpers__PRCreator__create_pr entry

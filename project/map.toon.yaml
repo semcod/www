@@ -1,10 +1,10 @@
-# www | 194f 21619L | shell:4,python:93,javascript:97 | 2026-04-12
-# stats: 1052 func | 0 cls | 194 mod | CC̄=2.7 | critical:3 | cycles:0
-# alerts[5]: CC FRONTEND_URL=33; CC MOCK_GITHUB_URL=33; fan-out FRONTEND_URL=29; fan-out MOCK_GITHUB_URL=29; fan-out create_redsl_auto_pr=28
-# hotspots[5]: FRONTEND_URL fan=29; MOCK_GITHUB_URL fan=29; create_redsl_auto_pr fan=28; FRONTEND_URL fan=25; MOCK_GITHUB_URL fan=25
-# evolution: CC̄ 2.7→2.7 (flat 0.0)
+# www | 200f 23495L | shell:4,python:95,javascript:101 | 2026-04-12
+# stats: 1161 func | 0 cls | 200 mod | CC̄=2.6 | critical:3 | cycles:0
+# alerts[5]: CC FRONTEND_URL=33; CC MOCK_GITHUB_URL=33; fan-out FRONTEND_URL=29; fan-out MOCK_GITHUB_URL=29; CC RedslHealthCard=27
+# hotspots[5]: FRONTEND_URL fan=29; MOCK_GITHUB_URL fan=29; FRONTEND_URL fan=25; MOCK_GITHUB_URL fan=25; BACKEND_URL fan=25
+# evolution: CC̄ 2.7→2.6 (improved -0.1)
 # Keys: M=modules, D=details, i=imports, e=exports, c=classes, f=functions, m=methods
-M[194]:
+M[200]:
   backend/adapters/__init__.py,34
   backend/adapters/base.py,155
   backend/adapters/gitea.py,349
@@ -24,8 +24,8 @@ M[194]:
   backend/apps/security/pipeline.py,115
   backend/config.py,88
   backend/database.py,72
-  backend/db_models.py,222
-  backend/db_module/__init__.py,92
+  backend/db_models.py,247
+  backend/db_module/__init__.py,121
   backend/db_module/benchmark_orm.py,220
   backend/db_module/db_connection.py,26
   backend/db_module/events.py,70
@@ -39,6 +39,7 @@ M[194]:
   backend/db_module/schema.py,184
   backend/db_module/tenants.py,76
   backend/db_module/tenants_orm.py,121
+  backend/db_module/tickets_orm.py,390
   backend/db_module/users.py,157
   backend/db_module/users_orm.py,183
   backend/db_module/wrappers.py,356
@@ -48,7 +49,7 @@ M[194]:
   backend/quality_gate.py,272
   backend/routers/audit.py,396
   backend/routers/auth.py,211
-  backend/routers/autopr.py,306
+  backend/routers/autopr.py,296
   backend/routers/badge.py,139
   backend/routers/benchmark.py,192
   backend/routers/billing.py,291
@@ -68,6 +69,7 @@ M[194]:
   backend/routers/redsl.py,207
   backend/routers/report.py,14
   backend/routers/system.py,34
+  backend/routers/tickets.py,584
   backend/routers/trend.py,250
   backend/routers/webhook.py,257
   backend/routers/webhook_v2.py,128
@@ -75,7 +77,7 @@ M[194]:
   backend/scheduler/cron.py,213
   backend/scheduler/scan_job.py,164
   backend/scripts/scan_samples.py,74
-  backend/server.py,78
+  backend/server.py,80
   backend/services/analyzer.py,344
   backend/services/autofix.py,299
   backend/services/autopr_helpers.py,179
@@ -100,16 +102,20 @@ M[194]:
   e2e/gitea-oauth-cycle.spec.js,125
   e2e/karate/karate-config.js,9
   e2e/playwright.config.js,24
-  e2e/specs/audit.spec.js,48
+  e2e/specs/audit.spec.js,27
+  e2e/specs/auth-flow.spec.js,136
   e2e/specs/badge.spec.js,28
-  e2e/specs/demo-login.spec.js,64
-  e2e/specs/demo-mode.spec.js,66
-  e2e/specs/gui-views.spec.js,161
-  e2e/specs/metrics.spec.js,126
-  e2e/specs/recent-scans.spec.js,86
-  e2e/specs/sandbox-recent-scans.spec.js,91
-  e2e/specs/scan-workflow.spec.js,103
-  e2e/specs/smoke.spec.js,59
+  e2e/specs/customer-journey.spec.js,180
+  e2e/specs/demo-login.spec.js,47
+  e2e/specs/demo-mode.spec.js,46
+  e2e/specs/gui-views.spec.js,74
+  e2e/specs/marketplace-flow.spec.js,283
+  e2e/specs/metrics.spec.js,131
+  e2e/specs/recent-scans.spec.js,90
+  e2e/specs/redsl-flow.spec.js,116
+  e2e/specs/sandbox-recent-scans.spec.js,77
+  e2e/specs/scan-workflow.spec.js,96
+  e2e/specs/smoke.spec.js,52
   e2e/specs/social-sharing.spec.js,134
   frontend/cypress/e2e/oauth-login.cy.js,117
   frontend/e2e/audit.spec.js,46
@@ -126,7 +132,7 @@ M[194]:
   frontend/e2e/system-integration.spec.js,193
   frontend/playwright.config.js,22
   frontend/src/App.jsx,100
-  frontend/src/api.js,303
+  frontend/src/api.js,446
   frontend/src/components/index.js,5
   frontend/src/components/AppCard.jsx,160
   frontend/src/components/GradeCircle.jsx,33
@@ -134,7 +140,7 @@ M[194]:
   frontend/src/components/InstallButton.jsx,143
   frontend/src/components/LanguageBar.jsx,26
   frontend/src/components/LoginMultiPlatform.jsx,135
-  frontend/src/components/MarketplaceDashboard.jsx,301
+  frontend/src/components/MarketplaceDashboard.jsx,463
   frontend/src/components/MetricCard.jsx,14
   frontend/src/components/PaywallModal.jsx,148
   frontend/src/components/Preview.jsx,195
@@ -232,6 +238,31 @@ D:
     h()
     grade()
     score()
+  backend/routers/tickets.py:
+    e: TicketCreate,TicketUpdate,TicketResponse,TicketListResponse,TicketStatsResponse,RedslAutoPRRequest,RedslAutoPRResponse,_get_tenant_for_user,create_new_ticket,list_tickets,get_stats,search_tickets_endpoint,get_tickets_for_repo,get_action_required_tickets,get_single_ticket,update_existing_ticket,delete_existing_ticket,process_ticket_with_redsl,_create_pr_for_ticket,get_ticket_processing_status,handle_pr_webhook,bulk_close_tickets,bulk_reprocess_tickets
+    TicketCreate(BaseModel):
+    TicketUpdate(BaseModel):
+    TicketResponse(BaseModel):
+    TicketListResponse(BaseModel):
+    TicketStatsResponse(BaseModel):
+    RedslAutoPRRequest(BaseModel):
+    RedslAutoPRResponse(BaseModel):
+    _get_tenant_for_user(user;db)
+    create_new_ticket(data;user;db)
+    list_tickets(status;user;db)
+    get_stats(user;db)
+    search_tickets_endpoint(q;user;db)
+    get_tickets_for_repo(repo;user;db)
+    get_action_required_tickets(user;db)
+    get_single_ticket(ticket_id;user;db)
+    update_existing_ticket(ticket_id;data;user;db)
+    delete_existing_ticket(ticket_id;user;db)
+    process_ticket_with_redsl(ticket_id;data;background_tasks;user;db)
+    _create_pr_for_ticket(ticket_id;repo;provider;project_path;decisions;files_modified;token;tenant_id)
+    get_ticket_processing_status(ticket_id;user;db)
+    handle_pr_webhook(payload;db)
+    bulk_close_tickets(ticket_ids;user;db)
+    bulk_reprocess_tickets(ticket_ids;user;db)
   frontend/src/components/tabs/TrendTab.jsx:
     i: ../../api,react
     e: TrendTab,repoName,history
@@ -292,17 +323,6 @@ Detects:
     checkScanAllowed()
     openCheckout()
     dismissPaywall()
-  backend/routers/autopr.py:
-    e: PatchFile,AutoPRRequest,AutoPRResult,RedslRefactorRequest,RedslRefactorResult,_score_improved,create_auto_pr,create_redsl_auto_pr,_build_redsl_pr_body
-    PatchFile(BaseModel):
-    AutoPRRequest(BaseModel):
-    AutoPRResult(BaseModel):
-    RedslRefactorRequest(BaseModel):
-    RedslRefactorResult(BaseModel):
-    _score_improved(repo;min_delta)
-    create_auto_pr(body;user)
-    create_redsl_auto_pr(body;user)
-    _build_redsl_pr_body(proposal_type;fix_id;decisions;files)
   backend/db_module/scans_orm.py:
     e: save_scan,get_recent_scans,get_repo_scans,get_total_scan_count,save_audit_result,get_audit_result,save_badge_cache,get_badge_cache
     save_scan(db;scan_data)
@@ -389,6 +409,33 @@ Detects:
     calculate_health_score(stats;complexity;duplication;quality)
     score_to_grade(score)
     generate_recommendations(complexity;duplication;quality)
+  backend/db_module/tickets_orm.py:
+    e: generate_ticket_id,create_ticket,get_tickets_by_tenant,get_ticket,get_ticket_by_pr,update_ticket,delete_ticket,get_tickets_by_repo,_ticket_to_dict,count_tickets_by_status,get_tickets_requiring_action,update_ticket_pr_info,update_ticket_redsl_results,mark_ticket_error,get_ticket_stats,search_tickets,get_tickets_with_pr_status,bulk_update_ticket_status,get_tickets_by_date_range,get_priority_distribution,get_average_resolution_time,clone_ticket,archive_old_tickets,get_tickets_for_redsl_processing,link_ticket_to_audit
+    generate_ticket_id()
+    create_ticket(db;tenant_id;payload)
+    get_tickets_by_tenant(db;tenant_id;status)
+    get_ticket(db;ticket_id)
+    get_ticket_by_pr(db;pr_number;repo)
+    update_ticket(db;ticket_id;updates)
+    delete_ticket(db;ticket_id)
+    get_tickets_by_repo(db;tenant_id;repo)
+    _ticket_to_dict(t)
+    count_tickets_by_status(db;tenant_id)
+    get_tickets_requiring_action(db;tenant_id)
+    update_ticket_pr_info(db;ticket_id;pr_url;pr_branch;pr_number)
+    update_ticket_redsl_results(db;ticket_id;decisions;files)
+    mark_ticket_error(db;ticket_id;error)
+    get_ticket_stats(db;tenant_id)
+    search_tickets(db;tenant_id;query)
+    get_tickets_with_pr_status(db;tenant_id)
+    bulk_update_ticket_status(db;ticket_ids;new_status)
+    get_tickets_by_date_range(db;tenant_id;start_date;end_date)
+    get_priority_distribution(db;tenant_id)
+    get_average_resolution_time(db;tenant_id)
+    clone_ticket(db;tenant_id;original_ticket_id;new_title)
+    archive_old_tickets(db;tenant_id;days)
+    get_tickets_for_redsl_processing(db;batch_size)
+    link_ticket_to_audit(db;ticket_id;audit_id)
   backend/db_module/benchmark_orm.py:
     e: create_benchmark_case,get_benchmark_cases,get_benchmark_case,update_benchmark_case,_case_to_dict,create_benchmark_event,_event_to_dict,get_benchmark_events,upsert_recommendation_feedback,_update_feedback_fields,_build_feedback_row,get_feedback_for_case,_feedback_to_dict,get_benchmark_summary,_compute_feedback_stats
     create_benchmark_case(db;payload)
@@ -423,6 +470,11 @@ Detects:
     _get_token_for_provider(provider)
     _analyze_diff(diff;repo)
     _format_pr_comment(event;analysis)
+  backend/routers/marketplace/browse.py:
+    e: preview_pr_comment,list_apps,_format_preview_comment
+    preview_pr_comment(request;user)
+    list_apps()
+    _format_preview_comment(repo;score;issues)
   backend/routers/marketplace/publish.py:
     e: install_app,uninstall_app,list_installations,get_app_status,_setup_webhook
     install_app(request;user)
@@ -430,11 +482,6 @@ Detects:
     list_installations(user)
     get_app_status(repo;provider;user)
     _setup_webhook(repo;provider;token)
-  backend/routers/marketplace/browse.py:
-    e: preview_pr_comment,list_apps,_format_preview_comment
-    preview_pr_comment(request;user)
-    list_apps()
-    _format_preview_comment(repo;score;issues)
   backend/routers/mcp/resources.py:
     e: _utc_now_iso,_summarize_scan,_build_metrics_summary,_get_scans_list,_get_scan_detail,_get_metrics_summary,_get_badge_status,mcp_list_resources,mcp_get_resource
     _utc_now_iso()
@@ -622,6 +669,23 @@ Handles:
 
 Analyzes:
 - Cyclomatic complex...
+  backend/routers/autopr.py:
+    e: PatchFile,AutoPRRequest,AutoPRResult,RedslRefactorRequest,RedslRefactorResult,_score_improved,_prepare_branch,_commit_patches,_check_rollback,_handle_rollback,create_auto_pr,_run_redsl_refactor,_commit_redsl_decisions,create_redsl_auto_pr,_build_redsl_pr_body
+    PatchFile(BaseModel):
+    AutoPRRequest(BaseModel):
+    AutoPRResult(BaseModel):
+    RedslRefactorRequest(BaseModel):
+    RedslRefactorResult(BaseModel):
+    _score_improved(repo;min_delta)
+    _prepare_branch(repo;branch;token)
+    _commit_patches(repo;patches;branch;proposal_type;fix_id;token)
+    _check_rollback(repo)
+    _handle_rollback(repo;proposal_type;fix_id;llm_prompt;patches;token;score_before;score_after;rollback_reason;branch)
+    create_auto_pr(body;user)
+    _run_redsl_refactor(redsl;project_path;max_actions;dry_run)
+    _commit_redsl_decisions(repo;decisions;project_path;branch;proposal_type;fix_id;token)
+    create_redsl_auto_pr(body;user)
+    _build_redsl_pr_body(proposal_type;fix_id;decisions;files)
   frontend/src/hooks/useDownloads.js:
     i: react
     e: recommendationLabel,recommendationLine,markdownRecommendationLine,toonRecommendationLine,filesContent,buildMetricsExportData,buildPromptText,buildMarkdownText,buildToonText,buildShareText,getResultTabContent,downloadContent,blob,url,link,useDownloads,handleDownloadMetrics,handleDownloadPrompt,handleDownloadMarkdown,handleDownloadToon,handleGenericDownload
@@ -751,6 +815,111 @@ Apps must implement:
     get_repo_trend(owner;repo;days)
     compare_repo_trend(owner;repo;days)
     get_scan_diff(owner;repo)
+  frontend/src/api.js:
+    i: ./constants
+    e: authHeaders,fetchMe,res,logout,res,fetchRepos,res,startAudit,res,fetchAudit,res,fetchBillingStatus,res,createCheckoutSession,res,analyzePublicRepo,res,loginWithProvider,getPreview,res,installApp,res,getInstallations,res,uninstallApp,res,fetchTrend,res,fetchSchedules,res,createSchedule,res,deleteSchedule,res,fetchBillingPortal,res,getApps,res,getAppStatus,res,createBenchmarkCase,res,updateBenchmarkCase,res,submitRecommendationFeedback,res,submitBenchmarkDecision,res,trackBenchmarkEvent,res,fetchBenchmarkSummary,res,downloadBenchmarkExport,getRedslStatus,res,redslAnalyze,res,redslHealth,res,redslRefactor,res,redslDecide,res,redslBadgeUrl,triggerAutoFix,res,triggerRedslAutoPR,res,createTicket,res,getTickets,url,res,getTicket,res,updateTicket,res,deleteTicket,res,getTicketStats,res,processTicketWithRedsl,res,getTicketProcessingStatus,res,searchTickets,res,getRepoTickets,res,getTicketsRequiringAction,res
+    authHeaders()
+    fetchMe()
+    res()
+    logout()
+    res()
+    fetchRepos()
+    res()
+    startAudit()
+    res()
+    fetchAudit()
+    res()
+    fetchBillingStatus()
+    res()
+    createCheckoutSession()
+    res()
+    analyzePublicRepo()
+    res()
+    loginWithProvider()
+    getPreview()
+    res()
+    installApp()
+    res()
+    getInstallations()
+    res()
+    uninstallApp()
+    res()
+    fetchTrend()
+    res()
+    fetchSchedules()
+    res()
+    createSchedule()
+    res()
+    deleteSchedule()
+    res()
+    fetchBillingPortal()
+    res()
+    getApps()
+    res()
+    getAppStatus()
+    res()
+    createBenchmarkCase()
+    res()
+    updateBenchmarkCase()
+    res()
+    submitRecommendationFeedback()
+    res()
+    submitBenchmarkDecision()
+    res()
+    trackBenchmarkEvent()
+    res()
+    fetchBenchmarkSummary()
+    res()
+    downloadBenchmarkExport()
+    getRedslStatus()
+    res()
+    redslAnalyze()
+    res()
+    redslHealth()
+    res()
+    redslRefactor()
+    res()
+    redslDecide()
+    res()
+    redslBadgeUrl()
+    triggerAutoFix()
+    res()
+    triggerRedslAutoPR()
+    res()
+    createTicket()
+    res()
+    getTickets()
+    url()
+    res()
+    getTicket()
+    res()
+    updateTicket()
+    res()
+    deleteTicket()
+    res()
+    getTicketStats()
+    res()
+    processTicketWithRedsl()
+    res()
+    getTicketProcessingStatus()
+    res()
+    searchTickets()
+    res()
+    getRepoTickets()
+    res()
+    getTicketsRequiringAction()
+    res()
+  frontend/src/components/MarketplaceDashboard.jsx:
+    i: ../api.js,./AppCard.jsx,./InstallButton.jsx,./Preview.jsx,react
+    e: loadData,toggleApp,handleRepoSelect,isRepoInstalled,handleAutoFix,result,handleRedslRefactor,result
+    loadData()
+    toggleApp()
+    handleRepoSelect()
+    isRepoInstalled()
+    handleAutoFix()
+    result()
+    handleRedslRefactor()
+    result()
   frontend/src/components/tabs/TrendSummaryCard.jsx:
     i: ../../constants
     e: TrendSummaryCard,sign,deltaColor
@@ -785,6 +954,23 @@ Apps must implement:
     jsonErrors()
     url()
     ct()
+  e2e/specs/metrics.spec.js:
+    i: @playwright/test
+    e: skipInCI,response,data,scan,response,data,listResponse,listData,repo,response,data,response,response,data
+    skipInCI()
+    response()
+    data()
+    scan()
+    response()
+    data()
+    listResponse()
+    listData()
+    repo()
+    response()
+    data()
+    response()
+    response()
+    data()
   mock-github/server.py:
     e: get_mock_user,authorize,issue_code,access_token,_get_user,get_user,get_repos,health
     get_mock_user()
@@ -853,14 +1039,14 @@ Apps must implement:
   backend/adapters/__init__.py:
     e: get_adapter_for_event
     get_adapter_for_event(event;token)
-  backend/adapters/gitlab.py:
-    e: GitLabAdapter
-    GitLabAdapter(GitProvider): __init__(2),get_api_headers(0),_get_project_path(1),comment_on_pr(3),update_pr_description(3),create_pr(5),close_pr(3),create_branch(3),delete_branch(2),commit_file(6),get_default_branch(1),get_ref_sha(2),get_file_sha(3),get_pr_diff(2),get_pr_files(2),get_file_content(3),create_issue(4),comment_on_issue(3),create_check_run(6),update_check_run(5),verify_webhook_signature(3)  # GitLab API implementation of GitProvider...
   backend/adapters/gitea.py:
     e: GiteaAdapter
     GiteaAdapter(GitProvider): __init__(2),get_api_headers(0),comment_on_pr(3),update_pr_description(3),create_pr(5),close_pr(3),create_branch(3),_create_branch_via_git(3),delete_branch(2),commit_file(6),get_default_branch(1),get_ref_sha(2),get_file_sha(3),get_pr_diff(2),get_pr_files(2),get_file_content(3),create_issue(4),comment_on_issue(3),create_check_run(6),update_check_run(5),verify_webhook_signature(3)  # Gitea API implementation of GitProvider.
 
 Gitea API is compa...
+  backend/adapters/gitlab.py:
+    e: GitLabAdapter
+    GitLabAdapter(GitProvider): __init__(2),get_api_headers(0),_get_project_path(1),comment_on_pr(3),update_pr_description(3),create_pr(5),close_pr(3),create_branch(3),delete_branch(2),commit_file(6),get_default_branch(1),get_ref_sha(2),get_file_sha(3),get_pr_diff(2),get_pr_files(2),get_file_content(3),create_issue(4),comment_on_issue(3),create_check_run(6),update_check_run(5),verify_webhook_signature(3)  # GitLab API implementation of GitProvider...
   backend/routers/badge.py:
     e: health_badge,scan_count_badge,_generate_badge_svg,_generate_count_badge_svg
     health_badge(repo_slug;style)
@@ -897,6 +1083,10 @@ Gitea API is compa...
     ShareButtons()
     handleShare()
     shareUrls()
+  frontend/src/components/phases/result/DownloadButtons.jsx:
+    e: DownloadButtons,active
+    DownloadButtons()
+    active()
   frontend/src/components/phases/LandingPhase.jsx:
     i: ../../constants,../../utils/share,../ShareButtons,react
     e: LandingPhase,fetchRecentScans,response,data,formatDate,date
@@ -906,10 +1096,6 @@ Gitea API is compa...
     data()
     formatDate()
     date()
-  frontend/src/components/phases/result/DownloadButtons.jsx:
-    e: DownloadButtons,active
-    DownloadButtons()
-    active()
   frontend/src/components/phases/result/ResultTabPanel.jsx:
     i: ../../../constants,../../../hooks/useDownloads,../../ShareButtons
     e: ResultTabPanel
@@ -1083,39 +1269,45 @@ This...
     userRes()
     loginBtn()
     userBtn()
-  e2e/specs/metrics.spec.js:
+  e2e/specs/recent-scans.spec.js:
     i: @playwright/test
-    e: skipInCI,response,data,scan,response,data,listResponse,listData,repo,response,data,response,response,data
-    skipInCI()
+    e: recentSection,isVisible,scanCards,count,gradeLocator,gradeCount,scanCard,count,viewButton,count
+    recentSection()
+    isVisible()
+    scanCards()
+    count()
+    gradeLocator()
+    gradeCount()
+    scanCard()
+    count()
+    viewButton()
+    count()
+  e2e/specs/sandbox-recent-scans.spec.js:
+    i: @playwright/test
+    e: input,resultVisible,sandboxBadge,hasSandbox,response,data,heading,isVisible,recentTab,isVisible,heading,headingVisible
+    input()
+    resultVisible()
+    sandboxBadge()
+    hasSandbox()
     response()
     data()
-    scan()
-    response()
-    data()
-    listResponse()
-    listData()
-    repo()
-    response()
-    data()
-    response()
-    response()
-    data()
+    heading()
+    isVisible()
+    recentTab()
+    isVisible()
+    heading()
+    headingVisible()
   e2e/specs/gui-views.spec.js:
     i: @playwright/test
-    e: tabButton,element,isVisible,recentSection,isVisible,badgeTab,anyVisible,el,isVisible,avatar,avatarVisible,demoIndicator,demoVisible
+    e: tabButton,isVisible,badgeTab,anyVisible,isVisible,recentSection,isVisible,input
     tabButton()
-    element()
-    isVisible()
-    recentSection()
     isVisible()
     badgeTab()
     anyVisible()
-    el()
     isVisible()
-    avatar()
-    avatarVisible()
-    demoIndicator()
-    demoVisible()
+    recentSection()
+    isVisible()
+    input()
   backend/db_session.py:
     e: get_db,init_db,_run_migrations
     get_db()
@@ -1148,6 +1340,17 @@ This...
   backend/apps/audit/hooks.py:
     e: on_pr_comment
     on_pr_comment(event;context)
+  backend/routers/mirror.py:
+    e: CreateMirrorRequest,SyncMirrorRequest,MirrorResponse,MirrorInfo,create_mirror,sync_mirror,list_mirrors,get_mirror,delete_mirror
+    CreateMirrorRequest(BaseModel):
+    SyncMirrorRequest(BaseModel):
+    MirrorResponse(BaseModel):
+    MirrorInfo(BaseModel):
+    create_mirror(request;user)
+    sync_mirror(request;user)
+    list_mirrors(user)
+    get_mirror(mirror_id;user)
+    delete_mirror(mirror_id;user)
   backend/scheduler/cron.py:
     e: ScheduleCreate,ScheduleOut,get_scheduler,start_scheduler,stop_scheduler,_job_id,_next_run_iso,_run_scan_sync,_run_redsl_quality_check_sync,_run_redsl_auto_refactor_sync,create_schedule,list_schedules,get_schedule,update_schedule,delete_schedule
     ScheduleCreate(BaseModel):
@@ -1165,17 +1368,6 @@ This...
     get_schedule(owner;repo)
     update_schedule(owner;repo;body)
     delete_schedule(owner;repo)
-  backend/routers/mirror.py:
-    e: CreateMirrorRequest,SyncMirrorRequest,MirrorResponse,MirrorInfo,create_mirror,sync_mirror,list_mirrors,get_mirror,delete_mirror
-    CreateMirrorRequest(BaseModel):
-    SyncMirrorRequest(BaseModel):
-    MirrorResponse(BaseModel):
-    MirrorInfo(BaseModel):
-    create_mirror(request;user)
-    sync_mirror(request;user)
-    list_mirrors(user)
-    get_mirror(mirror_id;user)
-    delete_mirror(mirror_id;user)
   frontend/src/constants.js:
     e: API,gradeColor
     API()
@@ -1190,73 +1382,6 @@ This...
     getOAuthStartUrl()
     confirmAuthFlow()
     logoutSession()
-  frontend/src/api.js:
-    i: ./constants
-    e: authHeaders,fetchMe,res,logout,res,fetchRepos,res,startAudit,res,fetchAudit,res,fetchBillingStatus,res,createCheckoutSession,res,analyzePublicRepo,res,loginWithProvider,getPreview,res,installApp,res,getInstallations,res,uninstallApp,res,fetchTrend,res,fetchSchedules,res,createSchedule,res,deleteSchedule,res,fetchBillingPortal,res,getApps,res,getAppStatus,res,createBenchmarkCase,res,updateBenchmarkCase,res,submitRecommendationFeedback,res,submitBenchmarkDecision,res,trackBenchmarkEvent,res,fetchBenchmarkSummary,res,downloadBenchmarkExport,getRedslStatus,res,redslAnalyze,res,redslHealth,res,redslRefactor,res,redslDecide,res,redslBadgeUrl
-    authHeaders()
-    fetchMe()
-    res()
-    logout()
-    res()
-    fetchRepos()
-    res()
-    startAudit()
-    res()
-    fetchAudit()
-    res()
-    fetchBillingStatus()
-    res()
-    createCheckoutSession()
-    res()
-    analyzePublicRepo()
-    res()
-    loginWithProvider()
-    getPreview()
-    res()
-    installApp()
-    res()
-    getInstallations()
-    res()
-    uninstallApp()
-    res()
-    fetchTrend()
-    res()
-    fetchSchedules()
-    res()
-    createSchedule()
-    res()
-    deleteSchedule()
-    res()
-    fetchBillingPortal()
-    res()
-    getApps()
-    res()
-    getAppStatus()
-    res()
-    createBenchmarkCase()
-    res()
-    updateBenchmarkCase()
-    res()
-    submitRecommendationFeedback()
-    res()
-    submitBenchmarkDecision()
-    res()
-    trackBenchmarkEvent()
-    res()
-    fetchBenchmarkSummary()
-    res()
-    downloadBenchmarkExport()
-    getRedslStatus()
-    res()
-    redslAnalyze()
-    res()
-    redslHealth()
-    res()
-    redslRefactor()
-    res()
-    redslDecide()
-    res()
-    redslBadgeUrl()
   frontend/src/hooks/useBenchmarkState.js:
     i: ./useBenchmarkTracking.js,react
     e: useBenchmarkState
@@ -1317,33 +1442,66 @@ This...
     count()
     viewButton()
     count()
-  e2e/specs/audit.spec.js:
+  e2e/specs/customer-journey.spec.js:
     i: @playwright/test
-    e: skipInCI
-    skipInCI()
-  e2e/specs/recent-scans.spec.js:
+    e: input,reportVisible,marketplaceHeader,response,data,response,data,input,marketplaceVisible,auditVisible,response,response,response,response,contentType,response,contentType
+    input()
+    reportVisible()
+    marketplaceHeader()
+    response()
+    data()
+    response()
+    data()
+    input()
+    marketplaceVisible()
+    auditVisible()
+    response()
+    response()
+    response()
+    response()
+    contentType()
+    response()
+    contentType()
+  e2e/specs/marketplace-flow.spec.js:
     i: @playwright/test
-    e: recentSection,isVisible,scanCards,count,scanCard,count,viewButton,count
-    recentSection()
-    isVisible()
-    scanCards()
-    count()
-    scanCard()
-    count()
-    viewButton()
-    count()
-  e2e/specs/scan-workflow.spec.js:
-    i: @playwright/test
-    e: currentUrl,recentScansSection,isVisible,twitterButton,linkedinButton,twitterVisible,linkedinVisible,recentTab,isTabVisible
-    currentUrl()
-    recentScansSection()
-    isVisible()
-    twitterButton()
-    linkedinButton()
-    twitterVisible()
-    linkedinVisible()
-    recentTab()
-    isTabVisible()
+    e: header,headerVisible,step1,step1Visible,response,apps,appNames,response,response,response,data,response,data,freePlan,response,data,freePlan,proPlan,response,response,response,plansRes,plans,response,response,response,response,response,response,marketplaceTab,body,url,marketplaceVisible,autofixNoAuth,redslNoAuth,response,data
+    header()
+    headerVisible()
+    step1()
+    step1Visible()
+    response()
+    apps()
+    appNames()
+    response()
+    response()
+    response()
+    data()
+    response()
+    data()
+    freePlan()
+    response()
+    data()
+    freePlan()
+    proPlan()
+    response()
+    response()
+    response()
+    plansRes()
+    plans()
+    response()
+    response()
+    response()
+    response()
+    response()
+    response()
+    marketplaceTab()
+    body()
+    url()
+    marketplaceVisible()
+    autofixNoAuth()
+    redslNoAuth()
+    response()
+    data()
   backend/services/redsl_client.py:
     e: RedslClient
     RedslClient: __init__(1),analyze(2),decide(1),refactor(4),batch_hybrid(2),health_score(1),health(0)  # HTTP client for the reDSL refactoring engine...
@@ -1372,13 +1530,6 @@ This...
     startOAuth()
     confirmAuth()
     clearSession()
-  frontend/src/components/MarketplaceDashboard.jsx:
-    i: ../api.js,./AppCard.jsx,./InstallButton.jsx,./Preview.jsx,react
-    e: loadData,toggleApp,handleRepoSelect,isRepoInstalled
-    loadData()
-    toggleApp()
-    handleRepoSelect()
-    isRepoInstalled()
   frontend/src/components/MetricCard.jsx:
     i: ../constants
     e: MetricCard
@@ -1462,32 +1613,71 @@ This...
     linkedinVisible()
     recentTab()
     isTabVisible()
-  e2e/specs/demo-mode.spec.js:
+  e2e/specs/redsl-flow.spec.js:
     i: @playwright/test
-    e: repoButtons,count,demoButton,isVisible
-    repoButtons()
-    count()
-    demoButton()
-    isVisible()
-  e2e/specs/smoke.spec.js:
-    i: @playwright/test
-    e: input,reportVisible
-    input()
-    reportVisible()
-  e2e/specs/sandbox-recent-scans.spec.js:
-    i: @playwright/test
-    e: input,sandboxBadge,hasSandbox,baseUrl,response,data,scan,heading,isVisible,recentTab,isVisible
-    input()
-    sandboxBadge()
-    hasSandbox()
-    baseUrl()
+    e: response,data,response,data,response,response,data,response,response,response,contentType,healthCard,healthVisible,response,data
     response()
     data()
-    scan()
-    heading()
+    response()
+    data()
+    response()
+    response()
+    data()
+    response()
+    response()
+    response()
+    contentType()
+    healthCard()
+    healthVisible()
+    response()
+    data()
+  e2e/specs/demo-mode.spec.js:
+    i: @playwright/test
+    e: url,input,input,resultVisible
+    url()
+    input()
+    input()
+    resultVisible()
+  e2e/specs/auth-flow.spec.js:
+    i: @playwright/test
+    e: url,response,data,response,response,response,badgeContent,visible,repoInput,inputVisible,markdown,mdVisible,newAuditBtn,newAuditVisible,recentVisible,prBotHeader,installBtn,installVisible,response
+    url()
+    response()
+    data()
+    response()
+    response()
+    response()
+    badgeContent()
+    visible()
+    repoInput()
+    inputVisible()
+    markdown()
+    mdVisible()
+    newAuditBtn()
+    newAuditVisible()
+    recentVisible()
+    prBotHeader()
+    installBtn()
+    installVisible()
+    response()
+  e2e/specs/smoke.spec.js:
+    i: @playwright/test
+    e: input,response,data
+    input()
+    response()
+    data()
+  e2e/specs/scan-workflow.spec.js:
+    i: @playwright/test
+    e: resultVisible,recentScansSection,isVisible,twitterButton,linkedinButton,twitterVisible,linkedinVisible,recentTab,isTabVisible
+    resultVisible()
+    recentScansSection()
     isVisible()
+    twitterButton()
+    linkedinButton()
+    twitterVisible()
+    linkedinVisible()
     recentTab()
-    isVisible()
+    isTabVisible()
   backend/server.py:
     e: lifespan
     lifespan(app)
@@ -1495,7 +1685,7 @@ This...
     e: get_sample_projects
     get_sample_projects()
   backend/db_models.py:
-    e: Base,Scan,Subscription,User,Tenant,Repository,Installation,Event,AuditResult,BadgeCache,BenchmarkCase,BenchmarkEvent,RecommendationFeedback,_utcnow
+    e: Base,Scan,Subscription,User,Tenant,Repository,Installation,Event,AuditResult,BadgeCache,BenchmarkCase,BenchmarkEvent,RecommendationFeedback,Ticket,_utcnow
     Base(DeclarativeBase):
     Scan(Base):
     Subscription(Base):
@@ -1509,6 +1699,7 @@ This...
     BenchmarkCase(Base):
     BenchmarkEvent(Base):
     RecommendationFeedback(Base):
+    Ticket(Base):  # Ticket for ticket-driven auto-PR generation...
     _utcnow()
   backend/db_module/wrappers.py:
     e: save_scan,get_recent_scans,get_repo_scans,get_total_scan_count,save_audit_result,get_audit_result,save_badge_cache,get_badge_cache,upsert_user,get_user_by_github_id,get_user_by_id,get_subscription,upsert_subscription,increment_scan_count,get_or_create_tenant,get_tenant_by_id,update_tenant_plan,get_or_create_repository,get_tenant_repositories,get_repository_by_full_name,create_installation,get_installation,get_tenant_installations,delete_installation,update_installation_scan,queue_event,get_pending_events,update_event_status,create_benchmark_case,get_benchmark_cases,get_benchmark_case,update_benchmark_case,create_benchmark_event,get_benchmark_events,upsert_recommendation_feedback,get_feedback_for_case,get_benchmark_summary
@@ -1640,6 +1831,15 @@ Provides...
     i: @playwright/test
     e: input
     input()
+  e2e/specs/audit.spec.js:
+    i: @playwright/test
+    e: input
+    input()
+  e2e/specs/demo-login.spec.js:
+    i: @playwright/test
+    e: url,input
+    url()
+    input()
   e2e/karate/karate-config.js:
     e: fn
     fn()
@@ -1709,6 +1909,4 @@ Provides...
     listen()
     deploy()
   e2e/playwright.config.js:
-    i: @playwright/test
-  e2e/specs/demo-login.spec.js:
     i: @playwright/test

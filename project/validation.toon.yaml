@@ -1,20 +1,22 @@
-# vallm batch | 368f | 155✓ 60⚠ 44✗ | 2026-04-12
+# vallm batch | 372f | 158✓ 60⚠ 45✗ | 2026-04-12
 
 SUMMARY:
-  scanned: 368  passed: 155 (42.1%)  warnings: 60  errors: 44  unsupported: 120
+  scanned: 372  passed: 158 (42.5%)  warnings: 60  errors: 45  unsupported: 120
 
 WARNINGS[60]{path,score}:
   frontend/src/hooks/useDownloads.js,0.67
     issues[1]{rule,severity,message,line}:
       js.import.resolvable,warning,Module 'react' not found,1
+  frontend/src/components/MarketplaceDashboard.jsx,0.68
+    issues[4]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+      complexity.lizard_cc,warning,(anonymous): CC=37 exceeds limit 15,103
+      complexity.lizard_length,warning,(anonymous): 147 lines exceeds limit 100,103
+      complexity.lizard_length,warning,(anonymous): 200 lines exceeds limit 100,103
   frontend/src/components/AppCard.jsx,0.74
     issues[2]{rule,severity,message,line}:
       syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
       complexity.lizard_length,warning,(anonymous): 138 lines exceeds limit 100,11
-  frontend/src/components/MarketplaceDashboard.jsx,0.74
-    issues[2]{rule,severity,message,line}:
-      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
-      complexity.lizard_length,warning,(anonymous): 151 lines exceeds limit 100,65
   frontend/src/components/Preview.jsx,0.74
     issues[2]{rule,severity,message,line}:
       syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
@@ -190,7 +192,7 @@ WARNINGS[60]{path,score}:
     issues[1]{rule,severity,message,line}:
       js.import.resolvable,warning,Module 'react' not found,1
 
-ERRORS[44]{path,score}:
+ERRORS[45]{path,score}:
   tests/backend/test_mcp.py,0.57
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'pytest' not found,3
@@ -206,6 +208,17 @@ ERRORS[44]{path,score}:
       python.import.resolvable,error,Module 'selenium.webdriver.support' not found,13
       python.import.resolvable,error,Module 'selenium.webdriver.chrome.options' not found,14
       python.import.resolvable,error,Module 'selenium.webdriver.firefox.options' not found,15
+  backend/db_module/tickets_orm.py,0.72
+    issues[9]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'sqlalchemy' not found,7
+      python.import.resolvable,error,Module 'sqlalchemy.orm' not found,8
+      python.import.resolvable,error,Module 'sqlalchemy' not found,146
+      python.import.resolvable,error,Module 'sqlalchemy' not found,195
+      python.import.resolvable,error,Module 'sqlalchemy' not found,248
+      python.import.resolvable,error,Module 'sqlalchemy' not found,276
+      python.import.resolvable,error,Module 'sqlalchemy' not found,300
+      python.import.resolvable,error,Module 'sqlalchemy' not found,311
+      python.import.resolvable,error,Module 'sqlalchemy' not found,345
   tests/backend/test_metrics.py,0.79
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'pytest' not found,3
@@ -312,13 +325,13 @@ ERRORS[44]{path,score}:
   tests/backend/test_integration_flows.py,0.96
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'pytest' not found,7
-  tests/backend/test_marketplace.py,0.96
-    issues[1]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'pytest' not found,3
   tests/backend/test_scheduler.py,0.96
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'pytest' not found,5
   tests/backend/test_autopr.py,0.97
+    issues[1]{rule,severity,message,line}:
+      python.import.resolvable,error,Module 'pytest' not found,3
+  tests/backend/test_marketplace.py,0.97
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'pytest' not found,3
   tests/backend/test_mirror.py,0.97
@@ -329,14 +342,14 @@ ERRORS[44]{path,score}:
       python.import.resolvable,error,Module 'pytest' not found,3
   backend/server.py,0.98
     issues[1]{rule,severity,message,line}:
-      python.import.resolvable,error,Module 'uvicorn' not found,76
+      python.import.resolvable,error,Module 'uvicorn' not found,78
   tests/backend/test_billing.py,0.98
     issues[1]{rule,severity,message,line}:
       python.import.resolvable,error,Module 'pytest' not found,4
 
 UNSUPPORTED[5]{bucket,count}:
-  *.md,81
+  *.md,80
   Dockerfile*,3
   *.txt,3
   *.yml,7
-  other,26
+  other,27

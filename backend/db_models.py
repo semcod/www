@@ -220,3 +220,28 @@ class RecommendationFeedback(Base):
     business_value_score = Column(Integer, nullable=True)
     notes = Column(Text, default="")
     created_at = Column(DateTime(timezone=True), default=_utcnow)
+
+
+class Ticket(Base):
+    """Ticket for ticket-driven auto-PR generation."""
+    __tablename__ = "tickets"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    ticket_id = Column(String, unique=True, nullable=False, index=True)
+    tenant_id = Column(Integer, nullable=False, index=True)
+    repo = Column(String, nullable=False)
+    provider = Column(String, default="github")
+    title = Column(String, nullable=False)
+    description = Column(Text, default="")
+    ticket_type = Column(String, nullable=False)  # 'feature' or 'bugfix'
+    status = Column(String, default="open")  # open, analyzing, in_progress, pr_created, merged, closed
+    priority = Column(String, default="medium")  # low, medium, high, critical
+    pr_url = Column(Text, default="")
+    pr_branch = Column(String, default="")
+    pr_number = Column(Integer, nullable=True)
+    redsl_decisions = Column(Text, default="[]")  # JSON array of reDSL decisions
+    files_modified = Column(Text, default="[]")  # JSON array of modified file paths
+    error_message = Column(Text, default="")
+    created_at = Column(DateTime(timezone=True), default=_utcnow)
+    updated_at = Column(DateTime(timezone=True), default=_utcnow, onupdate=_utcnow)
+    resolved_at = Column(DateTime(timezone=True), nullable=True)

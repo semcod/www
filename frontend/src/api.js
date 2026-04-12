@@ -338,3 +338,109 @@ export async function triggerRedslAutoPR(repo, projectPath, sessionToken, option
   if (!res.ok) throw new Error("Failed to trigger reDSL auto-PR");
   return res.json();
 }
+
+
+// ─── Tickets (Ticket-driven Auto-PR) ────────────────────────────────────────
+
+export async function createTicket(sessionToken, data) {
+  const res = await fetch(`${API}/api/tickets`, {
+    method: "POST",
+    headers: authHeaders(sessionToken),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to create ticket");
+  return res.json();
+}
+
+export async function getTickets(sessionToken, status = null) {
+  const url = status 
+    ? `${API}/api/tickets?status=${status}`
+    : `${API}/api/tickets`;
+  const res = await fetch(url, {
+    headers: authHeaders(sessionToken),
+  });
+  if (!res.ok) throw new Error("Failed to get tickets");
+  return res.json();
+}
+
+export async function getTicket(sessionToken, ticketId) {
+  const res = await fetch(`${API}/api/tickets/${ticketId}`, {
+    headers: authHeaders(sessionToken),
+  });
+  if (!res.ok) throw new Error("Failed to get ticket");
+  return res.json();
+}
+
+export async function updateTicket(sessionToken, ticketId, data) {
+  const res = await fetch(`${API}/api/tickets/${ticketId}`, {
+    method: "PATCH",
+    headers: authHeaders(sessionToken),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to update ticket");
+  return res.json();
+}
+
+export async function deleteTicket(sessionToken, ticketId) {
+  const res = await fetch(`${API}/api/tickets/${ticketId}`, {
+    method: "DELETE",
+    headers: authHeaders(sessionToken),
+  });
+  if (!res.ok) throw new Error("Failed to delete ticket");
+  return res.json();
+}
+
+export async function getTicketStats(sessionToken) {
+  const res = await fetch(`${API}/api/tickets/stats`, {
+    headers: authHeaders(sessionToken),
+  });
+  if (!res.ok) throw new Error("Failed to get ticket stats");
+  return res.json();
+}
+
+export async function processTicketWithRedsl(sessionToken, ticketId, projectPath, options = {}) {
+  const res = await fetch(`${API}/api/tickets/${ticketId}/process`, {
+    method: "POST",
+    headers: authHeaders(sessionToken),
+    body: JSON.stringify({
+      project_path: projectPath,
+      max_actions: options.maxActions || 10,
+      dry_run: options.dryRun || false,
+      auto_create_pr: options.autoCreatePr !== false,
+    }),
+  });
+  if (!res.ok) throw new Error("Failed to process ticket with reDSL");
+  return res.json();
+}
+
+export async function getTicketProcessingStatus(sessionToken, ticketId) {
+  const res = await fetch(`${API}/api/tickets/${ticketId}/status`, {
+    headers: authHeaders(sessionToken),
+  });
+  if (!res.ok) throw new Error("Failed to get ticket status");
+  return res.json();
+}
+
+export async function searchTickets(sessionToken, query) {
+  const res = await fetch(`${API}/api/tickets/search?q=${encodeURIComponent(query)}`, {
+    headers: authHeaders(sessionToken),
+  });
+  if (!res.ok) throw new Error("Failed to search tickets");
+  return res.json();
+}
+
+export async function getRepoTickets(sessionToken, repo) {
+  const res = await fetch(`${API}/api/tickets/repo/${encodeURIComponent(repo)}`, {
+    headers: authHeaders(sessionToken),
+  });
+  if (!res.ok) throw new Error("Failed to get repo tickets");
+  return res.json();
+}
+
+export async function getTicketsRequiringAction(sessionToken) {
+  const res = await fetch(`${API}/api/tickets/requiring-action`, {
+    headers: authHeaders(sessionToken),
+  });
+  if (!res.ok) throw new Error("Failed to get tickets requiring action");
+  return res.json();
+}

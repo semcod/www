@@ -8,6 +8,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **🎫 Ticket-driven Auto-PR (Scenariusz 6)** — automatyczna generacja PR z ticketu
+  - Nowy model `Ticket` w `db_models.py` — feature/bugfix tasks z status tracking
+  - Router `/api/tickets` z pełnym CRUD + reDSL integracją
+  - Endpoint `POST /api/tickets/{id}/process` — analiza ticketu przez reDSL → auto-PR
+  - Flow: Ticket (open) → reDSL decide() → refactor() → Branch → PR → Ticket updated (pr_created)
+  - Webhook handler `/api/tickets/webhook/pr-updated` — auto-update status przy merge/close
+  - Frontend API: `createTicket`, `processTicketWithRedsl`, `getTicketStats`, etc.
+  - Statusy: open → analyzing → in_progress → pr_created → merged/closed
+- **Marketplace Auto-Fix Artifact Generation** — pełny flow od wyboru repo do wygenerowania PR
+  - **Step 1**: Select Repository — lista repo z OAuth, wybór do instalacji
+  - **Step 2**: Preview & Configure — aplikacje (audit, security, performance) + przycisk Install
+  - **Step 3**: **Generate Artifact** — nowy step w MarketplaceDashboard z dwoma opcjami:
+    - 🤖 **Auto-fix PR** — `/api/autofix` endpoint, billing check, Celery task `create_auto_fix_pr`
+    - 🔄 **reDSL Refactor PR** — `/api/autopr/redsl` endpoint, 15 DSL refactor actions
+  - Nowe funkcje API: `triggerAutoFix()`, `triggerRedslAutoPR()` w `frontend/src/api.js`
+  - Style i UI dla artifact section: generowanie, success, error states
 - **Benchmark KPI MVP (Etap 1)** — pełna instrumentacja do zbierania metryk benchmarkowych
   - Nowe modele ORM: `BenchmarkCase`, `BenchmarkEvent`, `RecommendationFeedback`
   - Router `/api/benchmark` z endpointami: cases, feedback, decisions, events, summary, export (CSV/JSON)
@@ -23,8 +39,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Komponent frontendowy: `RedslHealthCard.jsx` — dashboard widget z oceną i badge
 
 ### Fixed
+- **🔥 Critical Bug:** `_record_billing_usage()` w `deploy.py:99-105` był dead code — wcięty pod `if not can_execute: raise HTTPException(402)` i nigdy się nie wykonywał. Naprawione — billing usage jest teraz rejestrowany poprawnie przed kolejkowaniem taska.
 - Sandbox/guest scans now persist to SQLite (were only in-memory, lost on restart)
 - `_run_audit_pipeline` and `_run_sandbox_analysis` now call `save_scan()` after completion
+
+### Added (Examples)
+- **Przykłady użycia Auto-PR** — `examples/*` z 10+ przykładami:
+  - `examples/rest-api/auto-pr-example.sh` — 10 przykładów cURL (REST API)
+  - `examples/shell/auto-pr-cli.sh` — Interaktywne menu CLI (bash)
+  - `examples/python-sdk/auto_pr_client.py` — Python SDK z 6 przykładami
+  - `examples/README.md` — Dokumentacja wszystkich przykładów
+
+### Added (Tests)
+- **95 Playwright E2E tests** — 4 nowe pliki spec:
+  - `e2e/specs/customer-journey.spec.js` (12 testów) — landing → sandbox → result → marketplace
+  - `e2e/specs/marketplace-flow.spec.js` (15 testów) — apps → install → billing → autofix artifact
+  - `e2e/specs/auth-flow.spec.js` (11 testów) — OAuth → repos → audit → badge
+  - `e2e/specs/redsl-flow.spec.js` (8 testów) — ReDSL status → health → refactor → badge SVG
+- **Backend marketplace tests** — 4 nowe testy w `tests/backend/test_marketplace.py`:
+  - `test_autofix_requires_auth` — weryfikacja 401 bez tokenu
+  - `test_autofix_requires_provider_token` — brak tokenu providera
+  - `test_autofix_billing_check_blocks_free_tier` — billing blokuje free tier
+  - `test_autofix_billing_records_usage_when_allowed` — **regression test** dla bug fixa
 
 ### Changed
 - All hardcoded values moved to environment variables (20 vars total in `.env`)

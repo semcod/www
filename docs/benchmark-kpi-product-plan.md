@@ -551,6 +551,70 @@ Każdy event powinien zawierać co najmniej:
 - `timestamp`
 - `metadata`
 
+## ReDSL Integration Status
+
+### ReDSL Engine — Autonomiczna Refaktoryzacja
+
+**ReDSL** (Re-factor + DSL + Self-Learning) to zaawansowany system refaktoryzacji kodu Python zintegrowany z Semcod. Działa jako osobny serwis HTTP (port 8000/8010) wywoływany przez API.
+
+**Lokalizacja projektu:** `/home/tom/github/semcod/redsl`
+
+### Stan reDSL (2026-04-12)
+
+| Komponent | Status | Testy |
+|-----------|--------|-------|
+| Core engine | ✅ Działa | 580 passing |
+| FastAPI server | ✅ Działa | 6/6 API tests |
+| 15 RefactorActions | ✅ Dostępne | SPLIT_MODULE, REDUCE_FAN_OUT, EXTRACT_FUNCTIONS, etc. |
+| CLI interface | ✅ Działa | `redsl refactor ./project --max-actions 10` |
+| HTTP API | ✅ Działa | `POST /refactor`, `POST /batch/semcod`, `GET /health` |
+
+### Integracja Semcod ↔ ReDSL
+
+**Backend Semcod:**
+- `backend/services/redsl_client.py` — `RedslClient` z metodami: `analyze()`, `decide()`, `refactor()`, `batch_hybrid()`, `health()`
+- `backend/routers/redsl.py` — router `/api/redsl/*` endpointy:
+  - `GET /api/redsl/status` — status silnika
+  - `POST /api/redsl/analyze` — analiza projektu
+  - `POST /api/redsl/health` — health score
+  - `POST /api/redsl/refactor` — refaktoryzacja
+  - `POST /api/redsl/decide` — decyzje DSL
+  - `POST /api/redsl/batch-hybrid` — hybrydowa refaktoryzacja
+  - `GET /api/redsl/badge/{owner}/{repo}` — SVG badge
+- `backend/routers/autopr.py` — `POST /api/autopr/redsl` — tworzenie PR z refaktoryzacją
+- `backend/routers/tickets.py` — `POST /api/tickets/{id}/process` — auto-PR z ticketu przez reDSL
+
+**Celery Tasks:**
+- `backend/worker/tasks/redsl.py` — `task_redsl_analyze`, `task_redsl_refactor`, `task_redsl_health_check`
+- Scheduler: godzinny quality check + tygodniowy auto-refactor
+
+**Frontend:**
+- `frontend/src/api.js` — `getRedslStatus`, `redslAnalyze`, `redslHealth`, `redslRefactor`, `redslDecide`
+- `frontend/src/components/RedslHealthCard.jsx` — widget dashboard z GradeCircle i badge
+
+### Scenariusze Użycia ReDSL w Semcod
+
+#### Scenariusz A: Health Score + Badge
+1. Użytkownik wchodzi w ReDSL tab
+2. System wywołuje `GET /api/redsl/status` → sprawdza czy engine działa
+3. `POST /api/redsl/health` → analiza projektu → health score (0-100)
+4. Wygenerowany badge: `/api/redsl/badge/owner/repo.svg`
+
+#### Scenariusz B: Auto-Refactor PR
+1. Użytkownik wybiera repo w Marketplace
+2. Klikna "🔄 reDSL Refactor PR"
+3. Backend: `POST /api/autopr/redsl` z `project_path`
+4. reDSL: `refactor()` → transformacja plików
+5. Auto-PR: branch → commits → PR na GitHub
+
+#### Scenariusz C: Ticket-driven Development (NOWY)
+1. Użytkownik tworzy ticket: "Dodaj paginację do listy użytkowników"
+2. Ticket typ: `feature` lub `bugfix`
+3. `POST /api/tickets/{id}/process` → reDSL `decide()` lokalizuje pliki
+4. reDSL `refactor()` generuje zmiany
+5. Auto-PR z linkiem do ticketu
+6. Webhook aktualizuje ticket przy merge/close
+
 ## Mapowanie KPI -> dane -> UI/API
 
 | KPI | Dane wejściowe | UI | API |
@@ -579,16 +643,25 @@ Każdy event powinien zawierać co najmniej:
 - dodać eksport CSV i JSON dla całego benchmarku,
 - dodać czytelne statusy review / PR / deployment.
 
-### Etap 3 — domknięcie pilota
+### Etap 3 — Ticket-driven Development ✅ (2026-04-12) ZAKOŃCZONY
 
-- dodać powiązanie z ticketami i PR reference,
-- dodać approval flow,
+- ✅ **Ticket System** — model `Ticket` w `db_models.py` (feature/bugfix)
+- ✅ **Tickets API** — CRUD endpointy `/api/tickets/*` + reDSL integracja
+- ✅ **Auto-PR z ticketu** — `POST /api/tickets/{id}/process` → reDSL → PR
+- ✅ **Webhook PR updates** — auto-aktualizacja statusu ticketu przy merge/close
+- ✅ **Powiązanie z PR reference** — `pr_url`, `pr_branch`, `pr_number` w ticketach
+- ✅ **Frontend API** — 12 funkcji dla ticket management
+
+### Etap 4 — domknięcie pilota (W planie)
+
+- dodać approval flow dla ticketów,
 - dodać automatyczne przejście z benchmark case do szkicu PR,
-- dodać dashboard deployment decisions.
+- dodać dashboard deployment decisions,
+- dodać integrację z zewnętrznymi systemami ticketów (Jira, Linear, GitHub Issues).
 
 ## Definicja gotowości produktowej
 
-Można uznać warstwę produktową za gotową do benchmarku, jeśli:
+### Dla Benchmark KPI:
 
 - każdy przypadek ma `case_id` i pełny rekord benchmarkowy,
 - każda rekomendacja ma stabilne `recommendation_id`,
@@ -596,3 +669,42 @@ Można uznać warstwę produktową za gotową do benchmarku, jeśli:
 - API potrafi zapisać feedback i decyzję deploymentową,
 - benchmark można wyeksportować do `CSV`, `JSON` i `Markdown`,
 - summary KPI jest liczone bez ręcznego składania danych poza systemem.
+
+### Dla Ticket-driven Development:
+
+- użytkownik może utworzyć ticket (feature/bugfix) z poziomu UI,
+- system może przetworzyć ticket przez reDSL i wygenerować PR,
+- ticket ma pełną historię statusów: open → analyzing → in_progress → pr_created → merged/closed,
+- PR jest automatycznie linkowane do ticketu,
+- webhook aktualizuje ticket przy zmianach w PR,
+- statystyki ticketów są dostępne przez API (`/api/tickets/stats`).
+
+## Podsumowanie architektury — 6 Scenariuszy Użycia
+
+| # | Scenariusz | Główne komponenty | Status |
+|---|-----------|-------------------|--------|
+| 1 | GitHub OAuth → Audit | `auth.py`, `audit.py`, `ResultPhase.jsx` | ✅ |
+| 2 | Sandbox Mode | `analyze` endpoint, sandbox scan | ✅ |
+| 3 | Marketplace Auto-Fix | `marketplace/`, `MarketplaceDashboard.jsx` Step 3 | ✅ |
+| 4 | PR Comment Bot | `webhook.py`, GitHub App | ✅ |
+| 5 | Badge Generator | `badge.py`, `badge_router` | ✅ |
+| 6 | **Ticket-driven Auto-PR** | `tickets.py`, `RedslClient`, reDSL engine | ✅ **NOWY** |
+
+## ReDSL — Podsumowanie Integracji
+
+**ReDSL** działa jako autonomiczny silnik refaktoryzacji z 580 testami. Jego integracja z Semcod umożliwia:
+
+1. **Analizę jakości kodu** — health score, 15 refactor actions
+2. **Auto-Refactor PR** — transformacja kodu + PR na GitHub
+3. **Ticket-driven Development** — od zgłoszenia feature/bugfix do gotowego PR
+
+**Kluczowe endpointy reDSL:**
+- `POST /refactor` — refaktoryzacja projektu
+- `POST /decide` — decyzje gdzie wprowadzić zmiany
+- `POST /batch/semcod` — batch processing projektów semcod
+- `GET /health` — health check silnika
+
+**Kluczowe endpointy Semcod wykorzystujące reDSL:**
+- `POST /api/redsl/refactor` — proxy do reDSL
+- `POST /api/autopr/redsl` — auto-PR z refaktoryzacją
+- `POST /api/tickets/{id}/process` — ticket → reDSL → PR

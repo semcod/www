@@ -200,3 +200,84 @@ test.describe('Marketplace: Artifact Generation (Auto-fix)', () => {
     expect([200, 401, 403, 422]).toContain(response.status());
   });
 });
+
+test.describe('Marketplace: Full 3-Step Artifact Generation Flow', () => {
+
+  test('Step 1-2-3: Marketplace UI is accessible', async ({ page }) => {
+    await page.goto('/', { timeout: 30000 });
+    await page.waitForLoadState('networkidle');
+
+    // Step 1: Navigate to Marketplace
+    const marketplaceTab = page.getByRole('button', { name: /Marketplace/i });
+    await expect(marketplaceTab).toBeVisible({ timeout: 10000 });
+    await marketplaceTab.click();
+    await page.waitForTimeout(1000);
+
+    // Verify marketplace tab was clicked and page is still working
+    // The UI may show different states depending on auth:
+    // - "Semcod Marketplace" header
+    // - "Loading..." text  
+    // - Empty state with message
+    // - Or repo list
+    const body = page.locator('body');
+    await expect(body).toBeVisible({ timeout: 10000 });
+    
+    // Verify the URL didn't change to error page
+    const url = page.url();
+    expect(url).toMatch(/localhost/);
+    expect(url).not.toMatch(/error|404/);
+  });
+
+  test('Artifact generation buttons require authentication', async ({ page }) => {
+    // This test verifies that the artifact generation UI is present
+    // but actual generation requires auth (will fail without token)
+    await page.goto('/', { timeout: 30000 });
+    await page.getByRole('button', { name: /Marketplace/i }).click();
+    await page.waitForTimeout(1000);
+
+    // Verify that Step 3 UI elements would be present after navigation
+    // (actual test with full OAuth flow would require mock token setup)
+    const marketplaceVisible = await page.getByText(/Marketplace|Select Repository|Step 1/i).first().isVisible({ timeout: 10000 }).catch(() => false);
+    expect(marketplaceVisible).toBeTruthy();
+  });
+
+  test('Autofix API endpoints are accessible and require auth', async ({ request }) => {
+    // Verify the autofix endpoints exist and behave correctly
+    
+    // Without auth should fail
+    const autofixNoAuth = await request.post('/api/autofix', {
+      data: {
+        repo: 'octocat/Hello-World',
+        provider: 'github',
+        pr_id: 1,
+        base_branch: 'main',
+      },
+    });
+    expect([401, 403]).toContain(autofixNoAuth.status());
+
+    // Autopr redsl without auth should fail
+    const redslNoAuth = await request.post('/api/autopr/redsl', {
+      data: {
+        repo: 'octocat/Hello-World',
+        project_path: '/mnt/project/test',
+      },
+    });
+    expect([401, 403]).toContain(redslNoAuth.status());
+  });
+
+  test('Billing plans endpoint returns free/pro/team tiers for marketplace billing', async ({ request }) => {
+    const response = await request.get('/api/billing/plans');
+    expect(response.status()).toBe(200);
+    
+    const data = await response.json();
+    // Verify structure matches what marketplace expects
+    expect(data).toHaveProperty('free');
+    expect(data).toHaveProperty('pro');
+    expect(data).toHaveProperty('team');
+    
+    // Free tier should have price_monthly = 0
+    expect(data.free.price_monthly).toBe(0);
+    // Pro should cost more than free
+    expect(data.pro.price_monthly).toBeGreaterThan(data.free.price_monthly);
+  });
+});

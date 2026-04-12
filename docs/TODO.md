@@ -15,7 +15,23 @@
   - `redsl-flow.spec.js` — ReDSL status → health → refactor → badge
 - **Backend marketplace tests** — 4 new tests for autofix deploy endpoint including regression test
 
+### 🔄 ReDSL Engine — Full Integration
+**Lokalizacja:** `/home/tom/github/semcod/redsl`
+- ✅ **580 testów przechodzi** — core engine działa poprawnie
+- ✅ **6/6 API tests** — FastAPI serwer (`create_app()`) działa
+- ✅ **15 RefactorActions** — SPLIT_MODULE, REDUCE_FAN_OUT, EXTRACT_FUNCTIONS, etc.
+- ✅ **CLI + HTTP API** — `redsl refactor` i `POST /refactor`
+- ✅ **Docker support** — sandbox testing
+- ✅ **Integracja z Semcod** — `RedslClient` w `backend/services/redsl_client.py`
+
 ### ✨ Features Completed
+- **🎫 Ticket-driven Auto-PR (Scenariusz 6) — NOWY:**
+  - Model `Ticket` (db_models.py) — feature/bugfix z status tracking
+  - Router `/api/tickets` — CRUD + reDSL integracja
+  - Endpoint `POST /api/tickets/{id}/process` — auto-generacja PR z ticketu
+  - Flow: open → analyzing → in_progress → pr_created → merged/closed
+  - Webhook handler — auto-update przy PR merge/close
+  - Frontend API — 12 nowych funkcji dla ticket management
 - **Marketplace 3-step flow:**
   1. Select Repository (OAuth repo list)
   2. Preview & Configure (apps + InstallButton + "Generate Artifact" button)
@@ -38,8 +54,10 @@
 - Pytanie do użytkownika: wdrożyć na swoim GitHub/GitLab czy na naszym środowisku?
 - Nasze środowisko bezplatne przez 1 miesiąc → oferować od razu generowanie automatyzacji z opcją PR
 - Druga opcja: automatyzacja na GitLab/GitHub z opcją deploymentu na naszej infra
-- Z partnerami: środowisko uruchomieniowe + generowanie automatyczne na bazie ticketów (zmiany, bugfix, features)
+- ~~Z partnerami: środowisko uruchomieniowe + generowanie automatyczne na bazie ticketów~~ ✅ **ZAIMPLEMENTOWANE** (Scenariusz 6)
 - Marketplace: oferowanie deploymentu artefaktów (SaaS, desktop, mobile) — płatne, z łatwą dystrybucją i rozliczaniem (tokeny, czas, usługa)
+- **Nowe:** Frontend UI dla Ticket System — komponenty React do tworzenia i zarządzania ticketami
+- **Nowe:** Przykłady użycia Auto-PR — `examples/rest-api/`, `examples/shell/`, `examples/python-sdk/` ✅
 
 ### Tech
 - [x] Testy E2E dla sandbox scans w recent scans — `e2e/specs/sandbox-recent-scans.spec.js` (5 scenariuszy)

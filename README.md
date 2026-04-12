@@ -39,6 +39,26 @@ Ten projekt służy jako **kompletna platforma SaaS do analizy jakości kodu** z
 - Wkleja do README → dynamiczny SVG z health score
 - Wynik: `![Code Health](https://semcod.com/badge/owner-repo.svg)`
 
+#### 6. 🎫 **Ticket-driven Auto-PR (NEW)**
+- **Step 1**: Użytkownik tworzy ticket w panelu Semcod:
+  - Typ: `feature` (nowa funkcja) lub `bugfix` (naprawa usterki)
+  - Tytuł: np. "Dodaj paginację do listy użytkowników"
+  - Opis: szczegóły zmiany lub stack trace błędu
+  - Target repo: wybór z zainstalowanych repozytoriów
+- **Step 2**: System analizuje ticket przez reDSL:
+  - `redsl.decide()` — ocena gdzie w kodzie wprowadzić zmiany
+  - `redsl.refactor()` — automatyczna refaktoryzacja dla nowego feature
+  - Lokalizacja plików do modyfikacji na podstawie opisu ticketu
+- **Step 3**: Auto-generacja PR:
+  - Tworzony jest branch `ticket-{id}-{typ}`
+  - reDSL commituje zmiany (nowe funkcje lub fixy)
+  - Otwierany jest PR na GitHub z linkiem do ticketu
+  - W PR: komentarz z opisem zmian i referencją do ticketu
+- **Step 4**: Aktualizacja ticketu:
+  - Status zmienia się na `in_progress` → `pr_created` → `merged`
+  - Po merge ticket automatycznie zamykany
+- Wynik: **Pełna automatyzacja od zgłoszenia do wdrożenia**
+
 ## ✅ **Current Status: Production Ready**
 
 - 🔐 **GitHub OAuth Authentication** - Complete OAuth flow with mock GitHub for development
