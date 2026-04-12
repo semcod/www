@@ -1,17 +1,14 @@
-# code2llm | 201f 23533L | javascript:101,python:95,shell:4 | 2026-04-12
-# CC̄=2.6 | critical:3/1161 | dups:0 | cycles:0
+# code2llm | 206f 23488L | javascript:102,python:99,shell:4 | 2026-04-12
+# CC̄=2.6 | critical:2/1198 | dups:0 | cycles:0
 
-HEALTH[4]:
-  🔴 GOD   backend/routers/tickets.py = 584L, 7 classes, 16m, max CC=14
-  🟡 CC    RedslHealthCard CC=27 (limit:15)
-  🟡 CC    FRONTEND_URL CC=33 (limit:15)
-  🟡 CC    MOCK_GITHUB_URL CC=33 (limit:15)
+HEALTH[2]:
+  🟡 CC    process_ticket_with_redsl CC=19 (limit:15)
+  🟡 CC    RedslHealthCard CC=15 (limit:15)
 
-REFACTOR[2]:
-  1. split backend/routers/tickets.py  (god module)
-  2. split 3 high-CC methods  (CC>15)
+REFACTOR[1]:
+  1. split 2 high-CC methods  (CC>15)
 
-PIPELINES[755]:
+PIPELINES[777]:
   [1] Src [lifespan]: lifespan → start_scheduler
       PURITY: 100% pure
   [2] Src [init_db]: init_db → _run_migrations → text
@@ -25,10 +22,9 @@ PIPELINES[755]:
 
 LAYERS:
   backend/                        CC̄=2.9    ←in:4  →out:3
-  │ !! tickets                    584L  7C   16m  CC=14     ←0
   │ audit                      396L  0C    8m  CC=13     ←1
   │ github                     392L  1C   22m  CC=6      ←1
-  │ tickets_orm                390L  0C   25m  CC=9      ←1
+  │ tickets_orm                390L  0C   25m  CC=9      ←3
   │ mirror                     387L  1C   11m  CC=6      ←0
   │ gitlab                     379L  1C   21m  CC=5      ←0
   │ wrappers                   356L  0C   37m  CC=1      ←0
@@ -45,15 +41,17 @@ LAYERS:
   │ metrics                    257L  0C    6m  CC=10     ←0
   │ trend                      250L  0C    8m  CC=6      ←0
   │ db_models                  247L  14C    1m  CC=1      ←0
+  │ auth                       245L  0C   11m  CC=6      ←0
   │ mirror                     236L  4C    5m  CC=3      ←0
+  │ !! redsl                      235L  0C    3m  CC=19     ←0
   │ benchmark_orm              220L  0C   15m  CC=9      ←1
   │ publish                    215L  0C    5m  CC=9      ←0
   │ cron                       213L  2C   13m  CC=3      ←1
-  │ auth                       211L  0C   10m  CC=6      ←0
   │ redsl                      207L  3C    9m  CC=7      ←1
   │ scans_orm                  204L  0C    8m  CC=10     ←0
   │ tools                      198L  0C   11m  CC=4      ←0
   │ benchmark                  192L  5C   12m  CC=4      ←0
+  │ crud                       187L  0C    9m  CC=6      ←0
   │ schema                     184L  0C    1m  CC=4      ←0
   │ users_orm                  183L  0C    6m  CC=6      ←0
   │ autopr                     183L  0C    3m  CC=5      ←0
@@ -71,6 +69,7 @@ LAYERS:
   │ badge                      139L  0C    4m  CC=5      ←0
   │ base                       134L  3C   13m  CC=6      ←0
   │ installations              132L  0C    5m  CC=4      ←1
+  │ redsl_client               131L  1C    9m  CC=2      ←0
   │ webhook_v2                 128L  0C    5m  CC=4      ←0
   │ marketplace                126L  0C    3m  CC=4      ←0
   │ deploy                     126L  0C    6m  CC=5      ←0
@@ -79,10 +78,11 @@ LAYERS:
   │ __init__                   121L  0C    0m  CC=0.0    ←0
   │ scoring                    119L  0C    4m  CC=9      ←3
   │ pipeline                   115L  1C    5m  CC=13     ←0
-  │ pipeline                   110L  1C    7m  CC=10     ←0
   │ pipeline                   110L  1C    8m  CC=7      ←0
+  │ pipeline                   110L  1C    7m  CC=10     ←0
   │ models                     100L  3C    5m  CC=4      ←0
-  │ redsl_client                90L  1C    7m  CC=2      ←0
+  │ models                      96L  7C    1m  CC=4      ←3
+  │ webhook                     92L  0C    3m  CC=8      ←0
   │ webhook_service             89L  0C    8m  CC=5      ←2
   │ config                      88L  0C    0m  CC=0.0    ←0
   │ events_orm                  87L  0C    3m  CC=5      ←0
@@ -116,6 +116,7 @@ LAYERS:
   │ db_connection               26L  0C    1m  CC=3      ←7
   │ scan_service                26L  0C    0m  CC=0.0    ←0
   │ models                      25L  4C    0m  CC=0.0    ←0
+  │ __init__                    19L  0C    0m  CC=0.0    ←0
   │ report                      14L  0C    1m  CC=1      ←0
   │ __init__                    13L  0C    0m  CC=0.0    ←0
   │ __init__                     4L  0C    0m  CC=0.0    ←0
@@ -124,11 +125,10 @@ LAYERS:
   mock-github/                    CC̄=2.9    ←in:0  →out:3
   │ server                     216L  0C    8m  CC=6      ←0
   │
-  frontend/                       CC̄=2.5    ←in:0  →out:0
+  frontend/                       CC̄=2.4    ←in:0  →out:0
   │ MarketplaceDashboard.jsx   463L  0C    7m  CC=6      ←0
   │ api.js                     446L  0C   49m  CC=6      ←0
   │ useDownloads.js            242L  0C   21m  CC=7      ←0
-  │ !! gui-login-enhanced.spec.js   237L  0C   15m  CC=33     ←0
   │ RecentScansTab.parts.jsx   229L  0C    7m  CC=5      ←0
   │ Preview.jsx                195L  0C    4m  CC=2      ←0
   │ system-integration.spec.js   193L  0C   20m  CC=1      ←0
@@ -140,7 +140,6 @@ LAYERS:
   │ PaywallModal.jsx           148L  0C    2m  CC=10     ←0
   │ InstallButton.jsx          143L  0C    4m  CC=3      ←0
   │ LoginMultiPlatform.jsx     135L  0C    3m  CC=1      ←0
-  │ !! RedslHealthCard.jsx        133L  0C    8m  CC=27     ←0
   │ metrics.spec.js            125L  0C    7m  CC=2      ←0
   │ benchmark.spec.js          122L  0C   16m  CC=2      ←2
   │ SettingsTab.parts.jsx      121L  0C   11m  CC=8      ←0
@@ -152,6 +151,7 @@ LAYERS:
   │ TrendTab.parts.jsx         100L  0C   14m  CC=5      ←0
   │ App.jsx                    100L  0C    0m  CC=0.0    ←0
   │ scan-workflow.spec.js       99L  0C    9m  CC=2      ←0
+  │ RedslHealthCard.parts.jsx    95L  0C    9m  CC=14     ←0
   │ usePolling.js               91L  0C   10m  CC=9      ←0
   │ recent-scans.spec.js        80L  0C    6m  CC=3      ←0
   │ useAuditActions.js          79L  0C    7m  CC=10     ←0
@@ -162,10 +162,12 @@ LAYERS:
   │ index.jsx                   68L  0C    6m  CC=12     ←0
   │ RecentScansTab.jsx          64L  0C    1m  CC=5      ←0
   │ Header.jsx                  62L  0C    2m  CC=5      ←1
+  │ gui-login-enhanced.spec.js    61L  0C    6m  CC=3      ←0
   │ useAuth.js                  58L  0C    7m  CC=3      ←0
   │ useBilling.js               58L  0C    5m  CC=11     ←0
   │ social-sharing.spec.js      58L  0C    8m  CC=4      ←0
   │ ShareButtons.jsx            51L  0C    3m  CC=5      ←0
+  │ !! RedslHealthCard.jsx         49L  0C    4m  CC=15     ←0
   │ AddScheduleForm.jsx         49L  0C    2m  CC=6      ←0
   │ RecommendationCard.jsx      48L  0C    1m  CC=5      ←0
   │ ProgressSteps.jsx           47L  0C    5m  CC=13     ←0
@@ -185,7 +187,7 @@ LAYERS:
   │ share.js                    29L  0C    8m  CC=5      ←1
   │ ScanningPhase.jsx           28L  0C    1m  CC=3      ←0
   │ LanguageBar.jsx             26L  0C    3m  CC=1      ←0
-  │ badge.spec.js               26L  0C    1m  CC=1      ←0
+  │ badge.spec.js               26L  0C    1m  CC=1      ←1
   │ playwright.config.js        22L  0C    0m  CC=0.0    ←0
   │ ErrorResult.jsx             21L  0C    1m  CC=2      ←0
   │ TrendSummaryCard.jsx        20L  0C    3m  CC=6      ←0
@@ -232,18 +234,18 @@ LAYERS:
   scripts/                        CC̄=0.0    ←in:0  →out:0
   │ setup-gitea.sh             417L  2C   10m  CC=0.0    ←0
   │
+  traefik/                        CC̄=0.0    ←in:0  →out:0
+  │ generate-certs.sh           27L  0C    0m  CC=0.0    ←0
+  │
   ./                              CC̄=0.0    ←in:0  →out:0
   │ run-sim.sh                  40L  0C    0m  CC=0.0    ←0
   │ project.sh                  35L  0C    0m  CC=0.0    ←0
   │
-  traefik/                        CC̄=0.0    ←in:0  →out:0
-  │ generate-certs.sh           27L  0C    0m  CC=0.0    ←0
-  │
 
 COUPLING:
                        backend.routers  backend.db_module   backend.services  backend.scheduler            backend     backend.worker   backend.adapters       backend.apps       frontend.src        mock-github    backend.scripts       frontend.e2e
-    backend.routers                 ──                101                 49                                     3                 ←1                                     2                                                       ←1                     !! fan-out
-  backend.db_module               ←101                 ──                 ←2                 ←2                                    ←3                                                                                                                    hub
+    backend.routers                 ──                102                 49                                     3                 ←1                                     2                                                       ←1                     !! fan-out
+  backend.db_module               ←102                 ──                 ←2                 ←2                                    ←3                                                                                                                    hub
    backend.services                ←49                  2                 ──                 ←8                                    ←3                  3                                                                                                 hub
   backend.scheduler                                     2                  8                 ──                 ←2                                                                                                                                       !! fan-out
             backend                 ←3                                                        2                 ──                                                                           1                                    ←1                   
@@ -255,9 +257,9 @@ COUPLING:
     backend.scripts                  1                                                                           1                                                                                                                ──                   
        frontend.e2e                                                                                                                                                      ←1                                    ←1                                    ──
   CYCLES: none
-  HUB: backend.db_module/ (fan-in=108)
+  HUB: backend.db_module/ (fan-in=109)
   HUB: backend.services/ (fan-in=60)
-  SMELL: backend.routers/ fan-out=155 → split needed
+  SMELL: backend.routers/ fan-out=156 → split needed
   SMELL: backend.scheduler/ fan-out=10 → split needed
 
 EXTERNAL:

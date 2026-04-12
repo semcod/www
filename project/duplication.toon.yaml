@@ -1,12 +1,12 @@
-# redup/duplication | 28 groups | 95f 14759L | 2026-04-12
+# redup/duplication | 28 groups | 99f 14879L | 2026-04-12
 
 SUMMARY:
-  files_scanned: 95
-  total_lines:   14759
+  files_scanned: 99
+  total_lines:   14879
   dup_groups:    28
   dup_fragments: 76
   saved_lines:   363
-  scan_ms:       8074
+  scan_ms:       11612
 
 DUPLICATES[28] (ranked by impact):
   [428d25b1063f7815] ! STRU  save_scan  L=6 N=14 saved=78 sim=1.00
@@ -78,8 +78,8 @@ DUPLICATES[28] (ranked by impact):
       backend/db_module/tickets_orm.py:144-152  (count_tickets_by_status)
       backend/db_module/tickets_orm.py:298-306  (get_priority_distribution)
   [0ee70ff9b8d9f87e]   STRU  search_tickets_endpoint  L=9 N=2 saved=9 sim=1.00
-      backend/routers/tickets.py:183-191  (search_tickets_endpoint)
-      backend/routers/tickets.py:195-203  (get_tickets_for_repo)
+      backend/routers/tickets/crud.py:89-97  (search_tickets_endpoint)
+      backend/routers/tickets/crud.py:101-109  (get_tickets_for_repo)
   [3f081aacba691e3b]   EXAC  get_default_branch  L=8 N=2 saved=8 sim=1.00
       backend/adapters/gitea.py:163-170  (get_default_branch)
       backend/adapters/github.py:145-152  (get_default_branch)
@@ -163,9 +163,9 @@ REFACTOR[28] (ranked by priority):
   [16] ○ extract_function   → backend/db_module/utils/count_tickets_by_status.py
       WHY: 2 occurrences of 9-line block across 1 files — saves 9 lines
       FILES: backend/db_module/tickets_orm.py
-  [17] ○ extract_function   → backend/routers/utils/search_tickets_endpoint.py
+  [17] ○ extract_function   → backend/routers/tickets/utils/search_tickets_endpoint.py
       WHY: 2 occurrences of 9-line block across 1 files — saves 9 lines
-      FILES: backend/routers/tickets.py
+      FILES: backend/routers/tickets/crud.py
   [18] ○ extract_function   → backend/adapters/utils/get_default_branch.py
       WHY: 2 occurrences of 8-line block across 2 files — saves 8 lines
       FILES: backend/adapters/gitea.py, backend/adapters/github.py

@@ -1,31 +1,22 @@
-# code2llm/evolution | 1150 func | 169f | 2026-04-12
+# code2llm/evolution | 1149 func | 173f | 2026-04-12
 
-NEXT[4] (ranked by impact):
-  [1] !! SPLIT           backend/routers/tickets.py
-      WHY: 584L, 7 classes, max CC=14
-      EFFORT: ~4h  IMPACT: 8176
+NEXT[2] (ranked by impact):
+  [1] !  SPLIT-FUNC      process_ticket_with_redsl  CC=19  fan=21
+      WHY: CC=19 exceeds 15
+      EFFORT: ~1h  IMPACT: 399
 
-  [2] !! SPLIT-FUNC      FRONTEND_URL  CC=33  fan=29
-      WHY: CC=33 exceeds 15
-      EFFORT: ~1h  IMPACT: 957
-
-  [3] !! SPLIT-FUNC      MOCK_GITHUB_URL  CC=33  fan=29
-      WHY: CC=33 exceeds 15
-      EFFORT: ~1h  IMPACT: 957
-
-  [4] !! SPLIT-FUNC      RedslHealthCard  CC=27  fan=14
-      WHY: CC=27 exceeds 15
-      EFFORT: ~1h  IMPACT: 378
+  [2] !  SPLIT-FUNC      RedslHealthCard  CC=15  fan=13
+      WHY: CC=15 exceeds 15
+      EFFORT: ~1h  IMPACT: 195
 
 
-RISKS[1]:
-  ⚠ Splitting backend/routers/tickets.py may break 16 import paths
+RISKS[0]: none
 
 METRICS-TARGET:
   CC̄:          2.6 → ≤1.8
-  max-CC:      33 → ≤16
-  god-modules: 1 → 0
-  high-CC(≥15): 3 → ≤1
+  max-CC:      19 → ≤9
+  god-modules: 0 → 0
+  high-CC(≥15): 2 → ≤1
   hub-types:   0 → ≤0
 
 PATTERNS (language parser shared logic):
@@ -53,4 +44,4 @@ PATTERNS (language parser shared logic):
     - Standardized FunctionInfo/ClassInfo models
 
 HISTORY:
-  prev CC̄=2.7 → now CC̄=2.6
+  prev CC̄=2.6 → now CC̄=2.6

@@ -4,12 +4,12 @@
 
 - **Project**: /home/tom/github/semcod/www
 - **Primary Language**: javascript
-- **Languages**: javascript: 101, python: 95, shell: 4
+- **Languages**: javascript: 102, python: 100, shell: 6
 - **Analysis Mode**: static
-- **Total Functions**: 1161
-- **Total Classes**: 89
-- **Modules**: 200
-- **Entry Points**: 921
+- **Total Functions**: 1198
+- **Total Classes**: 93
+- **Modules**: 208
+- **Entry Points**: 960
 
 ## Architecture by Module
 
@@ -33,6 +33,11 @@
 - **Functions**: 27
 - **File**: `system-integration.spec.js`
 
+### examples.python-sdk.auto_pr_client
+- **Functions**: 26
+- **Classes**: 4
+- **File**: `auto_pr_client.py`
+
 ### backend.db_module.tickets_orm
 - **Functions**: 25
 - **File**: `tickets_orm.py`
@@ -42,15 +47,15 @@
 - **Classes**: 1
 - **File**: `github.py`
 
-### backend.adapters.gitea
-- **Functions**: 21
-- **Classes**: 1
-- **File**: `gitea.py`
-
 ### backend.adapters.gitlab
 - **Functions**: 21
 - **Classes**: 1
 - **File**: `gitlab.py`
+
+### backend.adapters.gitea
+- **Functions**: 21
+- **Classes**: 1
+- **File**: `gitea.py`
 
 ### frontend.src.hooks.useUrlState
 - **Functions**: 21
@@ -85,10 +90,6 @@
 - **Functions**: 18
 - **File**: `benchmark.spec.js`
 
-### frontend.e2e.gui-login-enhanced.spec
-- **Functions**: 18
-- **File**: `gui-login-enhanced.spec.js`
-
 ### e2e.specs.customer-journey.spec
 - **Functions**: 17
 - **File**: `customer-journey.spec.js`
@@ -109,27 +110,21 @@ Main execution flows into the system:
 > Analyze any public repository by URL (sandbox mode). Supports file:// for local repos.
 - **Calls**: router.post, body.get, body.get, repo_url.startswith, backend.db_module.scans.save_audit_result, backend.routers.audit._schedule_background_task, request.json, HTTPException
 
-### backend.db_module.scans_orm.save_audit_result
-> Save audit result to database. Merges benchmark meta into audit_meta JSON.
-- **Calls**: None.first, db.commit, audit_data.get, audit_data.get, audit_data.get, audit_data.get, audit_data.get, json.dumps
-
-### backend.routers.tickets.process_ticket_with_redsl
+### backend.routers.tickets.redsl.process_ticket_with_redsl
 > Process ticket with reDSL engine to auto-generate PR.
 
 Flow:
   1. Analyze ticket description with reDSL decide()
   2. Run reDSL refactor() on identifi
-- **Calls**: router.post, Depends, Depends, backend.db_module.tickets_orm.get_ticket, backend.routers.tickets._get_tenant_for_user, user.get, backend.db_module.tickets_orm.update_ticket, HTTPException
+- **Calls**: router.post, Depends, Depends, backend.db_module.tickets_orm.get_ticket, backend.routers.tickets.models._get_tenant_for_user, user.get, backend.db_module.tickets_orm.update_ticket, HTTPException
+
+### backend.db_module.scans_orm.save_audit_result
+> Save audit result to database. Merges benchmark meta into audit_meta JSON.
+- **Calls**: None.first, db.commit, audit_data.get, audit_data.get, audit_data.get, audit_data.get, audit_data.get, json.dumps
 
 ### backend.scripts.scan_samples.scan_sample_projects
 > Scan all sample projects and save to database.
 - **Calls**: backend.sample_projects.get_sample_projects, print, print, enumerate, print, print, print, sum
-
-### frontend.e2e.gui-login-enhanced.spec.FRONTEND_URL
-- **Calls**: frontend.e2e.gui-login-enhanced.spec.describe, frontend.e2e.gui-login-enhanced.spec.beforeAll, frontend.e2e.gui-login-enhanced.spec.get, frontend.e2e.gui-login-enhanced.spec.expect, frontend.e2e.gui-login-enhanced.spec.ok, frontend.e2e.gui-login-enhanced.spec.toBeTruthy, frontend.e2e.gui-login-enhanced.spec.test, frontend.e2e.gui-login-enhanced.spec.testOAuthFlow
-
-### frontend.e2e.gui-login-enhanced.spec.MOCK_GITHUB_URL
-- **Calls**: frontend.e2e.gui-login-enhanced.spec.describe, frontend.e2e.gui-login-enhanced.spec.beforeAll, frontend.e2e.gui-login-enhanced.spec.get, frontend.e2e.gui-login-enhanced.spec.expect, frontend.e2e.gui-login-enhanced.spec.ok, frontend.e2e.gui-login-enhanced.spec.toBeTruthy, frontend.e2e.gui-login-enhanced.spec.test, frontend.e2e.gui-login-enhanced.spec.testOAuthFlow
 
 ### backend.routers.metrics.get_standard_metrics
 > Get standardized metrics for recent scans.
@@ -231,6 +226,10 @@ Flow:
 > Initialize the database and create tables.
 - **Calls**: backend.db_module.db_connection.get_connection, conn.cursor, cursor.execute, cursor.execute, cursor.execute, cursor.execute, cursor.execute, cursor.execute
 
+### backend.routers.audit.run_audit
+> Run one-click audit on a repo. Requires authentication.
+- **Calls**: router.post, Depends, backend.db_module.scans.save_audit_result, backend.routers.audit._schedule_background_task, request.json, None.hexdigest, body.get, body.get
+
 ### backend.routers.autopr.create_auto_pr
 > Apply LLM-generated patches to a repository and create a GitHub PR.
 
@@ -239,10 +238,6 @@ Flow:
   2. Commit each patch file
   3. Ch
 - **Calls**: router.post, Depends, user.get, backend.services.autopr_helpers.generate_fix_id, backend.db_module.scans.get_repo_scans, HTTPException, backend.routers.autopr._check_rollback, backend.routers.autopr._score_improved
-
-### backend.routers.audit.run_audit
-> Run one-click audit on a repo. Requires authentication.
-- **Calls**: router.post, Depends, backend.db_module.scans.save_audit_result, backend.routers.audit._schedule_background_task, request.json, None.hexdigest, body.get, body.get
 
 ### backend.routers.auth.gitea_oauth_callback
 > Step 2: Exchange code for token, fetch profile, create user, issue JWT.
@@ -260,6 +255,15 @@ Flow:
 > Get existing repository or create new one for tenant.
 - **Calls**: backend.db_module.db_connection.get_connection, conn.cursor, cursor.execute, cursor.fetchone, None.isoformat, None.join, cursor.execute, conn.commit
 
+### backend.routers.webhook.github_webhook
+> Handle GitHub webhook events.
+- **Calls**: router.post, request.headers.get, request.headers.get, json.loads, request.body, payload.get, payload.get, None.hexdigest
+
+### backend.routers.metrics.get_metrics_summary
+> Get summary statistics of all scans.
+Useful for dashboards and monitoring.
+- **Calls**: router.get, backend.db_module.scans.get_recent_scans, sum, sum, sum, len, HTTPException, grade_dist.get
+
 ## Process Flows
 
 Key execution flows identified:
@@ -276,18 +280,18 @@ analyze_repo [backend.routers.audit]
       └─ →> get_connection
 ```
 
-### Flow 3: save_audit_result
+### Flow 3: process_ticket_with_redsl
 ```
-save_audit_result [backend.db_module.scans_orm]
-```
-
-### Flow 4: process_ticket_with_redsl
-```
-process_ticket_with_redsl [backend.routers.tickets]
-  └─> _get_tenant_for_user
-      └─ →> get_or_create_tenant
+process_ticket_with_redsl [backend.routers.tickets.redsl]
   └─ →> get_ticket
       └─> _ticket_to_dict
+  └─ →> _get_tenant_for_user
+      └─ →> get_or_create_tenant
+```
+
+### Flow 4: save_audit_result
+```
+save_audit_result [backend.db_module.scans_orm]
 ```
 
 ### Flow 5: scan_sample_projects
@@ -296,17 +300,7 @@ scan_sample_projects [backend.scripts.scan_samples]
   └─ →> get_sample_projects
 ```
 
-### Flow 6: FRONTEND_URL
-```
-FRONTEND_URL [frontend.e2e.gui-login-enhanced.spec]
-```
-
-### Flow 7: MOCK_GITHUB_URL
-```
-MOCK_GITHUB_URL [frontend.e2e.gui-login-enhanced.spec]
-```
-
-### Flow 8: get_standard_metrics
+### Flow 6: get_standard_metrics
 ```
 get_standard_metrics [backend.routers.metrics]
   └─ →> get_recent_scans
@@ -315,12 +309,12 @@ get_standard_metrics [backend.routers.metrics]
       └─ →> get_connection
 ```
 
-### Flow 9: sync_mirror
+### Flow 7: sync_mirror
 ```
 sync_mirror [backend.services.mirror.MirrorService]
 ```
 
-### Flow 10: main
+### Flow 8: main
 ```
 main [backend.quality_gate]
   └─> _parse_args
@@ -329,7 +323,26 @@ main [backend.quality_gate]
       └─> analyze_file
 ```
 
+### Flow 9: create_mirror
+```
+create_mirror [backend.services.mirror.MirrorService]
+```
+
+### Flow 10: process_pr_event
+```
+process_pr_event [backend.worker.tasks.scan]
+  └─> _get_token_for_provider
+  └─ →> shared_task
+  └─ →> get_adapter_for_event
+```
+
 ## Key Classes
+
+### backend.adapters.gitlab.GitLabAdapter
+> GitLab API implementation of GitProvider.
+- **Methods**: 22
+- **Key Methods**: backend.adapters.gitlab.GitLabAdapter.__init__, backend.adapters.gitlab.GitLabAdapter.provider_name, backend.adapters.gitlab.GitLabAdapter.get_api_headers, backend.adapters.gitlab.GitLabAdapter._get_project_path, backend.adapters.gitlab.GitLabAdapter.comment_on_pr, backend.adapters.gitlab.GitLabAdapter.update_pr_description, backend.adapters.gitlab.GitLabAdapter.create_pr, backend.adapters.gitlab.GitLabAdapter.close_pr, backend.adapters.gitlab.GitLabAdapter.create_branch, backend.adapters.gitlab.GitLabAdapter.delete_branch
+- **Inherits**: GitProvider
 
 ### backend.adapters.gitea.GiteaAdapter
 > Gitea API implementation of GitProvider.
@@ -337,12 +350,6 @@ main [backend.quality_gate]
 Gitea API is compatible with GitHub API v3 in most places,
 - **Methods**: 22
 - **Key Methods**: backend.adapters.gitea.GiteaAdapter.__init__, backend.adapters.gitea.GiteaAdapter.provider_name, backend.adapters.gitea.GiteaAdapter.get_api_headers, backend.adapters.gitea.GiteaAdapter.comment_on_pr, backend.adapters.gitea.GiteaAdapter.update_pr_description, backend.adapters.gitea.GiteaAdapter.create_pr, backend.adapters.gitea.GiteaAdapter.close_pr, backend.adapters.gitea.GiteaAdapter.create_branch, backend.adapters.gitea.GiteaAdapter._create_branch_via_git, backend.adapters.gitea.GiteaAdapter.delete_branch
-- **Inherits**: GitProvider
-
-### backend.adapters.gitlab.GitLabAdapter
-> GitLab API implementation of GitProvider.
-- **Methods**: 22
-- **Key Methods**: backend.adapters.gitlab.GitLabAdapter.__init__, backend.adapters.gitlab.GitLabAdapter.provider_name, backend.adapters.gitlab.GitLabAdapter.get_api_headers, backend.adapters.gitlab.GitLabAdapter._get_project_path, backend.adapters.gitlab.GitLabAdapter.comment_on_pr, backend.adapters.gitlab.GitLabAdapter.update_pr_description, backend.adapters.gitlab.GitLabAdapter.create_pr, backend.adapters.gitlab.GitLabAdapter.close_pr, backend.adapters.gitlab.GitLabAdapter.create_branch, backend.adapters.gitlab.GitLabAdapter.delete_branch
 - **Inherits**: GitProvider
 
 ### backend.adapters.github.GitHubAdapter
@@ -374,6 +381,16 @@ Apps must implement:
 - **Key Methods**: backend.apps.base.AppBase.__init__, backend.apps.base.AppBase.run_pipeline, backend.apps.base.AppBase.get_triggers, backend.apps.base.AppBase.get_actions, backend.apps.base.AppBase.on_pr_opened, backend.apps.base.AppBase.on_pr_synchronize, backend.apps.base.AppBase.on_push, backend.apps.base.AppBase.on_pr_comment, backend.apps.base.AppBase.is_enabled_for_repo, backend.apps.base.AppBase.get_pricing_tier
 - **Inherits**: ABC
 
+### examples.python-sdk.auto_pr_client.SemcodClient
+> Semcod API client — authenticates via gh token exchange.
+- **Methods**: 11
+- **Key Methods**: examples.python-sdk.auto_pr_client.SemcodClient.__init__, examples.python-sdk.auto_pr_client.SemcodClient._authenticate, examples.python-sdk.auto_pr_client.SemcodClient._request, examples.python-sdk.auto_pr_client.SemcodClient.create_ticket, examples.python-sdk.auto_pr_client.SemcodClient.get_tickets, examples.python-sdk.auto_pr_client.SemcodClient.process_ticket, examples.python-sdk.auto_pr_client.SemcodClient.get_ticket_status, examples.python-sdk.auto_pr_client.SemcodClient.get_ticket_stats, examples.python-sdk.auto_pr_client.SemcodClient.get_redsl_status, examples.python-sdk.auto_pr_client.SemcodClient.redsl_health
+
+### backend.services.redsl_client.RedslClient
+> HTTP client for the reDSL refactoring engine.
+- **Methods**: 9
+- **Key Methods**: backend.services.redsl_client.RedslClient.__init__, backend.services.redsl_client.RedslClient.analyze, backend.services.redsl_client.RedslClient.decide, backend.services.redsl_client.RedslClient.refactor, backend.services.redsl_client.RedslClient.batch_hybrid, backend.services.redsl_client.RedslClient.cycle, backend.services.redsl_client.RedslClient.clear_history, backend.services.redsl_client.RedslClient.health_score, backend.services.redsl_client.RedslClient.health
+
 ### backend.services.billing.UsageTracker
 > Tracks usage per tenant for billing purposes.
 - **Methods**: 9
@@ -399,10 +416,10 @@ Analyzes:
 - **Key Methods**: backend.apps.audit.pipeline.AuditApp.__init__, backend.apps.audit.pipeline.AuditApp.run_pipeline, backend.apps.audit.pipeline.AuditApp._detect_issues, backend.apps.audit.pipeline.AuditApp._calculate_score, backend.apps.audit.pipeline.AuditApp._generate_recommendations, backend.apps.audit.pipeline.AuditApp.get_triggers, backend.apps.audit.pipeline.AuditApp.get_actions, backend.apps.audit.pipeline.AuditApp._score_to_grade
 - **Inherits**: AppBase
 
-### backend.services.redsl_client.RedslClient
-> HTTP client for the reDSL refactoring engine.
-- **Methods**: 7
-- **Key Methods**: backend.services.redsl_client.RedslClient.__init__, backend.services.redsl_client.RedslClient.analyze, backend.services.redsl_client.RedslClient.decide, backend.services.redsl_client.RedslClient.refactor, backend.services.redsl_client.RedslClient.batch_hybrid, backend.services.redsl_client.RedslClient.health_score, backend.services.redsl_client.RedslClient.health
+### examples.python-sdk.auto_pr_client.GhClient
+> GitHub CLI wrapper — uses `gh` which has valid token.
+- **Methods**: 8
+- **Key Methods**: examples.python-sdk.auto_pr_client.GhClient.get_token, examples.python-sdk.auto_pr_client.GhClient.get_user, examples.python-sdk.auto_pr_client.GhClient.api, examples.python-sdk.auto_pr_client.GhClient.list_repos, examples.python-sdk.auto_pr_client.GhClient.create_pr, examples.python-sdk.auto_pr_client.GhClient.create_branch, examples.python-sdk.auto_pr_client.GhClient.commit_file, examples.python-sdk.auto_pr_client.GhClient.create_issue
 
 ### backend.apps.performance.pipeline.PerformanceApp
 > Performance bottleneck analyzer.
@@ -430,13 +447,6 @@ Detects:
 - **Methods**: 5
 - **Key Methods**: backend.worker._celery_stub._StubTask.__init__, backend.worker._celery_stub._StubTask.__call__, backend.worker._celery_stub._StubTask.run, backend.worker._celery_stub._StubTask.delay, backend.worker._celery_stub._StubTask.retry
 
-### backend.events.models.Event
-> Unified event representation across all git platforms.
-
-This class normalizes events from GitHub, Gi
-- **Methods**: 5
-- **Key Methods**: backend.events.models.Event.is_pr_event, backend.events.models.Event.is_push_event, backend.events.models.Event.is_comment_event, backend.events.models.Event.get_pr_url, backend.events.models.Event.get_clone_url
-
 ### backend.apps.security.pipeline.SecurityApp
 > Security vulnerability scanner.
 
@@ -447,6 +457,13 @@ Detects:
 - **Key Methods**: backend.apps.security.pipeline.SecurityApp.__init__, backend.apps.security.pipeline.SecurityApp.run_pipeline, backend.apps.security.pipeline.SecurityApp._get_recommendations, backend.apps.security.pipeline.SecurityApp.get_triggers, backend.apps.security.pipeline.SecurityApp.get_actions
 - **Inherits**: AppBase
 
+### backend.events.models.Event
+> Unified event representation across all git platforms.
+
+This class normalizes events from GitHub, Gi
+- **Methods**: 5
+- **Key Methods**: backend.events.models.Event.is_pr_event, backend.events.models.Event.is_push_event, backend.events.models.Event.is_comment_event, backend.events.models.Event.get_pr_url, backend.events.models.Event.get_clone_url
+
 ### backend.services.autopr_helpers.PRCreator
 > Creates GitHub PRs and issues.
 - **Methods**: 4
@@ -456,16 +473,6 @@ Detects:
 > Manages GitHub branch operations.
 - **Methods**: 3
 - **Key Methods**: backend.services.autopr_helpers.BranchManager.get_default_branch, backend.services.autopr_helpers.BranchManager.get_ref_sha, backend.services.autopr_helpers.BranchManager.create_branch
-
-### backend.services.autofix.AutoFixService
-> Service for creating auto-fix PRs.
-- **Methods**: 3
-- **Key Methods**: backend.services.autofix.AutoFixService.__init__, backend.services.autofix.AutoFixService.create_auto_fix_pr, backend.services.autofix.AutoFixService.check_score_improvement
-
-### backend.services.autopr_helpers.PatchApplier
-> Applies patches to files in a GitHub repository.
-- **Methods**: 2
-- **Key Methods**: backend.services.autopr_helpers.PatchApplier.get_file_sha, backend.services.autopr_helpers.PatchApplier.commit_file
 
 ## Data Transformation Functions
 
@@ -559,27 +566,26 @@ Return
 ### backend.routers.trend._parse_completed
 - **Output to**: datetime.fromisoformat, iso.replace, datetime.now
 
-### backend.routers.tickets.process_ticket_with_redsl
+### backend.routers.tickets.webhook.bulk_reprocess_tickets
+> Reprocess multiple tickets with reDSL.
+- **Output to**: router.post, Depends, Depends, backend.routers.tickets.models._get_tenant_for_user, backend.db_module.tickets_orm.get_ticket
+
+### backend.routers.tickets.redsl.process_ticket_with_redsl
 > Process ticket with reDSL engine to auto-generate PR.
 
 Flow:
   1. Analyze ticket description with re
-- **Output to**: router.post, Depends, Depends, backend.db_module.tickets_orm.get_ticket, backend.routers.tickets._get_tenant_for_user
+- **Output to**: router.post, Depends, Depends, backend.db_module.tickets_orm.get_ticket, backend.routers.tickets.models._get_tenant_for_user
 
-### backend.routers.tickets.get_ticket_processing_status
+### backend.routers.tickets.redsl.get_ticket_processing_status
 > Get processing status for a ticket (polling endpoint).
-- **Output to**: router.get, Depends, Depends, backend.db_module.tickets_orm.get_ticket, backend.routers.tickets._get_tenant_for_user
-
-### backend.routers.tickets.bulk_reprocess_tickets
-> Reprocess multiple tickets with reDSL.
-- **Output to**: router.post, Depends, Depends, backend.routers.tickets._get_tenant_for_user, backend.db_module.tickets_orm.get_ticket
-
-### backend.routers.marketplace.browse._format_preview_comment
-> Format preview comment like GitHub PR comment.
-- **Output to**: issue.get, issue.get, issue.get
+- **Output to**: router.get, Depends, Depends, backend.db_module.tickets_orm.get_ticket, backend.routers.tickets.models._get_tenant_for_user
 
 ### backend.routers.mcp.tools._parse_public_repo
 - **Output to**: re.search, re.search, re.search, match.group, match.group
+
+### frontend.src.api.processTicketWithRedsl
+- **Output to**: frontend.src.api.fetch, frontend.src.api.authHeaders, frontend.src.api.stringify, frontend.src.api.Error, frontend.src.api.json
 
 ## Public API Surface
 
@@ -587,15 +593,13 @@ Functions exposed as public API (no underscore prefix):
 
 - `backend.alembic.versions.0001_initial_schema.upgrade` - 148 calls
 - `backend.routers.audit.analyze_repo` - 44 calls
+- `backend.routers.tickets.redsl.process_ticket_with_redsl` - 39 calls
 - `backend.db_module.scans_orm.save_audit_result` - 38 calls
-- `backend.routers.tickets.process_ticket_with_redsl` - 34 calls
 - `backend.scheduler.scan_job.run_scheduled_scan` - 33 calls
 - `backend.db_module.tickets_orm.get_ticket_stats` - 33 calls
 - `backend.db_module.scans.save_audit_result` - 32 calls
 - `backend.scripts.scan_samples.scan_sample_projects` - 30 calls
 - `backend.adapters.github.parse_github_event` - 29 calls
-- `frontend.e2e.gui-login-enhanced.spec.FRONTEND_URL` - 29 calls
-- `frontend.e2e.gui-login-enhanced.spec.MOCK_GITHUB_URL` - 29 calls
 - `backend.routers.metrics.get_standard_metrics` - 28 calls
 - `backend.services.mirror.MirrorService.sync_mirror` - 26 calls
 - `backend.quality_gate.main` - 26 calls
@@ -616,8 +620,9 @@ Functions exposed as public API (no underscore prefix):
 - `backend.services.autofix.AutoFixService.create_auto_fix_pr` - 22 calls
 - `backend.db_module.schema.init_db` - 21 calls
 - `backend.db_module.benchmark_orm.get_benchmark_summary` - 21 calls
-- `backend.routers.autopr.create_auto_pr` - 20 calls
+- `examples.python-sdk.auto_pr_client.example_1_gh_autopr` - 21 calls
 - `backend.routers.audit.run_audit` - 20 calls
+- `backend.routers.autopr.create_auto_pr` - 20 calls
 - `backend.db_module.tickets_orm.create_ticket` - 19 calls
 - `backend.routers.auth.gitea_oauth_callback` - 19 calls
 - `backend.adapters.gitlab.GitLabAdapter.get_pr_files` - 18 calls
@@ -625,6 +630,7 @@ Functions exposed as public API (no underscore prefix):
 - `backend.db_module.repositories.get_or_create_repository` - 17 calls
 - `backend.routers.webhook.github_webhook` - 17 calls
 - `backend.routers.metrics.get_metrics_summary` - 17 calls
+- `backend.routers.marketplace.publish.get_app_status` - 17 calls
 
 ## System Interactions
 
@@ -641,27 +647,27 @@ graph TD
     analyze_repo --> get
     analyze_repo --> startswith
     analyze_repo --> save_audit_result
-    save_audit_result --> first
-    save_audit_result --> commit
-    save_audit_result --> get
     process_ticket_with_ --> post
     process_ticket_with_ --> Depends
     process_ticket_with_ --> get_ticket
     process_ticket_with_ --> _get_tenant_for_user
+    save_audit_result --> first
+    save_audit_result --> commit
+    save_audit_result --> get
     scan_sample_projects --> get_sample_projects
     scan_sample_projects --> print
     scan_sample_projects --> enumerate
-    FRONTEND_URL --> describe
-    FRONTEND_URL --> beforeAll
-    FRONTEND_URL --> get
-    FRONTEND_URL --> expect
-    FRONTEND_URL --> ok
-    MOCK_GITHUB_URL --> describe
-    MOCK_GITHUB_URL --> beforeAll
-    MOCK_GITHUB_URL --> get
-    MOCK_GITHUB_URL --> expect
-    MOCK_GITHUB_URL --> ok
     get_standard_metrics --> get
+    get_standard_metrics --> get_recent_scans
+    get_standard_metrics --> get_total_scan_count
+    get_standard_metrics --> append
+    get_standard_metrics --> HTTPException
+    sync_mirror --> replace
+    sync_mirror --> TemporaryDirectory
+    sync_mirror --> Path
+    sync_mirror --> _get_source_adapter
+    sync_mirror --> GiteaAdapter
+    main --> _parse_args
 ```
 
 ## Reverse Engineering Guidelines

@@ -1,9 +1,9 @@
-# vallm batch | 372f | 158✓ 60⚠ 45✗ | 2026-04-12
+# vallm batch | 386f | 170✓ 62⚠ 45✗ | 2026-04-12
 
 SUMMARY:
-  scanned: 372  passed: 158 (42.5%)  warnings: 60  errors: 45  unsupported: 120
+  scanned: 386  passed: 170 (44.0%)  warnings: 62  errors: 45  unsupported: 121
 
-WARNINGS[60]{path,score}:
+WARNINGS[62]{path,score}:
   frontend/src/hooks/useDownloads.js,0.67
     issues[1]{rule,severity,message,line}:
       js.import.resolvable,warning,Module 'react' not found,1
@@ -21,10 +21,6 @@ WARNINGS[60]{path,score}:
     issues[2]{rule,severity,message,line}:
       syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
       complexity.lizard_length,warning,Preview: 136 lines exceeds limit 100,4
-  frontend/src/components/RedslHealthCard.jsx,0.74
-    issues[2]{rule,severity,message,line}:
-      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
-      complexity.lizard_cc,warning,MetricRow: CC=21 exceeds limit 15,6
   frontend/src/components/tabs/RecentScansTab.parts.jsx,0.74
     issues[2]{rule,severity,message,line}:
       syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
@@ -57,6 +53,12 @@ WARNINGS[60]{path,score}:
     issues[1]{rule,severity,message,line}:
       syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
   frontend/src/components/RecommendationCard.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/components/RedslHealthCard.jsx,0.78
+    issues[1]{rule,severity,message,line}:
+      syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
+  frontend/src/components/RedslHealthCard.parts.jsx,0.78
     issues[1]{rule,severity,message,line}:
       syntax.unsupported,warning,"Could not parse jsx: Download error: Language 'jsx' not available for download. Available groups: [""all""]",
   frontend/src/components/ShareButtons.jsx,0.78
@@ -191,6 +193,10 @@ WARNINGS[60]{path,score}:
   frontend/src/hooks/useAppState.js,0.96
     issues[1]{rule,severity,message,line}:
       js.import.resolvable,warning,Module 'react' not found,1
+  backend/routers/tickets/redsl.py,0.97
+    issues[2]{rule,severity,message,line}:
+      complexity.cyclomatic,warning,process_ticket_with_redsl has cyclomatic complexity 19 (max: 15),27
+      complexity.lizard_cc,warning,process_ticket_with_redsl: CC=19 exceeds limit 15,27
 
 ERRORS[45]{path,score}:
   tests/backend/test_mcp.py,0.57
@@ -348,8 +354,8 @@ ERRORS[45]{path,score}:
       python.import.resolvable,error,Module 'pytest' not found,4
 
 UNSUPPORTED[5]{bucket,count}:
-  *.md,80
+  *.md,82
   Dockerfile*,3
   *.txt,3
   *.yml,7
-  other,27
+  other,26
