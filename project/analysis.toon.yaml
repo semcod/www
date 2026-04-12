@@ -12,11 +12,11 @@ REFACTOR[1]:
 PIPELINES[675]:
   [1] Src [lifespan]: lifespan → start_scheduler
       PURITY: 100% pure
-  [2] Src [_utcnow]: _utcnow
+  [2] Src [get_db]: get_db
       PURITY: 100% pure
-  [3] Src [get_db]: get_db
+  [3] Src [init_db]: init_db → _run_migrations → text
       PURITY: 100% pure
-  [4] Src [init_db]: init_db → _run_migrations → text
+  [4] Src [_utcnow]: _utcnow
       PURITY: 100% pure
   [5] Src [get_default_branch]: get_default_branch → _gh_headers
       PURITY: 100% pure
@@ -224,12 +224,12 @@ LAYERS:
   scripts/                        CC̄=0.0    ←in:0  →out:0
   │ setup-gitea.sh             417L  2C   10m  CC=0.0    ←0
   │
-  traefik/                        CC̄=0.0    ←in:0  →out:0
-  │ generate-certs.sh           27L  0C    0m  CC=0.0    ←0
-  │
   ./                              CC̄=0.0    ←in:0  →out:0
   │ run-sim.sh                  40L  0C    0m  CC=0.0    ←0
   │ project.sh                  35L  0C    0m  CC=0.0    ←0
+  │
+  traefik/                        CC̄=0.0    ←in:0  →out:0
+  │ generate-certs.sh           27L  0C    0m  CC=0.0    ←0
   │
 
 COUPLING:

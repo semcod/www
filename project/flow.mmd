@@ -5,10 +5,10 @@ flowchart TD
 
     subgraph Core
         backend__server__lifespan["lifespan"]
-        backend__db_models___utcnow["_utcnow"]
         backend__db_session__get_db["get_db"]
         backend__db_session__init_db["init_db"]
         backend__worker__get_celery_app["get_celery_app"]
+        backend__db_models___utcnow["_utcnow"]
         backend__services__autopr_helpers__BranchManager__get_default_branch["get_default_branch"]
         backend__services__autopr_helpers__BranchManager__get_ref_sha["get_ref_sha"]
         backend__services__autopr_helpers__BranchManager__create_branch["create_branch"]
@@ -31,4 +31,4 @@ flowchart TD
         frontend__e2e__system_integration__spec__exportBody["exportBody"]
     end
 
-    class backend__server__lifespan,backend__db_models___utcnow,backend__db_session__get_db,backend__db_session__init_db,backend__worker__get_celery_app,backend__services__autopr_helpers__BranchManager__get_default_branch,backend__services__autopr_helpers__BranchManager__get_ref_sha,backend__services__autopr_helpers__BranchManager__create_branch,backend__services__autopr_helpers__PatchApplier__get_file_sha,backend__services__autopr_helpers__PatchApplier__commit_file entry
+    class backend__server__lifespan,backend__db_session__get_db,backend__db_session__init_db,backend__worker__get_celery_app,backend__db_models___utcnow,backend__services__autopr_helpers__BranchManager__get_default_branch,backend__services__autopr_helpers__BranchManager__get_ref_sha,backend__services__autopr_helpers__BranchManager__create_branch,backend__services__autopr_helpers__PatchApplier__get_file_sha,backend__services__autopr_helpers__PatchApplier__commit_file entry

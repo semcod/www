@@ -40,6 +40,23 @@ Semcod to narzędzie do automatycznej analizy zdrowia kodu (code health analysis
   - Markdown - sformatowany raport
   - TOON YAML - format analizy kodu
 
+### 📊 Benchmark KPI
+- **Benchmark Cases** — tworzenie przypadków testowych z metadanymi (repo, source_type, change_type)
+- **Recommendation Feedback** — ocena rekomendacji (akceptacja/odrzucenie + 5 score 0-3 + notatki)
+- **Decyzje deploymentowe** — PR candidate, deployment model, reviewer verdict
+- **Zdarzenia produktowe** — śledzenie eventów (result_viewed, recommendation_seen, itp.)
+- **Eksport** — CSV i JSON z pełnymi danymi benchmarkowymi
+- **Summary KPI** — automatycznie liczone: novelty rate, acceptance rate, false positive rate, PR conversion
+
+### 🔄 ReDSL (Refactoring DSL)
+- **Analiza** — automatyczna analiza projektu z reDSL
+- **Refaktoryzacja** — 15 akcji (SPLIT_MODULE, REDUCE_FAN_OUT, EXTRACT_FUNCTIONS, itp.)
+- **Health Score** — ocena zdrowia z grade i metrykami
+- **Decide** — ewaluacja reguł DSL bez wykonania (dry-run)
+- **Batch Hybrid** — automatyczna refaktoryzacja hybrydowa (bez LLM)
+- **Badge SVG** — badge z health score do osadzenia w README
+- **Scheduler** — godzinne quality check + tygodniowe auto-refactor
+
 ### 📜 Historia Skanów
 - Trwałe przechowywanie w SQLite
 - Wyświetlanie ostatnich 5 skanów na stronie głównej
@@ -47,6 +64,66 @@ Semcod to narzędzie do automatycznej analizy zdrowia kodu (code health analysis
 - API do pobierania metryk dla klientów
 
 ## API
+
+### Endpoint'y Benchmark KPI
+
+#### Utwórz przypadek benchmarkowy
+```bash
+curl -X POST http://localhost:9000/api/benchmark/cases \
+  -H 'Content-Type: application/json' \
+  -d '{"case_id":"BM-001","repo":"owner/repo","source_type":"pr","change_type":"bugfix"}'
+```
+
+#### Prześlij feedback do rekomendacji
+```bash
+curl -X POST http://localhost:9000/api/benchmark/cases/BM-001/recommendations/abc123/feedback \
+  -H 'Content-Type: application/json' \
+  -d '{"accepted":true,"novelty_score":3,"usefulness_score":3}'
+```
+
+#### Pobierz podsumowanie KPI
+```bash
+curl http://localhost:9000/api/benchmark/summary
+```
+
+#### Eksport benchmarku
+```bash
+curl http://localhost:9000/api/benchmark/export.json -o benchmark.json
+curl http://localhost:9000/api/benchmark/export.csv -o benchmark.csv
+```
+
+### Endpoint'y ReDSL
+
+#### Status silnika
+```bash
+curl http://localhost:9000/api/redsl/status
+```
+
+#### Analiza projektu
+```bash
+curl -X POST http://localhost:9000/api/redsl/analyze \
+  -H 'Content-Type: application/json' \
+  -d '{"project_path":"/path/to/project"}'
+```
+
+#### Health score
+```bash
+curl -X POST http://localhost:9000/api/redsl/health \
+  -H 'Content-Type: application/json' \
+  -d '{"project_path":"/path/to/project"}'
+```
+
+#### Refaktoryzacja (dry-run)
+```bash
+curl -X POST http://localhost:9000/api/redsl/refactor \
+  -H 'Content-Type: application/json' \
+  -d '{"project_path":"/path/to/project","max_actions":10,"dry_run":true}'
+```
+
+#### Badge SVG
+```markdown
+![Code Health](https://semcod.com/api/redsl/badge/owner/repo)
+```
 
 ### Endpoint'y Metryk
 
@@ -152,6 +229,7 @@ Semcod wykorzystuje następujące narzędzia:
 - **pyqual** - kontrola jakości Python (ruff, mypy, bandit)
 - **regix** - analiza regex
 - **vallm** - walidacja LLM
+- **reDSL** - silnik refaktoryzacji DSL (15 akcji, health score, auto-PR)
 
 ## Konfiguracja
 
@@ -169,6 +247,9 @@ PORT=8000
 GITHUB_CLIENT_ID=your_client_id
 GITHUB_CLIENT_SECRET=your_client_secret
 GITHUB_WEBHOOK_SECRET=your_webhook_secret
+
+# ReDSL Engine
+REDLS_URL=http://localhost:8000
 ```
 
 ### Uruchomienie Lokalne

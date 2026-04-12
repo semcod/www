@@ -6,7 +6,7 @@ SUMMARY:
   dup_groups:    26
   dup_fragments: 72
   saved_lines:   345
-  scan_ms:       6597
+  scan_ms:       6422
 
 DUPLICATES[26] (ranked by impact):
   [428d25b1063f7815] ! STRU  save_scan  L=6 N=14 saved=78 sim=1.00

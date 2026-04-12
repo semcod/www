@@ -271,17 +271,6 @@ Detects:
     activeContent()
     handleCopy()
     handleDownload()
-  backend/routers/autopr.py:
-    e: PatchFile,AutoPRRequest,AutoPRResult,RedslRefactorRequest,RedslRefactorResult,_score_improved,create_auto_pr,create_redsl_auto_pr,_build_redsl_pr_body
-    PatchFile(BaseModel):
-    AutoPRRequest(BaseModel):
-    AutoPRResult(BaseModel):
-    RedslRefactorRequest(BaseModel):
-    RedslRefactorResult(BaseModel):
-    _score_improved(repo;min_delta)
-    create_auto_pr(body;user)
-    create_redsl_auto_pr(body;user)
-    _build_redsl_pr_body(proposal_type;fix_id;decisions;files)
   frontend/src/hooks/useBenchmarkTracking.js:
     i: ../api,react
     e: safeTrack,useBenchmarkTracking,prevPhase,trackedResultEntry,startedAt,prev,elapsed,trackExport,trackRecommendationOpened,trackDecision
@@ -303,6 +292,17 @@ Detects:
     checkScanAllowed()
     openCheckout()
     dismissPaywall()
+  backend/routers/autopr.py:
+    e: PatchFile,AutoPRRequest,AutoPRResult,RedslRefactorRequest,RedslRefactorResult,_score_improved,create_auto_pr,create_redsl_auto_pr,_build_redsl_pr_body
+    PatchFile(BaseModel):
+    AutoPRRequest(BaseModel):
+    AutoPRResult(BaseModel):
+    RedslRefactorRequest(BaseModel):
+    RedslRefactorResult(BaseModel):
+    _score_improved(repo;min_delta)
+    create_auto_pr(body;user)
+    create_redsl_auto_pr(body;user)
+    _build_redsl_pr_body(proposal_type;fix_id;decisions;files)
   backend/db_module/scans_orm.py:
     e: save_scan,get_recent_scans,get_repo_scans,get_total_scan_count,save_audit_result,get_audit_result,save_badge_cache,get_badge_cache
     save_scan(db;scan_data)
@@ -406,6 +406,14 @@ Detects:
     _feedback_to_dict(f)
     get_benchmark_summary(db)
     _compute_feedback_stats(feedback_rows)
+  backend/apps/loader.py:
+    e: load_manifest,load_pricing,load_app,load_apps,get_app_by_trigger,validate_manifest
+    load_manifest(app_name)
+    load_pricing(app_name)
+    load_app(app_name)
+    load_apps()
+    get_app_by_trigger(trigger)
+    validate_manifest(manifest)
   backend/worker/tasks/scan.py:
     e: run_audit,process_pr_event,process_push_event,analyze_diff,_get_token_for_provider,_analyze_diff,_format_pr_comment
     run_audit(repo;commit_sha;config)
@@ -415,14 +423,6 @@ Detects:
     _get_token_for_provider(provider)
     _analyze_diff(diff;repo)
     _format_pr_comment(event;analysis)
-  backend/apps/loader.py:
-    e: load_manifest,load_pricing,load_app,load_apps,get_app_by_trigger,validate_manifest
-    load_manifest(app_name)
-    load_pricing(app_name)
-    load_app(app_name)
-    load_apps()
-    get_app_by_trigger(trigger)
-    validate_manifest(manifest)
   backend/routers/marketplace/publish.py:
     e: install_app,uninstall_app,list_installations,get_app_status,_setup_webhook
     install_app(request;user)
@@ -435,6 +435,17 @@ Detects:
     preview_pr_comment(request;user)
     list_apps()
     _format_preview_comment(repo;score;issues)
+  backend/routers/mcp/resources.py:
+    e: _utc_now_iso,_summarize_scan,_build_metrics_summary,_get_scans_list,_get_scan_detail,_get_metrics_summary,_get_badge_status,mcp_list_resources,mcp_get_resource
+    _utc_now_iso()
+    _summarize_scan(scan)
+    _build_metrics_summary(scans)
+    _get_scans_list()
+    _get_scan_detail(audit_id)
+    _get_metrics_summary()
+    _get_badge_status(repo_slug)
+    mcp_list_resources()
+    mcp_get_resource(uri)
   frontend/src/hooks/usePolling.js:
     i: ../api.js,react
     e: useScanAnimation,timers,done,useAuditPolling,pollCount,MAX_POLLS,poll,data,interval,shouldStop
@@ -452,17 +463,6 @@ Detects:
     i: ../../../constants,./DownloadButtons
     e: ResultHeader
     ResultHeader()
-  backend/routers/mcp/resources.py:
-    e: _utc_now_iso,_summarize_scan,_build_metrics_summary,_get_scans_list,_get_scan_detail,_get_metrics_summary,_get_badge_status,mcp_list_resources,mcp_get_resource
-    _utc_now_iso()
-    _summarize_scan(scan)
-    _build_metrics_summary(scans)
-    _get_scans_list()
-    _get_scan_detail(audit_id)
-    _get_metrics_summary()
-    _get_badge_status(repo_slug)
-    mcp_list_resources()
-    mcp_get_resource(uri)
   backend/scheduler/scan_job.py:
     e: _utc_now_iso,_build_audit_id,_detect_degradation,_fire_alert,run_scheduled_scan
     _utc_now_iso()
@@ -1165,10 +1165,31 @@ This...
     get_schedule(owner;repo)
     update_schedule(owner;repo;body)
     delete_schedule(owner;repo)
+  backend/routers/mirror.py:
+    e: CreateMirrorRequest,SyncMirrorRequest,MirrorResponse,MirrorInfo,create_mirror,sync_mirror,list_mirrors,get_mirror,delete_mirror
+    CreateMirrorRequest(BaseModel):
+    SyncMirrorRequest(BaseModel):
+    MirrorResponse(BaseModel):
+    MirrorInfo(BaseModel):
+    create_mirror(request;user)
+    sync_mirror(request;user)
+    list_mirrors(user)
+    get_mirror(mirror_id;user)
+    delete_mirror(mirror_id;user)
   frontend/src/constants.js:
     e: API,gradeColor
     API()
     gradeColor()
+  frontend/src/hooks/useAuth.js:
+    i: ../api.js,../constants.js,react
+    e: useSessionCallbackBootstrap,searchParams,session,useSessionProfile,getOAuthStartUrl,confirmAuthFlow,logoutSession
+    useSessionCallbackBootstrap()
+    searchParams()
+    session()
+    useSessionProfile()
+    getOAuthStartUrl()
+    confirmAuthFlow()
+    logoutSession()
   frontend/src/api.js:
     i: ./constants
     e: authHeaders,fetchMe,res,logout,res,fetchRepos,res,startAudit,res,fetchAudit,res,fetchBillingStatus,res,createCheckoutSession,res,analyzePublicRepo,res,loginWithProvider,getPreview,res,installApp,res,getInstallations,res,uninstallApp,res,fetchTrend,res,fetchSchedules,res,createSchedule,res,deleteSchedule,res,fetchBillingPortal,res,getApps,res,getAppStatus,res,createBenchmarkCase,res,updateBenchmarkCase,res,submitRecommendationFeedback,res,submitBenchmarkDecision,res,trackBenchmarkEvent,res,fetchBenchmarkSummary,res,downloadBenchmarkExport,getRedslStatus,res,redslAnalyze,res,redslHealth,res,redslRefactor,res,redslDecide,res,redslBadgeUrl
@@ -1236,16 +1257,6 @@ This...
     redslDecide()
     res()
     redslBadgeUrl()
-  frontend/src/hooks/useAuth.js:
-    i: ../api.js,../constants.js,react
-    e: useSessionCallbackBootstrap,searchParams,session,useSessionProfile,getOAuthStartUrl,confirmAuthFlow,logoutSession
-    useSessionCallbackBootstrap()
-    searchParams()
-    session()
-    useSessionProfile()
-    getOAuthStartUrl()
-    confirmAuthFlow()
-    logoutSession()
   frontend/src/hooks/useBenchmarkState.js:
     i: ./useBenchmarkTracking.js,react
     e: useBenchmarkState
@@ -1285,16 +1296,16 @@ This...
     getPrimaryLanguage()
     openRecentScanRepository()
     openRecentScanAudit()
-  frontend/src/components/tabs/SettingsTab.jsx:
-    i: ../../api,./SettingsTab.parts,react
-    e: SettingsTab,loadSchedules
-    SettingsTab()
-    loadSchedules()
   frontend/src/components/tabs/MarketplaceTab.jsx:
     i: ../MarketplaceDashboard.jsx
     e: MarketplaceTab,provider
     MarketplaceTab()
     provider()
+  frontend/src/components/tabs/SettingsTab.jsx:
+    i: ../../api,./SettingsTab.parts,react
+    e: SettingsTab,loadSchedules
+    SettingsTab()
+    loadSchedules()
   frontend/e2e/recent-scans.spec.js:
     i: @playwright/test
     e: recentSection,isVisible,scanCards,count,scanCard,count,viewButton,count
@@ -1333,17 +1344,6 @@ This...
     linkedinVisible()
     recentTab()
     isTabVisible()
-  backend/routers/mirror.py:
-    e: CreateMirrorRequest,SyncMirrorRequest,MirrorResponse,MirrorInfo,create_mirror,sync_mirror,list_mirrors,get_mirror,delete_mirror
-    CreateMirrorRequest(BaseModel):
-    SyncMirrorRequest(BaseModel):
-    MirrorResponse(BaseModel):
-    MirrorInfo(BaseModel):
-    create_mirror(request;user)
-    sync_mirror(request;user)
-    list_mirrors(user)
-    get_mirror(mirror_id;user)
-    delete_mirror(mirror_id;user)
   backend/services/redsl_client.py:
     e: RedslClient
     RedslClient: __init__(1),analyze(2),decide(1),refactor(4),batch_hybrid(2),health_score(1),health(0)  # HTTP client for the reDSL refactoring engine...
@@ -1469,6 +1469,11 @@ This...
     count()
     demoButton()
     isVisible()
+  e2e/specs/smoke.spec.js:
+    i: @playwright/test
+    e: input,reportVisible
+    input()
+    reportVisible()
   e2e/specs/sandbox-recent-scans.spec.js:
     i: @playwright/test
     e: input,sandboxBadge,hasSandbox,baseUrl,response,data,scan,heading,isVisible,recentTab,isVisible
@@ -1483,14 +1488,12 @@ This...
     isVisible()
     recentTab()
     isVisible()
-  e2e/specs/smoke.spec.js:
-    i: @playwright/test
-    e: input,reportVisible
-    input()
-    reportVisible()
   backend/server.py:
     e: lifespan
     lifespan(app)
+  backend/sample_projects.py:
+    e: get_sample_projects
+    get_sample_projects()
   backend/db_models.py:
     e: Base,Scan,Subscription,User,Tenant,Repository,Installation,Event,AuditResult,BadgeCache,BenchmarkCase,BenchmarkEvent,RecommendationFeedback,_utcnow
     Base(DeclarativeBase):
@@ -1507,9 +1510,6 @@ This...
     BenchmarkEvent(Base):
     RecommendationFeedback(Base):
     _utcnow()
-  backend/sample_projects.py:
-    e: get_sample_projects
-    get_sample_projects()
   backend/db_module/wrappers.py:
     e: save_scan,get_recent_scans,get_repo_scans,get_total_scan_count,save_audit_result,get_audit_result,save_badge_cache,get_badge_cache,upsert_user,get_user_by_github_id,get_user_by_id,get_subscription,upsert_subscription,increment_scan_count,get_or_create_tenant,get_tenant_by_id,update_tenant_plan,get_or_create_repository,get_tenant_repositories,get_repository_by_full_name,create_installation,get_installation,get_tenant_installations,delete_installation,update_installation_scan,queue_event,get_pending_events,update_event_status,create_benchmark_case,get_benchmark_cases,get_benchmark_case,update_benchmark_case,create_benchmark_event,get_benchmark_events,upsert_recommendation_feedback,get_feedback_for_case,get_benchmark_summary
     save_scan(scan_data)
@@ -1643,18 +1643,18 @@ Provides...
   e2e/karate/karate-config.js:
     e: fn
     fn()
-  traefik/generate-certs.sh:
   project.sh:
   run-sim.sh:
+  traefik/generate-certs.sh:
   backend/store.py:
-  backend/config.py:
   backend/database.py:
+  backend/config.py:
   backend/worker/__init__.py:
+  backend/services/scan_service.py:
   backend/services/mirror_models.py:
     e: MirrorConfig,MirrorStatus
     MirrorConfig:  # Configuration for repo mirror...
     MirrorStatus:  # Status of mirror operation...
-  backend/services/scan_service.py:
   backend/db_module/__init__.py:
   backend/worker/tasks/__init__.py:
   backend/events/__init__.py:

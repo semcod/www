@@ -30,6 +30,10 @@
 │  │  │   MCP    │  Report  │  Health  │    API Router      │ │   │
 │  │  │  Router  │  Router  │  Router  │    (Consolidated)  │ │   │
 │  │  └──────────┴──────────┴──────────┴────────────────────┘ │   │
+│  │  ┌──────────────────┬──────────────────────────────────┐ │   │
+│  │  │  Benchmark       │  ReDSL                           │ │   │
+│  │  │  Router          │  Router                          │ │   │
+│  │  └──────────────────┴──────────────────────────────────┘ │   │
 │  └──────────────────────────────────────────────────────────┘   │
 │                                                                 │
 │  ┌─────────────────────┐  ┌─────────────────────────────────┐   │
@@ -38,10 +42,13 @@
 │  │  │  Analyzer     │  │  │  │    SQLite (scans.db)      │  │   │
 │  │  │  (code2llm)   │  │  │  │  - scans table            │  │   │
 │  │  ├───────────────┤  │  │  │  - badges cache           │  │   │
-│  │  │  Scoring      │  │  │  └───────────────────────────┘  │   │
-│  │  │  (health)     │  │  │                                 │   │
+│  │  │  Scoring      │  │  │  │  - benchmark_cases        │  │   │
+│  │  │  (health)     │  │  │  │  - benchmark_events       │  │   │
+│  │  ├───────────────┤  │  │  │  - recommendation_feedback│  │   │
+│  │  │  GitHub Client│  │  │  └───────────────────────────┘  │   │
 │  │  ├───────────────┤  │  └─────────────────────────────────┘   │
-│  │  │  GitHub Client│  │                                        │
+│  │  │  RedslClient  │  │                                        │
+│  │  │  (reDSL HTTP) │  │                                        │
 │  │  └───────────────┘  │  ┌─────────────────────────────────┐   │
 │  └─────────────────────┘  │        In-Memory Store          │   │
 │                           │    - audit_results (dict)       │   │
@@ -64,6 +71,14 @@
 │  │  ┌────────────┐  ┌────────────┐  ┌────────────────────┐    │ │
 │  │  │ code2llm   │  │   redup    │  │     pyqual         │    │ │
 │  │  │(complexity)│  │(duplication│  │  (quality check)   │    │ │
+│  │  └────────────┘  └────────────┘  └────────────────────┘    │ │
+│  └────────────────────────────────────────────────────────────┘ │
+│                                                                 │
+│  ┌────────────────────────────────────────────────────────────┐ │
+│  │                 ReDSL Engine (separate service)            │ │
+│  │  ┌────────────┐  ┌────────────┐  ┌────────────────────┐    │ │
+│  │  │  analyze   │  │  refactor  │  │  health_score      │    │ │
+│  │  │            │  │(15 actions)│  │  (grade + metrics) │    │ │
 │  │  └────────────┘  └────────────┘  └────────────────────┘    │ │
 │  └────────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────────┘
@@ -92,6 +107,10 @@ frontend/src/
 │   │   ├── ReposPhase.jsx
 │   │   ├── ScanningPhase.jsx
 │   │   └── ResultPhase.jsx
+│   ├── benchmark/       # Benchmark KPI components
+│   │   ├── BenchmarkReviewPanel.jsx
+│   │   ├── RecommendationFeedbackForm.jsx
+│   │   └── BenchmarkDecisionPanel.jsx
 │   └── tabs/            # Result tabs
 │       ├── BadgeTab.jsx
 │       ├── PRBotTab.jsx
@@ -122,14 +141,17 @@ frontend/src/
 | MCP | `routers/mcp.py` | AI assistant integration |
 | Report | `routers/report.py` | Report redirects |
 | Webhook | `routers/webhook.py` | GitHub webhooks |
+| Benchmark | `routers/benchmark.py` | KPI benchmark (cases, feedback, decisions, events, export) |
+| ReDSL | `routers/redsl.py` | reDSL engine (analyze, refactor, health, decide, badge) |
 
 **Services:**
 
 | Service | File | Purpose |
 |---------|------|---------|
 | Analyzer | `services/analyzer.py` | Code statistics collection |
-| Scoring | `services/scoring.py` | Health score calculation |
+| Scoring | `services/scoring.py` | Health score calculation + recommendation_id |
 | GitHub Client | `services/github_client.py` | GitHub API integration |
+| RedslClient | `services/redsl_client.py` | ReDSL engine HTTP client |
 
 ---
 
@@ -238,6 +260,52 @@ CREATE TABLE badges (
     grade TEXT,
     weekly_issues INTEGER,
     updated TEXT          -- ISO timestamp
+);
+
+CREATE TABLE benchmark_cases (
+    case_id TEXT PRIMARY KEY,
+    audit_id TEXT,
+    repo TEXT NOT NULL,
+    source_type TEXT DEFAULT 'repo',
+    change_type TEXT,
+    baseline_tools TEXT,      -- JSON
+    baseline_findings TEXT,
+    baseline_detected BOOLEAN,
+    reviewer_verdict TEXT,
+    recommendation_accepted BOOLEAN,
+    pr_candidate BOOLEAN,
+    deployment_candidate BOOLEAN,
+    deployment_model_selected TEXT,
+    time_to_first_result_seconds INTEGER,
+    time_to_first_useful_recommendation_seconds INTEGER,
+    next_action TEXT,
+    created_at TEXT,
+    updated_at TEXT
+);
+
+CREATE TABLE benchmark_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    case_id TEXT REFERENCES benchmark_cases(case_id),
+    audit_id TEXT,
+    event_name TEXT NOT NULL,
+    event_value TEXT,
+    metadata_json TEXT,       -- JSON
+    created_at TEXT
+);
+
+CREATE TABLE recommendation_feedback (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    case_id TEXT REFERENCES benchmark_cases(case_id),
+    audit_id TEXT,
+    recommendation_id TEXT NOT NULL,
+    accepted BOOLEAN,
+    novelty_score INTEGER,         -- 0-3
+    usefulness_score INTEGER,     -- 0-3
+    accuracy_score INTEGER,       -- 0-3
+    actionability_score INTEGER,  -- 0-3
+    business_value_score INTEGER, -- 0-3
+    notes TEXT,
+    created_at TEXT
 );
 ```
 

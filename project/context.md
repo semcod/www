@@ -486,18 +486,22 @@ Key functions that process and transform data:
 ### backend.quality_gate._parse_args
 - **Output to**: len, Path, len, Path, len
 
-### backend.services.analyzer._process_file_for_duplication
-> Process a single file and update line occurrences. Returns total lines processed.
-- **Output to**: file_path.read_text, content.splitlines, backend.services.analyzer._should_skip_line, line.strip, line_occurrences.get
-
 ### backend.services.autofix.PatchGenerator._parse_diff_original
 > Extract original file content from diff.
 - **Output to**: diff_text.split, line.startswith, lines.append, line.startswith, line.startswith
+
+### backend.services.analyzer._process_file_for_duplication
+> Process a single file and update line occurrences. Returns total lines processed.
+- **Output to**: file_path.read_text, content.splitlines, backend.services.analyzer._should_skip_line, line.strip, line_occurrences.get
 
 ### backend.db_module.users.convert_query
 > Convert query placeholders based on DB_TYPE.
 PostgreSQL uses %s, SQLite uses ?.
 - **Output to**: query.replace
+
+### backend.apps.loader.validate_manifest
+> Validate manifest structure. Returns list of errors.
+- **Output to**: errors.append, errors.append, errors.append
 
 ### backend.worker.tasks.scan.process_pr_event
 > Process pull request event asynchronously.
@@ -515,10 +519,6 @@ Flow:
 ### backend.worker.tasks.scan._format_pr_comment
 > Format PR comment with analysis results.
 - **Output to**: analysis.get, analysis.get, analysis.get
-
-### backend.apps.loader.validate_manifest
-> Validate manifest structure. Returns list of errors.
-- **Output to**: errors.append, errors.append, errors.append
 
 ### backend.apps.registry.AppRegistry.process_event
 > Route event to all matching apps and collect results.
