@@ -116,6 +116,47 @@ class TestListRepos:
             _clear_auth(app)
 
 
+class TestGhTokenAuth:
+    """Tests for POST /auth/gh-token endpoint (gh CLI token exchange)."""
+
+    @patch("httpx.AsyncClient")
+    def test_gh_token_returns_session(self, mock_client_class, client):
+        mock_profile = MagicMock()
+        mock_profile.status_code = 200
+        mock_profile.json.return_value = {
+            "id": 12345, "login": "gh-user", "name": "GH User",
+            "avatar_url": "https://example.com/avatar.png",
+        }
+        mock_http = AsyncMock()
+        mock_http.get.return_value = mock_profile
+        mock_http.__aenter__ = AsyncMock(return_value=mock_http)
+        mock_http.__aexit__ = AsyncMock(return_value=None)
+        mock_client_class.return_value = mock_http
+
+        resp = client.post("/auth/gh-token?token=ghp_test123")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert "session_token" in data
+        assert data["user"]["login"] == "gh-user"
+
+    @patch("httpx.AsyncClient")
+    def test_gh_token_invalid_github_token(self, mock_client_class, client):
+        mock_profile = MagicMock()
+        mock_profile.status_code = 401
+        mock_http = AsyncMock()
+        mock_http.get.return_value = mock_profile
+        mock_http.__aenter__ = AsyncMock(return_value=mock_http)
+        mock_http.__aexit__ = AsyncMock(return_value=None)
+        mock_client_class.return_value = mock_http
+
+        resp = client.post("/auth/gh-token?token=bad_token")
+        assert resp.status_code == 401
+
+    def test_gh_token_missing_token(self, client):
+        resp = client.post("/auth/gh-token")
+        assert resp.status_code == 422
+
+
 class TestGithubOAuth:
     """Tests for /auth/github redirect."""
 

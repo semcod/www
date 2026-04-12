@@ -146,3 +146,60 @@ def test_api_logout_returns_success():
     assert response.json()["message"] == "Logged out"
 
 
+def test_gh_token_returns_session_token(monkeypatch):
+    """POST /auth/gh-token should exchange a GitHub token for a Semcod session token."""
+    profile_payload = {
+        "id": 99,
+        "login": "gh-cli-user",
+        "name": "GH CLI User",
+        "avatar_url": "https://github.com/images/gh-cli-user.png",
+    }
+
+    class _ProfileMockClient:
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            return None
+
+        async def get(self, *args, **kwargs):
+            resp = _MockResponse(profile_payload)
+            resp.status_code = 200
+            return resp
+
+    monkeypatch.setattr(auth_module.httpx, "AsyncClient", _ProfileMockClient)
+
+    response = client.post("/auth/gh-token?token=ghp_test123")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert "session_token" in data
+    assert data["user"]["login"] == "gh-cli-user"
+
+
+def test_gh_token_returns_401_for_invalid_github_token(monkeypatch):
+    """POST /auth/gh-token should return 401 if GitHub rejects the token."""
+    class _FailMockClient:
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            return None
+
+        async def get(self, *args, **kwargs):
+            resp = _MockResponse({"message": "Bad credentials"})
+            resp.status_code = 401
+            return resp
+
+    monkeypatch.setattr(auth_module.httpx, "AsyncClient", _FailMockClient)
+
+    response = client.post("/auth/gh-token?token=bad_token")
+
+    assert response.status_code == 401
+
+
+def test_gh_token_returns_422_without_token_param():
+    """POST /auth/gh-token without token parameter should return 422."""
+    response = client.post("/auth/gh-token")
+
+    assert response.status_code == 422

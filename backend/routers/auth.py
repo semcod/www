@@ -43,6 +43,40 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     return user
 
 
+@router.post("/auth/gh-token")
+async def auth_via_github_token(token: str):
+    """Exchange a GitHub personal access token (e.g. from `gh auth token`) for a Semcod session JWT.
+
+    This allows CLI tools using `gh` to authenticate without browser-based OAuth.
+    """
+    async with httpx.AsyncClient() as client:
+        profile_resp = await client.get(
+            f"{GITHUB_API_BASE_URL}/user",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Accept": "application/vnd.github+json",
+            },
+        )
+    if profile_resp.status_code != 200:
+        raise HTTPException(401, "Invalid GitHub token")
+    profile = profile_resp.json()
+
+    github_id = profile.get("id")
+    if not github_id:
+        raise HTTPException(400, "Failed to fetch GitHub profile")
+
+    user = upsert_user(
+        github_id=github_id,
+        login=profile.get("login", ""),
+        name=profile.get("name", "") or profile.get("login", ""),
+        avatar_url=profile.get("avatar_url", ""),
+        github_token=token,
+    )
+
+    session_token = create_session_token(user["id"])
+    return {"session_token": session_token, "user": {"id": user["id"], "login": user["login"]}}
+
+
 @router.get("/auth/github")
 async def github_oauth_start():
     """Step 1: Redirect user to GitHub OAuth."""
