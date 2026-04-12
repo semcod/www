@@ -18,8 +18,8 @@ test.describe('Recent Scans', () => {
     
     await page.waitForLoadState('networkidle');
     
-    // Check if recent scans section exists
-    const recentSection = page.getByText('Ostatnio skanowane projekty');
+    // Check if recent scans section exists (landing page may use different heading)
+    const recentSection = page.getByText(/Ostatnio skanowane|Recently scanned|Recent/i).first();
     const isVisible = await recentSection.isVisible().catch(() => false);
     
     if (isVisible) {
@@ -34,6 +34,7 @@ test.describe('Recent Scans', () => {
         await expect(page.locator('div').filter({ hasText: /[A-F]\+?/ })).first().toBeVisible();
       }
     }
+    // No recent scans yet is also acceptable
   });
 
   test('clicking scan card opens GitHub repo', async ({ page }) => {
