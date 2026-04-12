@@ -78,6 +78,46 @@ def _score_improved(repo: str, min_delta: int = 0) -> tuple[int | None, int | No
 
 # ─── Endpoint ─────────────────────────────────────────────────────────────────
 
+async def _prepare_branch(repo: str, branch: str, token: str) -> str:
+    """Create a new branch from the default branch. Returns default branch name."""
+    default_branch = await BranchManager.get_default_branch(repo, token)
+    base_sha = await BranchManager.get_ref_sha(repo, default_branch, token)
+    await BranchManager.create_branch(repo, branch, base_sha, token)
+    return default_branch
+
+
+async def _commit_patches(repo: str, patches: list, branch: str, proposal_type: str, fix_id: str, token: str) -> None:
+    """Commit each patch file to the branch."""
+    for patch in patches:
+        file_sha = await PatchApplier.get_file_sha(repo, patch.path, branch, token)
+        await PatchApplier.commit_file(
+            repo, patch.path, patch.content, branch,
+            f"fix({proposal_type}): auto-fix via Semcod [{fix_id}]",
+            token, file_sha,
+        )
+
+
+def _check_rollback(repo: str) -> str | None:
+    """Check if health score regressed. Returns rollback reason or None."""
+    score_before, score_after = _score_improved(repo)
+    if score_before is not None and score_after is not None:
+        if score_after < score_before - 2:
+            return f"Health score regressed: {score_before} → {score_after}. Patch was not applied."
+    return None
+
+
+async def _handle_rollback(repo: str, proposal_type: str, fix_id: str, llm_prompt: str,
+                           patches: list, token: str, score_before: int | None,
+                           score_after: int | None, rollback_reason: str, branch: str) -> AutoPRResult:
+    """Create a GitHub issue for the failed auto-fix."""
+    issue_title = f"[Semcod] Auto-fix failed: {proposal_type}"
+    issue_body = PRCreator.build_issue_body(proposal_type, fix_id, rollback_reason, llm_prompt, patches, score_before, score_after)
+    issue_url = await PRCreator.create_issue(repo, issue_title, issue_body, token)
+    logger.warning("Auto-PR rolled back for %s: %s", repo, rollback_reason)
+    return AutoPRResult(status="rolled_back", issue_url=issue_url, branch=branch,
+                        score_before=score_before, score_after=score_after, rollback_reason=rollback_reason)
+
+
 @router.post("", response_model=AutoPRResult)
 async def create_auto_pr(
     body: AutoPRRequest,
@@ -104,60 +144,23 @@ async def create_auto_pr(
     score_before = scans_before[-1]["health_score"] if scans_before else None
 
     try:
-        default_branch = await BranchManager.get_default_branch(body.repo, token)
-        base_sha = await BranchManager.get_ref_sha(body.repo, default_branch, token)
-        await BranchManager.create_branch(body.repo, branch, base_sha, token)
+        default_branch = await _prepare_branch(body.repo, branch, token)
+        await _commit_patches(body.repo, body.patches, branch, body.proposal_type, fix_id, token)
 
-        for patch in body.patches:
-            file_sha = await PatchApplier.get_file_sha(body.repo, patch.path, branch, token)
-            await PatchApplier.commit_file(
-                body.repo, patch.path, patch.content, branch,
-                f"fix({body.proposal_type}): auto-fix via Semcod [{fix_id}]",
-                token, file_sha,
-            )
-
-        # Validate: check if last scan score improved (or skip if no data)
-        score_before_cmp, score_after_cmp = _score_improved(body.repo)
-        rollback_reason = None
-
-        if score_before_cmp is not None and score_after_cmp is not None:
-            if score_after_cmp < score_before_cmp - 2:
-                rollback_reason = (
-                    f"Health score regressed: {score_before_cmp} → {score_after_cmp}. "
-                    "Patch was not applied."
-                )
-
+        rollback_reason = _check_rollback(body.repo)
         if rollback_reason:
-            issue_title = f"[Semcod] Auto-fix failed: {body.proposal_type}"
-            issue_body = PRCreator.build_issue_body(
-                body.proposal_type, fix_id, rollback_reason, body.llm_prompt, body.patches,
-                score_before, score_after_cmp
-            )
-            issue_url = await PRCreator.create_issue(body.repo, issue_title, issue_body, token)
-            logger.warning("Auto-PR rolled back for %s: %s", body.repo, rollback_reason)
-            return AutoPRResult(
-                status="rolled_back",
-                issue_url=issue_url,
-                branch=branch,
-                score_before=score_before,
-                score_after=score_after_cmp,
-                rollback_reason=rollback_reason,
-            )
+            _, score_after_cmp = _score_improved(body.repo)
+            return await _handle_rollback(body.repo, body.proposal_type, fix_id, body.llm_prompt,
+                                         body.patches, token, score_before, score_after_cmp, rollback_reason, branch)
 
+        _, score_after_cmp = _score_improved(body.repo)
         pr_title = f"[Semcod] Auto-fix: {body.proposal_type.replace('_', ' ')} [{fix_id}]"
-        pr_body = PRCreator.build_pr_body(
-            body.proposal_type, fix_id, body.llm_prompt, body.patches, score_before, score_after_cmp
-        )
+        pr_body = PRCreator.build_pr_body(body.proposal_type, fix_id, body.llm_prompt, body.patches, score_before, score_after_cmp)
         pr_url = await PRCreator.create_pr(body.repo, branch, default_branch, pr_title, pr_body, token)
         logger.info("Auto-PR created for %s: %s", body.repo, pr_url)
 
-        return AutoPRResult(
-            status="created",
-            pr_url=pr_url,
-            branch=branch,
-            score_before=score_before,
-            score_after=score_after_cmp,
-        )
+        return AutoPRResult(status="created", pr_url=pr_url, branch=branch,
+                            score_before=score_before, score_after=score_after_cmp)
 
     except HTTPException:
         raise
@@ -167,6 +170,41 @@ async def create_auto_pr(
 
 
 # ─── reDSL-powered endpoint ───────────────────────────────────────────────────
+
+async def _run_redsl_refactor(redsl: RedslClient, project_path: str, max_actions: int, dry_run: bool) -> list:
+    """Run reDSL refactor and return decisions list."""
+    refactor_result = await redsl.refactor(
+        project_path=project_path,
+        max_actions=max_actions,
+        dry_run=dry_run,
+        fmt="json",
+    )
+    return refactor_result.get("decisions", [])
+
+
+async def _commit_redsl_decisions(repo: str, decisions: list, project_path: str,
+                                  branch: str, proposal_type: str, fix_id: str, token: str) -> set[str]:
+    """Commit each decision's target file to the branch. Returns set of committed file paths."""
+    committed_files: set[str] = set()
+    for decision in decisions:
+        target_file = decision.get("target_file", "")
+        if not target_file or target_file in committed_files:
+            continue
+
+        file_path = Path(project_path) / target_file
+        if not file_path.exists():
+            continue
+
+        content = file_path.read_text(encoding="utf-8", errors="replace")
+        file_sha = await PatchApplier.get_file_sha(repo, target_file, branch, token)
+        await PatchApplier.commit_file(
+            repo, target_file, content, branch,
+            f"refactor({proposal_type}): {decision.get('action', 'auto-fix')} via reDSL [{fix_id}]",
+            token, file_sha,
+        )
+        committed_files.add(target_file)
+    return committed_files
+
 
 @router.post("/redsl", response_model=RedslRefactorResult)
 async def create_redsl_auto_pr(
@@ -197,81 +235,33 @@ async def create_redsl_auto_pr(
         )
 
     try:
-        # Run reDSL refactor on the project
-        refactor_result = await redsl.refactor(
-            project_path=body.project_path,
-            max_actions=body.max_actions,
-            dry_run=body.dry_run,
-            fmt="json",
-        )
-
-        decisions = refactor_result.get("decisions", [])
+        decisions = await _run_redsl_refactor(redsl, body.project_path, body.max_actions, body.dry_run)
         if not decisions:
-            return RedslRefactorResult(
-                status="no_decisions",
-                redsl_available=True,
-                decisions_count=0,
-            )
+            return RedslRefactorResult(status="no_decisions", redsl_available=True, decisions_count=0)
 
-        # Build patches from reDSL decisions
         fix_id = generate_fix_id(body.repo, body.proposal_type)
         branch = f"{body.branch_prefix}-{fix_id}"
 
-        default_branch = await BranchManager.get_default_branch(body.repo, token)
-        base_sha = await BranchManager.get_ref_sha(body.repo, default_branch, token)
-        await BranchManager.create_branch(body.repo, branch, base_sha, token)
-
-        # Commit each decision's target file (reDSL applies changes on disk)
-        committed_files = set()
-        for decision in decisions:
-            target_file = decision.get("target_file", "")
-            if not target_file or target_file in committed_files:
-                continue
-
-            # Read the refactored file content from disk (reDSL wrote it)
-            file_path = Path(body.project_path) / target_file
-            if not file_path.exists():
-                continue
-
-            content = file_path.read_text(encoding="utf-8", errors="replace")
-            file_sha = await PatchApplier.get_file_sha(body.repo, target_file, branch, token)
-            await PatchApplier.commit_file(
-                body.repo, target_file, content, branch,
-                f"refactor({body.proposal_type}): {decision.get('action', 'auto-fix')} via reDSL [{fix_id}]",
-                token, file_sha,
-            )
-            committed_files.add(target_file)
+        default_branch = await _prepare_branch(body.repo, branch, token)
+        committed_files = await _commit_redsl_decisions(
+            body.repo, decisions, body.project_path, branch, body.proposal_type, fix_id, token)
 
         if not committed_files:
-            return RedslRefactorResult(
-                status="no_changes",
-                redsl_available=True,
-                decisions_count=len(decisions),
-            )
+            return RedslRefactorResult(status="no_changes", redsl_available=True, decisions_count=len(decisions))
 
-        # Create PR
         pr_title = f"[Semcod] reDSL refactor: {body.proposal_type.replace('_', ' ')} [{fix_id}]"
         pr_body = _build_redsl_pr_body(body.proposal_type, fix_id, decisions, committed_files)
         pr_url = await PRCreator.create_pr(body.repo, branch, default_branch, pr_title, pr_body, token)
         logger.info("reDSL Auto-PR created for %s: %s", body.repo, pr_url)
 
-        return RedslRefactorResult(
-            status="created",
-            redsl_available=True,
-            decisions_count=len(decisions),
-            pr_url=pr_url,
-            branch=branch,
-        )
+        return RedslRefactorResult(status="created", redsl_available=True,
+                                   decisions_count=len(decisions), pr_url=pr_url, branch=branch)
 
     except HTTPException:
         raise
     except Exception as exc:
         logger.error("reDSL Auto-PR failed for %s: %s", body.repo, exc)
-        return RedslRefactorResult(
-            status="failed",
-            redsl_available=True,
-            error=str(exc),
-        )
+        return RedslRefactorResult(status="failed", redsl_available=True, error=str(exc))
 
 
 def _build_redsl_pr_body(proposal_type: str, fix_id: str, decisions: list, files: set) -> str:
