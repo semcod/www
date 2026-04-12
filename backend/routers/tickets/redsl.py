@@ -73,48 +73,36 @@ async def process_ticket_with_redsl(
                 error="reDSL engine is not running"
             )
         
-        # Step 1: Decide — analyze where to make changes based on ticket
-        decide_result = await redsl.decide(
-            project_path=data.project_path,
-            description=ticket["description"],
-            ticket_type=ticket["ticket_type"],
-        )
+        # Step 1: Decide — evaluate DSL rules for the project
+        decisions = await redsl.decide(project_path=data.project_path)
         
-        target_files = decide_result.get("target_files", [])
-        if not target_files:
+        if not decisions:
             update_ticket(db, ticket_id, {"status": "open"})  # Reset to open
             return RedslAutoPRResponse(
                 status="no_targets",
                 ticket_id=ticket_id,
-                decisions_count=0,
-                files_modified=[],
                 error="No target files identified for this ticket"
             )
         
         # Step 2: Refactor — apply changes
         refactor_result = await redsl.refactor(
             project_path=data.project_path,
-            target_files=target_files,
             max_actions=data.max_actions,
             dry_run=data.dry_run,
-            ticket_type=ticket["ticket_type"],
-            description=ticket["description"],
         )
         
-        decisions = refactor_result.get("decisions", [])
-        if not decisions and not data.dry_run:
+        applied = refactor_result.get("decisions", [])
+        if not applied and not data.dry_run:
             update_ticket(db, ticket_id, {"status": "open"})
             return RedslAutoPRResponse(
                 status="no_changes",
                 ticket_id=ticket_id,
-                decisions_count=0,
-                files_modified=[],
                 error="No refactoring decisions made"
             )
         
-        # Update ticket with reDSL results
-        modified_files = [d.get("target_file", "") for d in decisions if d.get("target_file")]
-        update_ticket_redsl_results(db, ticket_id, decisions, modified_files)
+        # Collect modified files from decisions
+        modified_files = [d.get("target_file", "") for d in applied if d.get("target_file")]
+        update_ticket_redsl_results(db, ticket_id, applied, modified_files)
         
         # Step 3: Create PR (if not dry_run)
         if data.auto_create_pr and not data.dry_run:
@@ -125,7 +113,7 @@ async def process_ticket_with_redsl(
                 ticket["repo"],
                 ticket["provider"],
                 data.project_path,
-                decisions,
+                applied,
                 modified_files,
                 token,
                 tenant["id"],
@@ -134,17 +122,15 @@ async def process_ticket_with_redsl(
             return RedslAutoPRResponse(
                 status="processing",
                 ticket_id=ticket_id,
-                decisions_count=len(decisions),
+                decisions_count=len(applied),
                 files_modified=modified_files,
-                pr_url=None,  # Will be updated by background task
-                branch=None,
             )
         
         # Dry run — just return analysis
         return RedslAutoPRResponse(
             status="dry_run" if data.dry_run else "analyzed",
             ticket_id=ticket_id,
-            decisions_count=len(decisions),
+            decisions_count=len(applied),
             files_modified=modified_files,
         )
         
@@ -153,8 +139,6 @@ async def process_ticket_with_redsl(
         return RedslAutoPRResponse(
             status="error",
             ticket_id=ticket_id,
-            decisions_count=0,
-            files_modified=[],
             error=str(e)
         )
 

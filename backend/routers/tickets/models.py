@@ -73,11 +73,11 @@ class RedslAutoPRRequest(BaseModel):
 class RedslAutoPRResponse(BaseModel):
     status: str
     ticket_id: str
-    decisions_count: int
-    files_modified: List[str]
-    pr_url: Optional[str]
-    branch: Optional[str]
-    error: Optional[str]
+    decisions_count: int = 0
+    files_modified: List[str] = []
+    pr_url: Optional[str] = None
+    branch: Optional[str] = None
+    error: Optional[str] = None
 
 
 # ─── Helpers ─────────────────────────────────────────────────────────────────
