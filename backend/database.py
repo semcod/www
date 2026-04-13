@@ -1,7 +1,7 @@
-"""SQLite database for scan history persistence.
+"""Database layer — re-exports all ORM functions for backward compatibility.
 
-This module is a thin wrapper that re-exports all database functions
-from the database package for backward compatibility.
+This module delegates to db_module (SQLAlchemy ORM) which supports both
+PostgreSQL and SQLite via db_session.py engine configuration.
 """
 
 from db_module import (

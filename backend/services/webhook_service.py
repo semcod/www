@@ -58,15 +58,17 @@ async def process_push_event(event: Event, provider: GitProvider) -> Dict:
     try:
         from worker.tasks.quality_loop import task_on_push_quality_loop
 
-        clone_url = event.get_clone_url() or ""
         # Derive local project path from repo name
         project_path = f"/tmp/local-git-repos/{event.repo.replace('/', '_')}"
+
+        # Resolve provider token for PR creation
+        token = getattr(provider, "token", "") or ""
 
         task_on_push_quality_loop.delay(
             repo=event.repo,
             commit_sha=event.commit_sha or "",
             project_path=project_path,
-            token="",  # token resolved in task from config
+            token=token,
             provider=event.provider.value,
         )
     except Exception:
