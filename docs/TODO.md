@@ -1,7 +1,3 @@
-# Semcod — TODO
-
-## ✅ Done (2026-04-12)
-
 ### 🔥 Critical Bug Fixes
 - **Marketplace artifact generation fixed** — billing recording was dead code (indentation bug in deploy.py:99-105)
 - **Missing API functions added** — `triggerAutoFix()` and `triggerRedslAutoPR()` in `api.js`
@@ -45,8 +41,6 @@
 - **Config:** all hardcoded values extracted to `.env` (20 variables: `DB_PATH`, `SCAN_HISTORY_LIMIT`, `REPOS_PER_PAGE`, `GITHUB_OAUTH_SCOPE`, `CORS_ORIGINS`, `LARGE_FILE_THRESHOLD`, etc.)
 - **Network:** Docker containers accessible from LAN via `http://nvidia:3000` (frontend) and `http://nvidia:8003` (backend)
 - **Docs:** README, CHANGELOG, .env.example updated
-
-## 📋 Next
 
 ### Product / Biznes
 - Walidacja co nowego wykrywa skan — czy to nowa jakość?

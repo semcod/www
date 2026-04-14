@@ -1,5 +1,3 @@
-# Roadmap celu produktu Semcod
-
 ## Cel dokumentu
 
 Ten dokument rozwija cel projektu na podstawie aktualnych artefaktów analitycznych:
@@ -15,8 +13,6 @@ Roadmapa ma odpowiedzieć na trzy pytania:
 1. Czy Semcod wykrywa coś nowego i realnie wartościowego względem standardowych narzędzi?
 2. Czy po wykryciu problemu potrafi od razu zaproponować, co należy poprawić?
 3. W jakim modelu wdrożeniowym i biznesowym to oferować: na GitHub/GitLab klienta, na naszej infrastrukturze, czy hybrydowo?
-
-## Wnioski z obecnego stanu projektu
 
 ### Co już działa i stanowi fundament produktu
 
@@ -71,8 +67,6 @@ Docelowo Semcod ma być warstwą pomiędzy:
 - deploymentem artefaktów,
 - rozliczeniem usługi i dystrybucją do klienta końcowego.
 
-## Główne hipotezy do zwalidowania
-
 ### Hipoteza 1 — nowa jakość detekcji
 
 Semcod powinien wykrywać problemy, których nie pokazują same linery, testy i podstawowy code review.
@@ -121,8 +115,6 @@ Sugerowany horyzont realizacji:
 - Faza 4 — 3-6 tygodni
 - Faza 5 — 4-8 tygodni
 
-### Faza 0 — stabilizacja pod roadmapę (1-2 tyg.)
-
 ### Cel
 
 Przygotować produkt do rozszerzania o kolejne ścieżki decyzyjne bez zwiększania chaosu w kluczowych modułach.
@@ -150,8 +142,6 @@ To nie jest refaktoryzacja „dla porządku”. To warunek, żeby bezpiecznie do
 - kluczowe hotspoty z `evolution.toon.yaml` mają rozpisany i rozpoczęty plan rozbicia,
 - wynik skanu i działania użytkownika są mierzalne,
 - główne flow audytu i prezentacji wyniku są zabezpieczone testami regresyjnymi.
-
-### Faza 1 — test walidacyjny „co nowego wykrywa?” (2-3 tyg.)
 
 ### Cel
 
@@ -192,8 +182,6 @@ Należy przygotować benchmark obejmujący:
 - czas od skanu do rekomendacji,
 - liczba wyników, które przeszły do etapu poprawki lub PR.
 
-### Faza 2 — warstwa rekomendacji i propozycji poprawy (2-4 tyg.)
-
 ### Cel
 
 Każdy wynik analizy ma prowadzić do następnej akcji, a nie kończyć się na liście problemów.
@@ -225,8 +213,6 @@ Ta warstwa powinna być widoczna równolegle w:
 - każdy wynik krytyczny lub ważny ma przypisaną rekomendację działania,
 - użytkownik widzi nie tylko „co jest źle”, ale też „co zrobić teraz”,
 - możliwe jest przejście z rekomendacji do szkicu PR bez ręcznego przepisywania analizy.
-
-### Faza 3 — produktowe ścieżki wdrożenia (1-2 tyg.)
 
 ### Cel
 
@@ -277,8 +263,6 @@ Semcod dostarcza wtedy:
 - każda ścieżka ma opis: dla kogo, co obejmuje, jakie są ograniczenia,
 - klient po skanie dostaje jasne pytanie o preferowany model wdrożenia.
 
-### Faza 4 — automatyzacja na bazie ticketów i zmian (3-6 tyg.)
-
 ### Cel
 
 Przenieść produkt z poziomu „analiza repo” na poziom „obsługa konkretnej zmiany biznesowej”.
@@ -317,8 +301,6 @@ Z partnerami można dostarczać:
 - co najmniej jeden pilotowy flow działa od ticketu do PR,
 - istnieje approval gate człowieka przed merge lub deploymentem,
 - wynik automatyzacji jest mierzalny: czas, jakość, liczba poprawek manualnych.
-
-### Faza 5 — marketplace artefaktów i rozliczenie usługi (4-8 tyg.)
 
 ### Cel
 

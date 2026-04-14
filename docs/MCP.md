@@ -18,8 +18,6 @@ All MCP endpoints are prefixed with `/mcp`:
 https://semcod.com/mcp
 ```
 
-## Endpoints
-
 ### Discovery
 
 | Endpoint | Description |
@@ -62,8 +60,6 @@ POST /mcp/invoke
   }
 }
 ```
-
-## Examples
 
 ### Start an Audit
 

@@ -1,7 +1,3 @@
-# Plan produktowy: zmiany UI/API do zbierania KPI benchmarku
-
-## Status implementacji
-
 ### Etap 1 (MVP) - ✅ Zakończony (2026-04-11)
 
 **Backend:**
@@ -70,8 +66,6 @@ To wystarcza do pokazywania wyniku analizy, ale nie wystarcza do zbierania KPI b
 - przejście do PR,
 - decyzja deploymentowa.
 
-## Luki produktowe
-
 ### Brak modelu benchmark case
 
 Aktualnie wynik skanu istnieje jako `audit_id` oraz zapis w tabeli `scans`, ale nie ma pojęcia:
@@ -120,10 +114,6 @@ Minimalny zakres zmian potrzebny do pierwszego benchmarku:
 5. dodać eksport benchmarku do `CSV` i `JSON`,
 6. dodać prosty panel oceny w UI wyniku skanu.
 
-## Zmiany backendowe
-
-## 1. Nowa warstwa danych
-
 ### Plik: `backend/database.py`
 
 Obecny stan:
@@ -132,10 +122,6 @@ Obecny stan:
 - brak powiązania z benchmarkiem,
 - brak eventów użytkownika,
 - brak feedbacku do rekomendacji.
-
-### Zalecana zmiana
-
-Dodać nowe tabele:
 
 #### `benchmark_cases`
 
@@ -187,8 +173,6 @@ Polecane pola:
 - `notes`,
 - `created_at`.
 
-## 2. Stabilne ID rekomendacji
-
 ### Plik: `backend/services/scoring.py`
 
 Obecny stan:
@@ -209,8 +193,6 @@ Każda rekomendacja powinna dostać dodatkowe pola:
 ### Efekt
 
 Dzięki temu frontend i API mogą zapisywać feedback dla konkretnej rekomendacji, a nie dla luźnego tekstu.
-
-## 3. Rozszerzenie flow audytu
 
 ### Plik: `backend/routers/audit.py`
 
@@ -252,13 +234,9 @@ To jest niezbędne do policzenia:
   - przejścia z benchmarku do oceny,
   - konwersji do PR i deploymentu.
 
-## 4. Nowy router benchmarkowy
-
 ### Zalecany nowy plik: `backend/routers/benchmark.py`
 
 Zamiast przeciążać `metrics.py`, lepiej dodać osobny router benchmarkowy.
-
-### Proponowane endpointy
 
 #### Cases
 
@@ -288,8 +266,6 @@ Zamiast przeciążać `metrics.py`, lepiej dodać osobny router benchmarkowy.
 - `PR conversion rate`,
 - `deployment decision rate`,
 - rozkład po `source_type`, `change_type`, `deployment_model_selected`.
-
-### Przykładowe payloady API
 
 #### `POST /api/benchmark/cases`
 
@@ -332,8 +308,6 @@ Zamiast przeciążać `metrics.py`, lepiej dodać osobny router benchmarkowy.
 }
 ```
 
-## 5. Metryki i eksport
-
 ### Plik: `backend/routers/metrics.py`
 
 Obecny stan:
@@ -344,10 +318,6 @@ Obecny stan:
 ### Zalecana zmiana
 
 `metrics.py` zostawić jako warstwę ogólną, a benchmark summary trzymać w osobnym routerze. Można dodać tylko odsyłacz lub lekki agregat, ale nie mieszać dwóch modeli danych.
-
-## Zmiany frontendowe
-
-### 1. Rozszerzenie klienta API
 
 ### Plik: `frontend/src/api.js`
 
@@ -371,8 +341,6 @@ Dodać funkcje:
 ### Efekt
 
 Frontend zyskuje pełną warstwę zapisu oceny benchmarkowej zamiast samego pobierania wyniku skanu.
-
-### 2. Przenoszenie metadanych benchmarkowych przez flow skanu
 
 ### Plik: `frontend/src/hooks/useAppState.helpers.js`
 
@@ -409,8 +377,6 @@ frontend powinien wysyłać event do `benchmark_events`.
 
 To pozwoli policzyć `time_to_first_result` i `time_to_first_useful_recommendation` bez ręcznego dopisywania danych po benchmarku.
 
-### 3. Panel benchmarkowy w widoku wyniku
-
 ### Plik: `frontend/src/components/phases/ResultPhase.jsx`
 
 Obecny stan:
@@ -422,8 +388,6 @@ Obecny stan:
 ### Zalecana zmiana
 
 Dodać sekcję `Benchmark Review` poniżej rekomendacji.
-
-### Minimalny zakres pól UI
 
 #### Na poziomie przypadku
 
@@ -479,8 +443,6 @@ Minimalny podział odpowiedzialności:
 4. Użytkownik zaznacza decyzję `PR candidate` i `deployment model`.
 5. Użytkownik zapisuje review i opcjonalnie eksportuje rekord do Markdown/CSV.
 
-### 4. Rozszerzenie eksportów wyniku
-
 ### Plik: `frontend/src/components/phases/resultPhaseContent.js`
 
 Obecny stan:
@@ -499,8 +461,6 @@ Dodać dodatkowe warianty eksportu:
 ### Efekt
 
 Pozwoli to przejść z UI bezpośrednio do artefaktów operacyjnych używanych w benchmarku.
-
-### 5. Widok historii benchmarku
 
 ### Plik: `frontend/src/components/tabs/RecentScansTab.jsx`
 
@@ -551,8 +511,6 @@ Każdy event powinien zawierać co najmniej:
 - `timestamp`
 - `metadata`
 
-## ReDSL Integration Status
-
 ### ReDSL Engine — Autonomiczna Refaktoryzacja
 
 **ReDSL** (Re-factor + DSL + Self-Learning) to zaawansowany system refaktoryzacji kodu Python zintegrowany z Semcod. Działa jako osobny serwis HTTP (port 8000/8010) wywoływany przez API.
@@ -592,8 +550,6 @@ Każdy event powinien zawierać co najmniej:
 - `frontend/src/api.js` — `getRedslStatus`, `redslAnalyze`, `redslHealth`, `redslRefactor`, `redslDecide`
 - `frontend/src/components/RedslHealthCard.jsx` — widget dashboard z GradeCircle i badge
 
-### Scenariusze Użycia ReDSL w Semcod
-
 #### Scenariusz A: Health Score + Badge
 1. Użytkownik wchodzi w ReDSL tab
 2. System wywołuje `GET /api/redsl/status` → sprawdza czy engine działa
@@ -626,8 +582,6 @@ Każdy event powinien zawierać co najmniej:
 | PR conversion rate | pr_candidate, next_action | `ResultPhase.jsx`, `RecentScansTab.jsx` | `POST /api/benchmark/.../decision` |
 | Deployment decision rate | deployment_model_selected | `ResultPhase.jsx`, `RecentScansTab.jsx` | `POST /api/benchmark/.../decision` |
 
-## Kolejność wdrożenia
-
 ### Etap 1 — MVP pod benchmark
 
 - dodać `benchmark_cases`, `benchmark_events`, `recommendation_feedback`,
@@ -658,8 +612,6 @@ Każdy event powinien zawierać co najmniej:
 - dodać automatyczne przejście z benchmark case do szkicu PR,
 - dodać dashboard deployment decisions,
 - dodać integrację z zewnętrznymi systemami ticketów (Jira, Linear, GitHub Issues).
-
-## Definicja gotowości produktowej
 
 ### Dla Benchmark KPI:
 

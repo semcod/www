@@ -1,5 +1,3 @@
-# Checklista benchmarku walidacyjnego Semcod
-
 ## Jak używać
 
 Ta checklista jest operacyjnym uzupełnieniem `docs/validation-benchmark.md`.

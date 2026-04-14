@@ -8,8 +8,6 @@ excerpt: "ReDSL to silnik refaktoryzacji, który analizuje kod, podejmuje decyzj
 author: Tom Softreck
 ---
 
-# ReDSL — autonomiczny silnik refaktoryzacji kodu
-
 ## Czym jest ReDSL
 
 ReDSL (Refactoring Domain-Specific Language) to silnik, który automatyzuje refaktoryzację kodu. Nie jest linterem ani statycznym analizatorem — jest agentem, który:

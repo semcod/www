@@ -1,9 +1,3 @@
-# API Reference
-
-## Backend API
-
-### Authentication
-
 #### `GET /auth/github`
 Redirect to GitHub OAuth authorization.
 
@@ -32,8 +26,6 @@ GitHub OAuth callback handler.
 ```
 
 ---
-
-### Audit
 
 #### `POST /api/audit`
 Start a new code health audit for a repository.
@@ -123,8 +115,6 @@ Analyze any public repository by URL (sandbox mode).
 ```
 
 ---
-
-### Metrics
 
 #### `GET /api/metrics/standard`
 Get standardized metrics for recent scans.
@@ -216,8 +206,6 @@ Get metrics for a specific repository.
 
 ---
 
-### Badges
-
 #### `GET /badge/{repo_slug}.svg`
 Generate SVG badge with code health score.
 
@@ -259,8 +247,6 @@ Get list of recent scans.
 
 ---
 
-### Health
-
 #### `GET /api/health`
 Health check endpoint.
 
@@ -275,10 +261,6 @@ Health check endpoint.
 ```
 
 ---
-
-## Benchmark KPI API
-
-### Cases
 
 #### `POST /api/benchmark/cases`
 Create a new benchmark case.
@@ -381,8 +363,6 @@ Update a benchmark case.
 
 ---
 
-### Decisions
-
 #### `POST /api/benchmark/cases/{case_id}/decision`
 Submit deployment decision for a case.
 
@@ -403,8 +383,6 @@ Submit deployment decision for a case.
 **Response:** Updated case object
 
 ---
-
-### Recommendation Feedback
 
 #### `POST /api/benchmark/cases/{case_id}/recommendations/{recommendation_id}/feedback`
 Submit feedback for a specific recommendation.
@@ -465,8 +443,6 @@ Get all feedback for a case.
 
 ---
 
-### Events
-
 #### `POST /api/benchmark/cases/{case_id}/events`
 Track a product event.
 
@@ -502,8 +478,6 @@ Get all events for a case.
 - `case_id` - Benchmark case ID
 
 ---
-
-### Summary & Export
 
 #### `GET /api/benchmark/summary`
 Get benchmark KPI summary.
@@ -554,8 +528,6 @@ Export benchmark cases as CSV.
 
 ReDSL (Refactoring DSL) integration for automated code refactoring.
 
-### Status
-
 #### `GET /api/redsl/status`
 Check if reDSL engine is available.
 
@@ -568,8 +540,6 @@ Check if reDSL engine is available.
 ```
 
 ---
-
-### Analysis
 
 #### `POST /api/redsl/analyze`
 Run reDSL analysis on a project.
@@ -620,8 +590,6 @@ Get unified health score for a project.
 ```
 
 ---
-
-### Refactoring
 
 #### `POST /api/redsl/refactor`
 Run reDSL refactoring on a project.
@@ -693,8 +661,6 @@ Run hybrid quality refactoring (no LLM needed).
 
 ---
 
-### Badge
-
 #### `GET /api/redsl/badge/{owner}/{repo}`
 Generate SVG badge with health score for README embedding.
 
@@ -740,8 +706,6 @@ See [MCP Documentation](./MCP.md) for full details on AI assistant integration.
 - `analyze_public_repo` - Analyze public repo
 
 ---
-
-## Webhooks
 
 #### `POST /webhook/github`
 Handle GitHub webhook events.

@@ -1,15 +1,9 @@
-# 📚 Documentation Update Summary
-
 ## ✅ **Complete Documentation Overhaul - Post Demo Removal**
 
 **Data:** 2026-04-11 16:25  
 **Status:** ✅ **Dokumentacja zaktualizowana i zorganizowana**
 
 ---
-
-## 🔄 **What Was Updated**
-
-### ✅ **README.md - Complete Overhaul**
 
 #### **New Structure:**
 - ✅ **Updated header** - Removed AI cost tracking, added OAuth/Mock badges
@@ -33,8 +27,6 @@
 + ✅ GitHub OAuth flow documentation
 ```
 
-### ✅ **Makefile - Cleaned and Updated**
-
 #### **Removed Targets:**
 - ❌ `make dev-demo` - Demo mode development
 - ❌ `make test-demo` - Demo login tests
@@ -45,8 +37,6 @@
 - ✅ Help messages - Removed demo references
 - ✅ `.PHONY` - Cleaned up target list
 
-#### **Current Available Commands:**
-```bash
 # Development
 make install          # Install dependencies
 make dev              # Start backend + frontend
@@ -76,10 +66,6 @@ make build            # Build frontend for production
 ```
 
 ---
-
-## 📋 **New Documentation Structure**
-
-### ✅ **Categorized Documentation Links:**
 
 #### **🚀 Quick Start**
 - [Getting Started](./docs/getting-started.md) - Quick start and installation
@@ -113,10 +99,6 @@ make build            # Build frontend for production
 
 ---
 
-## 🔧 **Environment Variables Documentation**
-
-### ✅ **Three-Section Structure:**
-
 #### **1. GitHub OAuth Configuration**
 ```bash
 GITHUB_APP_ID=              # GitHub App ID
@@ -133,22 +115,12 @@ MOCK_GITHUB_CLIENT_ID=      # Mock OAuth Client ID
 MOCK_GITHUB_CLIENT_SECRET=  # Mock OAuth Client Secret
 MOCK_USER_LOGIN=            # Mock user login
 MOCK_USER_NAME=             # Mock user name
-# ... 8 more mock variables
-```
-
 #### **3. Application Configuration**
 ```bash
 APP_URL=                    # Backend URL
 FRONTEND_URL=               # Frontend URL
 SECRET_KEY=                 # JWT secret key
 SESSION_EXPIRE_HOURS=       # Session expiration
-# ... 8 more app variables
-```
-
----
-
-## 📊 **API Endpoints Documentation**
-
 ### ✅ **Updated API Table:**
 ```diff
 - ❌ POST /auth/demo - Demo login (DEMO_MODE=1)
@@ -178,33 +150,18 @@ SESSION_EXPIRE_HOURS=       # Session expiration
 
 ---
 
-## 🚀 **Quick Start Workflow**
-
-### ✅ **New Makefile-First Approach:**
-
 #### **1. Installation and Configuration:**
 ```bash
 git clone <repository-url>
 cd semcod/www
 cp .env.example .env
-# For development with mock GitHub - variables already set
-# For production - fill in GITHUB_APP_ID, GITHUB_CLIENT_ID, etc.
-```
-
 #### **2. Development (Recommended):**
 ```bash
 make install    # Install dependencies
 make dev        # Start backend + frontend
-# Access: http://localhost:8200 (backend), http://localhost:5174 (frontend)
-```
-
 #### **3. Docker with Mock GitHub:**
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.sim.yml up -d
-# Access: http://localhost:3000 (frontend), http://localhost:8003 (backend)
-# Mock GitHub: http://localhost:4010
-```
-
 #### **4. Testing:**
 ```bash
 make test-fast   # Quick unit tests (~2s)
@@ -212,8 +169,6 @@ make test-e2e    # Full E2E tests (requires running services)
 ```
 
 ---
-
-## 🎯 **Documentation Quality Improvements**
 
 ### ✅ **Consistency Updates:**
 - ✅ **Unified terminology** - "GitHub OAuth" instead of "Demo login"
@@ -244,8 +199,6 @@ make test-e2e    # Full E2E tests (requires running services)
 
 ---
 
-## 🎉 **Final Documentation State**
-
 ### ✅ **Production Ready Documentation:**
 - **Complete** - All current features documented
 - **Accurate** - No deprecated or removed features
@@ -261,8 +214,6 @@ make test-e2e    # Full E2E tests (requires running services)
 - 🎯 **100% organized documentation structure**
 
 ---
-
-## 🚀 **Ready for Use**
 
 ### ✅ **Documentation Status: PRODUCTION READY**
 

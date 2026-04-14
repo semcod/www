@@ -14,11 +14,6 @@ Complete GitHub OAuth simulation for testing the `tom-sapletta-com` user login f
 └────────────────┘     └────────────────┘     └─────────────────┘
 ```
 
-## 🚀 Quick Start
-
-### Option 1: With Docker Compose (Recommended)
-
-```bash
 # Start the full stack with simulation
 docker compose -f docker-compose.yml -f docker-compose.sim.yml up -d
 
@@ -29,30 +24,16 @@ curl http://localhost:4010/health
 open http://localhost:3000
 ```
 
-### Option 2: Standalone Mock Server
-
-```bash
-# Start only the mock GitHub server
-./run-sim.sh
-
 # Or manually:
 cd mock-github
 pip install -r requirements.txt
 uvicorn server:app --host 0.0.0.0 --port 4010
 ```
 
-## 🧪 Testing
-
-### API Tests (No Browser)
-
-```bash
 # Test OAuth flow with mock server
 npx playwright test frontend/e2e/github-login-sim.spec.js --grep "mock server"
 ```
 
-### Full Browser Tests
-
-```bash
 # Complete end-to-end test with browser
 npx playwright test frontend/e2e/github-login-sim.spec.js --headed
 ```
@@ -90,8 +71,6 @@ npx playwright test frontend/e2e/github-login-sim.spec.js --headed
 4. **Token Exchange**: Backend exchanges code for access token via mock
 5. **Profile Fetch**: Backend fetches user profile from mock `/user` endpoint
 6. **Session Creation**: Backend creates JWT session and redirects to frontend
-
-## ⚙️ Configuration
 
 ### Environment Variables (Backend Override)
 
@@ -135,8 +114,6 @@ APP_URL=http://localhost:8003
 └── frontend/e2e/github-login-sim.spec.js  # Playwright tests
 ```
 
-## 🛠️ Development
-
 ### Adding New Test Users
 
 Edit `mock-github/server.py` and add to `MOCK_USERS` and `MOCK_REPOS`:
@@ -167,11 +144,6 @@ The mock server supports standard OAuth parameters:
 - `scope` - Optional, defaults to "read:user,repo"
 - `state` - Optional, passed through to callback
 
-## 🔍 Troubleshooting
-
-### Mock Server Not Starting
-
-```bash
 # Check Docker logs
 docker compose logs mock-github
 
@@ -185,9 +157,6 @@ cd mock-github && python server.py
 2. Check backend environment variables: `docker compose exec backend env | grep GITHUB`
 3. Verify frontend URL configuration matches `FRONTEND_URL`
 
-### Tests Not Passing
-
-```bash
 # Install Playwright browsers
 npx playwright install
 
@@ -217,4 +186,3 @@ The test suite covers:
 - [Backend OAuth Implementation](backend/routers/auth.py)
 - [Frontend Login Flow](frontend/src/components/)
 - [Docker Compose Configuration](docker-compose.yml)
-- [Playwright Testing Guide](frontend/e2e/README.md)

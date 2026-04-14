@@ -8,8 +8,6 @@ excerpt: "Model biznesowy Semcod: platforma AI zarządzająca kodem od ticketu d
 author: Tom Softreck
 ---
 
-# Semcod Marketplace — od analizy kodu do dystrybucji artefaktów
-
 ## Teza
 
 Narzędzia AI dla developerów (Copilot, Cursor, CodeRabbit) rozwiązują problemy na poziomie edytora i pojedynczego PR. Semcod celuje wyżej: na poziom, gdzie AI zarządza całym repozytorium — od analizy, przez naprawy, po deployment i dystrybucję do klienta końcowego.
@@ -31,8 +29,6 @@ Porównanie:
 | Scope | jeden plik | cały projekt |
 | Deployment | brak | wbudowany |
 | Monetyzacja | brak | marketplace |
-
-## Trzy modele wdrożenia
 
 ### Model A — Self-managed
 
@@ -98,8 +94,6 @@ Opcjonalnie: publish na Marketplace
 ```
 
 Approval gate człowieka jest konfigurowalny: przy każdym PR, co N zmian, lub pełen auto-mode.
-
-## Strategia wejścia na rynek
 
 ### Krok 1 — Projekty open source
 

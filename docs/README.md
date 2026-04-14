@@ -9,8 +9,6 @@
 **License:** Not specified  
 **Repository:** [https://github.com/semcod/www](https://github.com/semcod/www)
 
-## Installation
-
 ### From PyPI
 
 ```bash
@@ -30,14 +28,6 @@ pip install -e .
 ```bash
 pip install www[dev]    # development tools
 ```
-
-## Quick Start
-
-### CLI Usage
-
-```bash
-# Generate full documentation for your project
-www ./my-project
 
 # Only regenerate README
 www ./my-project --readme-only
@@ -147,8 +137,6 @@ Content outside the markers is preserved when regenerating. Enable this with `sy
 ```
 www/
 ├── project├── run-sim    ├── generate-certs    ├── store    ├── server    ├── database    ├── db_session    ├── sample_projects    ├── worker/    ├── config        ├── scan_job    ├── db_models        ├── autopr_helpers        ├── webhook_service        ├── mirror    ├── quality_gate        ├── redsl_client        ├── scoring        ├── autofix        ├── stripe_connect        ├── mirror_models        ├── scan_service        ├── github_client        ├── pipeline        ├── tenants_orm        ├── users        ├── schema        ├── analyzer        ├── tenants        ├── events        ├── tickets_orm        ├── users_orm        ├── benchmark_orm    ├── db_module/        ├── installations        ├── billing        ├── repositories_orm        ├── installations_orm        ├── scans        ├── db_connection        ├── tickets_query        ├── repositories        ├── scans_orm        ├── events_orm        ├── env        ├── _celery_stub            ├── marketplace            ├── 0001_initial_schema            ├── maintenance        ├── tasks/            ├── autopr            ├── redsl        ├── scan_samples    ├── events/            ├── scan        ├── wrappers        ├── loader        ├── registry    ├── apps/        ├── models            ├── hooks        ├── base            ├── pipeline            ├── pipeline            ├── pipeline    ├── adapters/        ├── gitea_events        ├── base        ├── gitea        ├── github        ├── system        ├── gitlab_events        ├── gitlab        ├── webhook        ├── auth        ├── trend        ├── cron        ├── metrics        ├── badge        ├── benchmark        ├── webhook_v2        ├── report        ├── audit        ├── billing            ├── webhook        ├── tickets/            ├── redsl            ├── models        ├── mirror        ├── marketplace/            ├── crud            ├── deploy            ├── models        ├── autopr            ├── browse            ├── publish            ├── connect            ├── billing        ├── mcp/            ├── models        ├── config        ├── config        ├── constants        ├── config            ├── resources        ├── App        ├── main            ├── tools            ├── usePolling            ├── useBenchmarkTracking            ├── useAuth            ├── useSession        ├── api            ├── useBenchmarkState            ├── useRepoList            ├── useUrlState            ├── useAppState            ├── useAuditActions            ├── useBilling            ├── Header            ├── useDownloads            ├── LanguageBar            ├── MarketplaceDashboard            ├── MetricCard            ├── ProgressSteps            ├── RecommendationCard            ├── GradeCircle            ├── PaywallModal        ├── components/            ├── Preview            ├── LoginMultiPlatform            ├── ShareButtons            ├── RedslHealthCard            ├── AppCard            ├── InstallButton                ├── parts                ├── BenchmarkDecisionPanel                ├── BenchmarkReviewPanel                ├── RecommendationFeedbackForm                ├── AuthPhase            ├── phases/                ├── ScanningPhase                ├── ReposPhase                    ├── ErrorResult                    ├── ResultRecommendations                    ├── ResultMetrics                    ├── DownloadButtons                    ├── index/                ├── LandingPhase                ├── LanguageBar                    ├── ResultHeader                ├── MetricCard                ├── RecommendationCard                ├── GradeCircle            ├── ui/                    ├── ResultTabPanel                ├── TrendTab                ├── recentScansHelpers                ├── PRBotTab                    ├── parts                ├── RepoTab                ├── TrendSummaryCard                    ├── parts            ├── tabs/                    ├── parts                ├── BadgeTab                ├── MarketplaceTab                ├── SettingsTab                ├── AddScheduleForm                ├── ScheduleRow                ├── RecentScansTab            ├── spec                ├── TrendChart            ├── spec            ├── share            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec                ├── cy        ├── auto-pr-example            ├── spec        ├── auto-pr-cli    ├── setup-gitea        ├── spec        ├── config            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec    ├── server            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec            ├── spec        ├── karate-config            ├── spec        ├── auto_pr_client        ├── redsl```
-
-## API Overview
 
 ### Classes
 
@@ -1318,10 +1306,6 @@ www/
 📄 `scripts.setup-gitea` (11 functions, 2 classes)
 📄 `traefik.generate-certs`
 
-## Requirements
-
-- axios ^1.15.0
-
 ## Contributing
 
 **Contributors:**
@@ -1330,19 +1314,12 @@ www/
 
 We welcome contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
-### Development Setup
-
-```bash
 # Clone the repository
 git clone https://github.com/semcod/www
 cd www
 
 # Install in development mode
 pip install -e ".[dev]"
-
-# Run tests
-pytest
-```
 
 ## Documentation
 
@@ -1358,13 +1335,13 @@ pytest
 |--------|-------------|------|
 | `README.md` | Project overview (this file) | — |
 | `docs/api.md` | Consolidated API reference | [View](./docs/api.md) |
-| `docs/modules.md` | Module reference with metrics | [View](./docs/modules.md) |
+| `docs/modules.md` | Module reference with metrics | [View](https://github.com/wronai/www/blob/main/docs/modules.md) |
 | `docs/architecture.md` | Architecture with diagrams | [View](./docs/architecture.md) |
-| `docs/dependency-graph.md` | Dependency graphs | [View](./docs/dependency-graph.md) |
-| `docs/coverage.md` | Docstring coverage report | [View](./docs/coverage.md) |
+| `docs/dependency-graph.md` | Dependency graphs | [View](https://github.com/wronai/www/blob/main/docs/dependency-graph.md) |
+| `docs/coverage.md` | Docstring coverage report | [View](https://github.com/wronai/www/blob/main/docs/coverage.md) |
 | `docs/getting-started.md` | Getting started guide | [View](./docs/getting-started.md) |
-| `docs/configuration.md` | Configuration reference | [View](./docs/configuration.md) |
-| `docs/api-changelog.md` | API change tracking | [View](./docs/api-changelog.md) |
+| `docs/configuration.md` | Configuration reference | [View](https://github.com/wronai/www/blob/main/docs/configuration.md) |
+| `docs/api-changelog.md` | API change tracking | [View](https://github.com/wronai/www/blob/main/docs/api-changelog.md) |
 | `CONTRIBUTING.md` | Contribution guidelines | [View](./CONTRIBUTING.md) |
 | `examples/` | Usage examples | [Browse](./examples) |
 | `mkdocs.yml` | MkDocs configuration | — |

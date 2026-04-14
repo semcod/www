@@ -8,8 +8,6 @@ excerpt: "Semcod to nie kolejny linter. To platforma, która skanuje, naprawia i
 author: Tom Softreck
 ---
 
-# Semcod — platforma AI do zarządzania jakością kodu i deploymentem
-
 ## Problem, który rozwiązujemy
 
 Każdy zespół programistyczny zna ten scenariusz: CI pipeline sprawdza testy i linting, code review łapie oczywiste błędy, ale nikt systematycznie nie patrzy na architekturę, złożoność i trendy jakości w czasie. Problemy narastają niewidocznie — plik po pliku, commit po commicie — aż god module ma 800 linii i nikt nie chce go dotykać.
@@ -47,10 +45,6 @@ Semcod celowo omija model wtyczek i narzędzi dla developerów. Zamiast tego wch
 
 To model biznesowy, w którym AI jest platformą, nie narzędziem.
 
-## Obecny stan
-
-# Walkthrough: Refaktoryzacja semcod/www — Fazy 0, 1, 2
-
 ## Cel
 
 Realizacja zadań z `docs/refactoring-todo.toon.yaml` dla projektu `semcod/www`:
@@ -69,8 +63,6 @@ Usunięte pliki o 0 linii kodu, nigdy nieimportowane:
 `server_old.py` — nie istniał już w repozytorium.
 
 ---
-
-## PHASE 1 — Split Frontend Hotspots
 
 ### 1.1 `useAppState` → 4 pliki
 

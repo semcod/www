@@ -8,8 +8,6 @@ excerpt: "Raport z analizy jakości kodu platformy semcod.dev: 73 pliki, CC̄=3.
 author: Tom Softreck
 ---
 
-# Semcod WWW — status projektu i plan rozwoju
-
 ## Przegląd projektu
 
 Semcod WWW to główna platforma webowa organizacji Semcod. Backend w Python (FastAPI), frontend w React (Vite), deployment via Docker. Produkt umożliwia one-click audit repozytoriów, generowanie health badge, integrację z GitHub przez webhooks i OAuth, oraz integrację z agentami AI przez Model Context Protocol (MCP).

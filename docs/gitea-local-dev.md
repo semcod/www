@@ -14,9 +14,6 @@ Zastępuje mock-github prawdziwą instancją Gitea w Docker do pełnego testowan
 | PR Comment Bot | Nie testowany | Pełny cykl: webhook → analiza → komentarz |
 | Adapter coverage | Tylko mock | Testuje prawdziwy `GiteaAdapter` |
 
-## Szybki start
-
-```bash
 # Uruchom cały cykl
 make gitea-cycle
 ```

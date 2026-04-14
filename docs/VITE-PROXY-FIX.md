@@ -1,5 +1,3 @@
-# 🔧 Vite Proxy Fix - Development Environment
-
 ## 🚨 **Problem: Vite Proxy Error**
 
 Frontend na porcie 5174 próbował połączyć się z backendiem na porcie 9000, ale backend działał na 8200:
@@ -45,10 +43,6 @@ server: {
 
 ---
 
-## 🛠️ **Solution Applied**
-
-### ✅ **1. Fixed Vite Configuration**
-```bash
 # Updated frontend/vite.config.js:
 - port: 5173 → port: 5174
 - proxy targets: localhost:9000 → localhost:8200
@@ -60,21 +54,10 @@ cd backend
 APP_URL=http://localhost:8200 FRONTEND_URL=http://localhost:5174 python3 -m uvicorn server:app --reload --port 8200 --host 0.0.0.0
 ```
 
-### ✅ **3. Verified Connection**
-```bash
 # Backend health check
 curl http://localhost:8200/api/health
-# Response: {"status":"ok"}
-
 # OAuth redirect test
 curl -I http://localhost:8200/auth/github
-# Response: HTTP/1.1 307 Found
-```
-
----
-
-## 🚀 **Development Environment Setup**
-
 ### ✅ **Complete Working Setup:**
 
 **Terminal 1 - Backend:**
@@ -110,8 +93,6 @@ make dev
 
 ---
 
-## 🔧 **Environment Variables**
-
 ### ✅ **Backend Variables:**
 ```bash
 APP_URL=http://localhost:8200           # Backend URL for OAuth
@@ -134,8 +115,6 @@ proxy: {
 ```
 
 ---
-
-## 🧪 **Testing the Fix**
 
 ### ✅ **Verification Steps:**
 
@@ -166,8 +145,6 @@ proxy: {
 
 ---
 
-## 🔍 **Troubleshooting**
-
 ### ✅ **Common Issues:**
 
 **Proxy errors still occur:**
@@ -192,13 +169,6 @@ echo $FRONTEND_URL
 ```bash
 # Test OAuth endpoint directly
 curl -I http://localhost:8200/auth/github
-# Should return 307 redirect
-```
-
----
-
-## 🎯 **Best Practices**
-
 ### ✅ **Development Setup:**
 1. **Always use consistent ports** - 5174 for frontend, 8200 for backend
 2. **Set environment variables** before starting services

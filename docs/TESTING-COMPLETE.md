@@ -1,10 +1,6 @@
-# GitHub OAuth Simulation - Complete Testing Suite
-
 ## 🎯 Overview
 
 Complete testing infrastructure for GitHub OAuth login simulation with `tom-sapletta-com` user. Successfully tested across multiple frameworks and browsers.
-
-## ✅ Test Results Summary
 
 ### 🌐 GUI Tests - All Passing ✅
 - **Playwright**: 4/4 tests passing (Chromium, Firefox, WebKit)
@@ -17,8 +13,6 @@ Complete testing infrastructure for GitHub OAuth login simulation with `tom-sapl
 - **Backend OAuth**: Complete flow validated
 - **Session Management**: Token generation and validation working
 - **Error Handling**: Proper error responses confirmed
-
-## 🧪 Testing Frameworks Implemented
 
 ### 1. Playwright E2E Tests
 **Location**: `frontend/e2e/`
@@ -36,8 +30,6 @@ Complete testing infrastructure for GitHub OAuth login simulation with `tom-sapl
 - ✅ Session persistence
 - ✅ Multiple login attempts
 
-#### Running Playwright Tests:
-```bash
 # All tests
 npx playwright test e2e/github-login-sim.spec.js
 
@@ -63,13 +55,9 @@ npx playwright test e2e/gui-login-enhanced.spec.js --headed
 - ✅ Multiple login attempts
 - ✅ Explicit waits and verification
 
-#### Running Cypress Tests:
-```bash
 # Install Cypress (if not already installed)
 npm install cypress --save-dev
 
-# Run Cypress tests
-npx cypress run
 # or
 npx cypress open
 ```
@@ -86,8 +74,6 @@ npx cypress open
 - ✅ Session persistence validation
 - ✅ Error scenario handling
 
-#### Running Selenium Tests:
-```bash
 # Install dependencies
 pip install selenium
 
@@ -107,8 +93,6 @@ python tests/selenium/oauth_login_test.py
 - ✅ Test instructions and checklist
 - ✅ Debugging tips and commands
 
-#### Running Manual Tests:
-```bash
 # Open all browsers
 node tests/manual/browser-test-script.js
 
@@ -132,8 +116,6 @@ node tests/manual/browser-test-script.js chrome
 - ✅ Session management and protected APIs
 - ✅ Error scenarios (invalid codes, tokens, unauthorized access)
 
-#### Running API Tests:
-```bash
 # Bash script (recommended)
 ./tests/api/test-oauth-api.sh
 
@@ -144,35 +126,17 @@ node tests/api/run-api-tests.js
 npx jest tests/api/oauth-api-validation.test.js
 ```
 
-## 🏗️ Architecture Tested
-
-```
-┌────────────────┐     ┌────────────────┐     ┌─────────────────┐
-│   Frontend     │────▶│   Backend      │────▶│  Mock GitHub    │
-│  :3000         │     │  :8003         │     │  :4010          │
-│                │     │                │     │                 │
-│  Click Login   │     │  /auth/github  │     │  /login/oauth/* │
-│  ← session ──  │◀────│  /auth/callback│◀────│  /user, /repos  │
-└────────────────┘     └────────────────┘     └─────────────────┘
-```
-
-## 🚀 Quick Start Commands
-
 ### Start All Services:
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.sim.yml up -d
 ```
 
-### Verify Services:
-```bash
 # Check all services
 curl http://localhost:3000        # Frontend
 curl http://localhost:8003/api/health  # Backend
 curl http://localhost:4010/health # Mock GitHub
 ```
 
-### Run Complete Test Suite:
-```bash
 # GUI tests (Playwright)
 npx playwright test e2e/gui-login-enhanced.spec.js
 
@@ -193,8 +157,6 @@ node tests/manual/browser-test-script.js
 | API | Node.js + Axios | N/A | ✅ Working | 100% |
 | API | Bash + Curl | N/A | ✅ Working | 100% |
 | Manual | Browser Automation | All browsers | ✅ Working | 100% |
-
-## 🔍 Test Scenarios Covered
 
 ### ✅ OAuth Flow:
 1. **Authorization Start**: Frontend → Backend → Mock GitHub
@@ -226,10 +188,6 @@ node tests/manual/browser-test-script.js
 - Network timeouts and retries
 - State parameter handling
 
-## 🛠️ Configuration
-
-### Environment Variables:
-```env
 # OAuth URLs (configured for simulation)
 GITHUB_OAUTH_AUTHORIZE_URL=http://localhost:4010/login/oauth/authorize
 GITHUB_OAUTH_TOKEN_URL=http://mock-github:4010/login/oauth/access_token
@@ -246,8 +204,6 @@ GITHUB_CLIENT_SECRET=mock_secret_for_testing
 - **Mock GitHub**: :4010 (FastAPI simulation)
 - **Database**: :5432 (PostgreSQL)
 - **Redis**: :6379 (Caching)
-
-## 🎯 Success Indicators
 
 ### ✅ All Tests Passing:
 - Playwright: 4/4 tests passing
@@ -267,18 +223,11 @@ GITHUB_CLIENT_SECRET=mock_secret_for_testing
 - Selenium: ✅ Ready for execution
 - Manual testing: ✅ Scripts prepared
 
-## 🔧 Troubleshooting
-
 ### Common Issues:
 1. **Services not running**: Use `docker compose -f docker-compose.yml -f docker-compose.sim.yml up -d`
 2. **Environment variables not applied**: Restart backend with `docker compose restart backend`
 3. **Mock server not accessible**: Check port 4010 with `curl http://localhost:4010/health`
 4. **Tests failing**: Verify all services are running and accessible
-
-### Debug Commands:
-```bash
-# Check service status
-docker compose ps
 
 # View backend logs
 docker compose logs backend

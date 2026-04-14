@@ -1,10 +1,6 @@
-# Semcod - Dokumentacja
-
 ## Co to jest Semcod?
 
 Semcod to narzędzie do automatycznej analizy zdrowia kodu (code health analysis) dla repozytoriów Git. Analizuje złożoność, duplikacje, jakość i generuje raporty z rekomendacjami refaktoryzacji.
-
-## Funkcjonalności
 
 ### 🔍 Analiza Kodu
 - **Automatyczne skanowanie** repozytoriów GitHub, GitLab, Bitbucket
@@ -63,10 +59,6 @@ Semcod to narzędzie do automatycznej analizy zdrowia kodu (code health analysis
 - Pełna historia dostępna w zakładce "Ostatnie Skany"
 - API do pobierania metryk dla klientów
 
-## API
-
-### Endpoint'y Benchmark KPI
-
 #### Utwórz przypadek benchmarkowy
 ```bash
 curl -X POST http://localhost:9000/api/benchmark/cases \
@@ -91,8 +83,6 @@ curl http://localhost:9000/api/benchmark/summary
 curl http://localhost:9000/api/benchmark/export.json -o benchmark.json
 curl http://localhost:9000/api/benchmark/export.csv -o benchmark.csv
 ```
-
-### Endpoint'y ReDSL
 
 #### Status silnika
 ```bash
@@ -124,8 +114,6 @@ curl -X POST http://localhost:9000/api/redsl/refactor \
 ```markdown
 ![Code Health](https://semcod.com/api/redsl/badge/owner/repo)
 ```
-
-### Endpoint'y Metryk
 
 #### Pobierz standardowe metryki
 ```bash
@@ -169,8 +157,6 @@ curl http://localhost:9000/api/metrics/prompt -o prompt.txt
 curl http://localhost:9000/api/metrics/prompt/markdown -o prompt.md
 ```
 
-### Endpoint'y Badge'ów
-
 #### Pobierz badge zdrowia kodu
 ```bash
 curl http://localhost:9000/badge/owner-repo.svg -o badge.svg
@@ -180,8 +166,6 @@ Markdown dla README:
 ```markdown
 ![Code Health](https://semcod.com/badge/owner-repo.svg)
 ```
-
-## Użycie
 
 ### Szybki Start (Sandbox Mode)
 
@@ -208,9 +192,6 @@ Po skanowaniu możesz pobrać dane w różnych formatach:
 
 Te dane możesz następnie użyć z Claude, GPT-4, lub innym LLM do uzyskania szczegółowych sugestii refaktoryzacji.
 
-## Przykład Użycia z LLM
-
-```bash
 # Pobierz prompt
 curl https://semcod.com/api/metrics/prompt -o prompt.txt
 
@@ -231,11 +212,6 @@ Semcod wykorzystuje następujące narzędzia:
 - **vallm** - walidacja LLM
 - **reDSL** - silnik refaktoryzacji DSL (15 akcji, health score, auto-PR)
 
-## Konfiguracja
-
-### Zmienne Środowiskowe
-
-```env
 # Backend
 FRONTEND_URL=http://localhost:5173
 PUBLIC_URL=https://semcod.com
@@ -252,9 +228,6 @@ GITHUB_WEBHOOK_SECRET=your_webhook_secret
 REDLS_URL=http://localhost:8000
 ```
 
-### Uruchomienie Lokalne
-
-```bash
 # Backend
 cd backend
 pip install -r requirements.txt
@@ -271,8 +244,6 @@ npm run dev
 ```bash
 docker-compose up -d
 ```
-
-## Testy
 
 ### E2E Tests
 
@@ -293,10 +264,6 @@ pytest tests/
 - ✅ GitHub (publiczne + prywatne przez App)
 - ✅ GitLab (publiczne)
 - ✅ Bitbucket (publiczne)
-
-## Licencja
-
-MIT
 
 ## Support
 

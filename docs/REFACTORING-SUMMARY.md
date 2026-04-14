@@ -1,13 +1,3 @@
-# 🔧 Refaktoryzacja Konfiguracji - Wszystko w .env
-
-## ✅ **Zakończono sukcesem** - Wszystkie dane przeniesione do `.env`
-
----
-
-## 📋 **Co zostało zrefaktoryzowane:**
-
-### 1. ✅ **Plik `.env` - Dodano zmienne środowiskowe**
-```bash
 # Mock GitHub Simulation Configuration
 MOCK_GITHUB_CLIENT_ID=Iv1.mock_test_client
 MOCK_GITHUB_CLIENT_SECRET=mock_secret_for_testing
@@ -26,8 +16,6 @@ MOCK_USER_AVATAR_URL=https://avatars.githubusercontent.com/u/5669315?v=4
 MOCK_USER_PUBLIC_REPOS=150
 ```
 
-### 2. ✅ **Docker Compose Simulation - Użycie zmiennych**
-```yaml
 # backend - teraz używa zmiennych z .env
 - GITHUB_CLIENT_ID=${MOCK_GITHUB_CLIENT_ID}
 - GITHUB_CLIENT_SECRET=${MOCK_GITHUB_CLIENT_SECRET}
@@ -38,11 +26,6 @@ MOCK_USER_PUBLIC_REPOS=150
 - MOCK_USER_LOGIN=${MOCK_USER_LOGIN}
 - MOCK_USER_NAME=${MOCK_USER_NAME}
 - MOCK_USER_EMAIL=${MOCK_USER_EMAIL}
-# ... itd.
-```
-
-### 3. ✅ **Mock GitHub Server - Dynamiczne wczytywanie**
-```python
 # Zamiast hardcoded values:
 def get_mock_user():
     return {
@@ -55,10 +38,6 @@ def get_mock_user():
 
 ---
 
-## 🔄 **Przed vs Po refaktoryzacji:**
-
-### ❌ **Przed (Hardcoded):**
-```python
 # mock-github/server.py
 MOCK_USERS = {
     "tom-sapletta-com": {
@@ -74,8 +53,6 @@ MOCK_USERS = {
 - GITHUB_CLIENT_SECRET=mock_secret_for_testing  # CODED
 ```
 
-### ✅ **Po (Environment Variables):**
-```python
 # mock-github/server.py
 def get_mock_user():
     return {
@@ -91,21 +68,6 @@ def get_mock_user():
 ```
 
 ---
-
-## 🧪 **Wyniki Testów - Wszystko działa!**
-
-### ✅ **Playwright Tests: 4/4 passing**
-```
-✅ Chromium - Full OAuth flow (2.7s)
-✅ Firefox - Full OAuth flow (2.5s)  
-✅ WebKit - Full OAuth flow (2.5s)
-✅ Manual exploration (2.5s)
-```
-
-### ✅ **API Tests - All working**
-```bash
-# OAuth Start
-Status: 307 ✅
 
 # Token Exchange
 {
@@ -123,24 +85,15 @@ Status: 307 ✅
 } ✅
 ```
 
-### ✅ **Environment Variables Verification**
-```bash
 # Backend container
 docker compose exec backend env | grep MOCK
 ✅ MOCK_USER_LOGIN=tom-sapletta-com
 ✅ MOCK_USER_NAME=Tom Sapletta
 ✅ MOCK_GITHUB_CLIENT_ID=Iv1.mock_test_client
-# ... wszystkie 12 zmiennych
-
 # Mock GitHub container  
 docker compose exec mock-github env | grep MOCK
 ✅ MOCK_USER_LOGIN=tom-sapletta-com
 ✅ MOCK_USER_NAME=Tom Sapletta
-# ... wszystkie 12 zmiennych
-```
-
----
-
 ## 📊 **Lokalizacja danych - Przed vs Po:**
 
 | Typ danych | Przed | Po |
@@ -153,8 +106,6 @@ docker compose exec mock-github env | grep MOCK
 | **Real GitHub secrets** | `.env` | ✅ `.env` (bez zmian) |
 
 ---
-
-## 🎯 **Korzyści refaktoryzacji:**
 
 ### ✅ **Centralizacja konfiguracji:**
 - Wszystkie dane w jednym pliku `.env`
@@ -178,10 +129,6 @@ docker compose exec mock-github env | grep MOCK
 
 ---
 
-## 🚀 **Użycie - Jak zmienić konfigurację:**
-
-### Zmiana użytkownika testowego:
-```bash
 # .env
 MOCK_USER_LOGIN=new-test-user
 MOCK_USER_NAME=New Test User
@@ -192,8 +139,6 @@ MOCK_USER_COMPANY=New Company
 docker compose restart backend mock-github
 ```
 
-### Zmiana OAuth credentials:
-```bash
 # .env
 MOCK_GITHUB_CLIENT_ID=new_client_id
 MOCK_GITHUB_CLIENT_SECRET=new_secret
@@ -203,8 +148,6 @@ docker compose restart backend
 ```
 
 ---
-
-## 🎉 **Podsumowanie**
 
 ### ✅ **100% sukcesu refaktoryzacji:**
 - ✅ **Wszystkie dane przeniesione do `.env`**

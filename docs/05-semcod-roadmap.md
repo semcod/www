@@ -8,8 +8,6 @@ excerpt: "Sześć faz rozwoju Semcod: stabilizacja, walidacja nowej jakości, wa
 author: Tom Softreck
 ---
 
-# Roadmap Semcod — od walidacji jakości do autonomicznego deploymentu
-
 ## Trzy pytania, na które odpowiada ten roadmap
 
 1. **Czy Semcod wykrywa coś nowego?** Coś, czego nie pokazują standardowe lintery, testy i code review?

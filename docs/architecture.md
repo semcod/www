@@ -1,5 +1,3 @@
-# Architecture Overview
-
 ## System Architecture
 
 ```
@@ -84,8 +82,6 @@
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-## Component Details
-
 ### Frontend (React + Vite)
 
 **Structure:**
@@ -154,8 +150,6 @@ frontend/src/
 | RedslClient | `services/redsl_client.py` | ReDSL engine HTTP client |
 
 ---
-
-## Data Flow
 
 ### 1. Audit Flow
 
@@ -237,8 +231,6 @@ Request: GET /api/metrics/standard
 ```
 
 ---
-
-## Database Schema
 
 ### SQLite (`scans.db`)
 
@@ -352,8 +344,6 @@ AI Assistant (Claude/Cascade)
 - `analyze_public_repo` - Sandbox analysis
 
 ---
-
-## Deployment
 
 ### Docker Compose
 

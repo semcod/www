@@ -1,7 +1,3 @@
-# Getting Started
-
-## Quick Start
-
 ### 1. Clone and Install
 
 ```bash
@@ -61,8 +57,6 @@ Navigate to `http://localhost:3000`
 
 ---
 
-## First Audit
-
 ### Public Repository (Sandbox Mode)
 
 1. On the landing page, enter a public repo URL:
@@ -87,8 +81,6 @@ Navigate to `http://localhost:3000`
 3. Start audit with one click
 
 ---
-
-## API Usage
 
 ### cURL Examples
 
@@ -141,8 +133,6 @@ print(f"Grade: {result['grade']}")
 ```
 
 ---
-
-## Understanding Results
 
 ### Health Score Calculation
 
@@ -230,8 +220,6 @@ Add a health badge to your README:
 - For The Badge: `?style=for-the-badge`
 
 ---
-
-## Common Issues
 
 ### "Failed to clone repository"
 - For private repos: Check your GitHub token has `repo` scope

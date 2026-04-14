@@ -1,5 +1,3 @@
-# 🔧 OAuth Development Environment Fix
-
 ## 🚨 **Problem Identified**
 
 OAuth działa poprawnie w Docker (port 3000) ale nie w lokalnym development (port 5174) z `make dev`.
@@ -20,8 +18,6 @@ OAuth:    ❌ Przekierowuje do http://localhost:5174/auth/github
 
 ---
 
-## 🔍 **Root Cause Analysis**
-
 ### ✅ **Problem Sources Identified:**
 
 1. **Brakujące zmienne środowiskowe w Makefile**
@@ -37,8 +33,6 @@ OAuth:    ❌ Przekierowuje do http://localhost:5174/auth/github
    - Backend musi być uruchomiony osobno
 
 ---
-
-## 🛠️ **Solutions Implemented**
 
 ### ✅ **1. Makefile Configuration Fix**
 
@@ -73,24 +67,8 @@ CORS_ORIGINS = [o.strip() for o in os.getenv("CORS_ORIGINS", default_origins).sp
 
 ---
 
-## 🚀 **How to Use Development Environment**
-
-### ✅ **Option 1: Use Docker (Recommended)**
-```bash
 # Zawsze działa, pełne środowisko
 docker compose -f docker-compose.yml -f docker-compose.sim.yml up -d
-# Dostęp: http://localhost:3000
-```
-
-### ✅ **Option 2: Fixed Local Development**
-```bash
-# Uruchom backend i frontend jednocześnie
-make dev
-# Dostęp: http://localhost:5174 (frontend), http://localhost:8200 (backend)
-```
-
-### ✅ **Option 3: Manual Development**
-```bash
 # Terminal 1 - Backend
 cd backend
 APP_URL=http://localhost:8200 FRONTEND_URL=http://localhost:5174 python3 -m uvicorn server:app --reload --port 8200
@@ -101,8 +79,6 @@ VITE_API_URL=http://localhost:8200 npm run dev -- --port 5174
 ```
 
 ---
-
-## 🔧 **Environment Variables Explained**
 
 ### ✅ **Frontend Variables:**
 ```bash
@@ -119,8 +95,6 @@ FRONTEND_URL=http://localhost:5174  # Frontend URL dla CORS
 Backend automatycznie dodaje localhost origins gdy wykryje localhost w FRONTEND_URL.
 
 ---
-
-## 🧪 **Testing the Fix**
 
 ### ✅ **Verification Steps:**
 
@@ -156,8 +130,6 @@ Backend automatycznie dodaje localhost origins gdy wykryje localhost w FRONTEND_
 
 ---
 
-## 🎯 **Recommendations**
-
 ### ✅ **For Development:**
 1. **Używaj Docker** dla pełnego środowiska z bazą danych i Redis
 2. **Używaj `make dev`** dla szybkiego developmentu bez zależności Docker
@@ -169,8 +141,6 @@ Backend automatycznie dodaje localhost origins gdy wykryje localhost w FRONTEND_
 3. **Używaj odpowiednich portów** dla każdego środowiska
 
 ---
-
-## 🔍 **Troubleshooting**
 
 ### ✅ **Common Issues:**
 
@@ -193,12 +163,6 @@ grep CORS_ORIGINS backend/config.py
 
 **Frontend nie łączy się z API:**
 ```bash
-# Sprawdź console w przeglądarce
-# Powinno pokazywać requesty do http://localhost:8200
-```
-
----
-
 ## ✅ **Fix Summary**
 
 **Problem:** OAuth działał w Docker ale nie w lokalnym development z `make dev`

@@ -1,5 +1,3 @@
-# Semcod GitHub App — Setup & Deployment Guide
-
 ## Architektura
 
 ```
@@ -28,8 +26,6 @@
 └─────────────────────────────────────────────────────┘
 ```
 
-## Szybki start (development)
-
 ### 1. Utwórz GitHub App
 
 1. Idź do https://github.com/settings/apps/new
@@ -41,9 +37,6 @@
    - `Webhook Secret` → `GITHUB_WEBHOOK_SECRET`
 4. Pobierz private key → zapisz jako `private-key.pem`
 
-### 2. Konfiguracja
-
-```bash
 # Skopiuj .env
 cp .env.example .env
 
@@ -71,11 +64,6 @@ Frontend to plik `semcod-app.jsx` — React component z trzema tabami:
 - **PR Bot** — podgląd komentarza PR  
 - **Badge** — generator badge do README
 
-## Deployment (produkcja)
-
-### Docker Compose
-
-```bash
 # Ustaw zmienne środowiskowe
 export GITHUB_APP_ID=...
 export GITHUB_CLIENT_ID=...
@@ -86,9 +74,6 @@ export GITHUB_WEBHOOK_SECRET=...
 docker-compose up -d
 ```
 
-### VPS (Ubuntu)
-
-```bash
 # 1. Zainstaluj zależności
 apt-get install -y python3-pip git nginx certbot
 pip install -r backend/requirements.txt
@@ -152,8 +137,6 @@ certbot --nginx -d api.semcod.com
 | `pull_request` | `opened` | Analiza zmian → komentarz z metrykami |
 | `pull_request` | `synchronize` | Re-analiza → aktualizacja komentarza |
 | `installation` | `created` | Log nowej instalacji |
-
-## Model biznesowy (rekomendowany)
 
 ### Freemium
 

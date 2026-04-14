@@ -26,12 +26,6 @@ Skopiuj ten plik do wersji roboczej dla konkretnego benchmarku i uzupełniaj jed
 | PR conversion rate | | 20% | 35% | |
 | Deployment decision rate | | 60% | 80% | |
 
-## Przypadki benchmarkowe
-
----
-
-### Case `BM-001`
-
 #### Identyfikacja
 
 | Pole | Wartość |
@@ -98,37 +92,9 @@ Skopiuj ten plik do wersji roboczej dla konkretnego benchmarku i uzupełniaj jed
 | Reviewer verdict | |
 | Next action | |
 
-#### Notatki
-
-- |
-- |
-- |
-
----
-
 ### Case `BM-002`
 
 Skopiuj blok `BM-001` dla kolejnych przypadków.
-
-## Wnioski końcowe
-
-### Co Semcod wykrywa lepiej niż baseline
-
-- |
-- |
-- |
-
-### Gdzie rekomendacje mają najwyższą wartość
-
-- |
-- |
-- |
-
-### Gdzie produkt wymaga poprawy
-
-- |
-- |
-- |
 
 ### Decyzja wdrożeniowa
 

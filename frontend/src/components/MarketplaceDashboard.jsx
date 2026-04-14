@@ -17,6 +17,12 @@ export default function MarketplaceDashboard({ token, provider }) {
   const [artifactResult, setArtifactResult] = useState(null);
 
   useEffect(() => {
+    if (!token) {
+      setError("AUTH_REQUIRED");
+      setLoading(false);
+      return;
+    }
+
     const loadData = async () => {
       try {
         const [appsData, reposData, installsData] = await Promise.all([
@@ -93,6 +99,29 @@ export default function MarketplaceDashboard({ token, provider }) {
 
   if (loading) {
     return <div style={styles.loading}>Loading...</div>;
+  }
+
+  if (error === "AUTH_REQUIRED") {
+    return (
+      <div style={styles.error}>
+        <p style={{ marginBottom: 16 }}>🔒 Zaloguj się aby przeglądać repozytoria</p>
+        <button
+          onClick={() => window.location.href = "/auth/github"}
+          style={{
+            padding: "12px 24px",
+            background: "#00e5ff",
+            color: "#05080f",
+            border: "none",
+            borderRadius: 8,
+            fontSize: 14,
+            fontWeight: 700,
+            cursor: "pointer",
+          }}
+        >
+          Zaloguj przez GitHub →
+        </button>
+      </div>
+    );
   }
 
   if (error) {

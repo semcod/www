@@ -1,5 +1,3 @@
-# Benchmark walidacyjny i plan pilota Semcod
-
 ## Cel dokumentu
 
 Ten dokument przekłada Fazę 1 z `docs/roadmap.md` na plan wykonawczy. Jego celem jest jednoczesne zwalidowanie trzech rzeczy:
@@ -26,8 +24,6 @@ Po wykonaniu benchmarku i pilota powinniśmy umieć odpowiedzieć:
 - czy rekomendacje są wystarczająco konkretne, aby generować poprawki,
 - czy klient jest gotowy na automatyzację ticket → branch → PR,
 - czy lepsza będzie sprzedaż produktu jako narzędzia repo-only, managed service, czy oferty hybrydowej.
-
-## Zakres benchmarku
 
 ### Minimalny zakres
 
@@ -87,10 +83,6 @@ Benchmark nie może porównywać Semcod do „braku procesu”. Należy ustalić
 - kto dziś podejmuje decyzję o poprawce,
 - czy istnieje już ścieżka do PR i deploymentu.
 
-## Procedura benchmarku
-
-### Etap 1 — Przygotowanie wejścia
-
 #### Cel
 
 Zebrać materiał testowy i ustalić baseline.
@@ -106,8 +98,6 @@ Zebrać materiał testowy i ustalić baseline.
 #### Artefakt
 
 - lista przypadków benchmarkowych z metadanymi.
-
-### Etap 2 — Uruchomienie Semcod
 
 #### Cel
 
@@ -135,8 +125,6 @@ Warto sprawdzić ten sam przypadek w kilku kanałach wyjścia:
 - eksport markdown lub prompt,
 - integracja MCP.
 
-### Etap 3 — Ocena ekspercka i porównanie z baseline
-
 #### Cel
 
 Ocenić, czy Semcod wniósł wartość, a nie tylko wygenerował dodatkowy hałas.
@@ -160,8 +148,6 @@ Każde wykrycie powinno dostać ocenę w pięciu wymiarach:
 - `2` — sygnał przydatny,
 - `3` — silna wartość i gotowość do działania.
 
-### Etap 4 — Warstwa rekomendacji
-
 #### Cel
 
 Sprawdzić, czy wynik przechodzi z diagnozy do sensownej propozycji działania.
@@ -178,8 +164,6 @@ Sprawdzić, czy wynik przechodzi z diagnozy do sensownej propozycji działania.
 
 Rekomendacja powinna być wystarczająco dobra, aby człowiek nie musiał od nowa analizować problemu od zera.
 
-### Etap 5 — Przejście do pilota
-
 #### Cel
 
 Sprawdzić, czy Semcod potrafi wyjść poza analizę i doprowadzić do realnej zmiany.
@@ -194,8 +178,6 @@ Dla przynajmniej 1-3 przypadków należy przejść dalej niż sam benchmark:
 - uruchomić review,
 - podjąć decyzję o deploymentcie,
 - zamknąć przypadek raportem końcowym.
-
-## KPI i progi sukcesu
 
 ### KPI produktu
 
@@ -299,8 +281,6 @@ Który model chcecie uruchomić po pilocie?
 - Czy chcecie włączyć obsługę ticketów jako wejście do generowania zmian?
 - Czy deployment ma być częścią oferty od początku, czy dopiero po potwierdzeniu wartości benchmarku?
 - Czy potrzebne są artefakty do dalszej dystrybucji: SaaS, desktop, mobile?
-
-## Plan pilota 2-4 tygodnie
 
 ### Tydzień 1 — Onboarding i baseline
 

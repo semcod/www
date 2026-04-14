@@ -5,8 +5,6 @@ Data: 2026-04-10 | Wersja: 3.0
 
 ---
 
-## Część I — Stan techniczny i refaktoryzacja
-
 ### 1.1 Aktualny stan www
 
 ```
@@ -152,8 +150,6 @@ backend/routers/mcp/
 
 ---
 
-## Część II — Core product: Scan → Diff → Fix → PR
-
 ### 2.1 Flow: co nowego wykryto vs. poprzedni scan
 
 **Obecny stan:** jednorazowy snapshot (health score).
@@ -216,8 +212,6 @@ FAIL → Create Issue:
 ```
 
 ---
-
-## Część III — Dwa modele wdrożenia
 
 ### Model A: Self-managed (GitHub/GitLab klienta)
 
@@ -282,8 +276,6 @@ Pierwszy miesiąc za darmo. Potem token-based.
 
 ---
 
-## Część IV — Marketplace artefaktów
-
 ### 4.1 Koncept
 
 Developers publikują gotowe aplikacje na Semcod Marketplace.
@@ -326,8 +318,6 @@ Klient końcowy:
 ```
 
 ---
-
-## Część V — Harmonogram
 
 ### Tydzień 1-2: Refaktoryzacja + foundation
 
