@@ -1,0 +1,105 @@
+name: semcod-www
+description: "Deploy semcod/www to VPS — Podman Quadlet + Traefik + Let's Encrypt"
+
+# ── Source: obecny stan (dev na nvidia) ──────────────────────────────────────
+source:
+  strategy: docker_full
+  host: local          # zmień na "user@VPS_IP" gdy detect --detect
+  app: semcod
+  version: "0.1.10"
+  domain: nvidia       # lokalny host dev
+
+# ── Target: produkcja VPS (Podman Quadlet / systemd) ─────────────────────────
+target:
+  strategy: podman_quadlet
+  host: local          # zmień na "user@VPS_IP"
+  app: semcod
+  version: "0.1.10"
+  remote_dir: /opt/semcod
+  domain: semcod.com
+  verify_url: https://semcod.com/api/health
+  verify_version: "0.1"
+
+# ── Kroki dodatkowe (po auto-generowanych) ────────────────────────────────────
+extra_steps:
+  - id: build_backend_image
+    action: ssh_cmd
+    description: "Build semcod-backend image on remote"
+    command: "cd /opt/semcod/www && podman build -t semcod-backend:latest ./backend"
+    risk: low
+
+  - id: build_frontend_image
+    action: ssh_cmd
+    description: "Build semcod-frontend image on remote"
+    command: "cd /opt/semcod/www && podman build -t semcod-frontend:latest ./frontend"
+    risk: low
+
+  - id: copy_quadlet_files
+    action: ssh_cmd
+    description: "Install Quadlet unit files to /etc/containers/systemd/"
+    command: >
+      sudo cp /opt/semcod/www/quadlet/*.network
+             /opt/semcod/www/quadlet/*.volume
+             /opt/semcod/www/quadlet/*.container
+             /etc/containers/systemd/
+      && sudo cp /opt/semcod/www/quadlet/traefik-prod.yml /opt/semcod/traefik/traefik-prod.yml
+    risk: medium
+    rollback_command: "sudo systemctl stop semcod-backend semcod-frontend semcod-traefik semcod-network || true"
+
+  - id: prepare_traefik_acme
+    action: ssh_cmd
+    description: "Prepare Traefik ACME cert file (if missing)"
+    command: >
+      sudo mkdir -p /opt/semcod/traefik
+      && sudo touch /opt/semcod/traefik/acme.json
+      && sudo chmod 600 /opt/semcod/traefik/acme.json
+    risk: low
+
+  - id: copy_env_to_vps
+    action: scp
+    description: "Copy .env to /opt/semcod/.env on VPS"
+    src: ".env"
+    dst: "/opt/semcod/.env"
+    risk: medium
+
+  - id: systemd_daemon_reload
+    action: ssh_cmd
+    description: "Reload systemd to pick up Quadlet unit files"
+    command: "sudo systemctl daemon-reload"
+    risk: low
+    insert_before: http_health_check
+
+  - id: start_semcod_network
+    action: ssh_cmd
+    description: "Start semcod network service"
+    command: "sudo systemctl start semcod-network.service"
+    risk: low
+    insert_before: http_health_check
+
+  - id: start_semcod_traefik
+    action: ssh_cmd
+    description: "Start Traefik reverse proxy"
+    command: "sudo systemctl start semcod-traefik.service"
+    risk: low
+    insert_before: http_health_check
+
+  - id: start_semcod_backend
+    action: ssh_cmd
+    description: "Start semcod backend"
+    command: "sudo systemctl start semcod-backend.service"
+    risk: low
+    insert_before: http_health_check
+
+  - id: start_semcod_frontend
+    action: ssh_cmd
+    description: "Start semcod frontend"
+    command: "sudo systemctl start semcod-frontend.service"
+    risk: low
+    insert_before: http_health_check
+
+notes:
+  - "Przed uruchomieniem: ustaw host na 'user@VPS_IP' (source.host i target.host)"
+  - "Upewnij się że /opt/semcod/www jest sklonowane na VPS (git clone)"
+  - "Wymagany Podman >= 4.4 i systemd z obsługą Quadlet"
+  - "Po pierwszym deployu Let's Encrypt wyda certyfikat — może trwać do 2 min"
+  - "Sprawdź logi: journalctl -u semcod-backend -f"

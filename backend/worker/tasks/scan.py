@@ -1,21 +1,25 @@
 """Scan-related Celery tasks - audits and diff analysis."""
+
 import asyncio
 from typing import Dict, Any
 
 try:
     from celery import shared_task
     from celery.exceptions import MaxRetriesExceededError
+
     _CELERY_AVAILABLE = True
 except ImportError:
     _CELERY_AVAILABLE = False
-    from .._celery_stub import shared_task, MaxRetriesExceededError  # type: ignore[assignment]
+    from .._celery_stub import shared_task  # type: ignore[assignment]
 
 from events.models import Event, EventType, ProviderType
 from adapters import get_adapter_for_event
 
 
 @shared_task(bind=True, max_retries=3)
-def run_audit(self, repo: str, commit_sha: str, config: Dict[str, Any]) -> Dict[str, Any]:
+def run_audit(
+    self, repo: str, commit_sha: str, config: Dict[str, Any]
+) -> Dict[str, Any]:
     """
     Run code audit on a repository asynchronously.
 
@@ -47,6 +51,7 @@ def run_audit(self, repo: str, commit_sha: str, config: Dict[str, Any]) -> Dict[
     if tenant_id:
         try:
             from services.billing import get_usage_tracker, BillingEventType
+
             usage = get_usage_tracker().record_usage(
                 tenant_id=tenant_id,
                 event_type=BillingEventType.PR_ANALYSIS,
@@ -131,7 +136,7 @@ def process_pr_event(self, event_dict: Dict[str, Any]) -> Dict[str, Any]:
 
     except Exception as exc:
         if self.request.retries < self.max_retries:
-            countdown = 60 * (2 ** self.request.retries)
+            countdown = 60 * (2**self.request.retries)
             raise self.retry(exc=exc, countdown=countdown)
         return {
             "status": "failed",
@@ -144,7 +149,7 @@ def process_push_event(event_dict: Dict[str, Any]) -> Dict[str, Any]:
     """
     Process push event - trigger analysis for default branch.
     """
-    from events.models import Event, EventType, ProviderType
+    from events.models import Event, ProviderType
 
     event = Event(
         type=EventType(event_dict["type"]),
@@ -185,22 +190,19 @@ def analyze_diff(self, repo: str, diff: str, config: Dict[str, Any]) -> Dict[str
     This analyzes diff content for code quality issues.
     """
     try:
-        from services.scoring import calculate_health_score
-        import re
-
         # Parse diff for actual issues
         issues = []
-        
+
         # Check for TODO/FIXME comments
         if "TODO" in diff:
             issues.append({"type": "todo", "severity": "low"})
         if "FIXME" in diff:
             issues.append({"type": "fixme", "severity": "medium"})
-        
+
         # Check for complexity indicators
         if diff.count("if ") > 10:
             issues.append({"type": "high_complexity", "severity": "medium"})
-        
+
         # Check for long lines (>100 chars in diff)
         for line in diff.split("\n"):
             if line.startswith("+") and len(line) > 100:
@@ -217,7 +219,7 @@ def analyze_diff(self, repo: str, diff: str, config: Dict[str, Any]) -> Dict[str
             "lines_changed": diff.count("\n"),
         }
 
-    except Exception as exc:
+    except Exception:
         if self.request.retries < self.max_retries:
             raise self.retry(countdown=30)
         raise
@@ -229,7 +231,9 @@ def _get_token_for_provider(provider: ProviderType) -> str:
     import os
 
     token_map = {
-        ProviderType.GITHUB: os.getenv("GITHUB_TOKEN", os.getenv("GITHUB_CLIENT_SECRET", "")),
+        ProviderType.GITHUB: os.getenv(
+            "GITHUB_TOKEN", os.getenv("GITHUB_CLIENT_SECRET", "")
+        ),
         ProviderType.GITLAB: os.getenv("GITLAB_TOKEN", ""),
         ProviderType.GITEA: os.getenv("GITEA_TOKEN", ""),
     }
@@ -239,7 +243,6 @@ def _get_token_for_provider(provider: ProviderType) -> str:
 async def _analyze_diff(diff: str, repo: str) -> Dict[str, Any]:
     """Run analysis on diff content."""
     # Placeholder - integrate with actual analysis service
-    from services.scoring import calculate_health_score
 
     # Simulated analysis
     issues = []

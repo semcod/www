@@ -43,10 +43,15 @@ def _detect_degradation(repo: str, new_score: int) -> dict | None:
 async def _fire_alert(alert: dict, webhook_url: str | None) -> None:
     """POST degradation alert to webhook_url (Slack/Discord compatible)."""
     if not webhook_url:
-        logger.warning("Degradation alert for %s but no webhook configured: %s", alert["repo"], alert)
+        logger.warning(
+            "Degradation alert for %s but no webhook configured: %s",
+            alert["repo"],
+            alert,
+        )
         return
 
     import httpx
+
     payload = {
         "text": (
             f"⚠️ *Code health degradation detected*\n"
@@ -61,7 +66,9 @@ async def _fire_alert(alert: dict, webhook_url: str | None) -> None:
         logger.error("Failed to send alert for %s: %s", alert["repo"], exc)
 
 
-async def run_scheduled_scan(repo: str, token: str = "", webhook_url: str | None = None) -> dict:
+async def run_scheduled_scan(
+    repo: str, token: str = "", webhook_url: str | None = None
+) -> dict:
     """
     Execute a full audit pipeline for *repo* (scheduled, no HTTP context).
 
@@ -69,7 +76,11 @@ async def run_scheduled_scan(repo: str, token: str = "", webhook_url: str | None
     token may be empty for public repos (shallow clone without auth).
     """
     audit_id = _build_audit_id(repo)
-    audit_results[audit_id] = {"status": "running", "repo": repo, "started": _utc_now_iso()}
+    audit_results[audit_id] = {
+        "status": "running",
+        "repo": repo,
+        "started": _utc_now_iso(),
+    }
 
     try:
         result = await run_pipeline(repo, token)
@@ -98,7 +109,11 @@ async def run_scheduled_scan(repo: str, token: str = "", webhook_url: str | None
             "score": result.health_score,
             "grade": result.grade,
             "updated": _utc_now_iso(),
-            "weekly_issues": sum(1 for r in result.recommendations if r.get("priority") in ("high", "medium")),
+            "weekly_issues": sum(
+                1
+                for r in result.recommendations
+                if r.get("priority") in ("high", "medium")
+            ),
         }
 
         scan_history.insert(0, scan_entry)

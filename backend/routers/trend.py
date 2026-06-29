@@ -1,7 +1,7 @@
 """Trend and scan-diff API endpoints."""
 
 from datetime import datetime, timedelta, timezone
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 from fastapi import APIRouter, HTTPException
 
@@ -44,56 +44,63 @@ def _build_diff_proposals(prev: Dict, curr: Dict) -> List[Dict]:
     prev_cc = prev["stats"].get("complexity", {}).get("cc_avg", 0)
     curr_cc = curr["stats"].get("complexity", {}).get("cc_avg", 0)
     if curr_cc > prev_cc + 0.5:
-        proposals.append({
-            "type": "complexity_regression",
-            "target": curr["repo"],
-            "reason": f"Average CC increased from {prev_cc:.1f} to {curr_cc:.1f}",
-            "effort": "medium",
-            "impact": round((curr_cc - prev_cc) * 10),
-            "auto_fixable": False,
-            "llm_prompt": (
-                f"Identify functions with cyclomatic complexity above 10 in {curr['repo']} "
-                f"and propose refactoring to reduce average CC from {curr_cc:.1f} to below {prev_cc:.1f}."
-            ),
-        })
+        proposals.append(
+            {
+                "type": "complexity_regression",
+                "target": curr["repo"],
+                "reason": f"Average CC increased from {prev_cc:.1f} to {curr_cc:.1f}",
+                "effort": "medium",
+                "impact": round((curr_cc - prev_cc) * 10),
+                "auto_fixable": False,
+                "llm_prompt": (
+                    f"Identify functions with cyclomatic complexity above 10 in {curr['repo']} "
+                    f"and propose refactoring to reduce average CC from {curr_cc:.1f} to below {prev_cc:.1f}."
+                ),
+            }
+        )
 
     prev_dup = prev["stats"].get("duplication", {}).get("duplication_groups", 0)
     curr_dup = curr["stats"].get("duplication", {}).get("duplication_groups", 0)
     if curr_dup > prev_dup:
-        proposals.append({
-            "type": "duplication_increase",
-            "target": curr["repo"],
-            "reason": f"Duplication groups increased from {prev_dup} to {curr_dup}",
-            "effort": "low",
-            "impact": (curr_dup - prev_dup) * 5,
-            "auto_fixable": True,
-            "llm_prompt": (
-                f"Find and eliminate {curr_dup - prev_dup} new duplication groups "
-                f"introduced in {curr['repo']} since the last scan."
-            ),
-        })
+        proposals.append(
+            {
+                "type": "duplication_increase",
+                "target": curr["repo"],
+                "reason": f"Duplication groups increased from {prev_dup} to {curr_dup}",
+                "effort": "low",
+                "impact": (curr_dup - prev_dup) * 5,
+                "auto_fixable": True,
+                "llm_prompt": (
+                    f"Find and eliminate {curr_dup - prev_dup} new duplication groups "
+                    f"introduced in {curr['repo']} since the last scan."
+                ),
+            }
+        )
 
     prev_q_errors = prev["stats"].get("quality", {}).get("errors", 0)
     curr_q_errors = curr["stats"].get("quality", {}).get("errors", 0)
     if curr_q_errors > prev_q_errors:
-        proposals.append({
-            "type": "quality_regression",
-            "target": curr["repo"],
-            "reason": f"Quality errors increased from {prev_q_errors} to {curr_q_errors}",
-            "effort": "low",
-            "impact": (curr_q_errors - prev_q_errors) * 8,
-            "auto_fixable": True,
-            "llm_prompt": (
-                f"Fix {curr_q_errors - prev_q_errors} new quality errors in {curr['repo']} "
-                f"(ruff/mypy/bandit). List each violation with a one-line fix."
-            ),
-        })
+        proposals.append(
+            {
+                "type": "quality_regression",
+                "target": curr["repo"],
+                "reason": f"Quality errors increased from {prev_q_errors} to {curr_q_errors}",
+                "effort": "low",
+                "impact": (curr_q_errors - prev_q_errors) * 8,
+                "auto_fixable": True,
+                "llm_prompt": (
+                    f"Fix {curr_q_errors - prev_q_errors} new quality errors in {curr['repo']} "
+                    f"(ruff/mypy/bandit). List each violation with a one-line fix."
+                ),
+            }
+        )
 
     proposals.sort(key=lambda p: p["impact"], reverse=True)
     return proposals
 
 
 # ─── Trend endpoints ───────────────────────────────────────────────────────────
+
 
 @router.get("/api/trend/{owner}/{repo}")
 async def get_repo_trend(owner: str, repo: str, days: int = 30) -> Dict:
@@ -153,10 +160,10 @@ async def compare_repo_trend(owner: str, repo: str, days: int = 30) -> Dict:
         raise HTTPException(422, f"Need at least 2 scans for {full_repo} to compare")
 
     recent = _filter_by_days(scans, days)
-    baseline = [s for s in scans if s not in recent]
+    scan_after = scans[-1]
+    baseline = [s for s in scans if s not in recent and s is not scan_after]
 
     scan_before = baseline[-1] if baseline else scans[0]
-    scan_after = scans[-1]
 
     score_delta = scan_after["health_score"] - scan_before["health_score"]
     cc_before = scan_before["stats"].get("complexity", {}).get("cc_avg", 0)
@@ -190,6 +197,7 @@ async def compare_repo_trend(owner: str, repo: str, days: int = 30) -> Dict:
 
 # ─── Scan diff endpoint ────────────────────────────────────────────────────────
 
+
 @router.get("/api/scan/diff/{owner}/{repo}")
 async def get_scan_diff(owner: str, repo: str) -> Dict:
     """
@@ -203,8 +211,7 @@ async def get_scan_diff(owner: str, repo: str) -> Dict:
     if len(scans) < 2:
         raise HTTPException(
             422,
-            f"Need at least 2 scans for {full_repo}. "
-            "Run another scan to see the diff.",
+            f"Need at least 2 scans for {full_repo}. Run another scan to see the diff.",
         )
 
     prev, curr = scans[-2], scans[-1]

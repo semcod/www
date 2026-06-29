@@ -1,14 +1,16 @@
 """Marketplace Celery tasks - mirror sync and deployment."""
+
 import asyncio
 from typing import Dict, Any, Optional
 
 try:
     from celery import shared_task
     from celery.exceptions import MaxRetriesExceededError
+
     _CELERY_AVAILABLE = True
 except ImportError:
     _CELERY_AVAILABLE = False
-    from .._celery_stub import shared_task, MaxRetriesExceededError  # type: ignore[assignment]
+    from .._celery_stub import shared_task  # type: ignore[assignment]
 
 from events.models import ProviderType
 
@@ -27,17 +29,17 @@ def sync_mirror_task(
 ) -> Dict[str, Any]:
     """
     Sync mirror from source to Gitea asynchronously.
-    
+
     This task runs periodically to keep mirrors in sync.
     """
     try:
         from services.mirror import MirrorService, MirrorConfig
-        
+
         # Get tokens
         github_token = _get_token_for_provider(ProviderType.GITHUB)
         gitlab_token = _get_token_for_provider(ProviderType.GITLAB)
         gitea_token = _get_token_for_provider(ProviderType.GITEA) or "gitea"
-        
+
         # Create mirror service
         service = MirrorService(
             github_token=github_token,
@@ -45,7 +47,7 @@ def sync_mirror_task(
             gitea_token=gitea_token,
             gitea_url=gitea_url,
         )
-        
+
         # Create config
         config = MirrorConfig(
             source_repo=source_repo,
@@ -56,10 +58,10 @@ def sync_mirror_task(
             deploy_branch=deploy_branch,
             docker_image=docker_image,
         )
-        
+
         # Sync mirror
         result = asyncio.run(service.sync_mirror(config))
-        
+
         return {
             "status": result.status,
             "mirror_id": mirror_id,
@@ -68,10 +70,10 @@ def sync_mirror_task(
             "commits_synced": result.commits_synced,
             "error": result.error,
         }
-        
+
     except Exception as exc:
         if self.request.retries < self.max_retries:
-            countdown = 60 * (2 ** self.request.retries)
+            countdown = 60 * (2**self.request.retries)
             raise self.retry(exc=exc, countdown=countdown)
         return {
             "status": "failed",
@@ -84,11 +86,11 @@ def sync_mirror_task(
 def schedule_periodic_mirrors() -> Dict[str, Any]:
     """
     Schedule periodic sync for all active mirrors.
-    
+
     This should be called by Celery beat periodically.
     """
     from routers.mirror import _mirrors
-    
+
     scheduled = []
     for mirror_id, mirror_info in _mirrors.items():
         if mirror_info["status"] == "success":
@@ -102,11 +104,13 @@ def schedule_periodic_mirrors() -> Dict[str, Any]:
                 deploy_branch=mirror_info["deploy_branch"],
                 docker_image=mirror_info["docker_image"],
             )
-            scheduled.append({
-                "mirror_id": mirror_id,
-                "task_id": task.id,
-            })
-    
+            scheduled.append(
+                {
+                    "mirror_id": mirror_id,
+                    "task_id": task.id,
+                }
+            )
+
     return {
         "status": "scheduled",
         "count": len(scheduled),
@@ -119,7 +123,9 @@ def _get_token_for_provider(provider: ProviderType) -> str:
     import os
 
     token_map = {
-        ProviderType.GITHUB: os.getenv("GITHUB_TOKEN", os.getenv("GITHUB_CLIENT_SECRET", "")),
+        ProviderType.GITHUB: os.getenv(
+            "GITHUB_TOKEN", os.getenv("GITHUB_CLIENT_SECRET", "")
+        ),
         ProviderType.GITLAB: os.getenv("GITLAB_TOKEN", ""),
         ProviderType.GITEA: os.getenv("GITEA_TOKEN", ""),
     }

@@ -59,12 +59,16 @@ def _stripe_client() -> stripe.StripeClient:
 
 def _plan_for_price(price_id: str) -> str:
     for plan_key, plan in PLANS.items():
-        if price_id in (plan.get("stripe_price_monthly"), plan.get("stripe_price_annual")):
+        if price_id in (
+            plan.get("stripe_price_monthly"),
+            plan.get("stripe_price_annual"),
+        ):
             return plan_key
     return "free"
 
 
 # ─── Pydantic models ───────────────────────────────────────────────────────────
+
 
 class CheckoutRequest(BaseModel):
     plan: str
@@ -80,6 +84,7 @@ class BillingStatus(BaseModel):
 
 
 # ─── Endpoints ─────────────────────────────────────────────────────────────────
+
 
 @router.get("/plans")
 async def list_plans() -> Dict:
@@ -133,12 +138,16 @@ async def create_checkout(
         else plan["stripe_price_monthly"]
     )
     if not price_id:
-        raise HTTPException(400, f"No Stripe price configured for {body.plan}/{body.billing}")
+        raise HTTPException(
+            400, f"No Stripe price configured for {body.plan}/{body.billing}"
+        )
 
     client = _stripe_client()
 
     sub = get_subscription(user["id"])
-    customer_id = sub["stripe_customer_id"] if sub and sub.get("stripe_customer_id") else None
+    customer_id = (
+        sub["stripe_customer_id"] if sub and sub.get("stripe_customer_id") else None
+    )
 
     params: dict = {
         "mode": "subscription",
@@ -168,10 +177,12 @@ async def billing_portal(user: dict = Depends(get_current_user)) -> Dict:
         raise HTTPException(404, "No billing account found. Subscribe first.")
 
     client = _stripe_client()
-    session = client.billing_portal.sessions.create(params={
-        "customer": customer_id,
-        "return_url": f"{FRONTEND_URL}/#tab=audit",
-    })
+    session = client.billing_portal.sessions.create(
+        params={
+            "customer": customer_id,
+            "return_url": f"{FRONTEND_URL}/#tab=audit",
+        }
+    )
     return {"url": session.url}
 
 
@@ -191,7 +202,9 @@ async def stripe_webhook(request: Request) -> Dict:
         raise HTTPException(503, "Webhook secret not configured")
 
     try:
-        event = stripe.Webhook.construct_event(payload, sig_header, STRIPE_WEBHOOK_SECRET)
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, STRIPE_WEBHOOK_SECRET
+        )
     except stripe.error.SignatureVerificationError:
         raise HTTPException(400, "Invalid webhook signature")
 
@@ -214,6 +227,7 @@ async def stripe_webhook(request: Request) -> Dict:
 
 
 # ─── Webhook handlers ──────────────────────────────────────────────────────────
+
 
 def _handle_checkout_completed(session: dict) -> None:
     user_id = int(session.get("metadata", {}).get("user_id", 0))
@@ -238,8 +252,15 @@ def _handle_subscription_updated(subscription: dict) -> None:
 
     sub = _find_sub_by_customer(customer_id)
     if sub:
-        upsert_subscription(sub["user_id"], plan, customer_id, subscription["id"], status)
-        logger.info("Subscription updated: customer=%s plan=%s status=%s", customer_id, plan, status)
+        upsert_subscription(
+            sub["user_id"], plan, customer_id, subscription["id"], status
+        )
+        logger.info(
+            "Subscription updated: customer=%s plan=%s status=%s",
+            customer_id,
+            plan,
+            status,
+        )
 
 
 def _handle_subscription_deleted(subscription: dict) -> None:
@@ -254,15 +275,21 @@ def _find_sub_by_customer(customer_id: str) -> dict | None:
     """Lookup subscription row by stripe_customer_id."""
     from db_session import engine
     from sqlalchemy import text
+
     with engine.connect() as conn:
-        row = conn.execute(
-            text("SELECT * FROM subscriptions WHERE stripe_customer_id = :cid"),
-            {"cid": customer_id}
-        ).mappings().fetchone()
+        row = (
+            conn.execute(
+                text("SELECT * FROM subscriptions WHERE stripe_customer_id = :cid"),
+                {"cid": customer_id},
+            )
+            .mappings()
+            .fetchone()
+        )
     return dict(row) if row else None
 
 
 # ─── Scan gate (used by audit router) ─────────────────────────────────────────
+
 
 def check_scan_allowed(user_id: int) -> None:
     """

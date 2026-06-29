@@ -6,6 +6,7 @@ Each app is a self-contained plugin with:
 - hooks.py - event handlers
 - pricing.json - billing configuration
 """
+
 from .registry import AppRegistry, get_registry
 from .loader import load_apps, load_app
 from .base import AppBase

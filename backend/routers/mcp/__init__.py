@@ -11,6 +11,7 @@ router.include_router(tools_router, prefix="/tools")
 
 router.add_api_route("/invoke", mcp_invoke_tool, methods=["POST"])
 
+
 @router.get("/info")
 async def mcp_server_info() -> dict:
     """Get MCP server information."""

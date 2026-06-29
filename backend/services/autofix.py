@@ -1,4 +1,5 @@
 """Auto-fix engine - generates patches and creates automated PRs with fixes."""
+
 import hashlib
 import re
 from datetime import datetime, timezone
@@ -9,6 +10,7 @@ from dataclasses import dataclass
 @dataclass
 class Patch:
     """Represents a single file patch."""
+
     path: str
     original_content: str
     new_content: str
@@ -19,6 +21,7 @@ class Patch:
 @dataclass
 class FixResult:
     """Result of applying auto-fix."""
+
     status: str  # success, partial, failed
     patches_generated: int
     patches_applied: int
@@ -58,9 +61,7 @@ class PatchGenerator:
         self.config = config or {}
 
     def analyze_and_generate_patches(
-        self,
-        files: List[Dict[str, Any]],
-        issues: List[Dict[str, Any]]
+        self, files: List[Dict[str, Any]], issues: List[Dict[str, Any]]
     ) -> List[Patch]:
         """Analyze files and generate patches for fixable issues."""
         patches = []
@@ -77,19 +78,19 @@ class PatchGenerator:
 
             # Apply fixes based on issue type
             new_lines, applied_fixes = self._apply_fixes(
-                original_lines,
-                issues,
-                filename
+                original_lines, issues, filename
             )
 
             if applied_fixes and new_lines != original_lines:
-                patches.append(Patch(
-                    path=filename,
-                    original_content="\n".join(original_lines),
-                    new_content="\n".join(new_lines),
-                    description=f"Auto-fix: {', '.join(applied_fixes)}",
-                    issue_type="auto_fix",
-                ))
+                patches.append(
+                    Patch(
+                        path=filename,
+                        original_content="\n".join(original_lines),
+                        new_content="\n".join(new_lines),
+                        description=f"Auto-fix: {', '.join(applied_fixes)}",
+                        issue_type="auto_fix",
+                    )
+                )
 
         return patches
 
@@ -106,10 +107,7 @@ class PatchGenerator:
         return lines
 
     def _apply_fixes(
-        self,
-        lines: List[str],
-        issues: List[Dict],
-        filename: str
+        self, lines: List[str], issues: List[Dict], filename: str
     ) -> Tuple[List[str], List[str]]:
         """Apply automated fixes to lines. Returns (new_lines, fix_descriptions)."""
         new_lines = lines.copy()
@@ -156,15 +154,17 @@ class PatchGenerator:
         for patch in patches:
             desc_lines.append(f"- `{patch.path}`: {patch.description}")
 
-        desc_lines.extend([
-            "",
-            "### Changes Applied:",
-            "- Code style fixes (trailing whitespace, blank lines)",
-            "- Formatting improvements",
-            "",
-            "---",
-            "*Generated automatically by [Semcod](https://semcod.com)*",
-        ])
+        desc_lines.extend(
+            [
+                "",
+                "### Changes Applied:",
+                "- Code style fixes (trailing whitespace, blank lines)",
+                "- Formatting improvements",
+                "",
+                "---",
+                "*Generated automatically by [Semcod](https://semcod.com)*",
+            ]
+        )
 
         return "\n".join(desc_lines)
 
@@ -220,9 +220,7 @@ class AutoFixService:
             for patch in patches:
                 try:
                     # Get current file SHA (if exists)
-                    file_sha = await self.adapter.get_file_sha(
-                        repo, patch.path, branch
-                    )
+                    file_sha = await self.adapter.get_file_sha(repo, patch.path, branch)
 
                     # Commit the fix
                     await self.adapter.commit_file(

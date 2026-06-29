@@ -17,6 +17,7 @@ class _MockResponse:
 
 class _MockAsyncClient:
     """Mock httpx.AsyncClient that returns predefined responses for token exchange and profile fetch."""
+
     def __init__(self, token_payload, profile_payload=None):
         self._token_payload = token_payload
         self._profile_payload = profile_payload
@@ -179,6 +180,7 @@ def test_gh_token_returns_session_token(monkeypatch):
 
 def test_gh_token_returns_401_for_invalid_github_token(monkeypatch):
     """POST /auth/gh-token should return 401 if GitHub rejects the token."""
+
     class _FailMockClient:
         async def __aenter__(self):
             return self

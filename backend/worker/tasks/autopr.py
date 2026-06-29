@@ -1,14 +1,16 @@
 """PR generation Celery tasks - auto-PR and auto-fix."""
+
 import asyncio
 from typing import Dict, Any, List
 
 try:
     from celery import shared_task
     from celery.exceptions import MaxRetriesExceededError
+
     _CELERY_AVAILABLE = True
 except ImportError:
     _CELERY_AVAILABLE = False
-    from .._celery_stub import shared_task, MaxRetriesExceededError  # type: ignore[assignment]
+    from .._celery_stub import shared_task  # type: ignore[assignment]
 
 from adapters.github import GitHubAdapter
 from adapters.gitlab import GitLabAdapter
@@ -58,9 +60,7 @@ def create_auto_pr(
 
         # Commit each patch
         for patch in patches:
-            file_sha = asyncio.run(
-                adapter.get_file_sha(repo, patch["path"], branch)
-            )
+            file_sha = asyncio.run(adapter.get_file_sha(repo, patch["path"], branch))
             asyncio.run(
                 adapter.commit_file(
                     repo,
@@ -176,7 +176,9 @@ def _get_token_for_provider(provider: ProviderType) -> str:
     import os
 
     token_map = {
-        ProviderType.GITHUB: os.getenv("GITHUB_TOKEN", os.getenv("GITHUB_CLIENT_SECRET", "")),
+        ProviderType.GITHUB: os.getenv(
+            "GITHUB_TOKEN", os.getenv("GITHUB_CLIENT_SECRET", "")
+        ),
         ProviderType.GITLAB: os.getenv("GITLAB_TOKEN", ""),
         ProviderType.GITEA: os.getenv("GITEA_TOKEN", ""),
     }

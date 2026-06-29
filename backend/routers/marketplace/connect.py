@@ -1,4 +1,5 @@
 """Marketplace Connect endpoints — Stripe Connect revenue share for publishers."""
+
 from typing import Dict, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -69,7 +70,10 @@ async def trigger_payout(
         return transfer_revenue(
             amount_cents=request.amount_cents,
             account_id=request.publisher_account_id,
-            metadata={"initiated_by": str(user.get("id")), "description": request.description or ""},
+            metadata={
+                "initiated_by": str(user.get("id")),
+                "description": request.description or "",
+            },
         )
     except ValueError as e:
         raise HTTPException(400, str(e))

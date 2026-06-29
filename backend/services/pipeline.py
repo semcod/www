@@ -15,7 +15,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from services.analyzer import count_code_stats, run_tool
-from services.scoring import calculate_health_score, generate_recommendations, score_to_grade
+from services.scoring import (
+    calculate_health_score,
+    generate_recommendations,
+    score_to_grade,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +27,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class PipelineResult:
     """Structured result from an analysis pipeline run."""
+
     stats: dict = field(default_factory=dict)
     complexity: dict = field(default_factory=dict)
     duplication: dict = field(default_factory=dict)
@@ -33,7 +38,9 @@ class PipelineResult:
     recommendations: list = field(default_factory=list)
 
 
-async def _run_tools(repo_path: Path, *, include_code2llm_files: bool = False) -> PipelineResult:
+async def _run_tools(
+    repo_path: Path, *, include_code2llm_files: bool = False
+) -> PipelineResult:
     """Run code2llm + redup + pyqual on a cloned repo path.
 
     This is the core shared pipeline — no cloning, no persistence.
@@ -48,7 +55,11 @@ async def _run_tools(repo_path: Path, *, include_code2llm_files: bool = False) -
     duplication = await run_tool(
         "redup",
         ["scan", str(repo_path), "--format", "json"],
-        fallback={"duplication_groups": 0, "duplicated_lines": 0, "recoverable_lines": 0},
+        fallback={
+            "duplication_groups": 0,
+            "duplicated_lines": 0,
+            "recoverable_lines": 0,
+        },
     )
     quality = await run_tool(
         "pyqual",
@@ -87,7 +98,11 @@ async def clone_repo(repo: str, token: str, dest: Path) -> None:
         else f"https://github.com/{repo}.git"
     )
     proc = await asyncio.create_subprocess_exec(
-        "git", "clone", "--depth=1", clone_url, str(dest),
+        "git",
+        "clone",
+        "--depth=1",
+        clone_url,
+        str(dest),
         stdout=asyncio.subprocess.PIPE,
         stderr=asyncio.subprocess.PIPE,
     )
@@ -109,7 +124,9 @@ async def run_pipeline(
     workdir = Path(tempfile.mkdtemp(prefix="semcod-pipe-"))
     try:
         await clone_repo(repo, token, workdir / "repo")
-        return await _run_tools(workdir / "repo", include_code2llm_files=include_code2llm_files)
+        return await _run_tools(
+            workdir / "repo", include_code2llm_files=include_code2llm_files
+        )
     finally:
         shutil.rmtree(workdir, ignore_errors=True)
 

@@ -1,0 +1,263 @@
+version: '1'
+name: semcod
+description: Minimal Taskfile
+variables:
+  APP_NAME: semcod
+environments:
+  local:
+    container_runtime: docker
+    compose_command: docker compose
+pipeline:
+  python_version: "3.12"
+  runner_image: ubuntu-latest
+  branches: [main]
+  cache: [~/.cache/pip]
+  artifacts: [dist/]
+
+  stages:
+    - name: lint
+      tasks: [lint]
+
+    - name: test
+      tasks: [test]
+
+    - name: build
+      tasks: [build]
+      when: "branch:main"
+
+tasks:
+  install:
+    desc: Install Python dependencies (editable)
+    cmds:
+    - pip install -e .[dev]
+  test:
+    desc: Run pytest suite
+    cmds:
+    - pytest -q
+  build:
+    desc: Build wheel + sdist
+    cmds:
+    - python -m build
+  clean:
+    desc: Remove build artefacts
+    cmds:
+    - rm -rf build/ dist/ *.egg-info
+  up:
+    desc: Start services via docker compose
+    cmds:
+    - docker compose up -d
+  down:
+    desc: Stop services
+    cmds:
+    - docker compose down
+  logs:
+    desc: Tail compose logs
+    cmds:
+    - docker compose logs -f
+  ps:
+    desc: Show running compose services
+    cmds:
+    - docker compose ps
+  help:
+    desc: '[imported from Makefile] help'
+    cmds:
+    - "echo \"Semcod WWW \u2014 available targets:\""
+    - echo ""
+    - "echo \"  make dev        \u2014 local dev server (Vite :5174 + backend :8200)\""
+    - "echo \"  make sim        \u2014 Docker + mock GitHub (:3000, :8003, mock :4010)\""
+    - "echo \"  make up         \u2014 Docker production stack\""
+    - "echo \"  make down       \u2014 stop all Docker services\""
+    - "echo \"  make test       \u2014 backend pytest\""
+    - "echo \"  make e2e        \u2014 Playwright E2E (requires sim or dev running)\""
+    - "echo \"  make lint       \u2014 ruff lint + format check\""
+    - "echo \"  make install    \u2014 install Python + Node dependencies\""
+    - "echo \"  make logs       \u2014 tail Docker logs\""
+    - "echo \"  make ps         \u2014 show running containers\""
+    - "echo \"  make clean      \u2014 remove caches and temp files\""
+    - echo ""
+    - echo "Gitea targets:"
+    - echo "  make gitea-up / gitea-down / gitea-setup / gitea-test / gitea-cycle"
+  backend:
+    desc: '[imported from Makefile] backend'
+    cmds:
+    - cd backend && python server.py
+  frontend:
+    desc: '[imported from Makefile] frontend'
+    cmds:
+    - cd frontend && npx vite --host
+  dev:
+    desc: '[imported from Makefile] dev'
+    cmds:
+    - 'echo "Starting local dev: backend :8200 + frontend :5174"'
+    - echo "Press Ctrl+C to stop"
+    - $(MAKE) -j2 backend frontend
+    deps:
+    - install
+  sim:
+    desc: '[imported from Makefile] sim'
+    cmds:
+    - docker compose -f docker-compose.yml -f docker-compose.sim.yml up -d --build
+    - echo ""
+    - "echo \"\u2705 Stack ready with mock GitHub\""
+    - 'echo "   Frontend:  http://localhost:3000"'
+    - 'echo "   Backend:   http://localhost:8003"'
+    - 'echo "   Mock GH:   http://localhost:4010"'
+  sim-down:
+    desc: '[imported from Makefile] sim-down'
+    cmds:
+    - docker compose -f docker-compose.yml -f docker-compose.sim.yml down
+  test-all:
+    desc: '[imported from Makefile] test-all'
+    cmds:
+    - cd backend && python -m pytest tests/ -v --tb=short
+  e2e:
+    desc: '[imported from Makefile] e2e'
+    cmds:
+    - cd e2e && BASE_URL=http://localhost:3000 npx playwright test --reporter=list
+  e2e-dev:
+    desc: '[imported from Makefile] e2e-dev'
+    cmds:
+    - cd e2e && BASE_URL=http://localhost:5174 npx playwright test --reporter=list
+  e2e-install:
+    desc: '[imported from Makefile] e2e-install'
+    cmds:
+    - cd e2e && npx playwright install chromium
+  lint:
+    desc: '[imported from Makefile] lint'
+    cmds:
+    - cd backend && python -m ruff check . && python -m ruff format --check .
+  gitea-up:
+    desc: '[imported from Makefile] gitea-up'
+    cmds:
+    - docker compose -f docker-compose.yml -f docker-compose.gitea.yml up -d
+    - echo ""
+    - "echo \"\u23F3 Waiting for Gitea to be ready...\""
+    - for i in $$(seq 1 30); do \
+    - curl -sf http://localhost:3100/api/v1/version >/dev/null 2>&1 && break; \
+    - sleep 2; \
+    - done
+    - "echo \"\u2705 Stack ready \u2014 run 'make gitea-setup' next\""
+  gitea-setup:
+    desc: '[imported from Makefile] gitea-setup'
+    cmds:
+    - bash scripts/setup-gitea.sh
+  gitea-test:
+    desc: '[imported from Makefile] gitea-test'
+    cmds:
+    - bash scripts/test-full-cycle.sh
+  gitea-cycle:
+    desc: '[imported from Makefile] gitea-cycle'
+    cmds:
+    - sleep 5
+    - $(MAKE) gitea-setup
+    - sleep 2
+    - $(MAKE) gitea-test
+    deps:
+    - gitea-up
+  gitea-down:
+    desc: '[imported from Makefile] gitea-down'
+    cmds:
+    - docker compose -f docker-compose.yml -f docker-compose.gitea.yml down
+  gitea-logs:
+    desc: '[imported from Makefile] gitea-logs'
+    cmds:
+    - docker compose -f docker-compose.yml -f docker-compose.gitea.yml logs -f gitea
+      backend
+  gitea-reset:
+    desc: '[imported from Makefile] gitea-reset'
+    cmds:
+    - docker compose -f docker-compose.yml -f docker-compose.gitea.yml down -v
+    - rm -f .env.gitea
+    - "echo \"\U0001F5D1\uFE0F  Gitea data wiped\""
+  pg-migrate:
+    desc: '[imported from Makefile] pg-migrate'
+    cmds:
+    - "echo \"\U0001F418 Running Alembic migrations...\""
+    - docker compose exec backend alembic upgrade head
+    - "echo \"\u2705 Migrations applied\""
+  pg-validate:
+    desc: '[imported from Makefile] pg-validate'
+    cmds:
+    - bash e2e/test-pg-migration.sh
+  pg-reset:
+    desc: '[imported from Makefile] pg-reset'
+    cmds:
+    - docker compose down -v
+    - docker compose up -d db
+    - sleep 3
+    - docker compose exec backend alembic upgrade head
+    - docker compose up -d
+    - "echo \"\u2705 PG reset complete\""
+  pg-shell:
+    desc: '[imported from Makefile] pg-shell'
+    cmds:
+    - docker compose exec db psql -U semcod -d semcod
+  e2e-mock:
+    desc: '[imported from Makefile] e2e-mock'
+    cmds:
+    - docker compose -f docker-compose.yml -f docker-compose.sim.yml up -d
+    - sleep 5
+    - GIT_PROVIDER=mock npx playwright test frontend/e2e/specs/user-journey.spec.js
+      --project=chromium
+    - docker compose -f docker-compose.yml -f docker-compose.sim.yml down
+  e2e-gitea:
+    desc: '[imported from Makefile] e2e-gitea'
+    deps:
+    - gitea-cycle
+  e2e-github:
+    desc: '[imported from Makefile] e2e-github'
+    cmds:
+    - bash e2e/github-real.sh
+  e2e-github-write:
+    desc: '[imported from Makefile] e2e-github-write'
+    cmds:
+    - bash e2e/github-real.sh --write
+  e2e-github-full:
+    desc: '[imported from Makefile] e2e-github-full'
+    cmds:
+    - bash e2e/github-real.sh --write --pr
+  e2e-github-apply:
+    desc: '[imported from Makefile] e2e-github-apply'
+    cmds:
+    - bash e2e/github-real.sh --write --pr --apply
+  e2e-browser:
+    desc: '[imported from Makefile] e2e-browser'
+    cmds:
+    - GIT_PROVIDER=mock npx playwright test frontend/e2e/specs/user-journey.spec.js
+      --headed
+  e2e-browser-gitea:
+    desc: '[imported from Makefile] e2e-browser-gitea'
+    cmds:
+    - GIT_PROVIDER=gitea npx playwright test frontend/e2e/specs/user-journey.spec.js
+      --headed
+  e2e-all:
+    desc: '[imported from Makefile] e2e-all'
+    cmds:
+    - "echo \"\u2705 All E2E modes passed\""
+    deps:
+    - e2e-mock
+    - e2e-github
+    - e2e-browser
+  health:
+    desc: '[from doql] workflow: health'
+    cmds:
+    - docker compose ps
+    - docker compose exec app echo "Health check passed"
+  import-makefile-hint:
+    desc: '[from doql] workflow: import-makefile-hint'
+    cmds:
+    - 'echo ''Run: taskfile import Makefile to import existing targets.'''
+  all:
+    desc: Run install, lint, test
+    cmds:
+    - taskfile run install
+    - taskfile run lint
+    - taskfile run test
+  fmt:
+    desc: Auto-format with ruff
+    cmds:
+    - ruff format .
+  format:
+    desc: Auto-format with ruff (alias of fmt)
+    cmds:
+    - ruff format .

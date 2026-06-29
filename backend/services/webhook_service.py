@@ -11,7 +11,7 @@ from adapters import (
     parse_gitea_event,
 )
 from adapters.base import GitProvider
-from events.models import Event, EventType, ProviderType
+from events.models import Event, ProviderType
 
 
 def get_adapter_for_event(event: Event, token: str) -> GitProvider:
@@ -22,7 +22,11 @@ def get_adapter_for_event(event: Event, token: str) -> GitProvider:
         return GitLabAdapter(token)
     elif event.provider == ProviderType.GITEA:
         # Try to get base URL from raw payload or use default
-        base_url = event.raw_payload.get("repository", {}).get("html_url", "").replace(f"/{event.repo}", "")
+        base_url = (
+            event.raw_payload.get("repository", {})
+            .get("html_url", "")
+            .replace(f"/{event.repo}", "")
+        )
         return GiteaAdapter(token, base_url or "http://localhost:3000")
     raise ValueError(f"Unknown provider: {event.provider}")
 

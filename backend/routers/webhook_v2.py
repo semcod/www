@@ -1,4 +1,5 @@
 """Unified webhook handler - multi-platform support via adapters."""
+
 import asyncio
 from typing import Dict, Optional
 

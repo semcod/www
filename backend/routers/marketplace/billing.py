@@ -1,4 +1,5 @@
 """Marketplace billing endpoints - billing status and plans."""
+
 from typing import Any, Dict
 from datetime import datetime
 from fastapi import APIRouter, Depends
@@ -16,7 +17,12 @@ async def get_billing_status(
     """Get current billing status and usage."""
     from database import get_or_create_tenant
 
-    provider_user_id = str(user.get("github_id") or user.get("gitlab_id") or user.get("gitea_id") or user.get("id"))
+    provider_user_id = str(
+        user.get("github_id")
+        or user.get("gitlab_id")
+        or user.get("gitea_id")
+        or user.get("id")
+    )
     tenant = get_or_create_tenant(
         provider=user.get("provider", "github"),
         provider_user_id=provider_user_id,
@@ -64,7 +70,11 @@ async def list_billing_plans() -> Dict[str, Any]:
                 "name": "Pro",
                 "price": 29,
                 "limits": PRO_TIER_LIMITS,
-                "features": ["1,000 PR analyses/month", "10 repos", "50 auto-fix/month"],
+                "features": [
+                    "1,000 PR analyses/month",
+                    "10 repos",
+                    "50 auto-fix/month",
+                ],
             },
             {
                 "id": "team",

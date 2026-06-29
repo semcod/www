@@ -6,6 +6,7 @@ from typing import Dict, Any
 
 try:
     from celery import shared_task
+
     _CELERY_AVAILABLE = True
 except ImportError:
     _CELERY_AVAILABLE = False
@@ -19,6 +20,7 @@ def task_redsl_analyze(self, project_path: str, repo: str = "") -> Dict[str, Any
     """Background: run reDSL analysis and save results."""
     try:
         from services.redsl_client import RedslClient
+
         redsl = RedslClient()
 
         loop = _get_loop()
@@ -44,21 +46,34 @@ def task_redsl_analyze(self, project_path: str, repo: str = "") -> Dict[str, Any
 
 
 @shared_task(bind=True, max_retries=2)
-def task_redsl_refactor(self, project_path: str, max_actions: int = 5) -> Dict[str, Any]:
+def task_redsl_refactor(
+    self, project_path: str, max_actions: int = 5
+) -> Dict[str, Any]:
     """Background: run reDSL refactoring."""
     try:
         from services.redsl_client import RedslClient
+
         redsl = RedslClient()
 
         loop = _get_loop()
         result = loop.run_until_complete(
-            redsl.refactor(project_path, max_actions=max_actions, dry_run=False, fmt="json")
+            redsl.refactor(
+                project_path, max_actions=max_actions, dry_run=False, fmt="json"
+            )
         )
 
         proposals_applied = len(result.get("decisions", []))
-        logger.info("redsl_refactor: %d proposals applied for %s", proposals_applied, project_path)
+        logger.info(
+            "redsl_refactor: %d proposals applied for %s",
+            proposals_applied,
+            project_path,
+        )
 
-        return {"status": "refactored", "proposals_applied": proposals_applied, "result": result}
+        return {
+            "status": "refactored",
+            "proposals_applied": proposals_applied,
+            "result": result,
+        }
 
     except Exception as exc:
         if self.request.retries < self.max_retries:
@@ -72,6 +87,7 @@ def task_redsl_health_check(self, project_path: str) -> Dict[str, Any]:
     """Background: get health score for a project."""
     try:
         from services.redsl_client import RedslClient
+
         redsl = RedslClient()
 
         loop = _get_loop()
@@ -118,6 +134,7 @@ def task_redsl_scheduled_auto_refactor() -> Dict[str, Any]:
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
 
+
 def _get_loop():
     """Get or create an asyncio event loop."""
     try:
@@ -134,6 +151,7 @@ def _get_loop():
 def _save_analysis(repo: str, result: dict) -> None:
     """Save reDSL analysis result to scans DB."""
     from datetime import datetime, timezone
+
     try:
         from db_module.wrappers import save_scan, save_badge_cache
         from config import APP_URL
@@ -151,12 +169,15 @@ def _save_analysis(repo: str, result: dict) -> None:
         }
         save_scan(scan_entry)
 
-        save_badge_cache(repo, {
-            "score": score,
-            "grade": grade,
-            "updated": now,
-            "weekly_issues": None,
-        })
+        save_badge_cache(
+            repo,
+            {
+                "score": score,
+                "grade": grade,
+                "updated": now,
+                "weekly_issues": None,
+            },
+        )
 
         # Check for health drop
         _check_health_drop(repo, score)
@@ -168,6 +189,7 @@ def _check_health_drop(repo: str, current_score: int) -> None:
     """Log warning if health dropped >=5 points vs previous scan."""
     try:
         from db_module.wrappers import get_repo_scans
+
         scans = get_repo_scans(repo, limit=2)
         if len(scans) < 2:
             return
@@ -176,7 +198,10 @@ def _check_health_drop(repo: str, current_score: int) -> None:
         if delta <= -5:
             logger.warning(
                 "HEALTH DROP for %s: %d → %d (%+d) — consider auto-refactor",
-                repo, prev_score, current_score, delta,
+                repo,
+                prev_score,
+                current_score,
+                delta,
             )
     except Exception as exc:
         logger.warning("Failed to check health drop for %s: %s", repo, exc)
@@ -186,6 +211,7 @@ def _get_repos_below_threshold(threshold: int) -> list[str]:
     """Get repos with health score below threshold."""
     try:
         from db_module.wrappers import get_recent_scans
+
         scans = get_recent_scans(limit=100)
         # Deduplicate: keep only most recent scan per repo
         seen: dict[str, int] = {}

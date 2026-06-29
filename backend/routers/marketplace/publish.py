@@ -1,4 +1,5 @@
 """Marketplace publish endpoints - install/uninstall apps."""
+
 from typing import Dict, List
 from fastapi import APIRouter, Depends, HTTPException
 
@@ -27,12 +28,19 @@ async def install_app(
         create_installation,
     )
 
-    token = user.get("github_token") or user.get("gitlab_token") or user.get("gitea_token")
+    token = (
+        user.get("github_token") or user.get("gitlab_token") or user.get("gitea_token")
+    )
     if not token:
         raise HTTPException(401, "Git provider token required")
 
     # Get or create tenant
-    provider_user_id = str(user.get("github_id") or user.get("gitlab_id") or user.get("gitea_id") or user.get("id"))
+    provider_user_id = str(
+        user.get("github_id")
+        or user.get("gitlab_id")
+        or user.get("gitea_id")
+        or user.get("id")
+    )
     tenant = get_or_create_tenant(
         provider=request.provider,
         provider_user_id=provider_user_id,
@@ -88,7 +96,12 @@ async def uninstall_app(
     )
 
     # Get tenant
-    provider_user_id = str(user.get("github_id") or user.get("gitlab_id") or user.get("gitea_id") or user.get("id"))
+    provider_user_id = str(
+        user.get("github_id")
+        or user.get("gitlab_id")
+        or user.get("gitea_id")
+        or user.get("id")
+    )
     tenant = get_or_create_tenant(
         provider=provider,
         provider_user_id=provider_user_id,
@@ -114,7 +127,12 @@ async def list_installations(
     from database import get_or_create_tenant, get_tenant_installations
 
     # Get tenant
-    provider_user_id = str(user.get("github_id") or user.get("gitlab_id") or user.get("gitea_id") or user.get("id"))
+    provider_user_id = str(
+        user.get("github_id")
+        or user.get("gitlab_id")
+        or user.get("gitea_id")
+        or user.get("id")
+    )
     tenant = get_or_create_tenant(
         provider=user.get("provider", "github"),
         provider_user_id=provider_user_id,
@@ -150,7 +168,12 @@ async def get_app_status(
     from routers.marketplace.models import AppStatusResponse
 
     # Get tenant
-    provider_user_id = str(user.get("github_id") or user.get("gitlab_id") or user.get("gitea_id") or user.get("id"))
+    provider_user_id = str(
+        user.get("github_id")
+        or user.get("gitlab_id")
+        or user.get("gitea_id")
+        or user.get("id")
+    )
     tenant = get_or_create_tenant(
         provider=provider,
         provider_user_id=provider_user_id,

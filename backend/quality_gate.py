@@ -30,14 +30,26 @@ CC_MEAN_DELTA_MAX = 0.2
 CRITICAL_CC = 15
 
 SCAN_DIRS = [Path(__file__).parent]
-EXCLUDE_PATTERNS = {"__pycache__", ".venv", "node_modules", ".git", "dist", "migrations"}
+EXCLUDE_PATTERNS = {
+    "__pycache__",
+    ".venv",
+    "node_modules",
+    ".git",
+    "dist",
+    "migrations",
+}
 
 
 # ─── CC estimation (McCabe approximation via AST) ─────────────────────────────
 
 CC_NODES = (
-    ast.If, ast.For, ast.While, ast.ExceptHandler,
-    ast.With, ast.Assert, ast.comprehension,
+    ast.If,
+    ast.For,
+    ast.While,
+    ast.ExceptHandler,
+    ast.With,
+    ast.Assert,
+    ast.comprehension,
     ast.BoolOp,  # 'and'/'or' each add a branch
 )
 
@@ -55,6 +67,7 @@ def _estimate_cc(func_node: ast.FunctionDef | ast.AsyncFunctionDef) -> int:
 
 
 # ─── File analysis ────────────────────────────────────────────────────────────
+
 
 @dataclass
 class FunctionResult:
@@ -102,7 +115,9 @@ def analyze_file(path: Path) -> Optional[FileResult]:
     for node in ast.walk(tree):
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             cc = _estimate_cc(node)
-            result.functions.append(FunctionResult(str(path), node.name, node.lineno, cc))
+            result.functions.append(
+                FunctionResult(str(path), node.name, node.lineno, cc)
+            )
 
     return result
 
@@ -121,6 +136,7 @@ def collect_results(dirs: List[Path]) -> List[FileResult]:
 
 # ─── Gate checks ──────────────────────────────────────────────────────────────
 
+
 @dataclass
 class Violation:
     rule: str
@@ -128,8 +144,9 @@ class Violation:
     severity: str = "error"
 
 
-def check_file_lines(results: List[FileResult],
-                     baseline: Optional[dict] = None) -> List[Violation]:
+def check_file_lines(
+    results: List[FileResult], baseline: Optional[dict] = None
+) -> List[Violation]:
     baseline_files: dict = (baseline or {}).get("oversized_files", {})
     violations = []
     for r in results:
@@ -138,10 +155,12 @@ def check_file_lines(results: List[FileResult],
         prev = baseline_files.get(r.path)
         if prev is not None and r.lines <= prev:
             continue
-        violations.append(Violation(
-            "max_file_lines",
-            f"{r.path}: {r.lines} lines (limit {MAX_FILE_LINES})",
-        ))
+        violations.append(
+            Violation(
+                "max_file_lines",
+                f"{r.path}: {r.lines} lines (limit {MAX_FILE_LINES})",
+            )
+        )
     return violations
 
 
@@ -150,42 +169,55 @@ def check_function_cc(results: List[FileResult]) -> List[Violation]:
     for r in results:
         for f in r.functions:
             if f.cc > MAX_FUNCTION_CC:
-                violations.append(Violation(
-                    "max_function_cc",
-                    f"{f.file}:{f.line} {f.name}() CC={f.cc} (limit {MAX_FUNCTION_CC})",
-                ))
+                violations.append(
+                    Violation(
+                        "max_function_cc",
+                        f"{f.file}:{f.line} {f.name}() CC={f.cc} (limit {MAX_FUNCTION_CC})",
+                    )
+                )
     return violations
 
 
-def check_cc_mean_delta(results: List[FileResult], baseline: Optional[dict]) -> List[Violation]:
+def check_cc_mean_delta(
+    results: List[FileResult], baseline: Optional[dict]
+) -> List[Violation]:
     if not baseline:
         return []
     baseline_mean = baseline.get("cc_mean", 0.0)
     current_mean = _global_mean_cc(results)
     delta = current_mean - baseline_mean
     if delta > CC_MEAN_DELTA_MAX:
-        return [Violation(
-            "cc_mean_delta",
-            f"CC mean rose {delta:+.2f} (baseline {baseline_mean:.2f} → current {current_mean:.2f}, limit +{CC_MEAN_DELTA_MAX})",
-        )]
+        return [
+            Violation(
+                "cc_mean_delta",
+                f"CC mean rose {delta:+.2f} (baseline {baseline_mean:.2f} → current {current_mean:.2f}, limit +{CC_MEAN_DELTA_MAX})",
+            )
+        ]
     return []
 
 
-def check_critical_delta(results: List[FileResult], baseline: Optional[dict]) -> List[Violation]:
+def check_critical_delta(
+    results: List[FileResult], baseline: Optional[dict]
+) -> List[Violation]:
     if not baseline:
         return []
     baseline_critical = baseline.get("critical_count", 0)
-    current_critical = sum(1 for r in results for f in r.functions if f.cc >= CRITICAL_CC)
+    current_critical = sum(
+        1 for r in results for f in r.functions if f.cc >= CRITICAL_CC
+    )
     delta = current_critical - baseline_critical
     if delta > 0:
-        return [Violation(
-            "critical_count_delta",
-            f"Critical functions (CC≥{CRITICAL_CC}) increased by {delta} ({baseline_critical} → {current_critical})",
-        )]
+        return [
+            Violation(
+                "critical_count_delta",
+                f"Critical functions (CC≥{CRITICAL_CC}) increased by {delta} ({baseline_critical} → {current_critical})",
+            )
+        ]
     return []
 
 
 # ─── Metrics snapshot ─────────────────────────────────────────────────────────
+
 
 def _global_mean_cc(results: List[FileResult]) -> float:
     all_ccs = [f.cc for r in results for f in r.functions]
@@ -208,6 +240,7 @@ def build_snapshot(results: List[FileResult]) -> dict:
 
 
 # ─── CLI ──────────────────────────────────────────────────────────────────────
+
 
 def _parse_args() -> Tuple[Optional[Path], Optional[Path]]:
     baseline_path = None

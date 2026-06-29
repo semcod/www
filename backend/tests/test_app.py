@@ -18,7 +18,11 @@ def test_health_check():
 
 
 def test_core_routes_are_registered():
-    routes = {(route.path, tuple(sorted(route.methods))) for route in app.routes if hasattr(route, "methods")}
+    routes = {
+        (route.path, tuple(sorted(route.methods)))
+        for route in app.routes
+        if hasattr(route, "methods")
+    }
 
     assert ("/api/health", ("GET",)) in routes
     assert ("/auth/github", ("GET",)) in routes

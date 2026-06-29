@@ -1,4 +1,5 @@
 """Usage-based billing service with Stripe integration."""
+
 import json
 from datetime import datetime, timezone
 from typing import Dict, Any, Optional, Tuple
@@ -54,7 +55,7 @@ class UsageTracker:
         # Check if within limits
         limit_key = self._event_type_to_limit_key(event_type)
         plan_limit = limits.get(limit_key, 0)
-        within_limit = new_usage <= plan_limit or plan_limit == float('inf')
+        within_limit = new_usage <= plan_limit or plan_limit == float("inf")
 
         # Calculate cost (only if over limit or on usage-based plan)
         cost_cents = 0
@@ -106,11 +107,17 @@ class UsageTracker:
         limit_key = self._event_type_to_limit_key(event_type)
         plan_limit = limits.get(limit_key, 0)
 
-        if current_usage + quantity > plan_limit and plan_limit != float('inf'):
+        if current_usage + quantity > plan_limit and plan_limit != float("inf"):
             if plan == "free":
-                return False, f"Free tier limit reached ({plan_limit}/month). Upgrade to Pro."
+                return (
+                    False,
+                    f"Free tier limit reached ({plan_limit}/month). Upgrade to Pro.",
+                )
             # Over limit but allowed (will be billed)
-            return True, f"Over limit - will be billed ${self._calculate_cost(event_type, quantity) / 100:.2f}"
+            return (
+                True,
+                f"Over limit - will be billed ${self._calculate_cost(event_type, quantity) / 100:.2f}",
+            )
 
         return True, "OK"
 
@@ -123,12 +130,15 @@ class UsageTracker:
         with engine.connect() as conn:
             # strftime works in SQLite; TO_CHAR/date_trunc works in PG
             # Use LIKE for cross-DB compat
-            rows = conn.execute(text(
-                "SELECT event_type, SUM(quantity), SUM(cost_cents) "
-                "FROM usage_records "
-                "WHERE tenant_id = :tid AND CAST(created_at AS TEXT) LIKE :month "
-                "GROUP BY event_type"
-            ), {"tid": tenant_id, "month": f"{month_str}%"}).fetchall()
+            rows = conn.execute(
+                text(
+                    "SELECT event_type, SUM(quantity), SUM(cost_cents) "
+                    "FROM usage_records "
+                    "WHERE tenant_id = :tid AND CAST(created_at AS TEXT) LIKE :month "
+                    "GROUP BY event_type"
+                ),
+                {"tid": tenant_id, "month": f"{month_str}%"},
+            ).fetchall()
 
         usage_by_type = {
             row[0]: {
@@ -171,12 +181,19 @@ class UsageTracker:
         now = datetime.now(timezone.utc)
         month_prefix = now.strftime("%Y-%m")
         with engine.connect() as conn:
-            result = conn.execute(text(
-                "SELECT COALESCE(SUM(quantity), 0) "
-                "FROM usage_records "
-                "WHERE tenant_id = :tid AND event_type = :etype "
-                "AND CAST(created_at AS TEXT) LIKE :month"
-            ), {"tid": tenant_id, "etype": event_type.value, "month": f"{month_prefix}%"}).fetchone()
+            result = conn.execute(
+                text(
+                    "SELECT COALESCE(SUM(quantity), 0) "
+                    "FROM usage_records "
+                    "WHERE tenant_id = :tid AND event_type = :etype "
+                    "AND CAST(created_at AS TEXT) LIKE :month"
+                ),
+                {
+                    "tid": tenant_id,
+                    "etype": event_type.value,
+                    "month": f"{month_prefix}%",
+                },
+            ).fetchone()
 
         return result[0] if result else 0
 
@@ -194,22 +211,32 @@ class UsageTracker:
 
         with engine.connect() as conn:
             # Create table if not exists (cross-DB)
-            conn.execute(text(
-                "CREATE TABLE IF NOT EXISTS usage_records ("
-                "id SERIAL PRIMARY KEY, "
-                "tenant_id INTEGER NOT NULL, "
-                "event_type TEXT NOT NULL, "
-                "quantity INTEGER DEFAULT 1, "
-                "cost_cents INTEGER DEFAULT 0, "
-                "metadata TEXT DEFAULT '{}', "
-                "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)"
-            ))
+            conn.execute(
+                text(
+                    "CREATE TABLE IF NOT EXISTS usage_records ("
+                    "id SERIAL PRIMARY KEY, "
+                    "tenant_id INTEGER NOT NULL, "
+                    "event_type TEXT NOT NULL, "
+                    "quantity INTEGER DEFAULT 1, "
+                    "cost_cents INTEGER DEFAULT 0, "
+                    "metadata TEXT DEFAULT '{}', "
+                    "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)"
+                )
+            )
 
-            conn.execute(text(
-                "INSERT INTO usage_records (tenant_id, event_type, quantity, cost_cents, metadata) "
-                "VALUES (:tid, :etype, :qty, :cost, :meta)"
-            ), {"tid": tenant_id, "etype": event_type.value, "qty": quantity,
-                 "cost": cost_cents, "meta": json.dumps(metadata or {})})
+            conn.execute(
+                text(
+                    "INSERT INTO usage_records (tenant_id, event_type, quantity, cost_cents, metadata) "
+                    "VALUES (:tid, :etype, :qty, :cost, :meta)"
+                ),
+                {
+                    "tid": tenant_id,
+                    "etype": event_type.value,
+                    "qty": quantity,
+                    "cost": cost_cents,
+                    "meta": json.dumps(metadata or {}),
+                },
+            )
             conn.commit()
 
     def _calculate_cost(self, event_type: BillingEventType, quantity: int) -> int:
@@ -239,6 +266,7 @@ class StripeBilling:
         self.stripe = None
         if STRIPE_SECRET_KEY:
             import stripe
+
             stripe.api_key = STRIPE_SECRET_KEY
             self.stripe = stripe
 

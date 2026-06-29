@@ -1,7 +1,7 @@
 """Celery worker configuration - async task processing for Semcod."""
+
 import os
 from celery import Celery
-from typing import Dict, Any
 
 # Redis broker from env or default
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")

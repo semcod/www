@@ -1,4 +1,5 @@
 """Benchmark CRUD operations using SQLAlchemy ORM."""
+
 import json
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
@@ -10,6 +11,7 @@ from db_models import BenchmarkCase, BenchmarkEvent, RecommendationFeedback
 
 
 # ─── BenchmarkCase ────────────────────────────────────────────────────────────
+
 
 def create_benchmark_case(db: Session, payload: Dict) -> Dict:
     case = BenchmarkCase(
@@ -32,17 +34,25 @@ def create_benchmark_case(db: Session, payload: Dict) -> Dict:
 
 
 def get_benchmark_cases(db: Session) -> List[Dict]:
-    rows = db.execute(select(BenchmarkCase).order_by(BenchmarkCase.created_at.desc())).scalars().all()
+    rows = (
+        db.execute(select(BenchmarkCase).order_by(BenchmarkCase.created_at.desc()))
+        .scalars()
+        .all()
+    )
     return [_case_to_dict(r) for r in rows]
 
 
 def get_benchmark_case(db: Session, case_id: str) -> Optional[Dict]:
-    row = db.execute(select(BenchmarkCase).where(BenchmarkCase.case_id == case_id)).scalar_one_or_none()
+    row = db.execute(
+        select(BenchmarkCase).where(BenchmarkCase.case_id == case_id)
+    ).scalar_one_or_none()
     return _case_to_dict(row) if row else None
 
 
 def update_benchmark_case(db: Session, case_id: str, updates: Dict) -> Optional[Dict]:
-    row = db.execute(select(BenchmarkCase).where(BenchmarkCase.case_id == case_id)).scalar_one_or_none()
+    row = db.execute(
+        select(BenchmarkCase).where(BenchmarkCase.case_id == case_id)
+    ).scalar_one_or_none()
     if not row:
         return None
     for k, v in updates.items():
@@ -82,6 +92,7 @@ def _case_to_dict(c: BenchmarkCase) -> Dict:
 
 # ─── BenchmarkEvent ───────────────────────────────────────────────────────────
 
+
 def create_benchmark_event(db: Session, case_id: str, payload: Dict) -> Dict:
     ev = BenchmarkEvent(
         case_id=case_id,
@@ -109,15 +120,24 @@ def _event_to_dict(ev: BenchmarkEvent) -> Dict:
 
 
 def get_benchmark_events(db: Session, case_id: str) -> List[Dict]:
-    rows = db.execute(
-        select(BenchmarkEvent).where(BenchmarkEvent.case_id == case_id).order_by(BenchmarkEvent.created_at.asc())
-    ).scalars().all()
+    rows = (
+        db.execute(
+            select(BenchmarkEvent)
+            .where(BenchmarkEvent.case_id == case_id)
+            .order_by(BenchmarkEvent.created_at.asc())
+        )
+        .scalars()
+        .all()
+    )
     return [_event_to_dict(r) for r in rows]
 
 
 # ─── RecommendationFeedback ───────────────────────────────────────────────────
 
-def upsert_recommendation_feedback(db: Session, case_id: str, recommendation_id: str, payload: Dict) -> Dict:
+
+def upsert_recommendation_feedback(
+    db: Session, case_id: str, recommendation_id: str, payload: Dict
+) -> Dict:
     row = db.execute(
         select(RecommendationFeedback).where(
             RecommendationFeedback.case_id == case_id,
@@ -136,8 +156,15 @@ def upsert_recommendation_feedback(db: Session, case_id: str, recommendation_id:
     return _feedback_to_dict(row)
 
 
-_FEEDBACK_FIELDS = ("accepted", "novelty_score", "usefulness_score", "accuracy_score",
-                    "actionability_score", "business_value_score", "notes")
+_FEEDBACK_FIELDS = (
+    "accepted",
+    "novelty_score",
+    "usefulness_score",
+    "accuracy_score",
+    "actionability_score",
+    "business_value_score",
+    "notes",
+)
 
 
 def _update_feedback_fields(row: RecommendationFeedback, payload: Dict) -> None:
@@ -146,7 +173,9 @@ def _update_feedback_fields(row: RecommendationFeedback, payload: Dict) -> None:
             setattr(row, k, payload[k])
 
 
-def _build_feedback_row(case_id: str, recommendation_id: str, payload: Dict) -> RecommendationFeedback:
+def _build_feedback_row(
+    case_id: str, recommendation_id: str, payload: Dict
+) -> RecommendationFeedback:
     return RecommendationFeedback(
         case_id=case_id,
         audit_id=payload.get("audit_id"),
@@ -162,9 +191,15 @@ def _build_feedback_row(case_id: str, recommendation_id: str, payload: Dict) -> 
 
 
 def get_feedback_for_case(db: Session, case_id: str) -> List[Dict]:
-    rows = db.execute(
-        select(RecommendationFeedback).where(RecommendationFeedback.case_id == case_id)
-    ).scalars().all()
+    rows = (
+        db.execute(
+            select(RecommendationFeedback).where(
+                RecommendationFeedback.case_id == case_id
+            )
+        )
+        .scalars()
+        .all()
+    )
     return [_feedback_to_dict(r) for r in rows]
 
 
@@ -187,14 +222,25 @@ def _feedback_to_dict(f: RecommendationFeedback) -> Dict:
 
 # ─── Summary ──────────────────────────────────────────────────────────────────
 
+
 def get_benchmark_summary(db: Session) -> Dict:
     total = db.execute(select(func.count(BenchmarkCase.id))).scalar() or 0
-    pr_candidates = db.execute(
-        select(func.count(BenchmarkCase.id)).where(BenchmarkCase.pr_candidate == True)
-    ).scalar() or 0
-    deployment_decisions = db.execute(
-        select(func.count(BenchmarkCase.id)).where(BenchmarkCase.deployment_model_selected != "")
-    ).scalar() or 0
+    pr_candidates = (
+        db.execute(
+            select(func.count(BenchmarkCase.id)).where(
+                BenchmarkCase.pr_candidate == True
+            )
+        ).scalar()
+        or 0
+    )
+    deployment_decisions = (
+        db.execute(
+            select(func.count(BenchmarkCase.id)).where(
+                BenchmarkCase.deployment_model_selected != ""
+            )
+        ).scalar()
+        or 0
+    )
 
     feedback_rows = db.execute(select(RecommendationFeedback)).scalars().all()
     fb_stats = _compute_feedback_stats(feedback_rows)
@@ -202,7 +248,9 @@ def get_benchmark_summary(db: Session) -> Dict:
     return {
         "total_cases": total,
         "pr_conversion_rate": round(pr_candidates / total, 3) if total else 0,
-        "deployment_decision_rate": round(deployment_decisions / total, 3) if total else 0,
+        "deployment_decision_rate": round(deployment_decisions / total, 3)
+        if total
+        else 0,
         **fb_stats,
     }
 
@@ -210,11 +258,17 @@ def get_benchmark_summary(db: Session) -> Dict:
 def _compute_feedback_stats(feedback_rows: list) -> Dict:
     total_fb = len(feedback_rows)
     accepted = sum(1 for f in feedback_rows if f.accepted)
-    novelty_scores = [f.novelty_score for f in feedback_rows if f.novelty_score is not None]
+    novelty_scores = [
+        f.novelty_score for f in feedback_rows if f.novelty_score is not None
+    ]
     novel_high = sum(1 for s in novelty_scores if s >= 2)
 
     return {
         "total_feedback": total_fb,
-        "recommendation_acceptance_rate": round(accepted / total_fb, 3) if total_fb else 0,
-        "novel_actionable_finding_rate": round(novel_high / len(novelty_scores), 3) if novelty_scores else 0,
+        "recommendation_acceptance_rate": round(accepted / total_fb, 3)
+        if total_fb
+        else 0,
+        "novel_actionable_finding_rate": round(novel_high / len(novelty_scores), 3)
+        if novelty_scores
+        else 0,
     }

@@ -3,12 +3,13 @@
 Query/stats functions moved to db_module.tickets_query — re-exported here
 for backward compatibility.
 """
+
 import json
 import hashlib
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
 
-from sqlalchemy import select, desc
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from db_models import Ticket
@@ -48,24 +49,25 @@ def create_ticket(db: Session, tenant_id: int, payload: Dict) -> Dict:
 
 def get_ticket(db: Session, ticket_id: str) -> Optional[Dict]:
     """Get single ticket by ID."""
-    row = db.execute(select(Ticket).where(Ticket.ticket_id == ticket_id)).scalar_one_or_none()
+    row = db.execute(
+        select(Ticket).where(Ticket.ticket_id == ticket_id)
+    ).scalar_one_or_none()
     return _ticket_to_dict(row) if row else None
 
 
 def get_ticket_by_pr(db: Session, pr_number: int, repo: str) -> Optional[Dict]:
     """Get ticket associated with a PR."""
     row = db.execute(
-        select(Ticket).where(
-            Ticket.pr_number == pr_number,
-            Ticket.repo == repo
-        )
+        select(Ticket).where(Ticket.pr_number == pr_number, Ticket.repo == repo)
     ).scalar_one_or_none()
     return _ticket_to_dict(row) if row else None
 
 
 def update_ticket(db: Session, ticket_id: str, updates: Dict) -> Optional[Dict]:
     """Update ticket fields."""
-    row = db.execute(select(Ticket).where(Ticket.ticket_id == ticket_id)).scalar_one_or_none()
+    row = db.execute(
+        select(Ticket).where(Ticket.ticket_id == ticket_id)
+    ).scalar_one_or_none()
     if not row:
         return None
 
@@ -90,7 +92,9 @@ def update_ticket(db: Session, ticket_id: str, updates: Dict) -> Optional[Dict]:
 
 def delete_ticket(db: Session, ticket_id: str) -> bool:
     """Delete ticket (soft delete by marking as closed)."""
-    row = db.execute(select(Ticket).where(Ticket.ticket_id == ticket_id)).scalar_one_or_none()
+    row = db.execute(
+        select(Ticket).where(Ticket.ticket_id == ticket_id)
+    ).scalar_one_or_none()
     if not row:
         return False
     row.status = "closed"
@@ -124,31 +128,40 @@ def _ticket_to_dict(t: Ticket) -> Dict:
     }
 
 
-def update_ticket_pr_info(db: Session, ticket_id: str, pr_url: str, pr_branch: str, pr_number: int) -> Optional[Dict]:
+def update_ticket_pr_info(
+    db: Session, ticket_id: str, pr_url: str, pr_branch: str, pr_number: int
+) -> Optional[Dict]:
     """Update ticket with PR information after auto-generation."""
-    return update_ticket(db, ticket_id, {
-        "pr_url": pr_url,
-        "pr_branch": pr_branch,
-        "pr_number": pr_number,
-        "status": "pr_created"
-    })
+    return update_ticket(
+        db,
+        ticket_id,
+        {
+            "pr_url": pr_url,
+            "pr_branch": pr_branch,
+            "pr_number": pr_number,
+            "status": "pr_created",
+        },
+    )
 
 
-def update_ticket_redsl_results(db: Session, ticket_id: str, decisions: List[Dict], files: List[str]) -> Optional[Dict]:
+def update_ticket_redsl_results(
+    db: Session, ticket_id: str, decisions: List[Dict], files: List[str]
+) -> Optional[Dict]:
     """Update ticket with reDSL analysis results."""
-    return update_ticket(db, ticket_id, {
-        "redsl_decisions": decisions,
-        "files_modified": files,
-        "status": "in_progress"
-    })
+    return update_ticket(
+        db,
+        ticket_id,
+        {
+            "redsl_decisions": decisions,
+            "files_modified": files,
+            "status": "in_progress",
+        },
+    )
 
 
 def mark_ticket_error(db: Session, ticket_id: str, error: str) -> Optional[Dict]:
     """Mark ticket as failed with error message."""
-    return update_ticket(db, ticket_id, {
-        "status": "error",
-        "error_message": error
-    })
+    return update_ticket(db, ticket_id, {"status": "error", "error_message": error})
 
 
 # ─── Re-exports from tickets_query for backward compatibility ────────────

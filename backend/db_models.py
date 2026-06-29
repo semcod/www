@@ -1,8 +1,16 @@
 """SQLAlchemy ORM models — declarative base for all database tables."""
+
 from datetime import datetime, timezone
 
 from sqlalchemy import (
-    Boolean, Column, DateTime, Index, Integer, String, Text, UniqueConstraint,
+    Boolean,
+    Column,
+    DateTime,
+    Index,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import DeclarativeBase
 
@@ -152,7 +160,9 @@ class AuditResult(Base):
     metrics = Column(Text)
     recommendations = Column(Text)
     error = Column(Text)
-    audit_meta = Column(Text, default="{}")  # JSON: benchmark_mode, case_id, source_type, …
+    audit_meta = Column(
+        Text, default="{}"
+    )  # JSON: benchmark_mode, case_id, source_type, …
     created_at = Column(DateTime(timezone=True), default=_utcnow)
 
 
@@ -224,6 +234,7 @@ class RecommendationFeedback(Base):
 
 class Ticket(Base):
     """Ticket for ticket-driven auto-PR generation."""
+
     __tablename__ = "tickets"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -234,7 +245,9 @@ class Ticket(Base):
     title = Column(String, nullable=False)
     description = Column(Text, default="")
     ticket_type = Column(String, nullable=False)  # 'feature' or 'bugfix'
-    status = Column(String, default="open")  # open, analyzing, in_progress, pr_created, merged, closed
+    status = Column(
+        String, default="open"
+    )  # open, analyzing, in_progress, pr_created, merged, closed
     priority = Column(String, default="medium")  # low, medium, high, critical
     pr_url = Column(Text, default="")
     pr_branch = Column(String, default="")

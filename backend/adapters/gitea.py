@@ -1,11 +1,10 @@
 """Gitea adapter - implementation of GitProvider for Gitea."""
+
 from typing import Dict, Optional
 
 from fastapi import HTTPException
 
-from events.models import Event, EventType, ProviderType
 from .base import HttpApiProvider
-from .gitea_events import parse_gitea_event
 
 
 class GiteaAdapter(HttpApiProvider):
@@ -34,16 +33,22 @@ class GiteaAdapter(HttpApiProvider):
 
     async def create_branch(self, repo: str, branch: str, from_sha: str) -> str:
         url = f"{self.api_base}/repos/{repo}/branches"
-        resp = await self._req("POST", url, json={"new_branch_name": branch, "old_branch_name": from_sha})
+        resp = await self._req(
+            "POST", url, json={"new_branch_name": branch, "old_branch_name": from_sha}
+        )
         if resp.status_code == 409:
             return f"refs/heads/{branch}"
         if resp.status_code not in (200, 201):
             await self._create_branch_via_git(repo, branch, from_sha)
         return f"refs/heads/{branch}"
 
-    async def _create_branch_via_git(self, repo: str, branch: str, from_sha: str) -> None:
+    async def _create_branch_via_git(
+        self, repo: str, branch: str, from_sha: str
+    ) -> None:
         url = f"{self.api_base}/repos/{repo}/git/refs"
-        resp = await self._req("POST", url, json={"ref": f"refs/heads/{branch}", "sha": from_sha})
+        resp = await self._req(
+            "POST", url, json={"ref": f"refs/heads/{branch}", "sha": from_sha}
+        )
         if resp.status_code not in (200, 201, 422):
             raise HTTPException(500, f"Failed to create branch: {resp.text}")
 
@@ -75,32 +80,48 @@ class GiteaAdapter(HttpApiProvider):
         if resp.status_code == 404:
             raise HTTPException(404, f"PR #{pr_id} not found in {repo}")
         if resp.status_code != 200:
-            raise HTTPException(422, f"Cannot get diff: {resp.status_code} - {resp.text}")
+            raise HTTPException(
+                422, f"Cannot get diff: {resp.status_code} - {resp.text}"
+            )
         return resp.text
 
     # ─── Check Runs (Gitea uses commit status API) ────────────────────────────
 
     async def create_check_run(
-        self, repo: str, name: str, head_sha: str, status: str,
-        conclusion: Optional[str] = None, output: Optional[Dict] = None,
+        self,
+        repo: str,
+        name: str,
+        head_sha: str,
+        status: str,
+        conclusion: Optional[str] = None,
+        output: Optional[Dict] = None,
     ) -> str:
         state_map = {
-            "queued": "pending", "in_progress": "pending",
+            "queued": "pending",
+            "in_progress": "pending",
             "completed": "success" if conclusion == "success" else "failure",
         }
         url = f"{self.api_base}/repos/{repo}/statuses/{head_sha}"
-        resp = await self._req("POST", url, json={
-            "context": name,
-            "state": state_map.get(status, "pending"),
-            "description": output.get("title", "Semcod") if output else "Semcod",
-            "target_url": output.get("url", "") if output else "",
-        })
+        resp = await self._req(
+            "POST",
+            url,
+            json={
+                "context": name,
+                "state": state_map.get(status, "pending"),
+                "description": output.get("title", "Semcod") if output else "Semcod",
+                "target_url": output.get("url", "") if output else "",
+            },
+        )
         if resp.status_code != 201:
             raise HTTPException(500, f"Failed to create status: {resp.text}")
         return str(resp.json().get("id", head_sha))
 
     async def update_check_run(
-        self, repo: str, check_run_id: str, status: str,
-        conclusion: Optional[str] = None, output: Optional[Dict] = None,
+        self,
+        repo: str,
+        check_run_id: str,
+        status: str,
+        conclusion: Optional[str] = None,
+        output: Optional[Dict] = None,
     ) -> bool:
         return True

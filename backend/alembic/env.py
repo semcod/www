@@ -1,4 +1,5 @@
 """Alembic environment configuration."""
+
 import os
 from logging.config import fileConfig
 
@@ -12,6 +13,7 @@ if config.config_file_name is not None:
 
 # Import all models so autogenerate can detect them
 from db_models import Base  # noqa: F401
+
 target_metadata = Base.metadata
 
 

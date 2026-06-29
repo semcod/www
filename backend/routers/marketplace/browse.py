@@ -1,8 +1,8 @@
 """Marketplace browse endpoints - preview and list apps."""
+
 from typing import Dict, List
 from fastapi import APIRouter, Depends
 
-from adapters import get_adapter_for_event
 from apps.base import AppContext
 from events.models import Event, EventType, ProviderType
 from routers.auth import get_current_user
@@ -86,6 +86,7 @@ async def preview_pr_comment(
 async def list_apps() -> List[Dict]:
     """List all available marketplace apps."""
     from apps.registry import get_registry
+
     registry = get_registry()
     return registry.list_apps()
 

@@ -143,3 +143,10 @@ db_models.py            — SQLAlchemy declarative models
 | Backend pytest | 20 | 0 | 0 |
 | Playwright E2E | 67 | 6 | 0 |
 | **Total** | **87** | **6** | **0** |
+
+## Discovered
+
+- Implement integration tests and E2E coverage for the reDSL /cycle API to validate real file modifications and PR lifecycle
+- Add tests and safety/authorization checks around quick-ticket --apply to ensure run_cycle is invoked securely
+- Add tests and documentation for quick-ticket --auto mode (behavior, limits, and CI coverage)
+- Document and include quick-ticket.sh in developer workflow; validate refactor result parsing in CI

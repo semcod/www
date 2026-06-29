@@ -3,7 +3,6 @@ from typing import Optional
 from fastapi import APIRouter
 from fastapi.responses import Response
 
-from config import APP_URL
 from store import badge_cache
 
 router = APIRouter()
@@ -26,11 +25,15 @@ async def health_badge(repo_slug: str, style: str = "flat"):
         # Fallback: try DB-backed badge cache / latest scan
         try:
             from db_module.wrappers import get_badge_cache, get_repo_scans
+
             cached = get_badge_cache(repo)
             if not cached:
                 scans = get_repo_scans(repo, limit=1)
                 if scans:
-                    cached = {"score": scans[-1]["health_score"], "grade": scans[-1]["grade"]}
+                    cached = {
+                        "score": scans[-1]["health_score"],
+                        "grade": scans[-1]["grade"],
+                    }
         except Exception:
             pass
 
@@ -60,11 +63,12 @@ async def scan_count_badge():
     Generate SVG badge showing total number of scans performed.
     """
     from store import scan_history
-    
+
     total_scans = len(scan_history)
     if total_scans == 0:
         try:
             from db_module.wrappers import get_total_scan_count
+
             total_scans = get_total_scan_count()
         except Exception:
             pass
@@ -78,12 +82,19 @@ async def scan_count_badge():
     )
 
 
-def _generate_badge_svg(grade: str, score: Optional[int], style: str, weekly_issues: Optional[int] = None) -> str:
+def _generate_badge_svg(
+    grade: str, score: Optional[int], style: str, weekly_issues: Optional[int] = None
+) -> str:
     """Generate shields.io-style SVG badge."""
     colors = {
-        "A+": "#22c55e", "A": "#34d399", "B+": "#a3e635",
-        "B": "#facc15", "C": "#fb923c", "D": "#f87171",
-        "F": "#ef4444", "?": "#94a3b8",
+        "A+": "#22c55e",
+        "A": "#34d399",
+        "B+": "#a3e635",
+        "B": "#facc15",
+        "C": "#fb923c",
+        "D": "#f87171",
+        "F": "#ef4444",
+        "?": "#94a3b8",
     }
     color = colors.get(grade, "#94a3b8")
 
@@ -116,10 +127,10 @@ def _generate_badge_svg(grade: str, score: Optional[int], style: str, weekly_iss
     <rect width=\"{total_width}\" height=\"20\" fill=\"url(#s)\"/>
   </g>
   <g fill=\"#fff\" text-anchor=\"middle\" font-family=\"Verdana,Geneva,DejaVu Sans,sans-serif\" text-rendering=\"geometricPrecision\" font-size=\"11\">
-    <text aria-hidden=\"true\" x=\"{label_width/2}\" y=\"15\" fill=\"#010101\" fill-opacity=\".3\">{label}</text>
-    <text x=\"{label_width/2}\" y=\"14\">{label}</text>
-    <text aria-hidden=\"true\" x=\"{label_width + value_width/2}\" y=\"15\" fill=\"#010101\" fill-opacity=\".3\">{value}</text>
-    <text x=\"{label_width + value_width/2}\" y=\"14\">{value}</text>
+    <text aria-hidden=\"true\" x=\"{label_width / 2}\" y=\"15\" fill=\"#010101\" fill-opacity=\".3\">{label}</text>
+    <text x=\"{label_width / 2}\" y=\"14\">{label}</text>
+    <text aria-hidden=\"true\" x=\"{label_width + value_width / 2}\" y=\"15\" fill=\"#010101\" fill-opacity=\".3\">{value}</text>
+    <text x=\"{label_width + value_width / 2}\" y=\"14\">{value}</text>
   </g>
 </svg>"""
     return svg
@@ -148,10 +159,10 @@ def _generate_count_badge_svg(label: str, count: int) -> str:
     <rect width="{total_width}" height="20" fill="url(#s)"/>
   </g>
   <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="11">
-    <text aria-hidden="true" x="{label_width/2}" y="15" fill="#010101" fill-opacity=".3">{label}</text>
-    <text x="{label_width/2}" y="14">{label}</text>
-    <text aria-hidden="true" x="{label_width + value_width/2}" y="15" fill="#010101" fill-opacity=".3">{value}</text>
-    <text x="{label_width + value_width/2}" y="14">{value}</text>
+    <text aria-hidden="true" x="{label_width / 2}" y="15" fill="#010101" fill-opacity=".3">{label}</text>
+    <text x="{label_width / 2}" y="14">{label}</text>
+    <text aria-hidden="true" x="{label_width + value_width / 2}" y="15" fill="#010101" fill-opacity=".3">{value}</text>
+    <text x="{label_width + value_width / 2}" y="14">{value}</text>
   </g>
 </svg>"""
     return svg

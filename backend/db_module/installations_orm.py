@@ -1,4 +1,5 @@
 """Installation database operations using SQLAlchemy ORM."""
+
 import json
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
@@ -25,9 +26,9 @@ def create_installation(
         )
         .first()
     )
-    
+
     now = datetime.now(timezone.utc)
-    
+
     if installation:
         # Update existing
         installation.apps = json.dumps(apps)
@@ -48,7 +49,7 @@ def create_installation(
             status="active",
         )
         db.add(installation)
-    
+
     db.commit()
     db.refresh(installation)
     return get_installation(db, tenant_id, repository_id) or {}
@@ -65,12 +66,12 @@ def get_installation(db: Session, tenant_id: int, repository_id: int) -> Optiona
         )
         .first()
     )
-    
+
     if not installation:
         return None
-    
+
     inst, repo = installation
-    
+
     result = {
         "id": inst.id,
         "tenant_id": inst.tenant_id,
@@ -87,7 +88,7 @@ def get_installation(db: Session, tenant_id: int, repository_id: int) -> Optiona
         "repo_full_name": repo.full_name,
         "repo_provider": repo.provider,
     }
-    
+
     return result
 
 
@@ -99,7 +100,7 @@ def get_tenant_installations(db: Session, tenant_id: int) -> List[Dict]:
         .filter(Installation.tenant_id == tenant_id)
         .all()
     )
-    
+
     results = []
     for inst, repo in installations:
         result = {
@@ -111,16 +112,20 @@ def get_tenant_installations(db: Session, tenant_id: int) -> List[Dict]:
             "webhook_secret": inst.webhook_secret,
             "webhook_url": inst.webhook_url,
             "status": inst.status,
-            "installed_at": inst.installed_at.isoformat() if inst.installed_at else None,
+            "installed_at": inst.installed_at.isoformat()
+            if inst.installed_at
+            else None,
             "updated_at": inst.updated_at.isoformat() if inst.updated_at else None,
-            "last_scan_at": inst.last_scan_at.isoformat() if inst.last_scan_at else None,
+            "last_scan_at": inst.last_scan_at.isoformat()
+            if inst.last_scan_at
+            else None,
             "last_scan_score": inst.last_scan_score,
             "repo_full_name": repo.full_name,
             "repo_provider": repo.provider,
         }
-        
+
         results.append(result)
-    
+
     return results
 
 
@@ -134,10 +139,10 @@ def delete_installation(db: Session, tenant_id: int, repository_id: int) -> bool
         )
         .first()
     )
-    
+
     if not installation:
         return False
-    
+
     installation.status = "inactive"
     installation.updated_at = datetime.now(timezone.utc)
     db.commit()
@@ -156,7 +161,7 @@ def update_installation_scan(
         )
         .first()
     )
-    
+
     if installation:
         now = datetime.now(timezone.utc)
         installation.last_scan_at = now

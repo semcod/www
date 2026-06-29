@@ -1,9 +1,10 @@
 """App registry - manages loaded apps and event routing."""
-from typing import Dict, List, Optional, Any
+
+from typing import Dict, List, Optional
 from events.models import Event, EventType
 
 from .base import AppBase, AppContext, AppResult
-from .loader import load_apps, load_app
+from .loader import load_apps
 
 
 class AppRegistry:
@@ -119,7 +120,9 @@ class AppRegistry:
                     elif event.action == "synchronize":
                         result = app.on_pr_synchronize(context)
                     else:
-                        result = AppResult(status="skipped", details={"reason": "unhandled action"})
+                        result = AppResult(
+                            status="skipped", details={"reason": "unhandled action"}
+                        )
                 elif event.type == EventType.PUSH:
                     result = app.on_push(context)
                 else:

@@ -1,4 +1,5 @@
 """GitHub adapter - implementation of GitProvider for GitHub."""
+
 from typing import Dict, Optional
 
 from fastapi import HTTPException
@@ -31,7 +32,9 @@ class GitHubAdapter(HttpApiProvider):
 
     async def create_branch(self, repo: str, branch: str, from_sha: str) -> str:
         url = f"{self.api_base}/repos/{repo}/git/refs"
-        resp = await self._req("POST", url, json={"ref": f"refs/heads/{branch}", "sha": from_sha})
+        resp = await self._req(
+            "POST", url, json={"ref": f"refs/heads/{branch}", "sha": from_sha}
+        )
         if resp.status_code == 422:
             return f"refs/heads/{branch}"
         if resp.status_code != 201:
@@ -54,18 +57,27 @@ class GitHubAdapter(HttpApiProvider):
 
     async def get_pr_diff(self, repo: str, pr_id: int) -> str:
         url = f"{self.api_base}/repos/{repo}/pulls/{pr_id}"
-        resp = await self._req("GET", url, extra_headers={"Accept": "application/vnd.github.diff"})
+        resp = await self._req(
+            "GET", url, extra_headers={"Accept": "application/vnd.github.diff"}
+        )
         if resp.status_code == 404:
             raise HTTPException(404, f"PR #{pr_id} not found in {repo}")
         if resp.status_code != 200:
-            raise HTTPException(422, f"Cannot get diff: {resp.status_code} - {resp.text}")
+            raise HTTPException(
+                422, f"Cannot get diff: {resp.status_code} - {resp.text}"
+            )
         return resp.text
 
     # ─── Check Runs (GitHub-specific) ────────────────────────────────────────
 
     async def create_check_run(
-        self, repo: str, name: str, head_sha: str, status: str,
-        conclusion: Optional[str] = None, output: Optional[Dict] = None,
+        self,
+        repo: str,
+        name: str,
+        head_sha: str,
+        status: str,
+        conclusion: Optional[str] = None,
+        output: Optional[Dict] = None,
     ) -> str:
         url = f"{self.api_base}/repos/{repo}/check-runs"
         body: Dict = {"name": name, "head_sha": head_sha, "status": status}
@@ -79,8 +91,12 @@ class GitHubAdapter(HttpApiProvider):
         return str(resp.json()["id"])
 
     async def update_check_run(
-        self, repo: str, check_run_id: str, status: str,
-        conclusion: Optional[str] = None, output: Optional[Dict] = None,
+        self,
+        repo: str,
+        check_run_id: str,
+        status: str,
+        conclusion: Optional[str] = None,
+        output: Optional[Dict] = None,
     ) -> bool:
         url = f"{self.api_base}/repos/{repo}/check-runs/{check_run_id}"
         body: Dict = {"status": status}
@@ -93,10 +109,15 @@ class GitHubAdapter(HttpApiProvider):
 
     # ─── Webhook (GitHub prefixes with "sha256=") ─────────────────────────────
 
-    def verify_webhook_signature(self, body: bytes, signature: str, secret: str) -> bool:
+    def verify_webhook_signature(
+        self, body: bytes, signature: str, secret: str
+    ) -> bool:
         import hashlib
         import hmac
-        expected = "sha256=" + hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
+
+        expected = (
+            "sha256=" + hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
+        )
         return hmac.compare_digest(signature, expected)
 
 
@@ -126,7 +147,9 @@ def parse_github_event(payload: Dict) -> Optional[Event]:
     base_branch = None
     if event_type == EventType.PUSH:
         ref = payload.get("ref", "")
-        branch = ref.replace("refs/heads/", "") if ref.startswith("refs/heads/") else ref
+        branch = (
+            ref.replace("refs/heads/", "") if ref.startswith("refs/heads/") else ref
+        )
     else:
         branch = pr_data.get("head", {}).get("ref")
         base_branch = pr_data.get("base", {}).get("ref")

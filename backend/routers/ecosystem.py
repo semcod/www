@@ -55,15 +55,17 @@ async def get_ecosystem() -> EcosystemResponse:
             elif delta <= -3:
                 trend = "degrading"
 
-        projects.append(ProjectHealth(
-            name=repo,
-            health_score=score,
-            grade=latest["grade"],
-            trend=trend,
-            last_scan=latest["completed"],
-            scan_count=len(scans_list),
-            badge_url=latest.get("badge_url", ""),
-        ))
+        projects.append(
+            ProjectHealth(
+                name=repo,
+                health_score=score,
+                grade=latest["grade"],
+                trend=trend,
+                last_scan=latest["completed"],
+                scan_count=len(scans_list),
+                badge_url=latest.get("badge_url", ""),
+            )
+        )
 
     # Sort by health score ascending (worst first = highest priority)
     projects.sort(key=lambda p: p.health_score or 999)

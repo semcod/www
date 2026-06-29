@@ -1,4 +1,5 @@
 """Mirror API - manage repo mirrors to local Gitea."""
+
 from datetime import datetime, timezone
 from typing import Dict, Any, Optional, List
 
@@ -6,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from routers.auth import get_current_user
-from services.mirror import MirrorService, MirrorConfig, MirrorStatus
+from services.mirror import MirrorService, MirrorConfig
 
 router = APIRouter(prefix="/api/mirror", tags=["mirror"])
 

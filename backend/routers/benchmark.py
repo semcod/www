@@ -1,4 +1,5 @@
 """Benchmark KPI router — cases, feedback, decisions, events, export, summary."""
+
 import csv
 import io
 from typing import Dict, List, Optional
@@ -23,6 +24,7 @@ router = APIRouter(prefix="/api/benchmark", tags=["benchmark"])
 
 
 # ─── Pydantic Models ──────────────────────────────────────────────────────────
+
 
 class CaseCreate(BaseModel):
     case_id: str
@@ -78,6 +80,7 @@ class EventPayload(BaseModel):
 
 # ─── Cases ────────────────────────────────────────────────────────────────────
 
+
 @router.post("/cases", status_code=201)
 def post_case(body: CaseCreate):
     existing = get_benchmark_case(body.case_id)
@@ -110,6 +113,7 @@ def patch_case(case_id: str, body: CaseUpdate):
 
 # ─── Decision ─────────────────────────────────────────────────────────────────
 
+
 @router.post("/cases/{case_id}/decision")
 def post_decision(case_id: str, body: DecisionPayload):
     updates = {k: v for k, v in body.model_dump().items() if v is not None}
@@ -120,6 +124,7 @@ def post_decision(case_id: str, body: DecisionPayload):
 
 
 # ─── Recommendation Feedback ──────────────────────────────────────────────────
+
 
 @router.post("/cases/{case_id}/recommendations/{recommendation_id}/feedback")
 def post_feedback(case_id: str, recommendation_id: str, body: FeedbackPayload):
@@ -137,6 +142,7 @@ def list_feedback(case_id: str):
 
 # ─── Events ───────────────────────────────────────────────────────────────────
 
+
 @router.post("/cases/{case_id}/events", status_code=201)
 def post_event(case_id: str, body: EventPayload):
     if not get_benchmark_case(case_id):
@@ -153,12 +159,14 @@ def list_events(case_id: str):
 
 # ─── Summary ──────────────────────────────────────────────────────────────────
 
+
 @router.get("/summary")
 def summary():
     return get_benchmark_summary()
 
 
 # ─── Export ───────────────────────────────────────────────────────────────────
+
 
 @router.get("/export.json")
 def export_json():
@@ -173,14 +181,26 @@ def export_json():
 def export_csv():
     cases = get_benchmark_cases()
     if not cases:
-        return StreamingResponse(io.StringIO(""), media_type="text/csv",
-                                 headers={"Content-Disposition": "attachment; filename=benchmark.csv"})
+        return StreamingResponse(
+            io.StringIO(""),
+            media_type="text/csv",
+            headers={"Content-Disposition": "attachment; filename=benchmark.csv"},
+        )
     fields = [
-        "case_id", "repo", "source_type", "change_type", "baseline_detected",
-        "reviewer_verdict", "recommendation_accepted", "pr_candidate",
-        "deployment_candidate", "deployment_model_selected",
-        "time_to_first_result_seconds", "time_to_first_useful_recommendation_seconds",
-        "next_action", "created_at",
+        "case_id",
+        "repo",
+        "source_type",
+        "change_type",
+        "baseline_detected",
+        "reviewer_verdict",
+        "recommendation_accepted",
+        "pr_candidate",
+        "deployment_candidate",
+        "deployment_model_selected",
+        "time_to_first_result_seconds",
+        "time_to_first_useful_recommendation_seconds",
+        "next_action",
+        "created_at",
     ]
     buf = io.StringIO()
     writer = csv.DictWriter(buf, fieldnames=fields, extrasaction="ignore")
@@ -188,5 +208,8 @@ def export_csv():
     for c in cases:
         writer.writerow(c)
     buf.seek(0)
-    return StreamingResponse(buf, media_type="text/csv",
-                             headers={"Content-Disposition": "attachment; filename=benchmark.csv"})
+    return StreamingResponse(
+        buf,
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=benchmark.csv"},
+    )

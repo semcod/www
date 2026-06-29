@@ -1,4 +1,5 @@
 """App loader - dynamically loads marketplace plugins from apps/ directory."""
+
 import json
 import yaml
 import importlib
@@ -148,7 +149,14 @@ def validate_manifest(manifest: Dict) -> List[str]:
                 errors.append(f"Invalid trigger: {trigger}")
 
     if "actions" in manifest:
-        valid_actions = ["comment", "create_pr", "badge", "label", "approve", "status_check"]
+        valid_actions = [
+            "comment",
+            "create_pr",
+            "badge",
+            "label",
+            "approve",
+            "status_check",
+        ]
         for action in manifest["actions"]:
             if action not in valid_actions:
                 errors.append(f"Invalid action: {action}")

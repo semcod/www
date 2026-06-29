@@ -5,7 +5,24 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import RedirectResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-from config import APP_URL, FRONTEND_URL, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_SCOPE, SECRET_KEY, SESSION_EXPIRE_HOURS, REPOS_PER_PAGE, GITHUB_OAUTH_AUTHORIZE_URL, GITHUB_OAUTH_TOKEN_URL, GITHUB_API_BASE_URL, GITEA_CLIENT_ID, GITEA_CLIENT_SECRET, GITEA_OAUTH_AUTHORIZE_URL, GITEA_OAUTH_TOKEN_URL, GITEA_API_BASE_URL
+from config import (
+    APP_URL,
+    FRONTEND_URL,
+    GITHUB_CLIENT_ID,
+    GITHUB_CLIENT_SECRET,
+    GITHUB_OAUTH_SCOPE,
+    SECRET_KEY,
+    SESSION_EXPIRE_HOURS,
+    REPOS_PER_PAGE,
+    GITHUB_OAUTH_AUTHORIZE_URL,
+    GITHUB_OAUTH_TOKEN_URL,
+    GITHUB_API_BASE_URL,
+    GITEA_CLIENT_ID,
+    GITEA_CLIENT_SECRET,
+    GITEA_OAUTH_AUTHORIZE_URL,
+    GITEA_OAUTH_TOKEN_URL,
+    GITEA_API_BASE_URL,
+)
 from database import upsert_user, get_user_by_id
 
 router = APIRouter()
@@ -30,7 +47,9 @@ def decode_session_token(token: str) -> dict:
         raise HTTPException(401, "Invalid token")
 
 
-async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> dict:
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+) -> dict:
     if not credentials:
         raise HTTPException(401, "Not authenticated")
     payload = decode_session_token(credentials.credentials)
@@ -74,7 +93,10 @@ async def auth_via_github_token(token: str):
     )
 
     session_token = create_session_token(user["id"])
-    return {"session_token": session_token, "user": {"id": user["id"], "login": user["login"]}}
+    return {
+        "session_token": session_token,
+        "user": {"id": user["id"], "login": user["login"]},
+    }
 
 
 @router.get("/auth/github")
@@ -135,20 +157,21 @@ async def github_oauth_callback(code: str):
     return RedirectResponse(f"{FRONTEND_URL}/audit?session={session_token}")
 
 
-
-
 @router.get("/auth/gitea")
 async def gitea_oauth_start():
     """Step 1: Redirect user to Gitea OAuth."""
     if not GITEA_CLIENT_ID or not GITEA_OAUTH_AUTHORIZE_URL:
         raise HTTPException(501, "Gitea OAuth not configured")
     from urllib.parse import urlencode
-    params = urlencode({
-        "client_id": GITEA_CLIENT_ID,
-        "redirect_uri": f"{APP_URL}/auth/callback/gitea",
-        "response_type": "code",
-        "scope": "repo",
-    })
+
+    params = urlencode(
+        {
+            "client_id": GITEA_CLIENT_ID,
+            "redirect_uri": f"{APP_URL}/auth/callback/gitea",
+            "response_type": "code",
+            "scope": "repo",
+        }
+    )
     return RedirectResponse(f"{GITEA_OAUTH_AUTHORIZE_URL}?{params}")
 
 
@@ -217,9 +240,9 @@ async def logout():
 @router.get("/api/repos")
 async def list_repos(user: dict = Depends(get_current_user)):
     """List user's repos for audit selection."""
-    if not user.get('github_token'):
+    if not user.get("github_token"):
         raise HTTPException(status_code=401, detail="GitHub token required")
-    
+
     async with httpx.AsyncClient() as client:
         resp = await client.get(
             f"{GITHUB_API_BASE_URL}/user/repos",

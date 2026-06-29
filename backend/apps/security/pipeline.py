@@ -1,4 +1,5 @@
 """Security App - Vulnerability scanning for Semcod."""
+
 from typing import Dict, Any
 import re
 
@@ -47,29 +48,35 @@ class SecurityApp(AppBase):
             for pattern, name in self.SECRET_PATTERNS:
                 matches = re.finditer(pattern, content, re.IGNORECASE)
                 for match in matches:
-                    issues.append({
-                        "type": "secret",
-                        "severity": "critical",
-                        "message": f"Potential {name} found",
-                        "line": content[:match.start()].count("\n") + 1,
-                    })
+                    issues.append(
+                        {
+                            "type": "secret",
+                            "severity": "critical",
+                            "message": f"Potential {name} found",
+                            "line": content[: match.start()].count("\n") + 1,
+                        }
+                    )
                     critical_count += 1
 
         # Scan for security anti-patterns
         if "eval(" in content:
-            issues.append({
-                "type": "code_injection",
-                "severity": "high",
-                "message": "eval() detected - potential code injection risk",
-            })
+            issues.append(
+                {
+                    "type": "code_injection",
+                    "severity": "high",
+                    "message": "eval() detected - potential code injection risk",
+                }
+            )
             high_count += 1
 
         if "innerHTML" in content and "user" in content.lower():
-            issues.append({
-                "type": "xss",
-                "severity": "high",
-                "message": "Potential XSS vulnerability (innerHTML with user input)",
-            })
+            issues.append(
+                {
+                    "type": "xss",
+                    "severity": "high",
+                    "message": "Potential XSS vulnerability (innerHTML with user input)",
+                }
+            )
             high_count += 1
 
         # Calculate score

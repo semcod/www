@@ -1,4 +1,5 @@
 """Base interface for git providers - PR Bot abstraction."""
+
 from __future__ import annotations
 
 import base64
@@ -59,23 +60,39 @@ class HttpApiProvider(GitProvider):
             raise HTTPException(500, f"Failed to comment: {resp.text}")
         return resp.json().get("html_url", "")
 
-    async def update_pr_description(self, repo: str, pr_id: int, description: str) -> bool:
+    async def update_pr_description(
+        self, repo: str, pr_id: int, description: str
+    ) -> bool:
         url = f"{self.api_base}/repos/{repo}/pulls/{pr_id}"
         resp = await self._req("PATCH", url, json={"body": description})
         return resp.status_code == 200
 
     async def create_pr(
-        self, repo: str, title: str, body: str, head_branch: str, base_branch: str,
+        self,
+        repo: str,
+        title: str,
+        body: str,
+        head_branch: str,
+        base_branch: str,
     ) -> str:
         url = f"{self.api_base}/repos/{repo}/pulls"
-        resp = await self._req("POST", url, json={
-            "title": title, "body": body, "head": head_branch, "base": base_branch,
-        })
+        resp = await self._req(
+            "POST",
+            url,
+            json={
+                "title": title,
+                "body": body,
+                "head": head_branch,
+                "base": base_branch,
+            },
+        )
         if resp.status_code != 201:
             raise HTTPException(500, f"Failed to create PR: {resp.text}")
         return resp.json()["html_url"]
 
-    async def close_pr(self, repo: str, pr_id: int, comment: Optional[str] = None) -> bool:
+    async def close_pr(
+        self, repo: str, pr_id: int, comment: Optional[str] = None
+    ) -> bool:
         if comment:
             await self.comment_on_pr(repo, pr_id, comment)
         url = f"{self.api_base}/repos/{repo}/pulls/{pr_id}"
@@ -85,7 +102,12 @@ class HttpApiProvider(GitProvider):
     # ─── Commit & Content Operations ──────────────────────────────────────────
 
     async def commit_file(
-        self, repo: str, path: str, content: str, branch: str, message: str,
+        self,
+        repo: str,
+        path: str,
+        content: str,
+        branch: str,
+        message: str,
         file_sha: Optional[str] = None,
     ) -> str:
         encoded = base64.b64encode(content.encode()).decode()
@@ -125,9 +147,13 @@ class HttpApiProvider(GitProvider):
 
     # ─── Issue Operations ─────────────────────────────────────────────────────
 
-    async def create_issue(self, repo: str, title: str, body: str, labels: List[str]) -> str:
+    async def create_issue(
+        self, repo: str, title: str, body: str, labels: List[str]
+    ) -> str:
         url = f"{self.api_base}/repos/{repo}/issues"
-        resp = await self._req("POST", url, json={"title": title, "body": body, "labels": labels})
+        resp = await self._req(
+            "POST", url, json={"title": title, "body": body, "labels": labels}
+        )
         if resp.status_code != 201:
             raise HTTPException(500, f"Failed to create issue: {resp.text}")
         return resp.json()["html_url"]
@@ -157,7 +183,9 @@ class HttpApiProvider(GitProvider):
 
     # ─── Webhook Verification ─────────────────────────────────────────────────
 
-    def verify_webhook_signature(self, body: bytes, signature: str, secret: str) -> bool:
+    def verify_webhook_signature(
+        self, body: bytes, signature: str, secret: str
+    ) -> bool:
         expected = _hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
         return _hmac.compare_digest(signature, expected)
 
@@ -184,12 +212,21 @@ class HttpApiProvider(GitProvider):
 
     @abstractmethod
     async def create_check_run(
-        self, repo: str, name: str, head_sha: str, status: str,
-        conclusion: Optional[str] = None, output: Optional[Dict] = None,
+        self,
+        repo: str,
+        name: str,
+        head_sha: str,
+        status: str,
+        conclusion: Optional[str] = None,
+        output: Optional[Dict] = None,
     ) -> str: ...
 
     @abstractmethod
     async def update_check_run(
-        self, repo: str, check_run_id: str, status: str,
-        conclusion: Optional[str] = None, output: Optional[Dict] = None,
+        self,
+        repo: str,
+        check_run_id: str,
+        status: str,
+        conclusion: Optional[str] = None,
+        output: Optional[Dict] = None,
     ) -> bool: ...

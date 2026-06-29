@@ -1,4 +1,5 @@
 """Performance App - Performance analysis for Semcod."""
+
 from typing import Dict, Any
 
 from apps.base import AppBase, AppContext, AppResult
@@ -46,43 +47,48 @@ class PerformanceApp(AppBase):
         content_upper = content.upper()
 
         if "for" in content and "query" in content_lower:
-            issues.append({
-                "type": "n_plus_1",
-                "severity": "medium",
-                "message": "Potential N+1 query pattern detected",
-            })
+            issues.append(
+                {
+                    "type": "n_plus_1",
+                    "severity": "medium",
+                    "message": "Potential N+1 query pattern detected",
+                }
+            )
 
         if "SELECT" in content_upper and "WHERE" in content_upper:
             if "index" not in content_lower:
-                issues.append({
-                    "type": "missing_index",
-                    "severity": "medium",
-                    "message": "Query without index - consider adding database index",
-                })
+                issues.append(
+                    {
+                        "type": "missing_index",
+                        "severity": "medium",
+                        "message": "Query without index - consider adding database index",
+                    }
+                )
 
         if "Array(" in content or "new Array" in content:
-            issues.append({
-                "type": "memory",
-                "severity": "low",
-                "message": "Large array allocation - monitor memory usage",
-            })
+            issues.append(
+                {
+                    "type": "memory",
+                    "severity": "low",
+                    "message": "Large array allocation - monitor memory usage",
+                }
+            )
 
         if ".forEach" in content and "async" in content:
-            issues.append({
-                "type": "async_loop",
-                "severity": "high",
-                "message": "async/await in forEach - use for...of instead",
-            })
+            issues.append(
+                {
+                    "type": "async_loop",
+                    "severity": "high",
+                    "message": "async/await in forEach - use for...of instead",
+                }
+            )
 
         return issues
 
     def _calculate_score(self, issues: list) -> int:
         """Calculate performance score based on issues."""
         severity_weights = {"critical": 30, "high": 20, "medium": 10, "low": 5}
-        penalty = sum(
-            severity_weights.get(i["severity"], 5)
-            for i in issues
-        )
+        penalty = sum(severity_weights.get(i["severity"], 5) for i in issues)
         return max(0, 100 - penalty)
 
     def _get_recommendations(self, issues: list) -> list:

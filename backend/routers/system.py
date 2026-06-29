@@ -1,6 +1,7 @@
 """
 System routes - health checks and configuration
 """
+
 from fastapi import APIRouter
 from datetime import datetime, timezone
 import re
@@ -27,8 +28,8 @@ async def health_check():
 @router.get("/api/config/domain")
 async def get_domain_config():
     """Return the configured domain from environment."""
-    domain = re.sub(r'^https?://', '', PUBLIC_URL)
-    domain = re.sub(r':[0-9]+$', '', domain)
-    if domain == 'localhost':
-        domain = 'semcod.com'
+    domain = re.sub(r"^https?://", "", PUBLIC_URL)
+    domain = re.sub(r":[0-9]+$", "", domain)
+    if domain == "localhost":
+        domain = "semcod.com"
     return {"domain": domain}

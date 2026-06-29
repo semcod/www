@@ -1,11 +1,10 @@
 """Mirror service - clone and sync repos from GitHub/GitLab to local Gitea."""
-import asyncio
+
 import logging
-import shutil
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, Any, Optional, List
+from typing import Any, Optional
 import subprocess
 
 import httpx
@@ -14,6 +13,7 @@ from adapters.github import GitHubAdapter
 from adapters.gitlab import GitLabAdapter
 from adapters.gitea import GiteaAdapter
 from .mirror_models import MirrorConfig, MirrorStatus
+from .mirror_workflow import generate_workflow
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +57,9 @@ class MirrorService:
                 target_adapter = GiteaAdapter(self.gitea_token, self.gitea_url)
 
                 # Clone source repo
-                source_url = await self._get_clone_url(config.source_provider, config.source_repo)
+                source_url = await self._get_clone_url(
+                    config.source_provider, config.source_repo
+                )
                 logger.info(f"[mirror] Cloning {source_url} to {tmpdir}")
                 clone_result = subprocess.run(
                     ["git", "clone", source_url, str(tmp_path / "repo")],
@@ -159,7 +161,9 @@ class MirrorService:
                 repo_path = tmp_path / "repo"
 
                 # Add source remote
-                source_url = await self._get_clone_url(config.source_provider, config.source_repo)
+                source_url = await self._get_clone_url(
+                    config.source_provider, config.source_repo
+                )
                 subprocess.run(
                     ["git", "remote", "add", "source", source_url],
                     cwd=repo_path,
@@ -188,7 +192,14 @@ class MirrorService:
                 )
 
                 # If main doesn't exist, try master
-                if subprocess.run(["git", "merge", "source/main"], cwd=repo_path, capture_output=True).returncode != 0:
+                if (
+                    subprocess.run(
+                        ["git", "merge", "source/main"],
+                        cwd=repo_path,
+                        capture_output=True,
+                    ).returncode
+                    != 0
+                ):
                     subprocess.run(
                         ["git", "merge", "source/master"],
                         cwd=repo_path,
@@ -212,7 +223,14 @@ class MirrorService:
                     timeout=300,
                 )
 
-                if subprocess.run(["git", "push", "gitea", "main"], cwd=repo_path, capture_output=True).returncode != 0:
+                if (
+                    subprocess.run(
+                        ["git", "push", "gitea", "main"],
+                        cwd=repo_path,
+                        capture_output=True,
+                    ).returncode
+                    != 0
+                ):
                     subprocess.run(
                         ["git", "push", "gitea", "master"],
                         cwd=repo_path,
@@ -292,7 +310,7 @@ class MirrorService:
         workflows_dir.mkdir(parents=True, exist_ok=True)
 
         # Create deployment workflow
-        workflow_content = self._generate_workflow(config)
+        workflow_content = generate_workflow(config)
         (workflows_dir / "deploy.yml").write_text(workflow_content)
 
         # Commit and push CI/CD config
@@ -314,55 +332,6 @@ class MirrorService:
             capture_output=True,
             check=True,
         )
-
-    def _generate_workflow(self, config: MirrorConfig) -> str:
-        """Generate Gitea Actions workflow file."""
-        if config.docker_image:
-            return f"""name: Deploy
-
-on:
-  push:
-    branches:
-      - {config.deploy_branch}
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Build Docker image
-        run: |
-          docker build -t {config.docker_image} .
-
-      - name: Push to registry
-        run: |
-          echo "Push to registry here"
-
-      - name: Deploy
-        run: |
-          echo "Deploy application"
-"""
-        else:
-            return f"""name: Deploy
-
-on:
-  push:
-    branches:
-      - {config.deploy_branch}
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Deploy
-        run: |
-          echo "Deploy application"
-"""
 
     def _get_latest_commit(self, repo_path: Path) -> str:
         """Get latest commit SHA."""

@@ -34,6 +34,7 @@ from routers.ecosystem import router as ecosystem_router
 
 # ─── Config ───────────────────────────────────────────────────────────────────
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     start_scheduler()
@@ -79,4 +80,5 @@ app.include_router(ecosystem_router)
 if __name__ == "__main__":
     import uvicorn
     from config import HOST, PORT
+
     uvicorn.run(app, host=HOST, port=PORT)

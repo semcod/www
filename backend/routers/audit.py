@@ -11,10 +11,15 @@ from datetime import timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 
-from config import APP_URL, SCAN_HISTORY_LIMIT
-from services.pipeline import run_pipeline, run_pipeline_local, clone_repo
-from services.scoring import score_to_grade
-from services.scan_service import save_scan, get_recent_scans, save_audit_result, get_audit_result, save_badge_cache, get_badge_cache
+from config import APP_URL
+from services.pipeline import run_pipeline, run_pipeline_local
+from services.scan_service import (
+    save_scan,
+    get_recent_scans,
+    save_audit_result,
+    get_audit_result,
+    save_badge_cache,
+)
 from routers.auth import get_current_user
 
 router = APIRouter()
@@ -39,9 +44,7 @@ async def run_audit(request: Request, user: dict = Depends(get_current_user)):
     body = await request.json()
     repo = body["repo"]
     token = user["github_token"]
-    audit_id = hashlib.sha256(
-        f"{repo}-{_utc_now_iso()}".encode()
-    ).hexdigest()[:12]
+    audit_id = hashlib.sha256(f"{repo}-{_utc_now_iso()}".encode()).hexdigest()[:12]
 
     benchmark_meta = {
         "case_id": body.get("case_id"),
@@ -54,15 +57,22 @@ async def run_audit(request: Request, user: dict = Depends(get_current_user)):
     }
 
     # Save initial audit status to database
-    save_audit_result(audit_id, {
-        "status": "running",
-        "repo": repo,
-        "started": _utc_now_iso(),
-        **{k: v for k, v in benchmark_meta.items() if v is not None},
-    })
+    save_audit_result(
+        audit_id,
+        {
+            "status": "running",
+            "repo": repo,
+            "started": _utc_now_iso(),
+            **{k: v for k, v in benchmark_meta.items() if v is not None},
+        },
+    )
 
     _schedule_background_task(_run_audit_pipeline(audit_id, repo, token))
-    return {"audit_id": audit_id, "status": "running", **{k: v for k, v in benchmark_meta.items() if v is not None}}
+    return {
+        "audit_id": audit_id,
+        "status": "running",
+        **{k: v for k, v in benchmark_meta.items() if v is not None},
+    }
 
 
 @router.get("/api/audit/{audit_id}")
@@ -84,7 +94,7 @@ async def get_recent_scans_api(limit: int = 100):
     except Exception:
         scans = scan_history[:limit]
         total = len(scan_history)
-    
+
     return {
         "scans": scans,
         "total": total,
@@ -108,6 +118,7 @@ async def analyze_repo(request: Request):
     if repo_url.startswith("local:/"):
         # Extract repo name from local path for audit_id
         import os
+
         path = repo_url.replace("local:/", "/local-repos/")
         repo_name = os.path.basename(path)
         owner = "local"
@@ -120,6 +131,7 @@ async def analyze_repo(request: Request):
     elif repo_url.startswith("file://"):
         # Extract repo name from file path for audit_id
         import os
+
         path = repo_url.replace("file://", "")
         repo_name = os.path.basename(path.rstrip("/.git"))
         owner = "local"
@@ -160,17 +172,27 @@ async def analyze_repo(request: Request):
     }
 
     # Save initial audit status to database
-    save_audit_result(audit_id, {
-        "status": "running",
-        "repo": f"{owner}/{repo}",
-        "sandbox": sandbox,
-        "started": _utc_now_iso(),
-        **{k: v for k, v in benchmark_meta.items() if v is not None},
-    })
+    save_audit_result(
+        audit_id,
+        {
+            "status": "running",
+            "repo": f"{owner}/{repo}",
+            "sandbox": sandbox,
+            "started": _utc_now_iso(),
+            **{k: v for k, v in benchmark_meta.items() if v is not None},
+        },
+    )
 
     # Use actual_repo_url for local repos, otherwise repo_url
-    _schedule_background_task(_run_sandbox_analysis(audit_id, actual_repo_url, f"{owner}/{repo}"))
-    return {"audit_id": audit_id, "status": "running", "sandbox": True, **{k: v for k, v in benchmark_meta.items() if v is not None}}
+    _schedule_background_task(
+        _run_sandbox_analysis(audit_id, actual_repo_url, f"{owner}/{repo}")
+    )
+    return {
+        "audit_id": audit_id,
+        "status": "running",
+        "sandbox": True,
+        **{k: v for k, v in benchmark_meta.items() if v is not None},
+    }
 
 
 async def _run_audit_pipeline(audit_id: str, repo: str, token: str):
@@ -197,13 +219,18 @@ async def _run_audit_pipeline(audit_id: str, repo: str, token: str):
 
         save_audit_result(audit_id, report)
 
-        weekly_issues = sum(1 for r in result.recommendations if r.get("priority") in ("high", "medium"))
-        save_badge_cache(repo, {
-            "score": result.health_score,
-            "grade": result.grade,
-            "updated": _utc_now_iso(),
-            "weekly_issues": weekly_issues,
-        })
+        weekly_issues = sum(
+            1 for r in result.recommendations if r.get("priority") in ("high", "medium")
+        )
+        save_badge_cache(
+            repo,
+            {
+                "score": result.health_score,
+                "grade": result.grade,
+                "updated": _utc_now_iso(),
+                "weekly_issues": weekly_issues,
+            },
+        )
 
         scan_entry = {
             "repo": repo,
@@ -233,26 +260,36 @@ async def _run_sandbox_analysis(audit_id: str, repo_url: str, repo: str):
             if source_path.exists():
                 shutil.copytree(source_path, workdir / "repo")
             else:
-                save_audit_result(audit_id, {
-                    "status": "error",
-                    "error": f"Local repository not found: {repo_url}",
-                    "repo": repo,
-                })
+                save_audit_result(
+                    audit_id,
+                    {
+                        "status": "error",
+                        "error": f"Local repository not found: {repo_url}",
+                        "repo": repo,
+                    },
+                )
                 return
         else:
             # Use git clone for remote repos
             proc = await asyncio.create_subprocess_exec(
-                "git", "clone", "--depth=1", repo_url, str(workdir / "repo"),
+                "git",
+                "clone",
+                "--depth=1",
+                repo_url,
+                str(workdir / "repo"),
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
             await proc.wait()
             if proc.returncode != 0:
-                save_audit_result(audit_id, {
-                    "status": "error",
-                    "error": "Failed to clone repository. Ensure it's public.",
-                    "repo": repo,
-                })
+                save_audit_result(
+                    audit_id,
+                    {
+                        "status": "error",
+                        "error": "Failed to clone repository. Ensure it's public.",
+                        "repo": repo,
+                    },
+                )
                 return
 
         result = await run_pipeline_local(workdir / "repo", include_code2llm_files=True)

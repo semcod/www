@@ -1,4 +1,5 @@
 """Unified Event Model - platform-agnostic representation of git events."""
+
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Optional
@@ -6,6 +7,7 @@ from typing import Any, Dict, List, Optional
 
 class EventType(Enum):
     """Supported event types across all platforms."""
+
     PULL_REQUEST = "pull_request"
     PUSH = "push"
     ISSUE = "issue"
@@ -15,6 +17,7 @@ class EventType(Enum):
 
 class ProviderType(Enum):
     """Supported git providers."""
+
     GITHUB = "github"
     GITLAB = "gitlab"
     GITEA = "gitea"
@@ -28,6 +31,7 @@ class Event:
     This class normalizes events from GitHub, GitLab, Gitea, etc.
     into a common format that apps can work with.
     """
+
     # Core identification
     type: EventType
     provider: ProviderType

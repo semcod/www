@@ -1,0 +1,373 @@
+// LESS format — define @variables here as needed
+
+app {
+  name: semcodes;
+  version: 0.1.11;
+}
+
+dependencies {
+  runtime: "fastapi>=0.110.0, httpx>=0.27.0, PyJWT>=2.8.0, goal>=2.1.0, costs>=0.1.20, pfix>=0.1.60";
+  dev: "pytest>=8.0.0, pytest-asyncio>=0.23.0, goal>=2.1.0, costs>=0.1.20, pfix>=0.1.60";
+}
+
+entity[name="MCPResource"] {
+  uri: string!;
+  name: string!;
+  description: string!;
+  mime_type: string!;
+}
+
+entity[name="MCPTool"] {
+  name: string!;
+  description: string!;
+  input_schema: json!;
+}
+
+database[name="postgres"] {
+  type: postgresql;
+  url: env.DATABASE_URL;
+}
+
+database[name="redis"] {
+  type: redis;
+  url: env.REDIS_URL;
+}
+
+interface[type="api"] {
+  type: rest;
+  framework: fastapi;
+  auth-type: jwt;
+}
+
+integration[name="email"] {
+  type: smtp;
+}
+
+integration[name="github"] {
+  type: scm;
+}
+
+workflow[name="redeploy-status"] {
+  trigger: manual;
+  step-1: run cmd=redeploy status;
+}
+
+workflow[name="redeploy-dry"] {
+  trigger: manual;
+  step-1: run cmd=redeploy run --dry-run;
+}
+
+workflow[name="redeploy-plan"] {
+  trigger: manual;
+  step-1: run cmd=redeploy run --plan-only --plan-out migration-plan.yaml;
+}
+
+workflow[name="redeploy-detect"] {
+  trigger: manual;
+  step-1: run cmd=redeploy run --detect --plan-only;
+}
+
+workflow[name="redeploy-vps"] {
+  trigger: manual;
+  step-1: run cmd=redeploy run;
+}
+
+workflow[name="redeploy-local"] {
+  trigger: manual;
+  step-1: run cmd=redeploy run migration-local.yaml;
+}
+
+workflow[name="backend"] {
+  trigger: manual;
+  step-1: run cmd=cd backend && python server.py;
+}
+
+workflow[name="frontend"] {
+  trigger: manual;
+  step-1: run cmd=cd frontend && npx vite --host;
+}
+
+workflow[name="dev"] {
+  trigger: manual;
+  step-1: run cmd=echo "Starting local dev: backend :8200 + frontend :5174";
+  step-2: run cmd=echo "Press Ctrl+C to stop";
+  step-3: run cmd=$(MAKE) -j2 backend frontend;
+}
+
+workflow[name="sim"] {
+  trigger: manual;
+  step-1: run cmd=docker compose -f docker-compose.yml -f docker-compose.sim.yml up -d --build;
+  step-2: run cmd=echo "";
+  step-3: run cmd=echo "✅ Stack ready with mock GitHub";
+  step-4: run cmd=echo "   Frontend:  http://localhost:3000";
+  step-5: run cmd=echo "   Backend:   http://localhost:8003";
+  step-6: run cmd=echo "   Mock GH:   http://localhost:4010";
+}
+
+workflow[name="sim-down"] {
+  trigger: manual;
+  step-1: run cmd=docker compose -f docker-compose.yml -f docker-compose.sim.yml down;
+}
+
+workflow[name="up"] {
+  trigger: manual;
+  step-1: run cmd=docker compose up -d --build;
+  step-2: run cmd=echo "";
+  step-3: run cmd=echo "✅ Production stack ready";
+  step-4: run cmd=echo "   Frontend:  http://localhost:3000";
+  step-5: run cmd=echo "   Backend:   http://localhost:8003";
+}
+
+workflow[name="down"] {
+  trigger: manual;
+  step-1: run cmd=docker compose down;
+}
+
+workflow[name="test"] {
+  trigger: manual;
+  step-1: run cmd=cd backend && python -m pytest tests/ -v -m "not slow" --tb=short;
+}
+
+workflow[name="test-all"] {
+  trigger: manual;
+  step-1: run cmd=cd backend && python -m pytest tests/ -v --tb=short;
+}
+
+workflow[name="e2e"] {
+  trigger: manual;
+  step-1: run cmd=cd e2e && BASE_URL=http://localhost:3000 npx playwright test --reporter=list;
+}
+
+workflow[name="e2e-dev"] {
+  trigger: manual;
+  step-1: run cmd=cd e2e && BASE_URL=http://localhost:5174 npx playwright test --reporter=list;
+}
+
+workflow[name="e2e-install"] {
+  trigger: manual;
+  step-1: run cmd=cd e2e && npx playwright install chromium;
+}
+
+workflow[name="lint"] {
+  trigger: manual;
+  step-1: run cmd=cd backend && python -m ruff check . && python -m ruff format --check .;
+}
+
+workflow[name="install"] {
+  trigger: manual;
+  step-1: run cmd=cd backend && pip install -q -r requirements.txt 2>/dev/null || true;
+  step-2: run cmd=cd frontend && npm install --silent 2>/dev/null || true;
+  step-3: run cmd=cd e2e && npm install --silent 2>/dev/null || true;
+}
+
+workflow[name="logs"] {
+  trigger: manual;
+  step-1: run cmd=docker compose logs -f backend frontend worker;
+}
+
+workflow[name="ps"] {
+  trigger: manual;
+  step-1: run cmd=docker compose ps;
+}
+
+workflow[name="clean"] {
+  trigger: manual;
+  step-1: run cmd=find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true;
+  step-2: run cmd=find . -type d -name .pytest_cache -exec rm -rf {} + 2>/dev/null || true;
+  step-3: run cmd=find . -type d -name .ruff_cache -exec rm -rf {} + 2>/dev/null || true;
+  step-4: run cmd=find . -type d -name node_modules -exec rm -rf {} + 2>/dev/null || true;
+  step-5: run cmd=rm -rf e2e/test-results/ e2e/playwright-report/;
+}
+
+workflow[name="gitea-up"] {
+  trigger: manual;
+  step-1: run cmd=docker compose -f docker-compose.yml -f docker-compose.gitea.yml up -d;
+  step-2: run cmd=echo "";
+  step-3: run cmd=echo "⏳ Waiting for Gitea to be ready...";
+  step-4: run cmd=for i in $$(seq 1 30); do \;
+  step-5: run cmd=curl -sf http://localhost:3100/api/v1/version >/dev/null 2>&1 && break; \;
+  step-6: run cmd=sleep 2; \;
+  step-7: run cmd=done;
+  step-8: run cmd=echo "✅ Stack ready — run 'make gitea-setup' next";
+}
+
+workflow[name="gitea-setup"] {
+  trigger: manual;
+  step-1: run cmd=bash scripts/setup-gitea.sh;
+}
+
+workflow[name="gitea-test"] {
+  trigger: manual;
+  step-1: run cmd=bash scripts/test-full-cycle.sh;
+}
+
+workflow[name="gitea-cycle"] {
+  trigger: manual;
+  step-1: run cmd=sleep 5;
+  step-2: run cmd=$(MAKE) gitea-setup;
+  step-3: run cmd=sleep 2;
+  step-4: run cmd=$(MAKE) gitea-test;
+}
+
+workflow[name="gitea-down"] {
+  trigger: manual;
+  step-1: run cmd=docker compose -f docker-compose.yml -f docker-compose.gitea.yml down;
+}
+
+workflow[name="gitea-logs"] {
+  trigger: manual;
+  step-1: run cmd=docker compose -f docker-compose.yml -f docker-compose.gitea.yml logs -f gitea backend;
+}
+
+workflow[name="gitea-reset"] {
+  trigger: manual;
+  step-1: run cmd=docker compose -f docker-compose.yml -f docker-compose.gitea.yml down -v;
+  step-2: run cmd=rm -f .env.gitea;
+  step-3: run cmd=echo "🗑️  Gitea data wiped";
+}
+
+workflow[name="pg-migrate"] {
+  trigger: manual;
+  step-1: run cmd=echo "🐘 Running Alembic migrations...";
+  step-2: run cmd=docker compose exec backend alembic upgrade head;
+  step-3: run cmd=echo "✅ Migrations applied";
+}
+
+workflow[name="pg-validate"] {
+  trigger: manual;
+  step-1: run cmd=bash e2e/test-pg-migration.sh;
+}
+
+workflow[name="pg-reset"] {
+  trigger: manual;
+  step-1: run cmd=docker compose down -v;
+  step-2: run cmd=docker compose up -d db;
+  step-3: run cmd=sleep 3;
+  step-4: run cmd=docker compose exec backend alembic upgrade head;
+  step-5: run cmd=docker compose up -d;
+  step-6: run cmd=echo "✅ PG reset complete";
+}
+
+workflow[name="pg-shell"] {
+  trigger: manual;
+  step-1: run cmd=docker compose exec db psql -U semcod -d semcod;
+}
+
+workflow[name="e2e-mock"] {
+  trigger: manual;
+  step-1: run cmd=docker compose -f docker-compose.yml -f docker-compose.sim.yml up -d;
+  step-2: run cmd=sleep 5;
+  step-3: run cmd=GIT_PROVIDER=mock npx playwright test frontend/e2e/specs/user-journey.spec.js --project=chromium;
+  step-4: run cmd=docker compose -f docker-compose.yml -f docker-compose.sim.yml down;
+}
+
+workflow[name="e2e-gitea"] {
+  trigger: manual;
+  step-1: depend target=gitea-cycle;
+}
+
+workflow[name="e2e-github"] {
+  trigger: manual;
+  step-1: run cmd=bash e2e/github-real.sh;
+}
+
+workflow[name="e2e-github-write"] {
+  trigger: manual;
+  step-1: run cmd=bash e2e/github-real.sh --write;
+}
+
+workflow[name="e2e-github-full"] {
+  trigger: manual;
+  step-1: run cmd=bash e2e/github-real.sh --write --pr;
+}
+
+workflow[name="e2e-github-apply"] {
+  trigger: manual;
+  step-1: run cmd=bash e2e/github-real.sh --write --pr --apply;
+}
+
+workflow[name="e2e-browser"] {
+  trigger: manual;
+  step-1: run cmd=GIT_PROVIDER=mock npx playwright test frontend/e2e/specs/user-journey.spec.js --headed;
+}
+
+workflow[name="e2e-browser-gitea"] {
+  trigger: manual;
+  step-1: run cmd=GIT_PROVIDER=gitea npx playwright test frontend/e2e/specs/user-journey.spec.js --headed;
+}
+
+workflow[name="e2e-all"] {
+  trigger: manual;
+  step-1: run cmd=echo "✅ All E2E modes passed";
+}
+
+workflow[name="build"] {
+  trigger: manual;
+  step-1: run cmd=python -m build;
+}
+
+workflow[name="help"] {
+  trigger: manual;
+  step-1: run cmd=echo "Semcod WWW — available targets:";
+  step-2: run cmd=echo "";
+  step-3: run cmd=echo "  make dev        — local dev server (Vite :5174 + backend :8200)";
+  step-4: run cmd=echo "  make sim        — Docker + mock GitHub (:3000, :8003, mock :4010)";
+  step-5: run cmd=echo "  make up         — Docker production stack";
+  step-6: run cmd=echo "  make down       — stop all Docker services";
+  step-7: run cmd=echo "  make test       — backend pytest";
+  step-8: run cmd=echo "  make e2e        — Playwright E2E (requires sim or dev running)";
+  step-9: run cmd=echo "  make lint       — ruff lint + format check";
+  step-10: run cmd=echo "  make install    — install Python + Node dependencies";
+  step-11: run cmd=echo "  make logs       — tail Docker logs";
+  step-12: run cmd=echo "  make ps         — show running containers";
+  step-13: run cmd=echo "  make clean      — remove caches and temp files";
+  step-14: run cmd=echo "";
+  step-15: run cmd=echo "Gitea targets:";
+  step-16: run cmd=echo "  make gitea-up / gitea-down / gitea-setup / gitea-test / gitea-cycle";
+}
+
+workflow[name="health"] {
+  trigger: manual;
+  step-1: run cmd=docker compose ps;
+  step-2: run cmd=docker compose exec app echo "Health check passed";
+}
+
+workflow[name="import-makefile-hint"] {
+  trigger: manual;
+  step-1: run cmd=echo 'Run: taskfile import Makefile to import existing targets.';
+}
+
+workflow[name="all"] {
+  trigger: manual;
+  step-1: run cmd=taskfile run install;
+  step-2: run cmd=taskfile run lint;
+  step-3: run cmd=taskfile run test;
+}
+
+workflow[name="fmt"] {
+  trigger: manual;
+  step-1: run cmd=ruff format .;
+}
+
+workflow[name="format"] {
+  trigger: manual;
+  step-1: run cmd=ruff format .;
+}
+
+env_vars {
+  keys: OPENROUTER_API_KEY, LLM_MODEL, REFACTOR_LLM_MODEL, GITHUB_APP_ID, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_WEBHOOK_SECRET, GITHUB_PRIVATE_KEY_PATH, GITHUB_OAUTH_SCOPE, MOCK_GITHUB_CLIENT_ID, MOCK_GITHUB_CLIENT_SECRET, MOCK_GITHUB_APP_ID, MOCK_GITHUB_WEBHOOK_SECRET, MOCK_USER_LOGIN, MOCK_USER_NAME, MOCK_USER_EMAIL, MOCK_USER_ID, MOCK_USER_BIO, MOCK_USER_COMPANY, MOCK_USER_LOCATION, MOCK_USER_AVATAR_URL, MOCK_USER_PUBLIC_REPOS, APP_URL, FRONTEND_URL, PUBLIC_URL, HOST, PORT, SECRET_KEY, SESSION_EXPIRE_HOURS, DB_PATH, SCAN_HISTORY_LIMIT, REPOS_PER_PAGE, CORS_ORIGINS, LARGE_FILE_THRESHOLD, DEMO_MODE;
+}
+
+deploy {
+  target: docker-compose;
+  compose_file: docker-compose.yml;
+}
+
+environment[name="local"] {
+  runtime: docker-compose;
+  env_file: .env;
+  template_file: .env.example;
+  python_version: >=3.8;
+  vars: APP_URL, CORS_ORIGINS, DB_PATH, DEMO_MODE, FRONTEND_URL, GITHUB_APP_ID, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_SCOPE, GITHUB_PRIVATE_KEY_PATH, GITHUB_WEBHOOK_SECRET, HOST, LARGE_FILE_THRESHOLD, LLM_MODEL, MOCK_GITHUB_APP_ID, MOCK_GITHUB_CLIENT_ID, MOCK_GITHUB_CLIENT_SECRET, MOCK_GITHUB_WEBHOOK_SECRET, MOCK_USER_AVATAR_URL, MOCK_USER_BIO, MOCK_USER_COMPANY, MOCK_USER_EMAIL, MOCK_USER_ID, MOCK_USER_LOCATION, MOCK_USER_LOGIN, MOCK_USER_NAME, MOCK_USER_PUBLIC_REPOS, OPENROUTER_API_KEY, PORT, PUBLIC_URL, REFACTOR_LLM_MODEL, REPOS_PER_PAGE, SCAN_HISTORY_LIMIT, SECRET_KEY, SESSION_EXPIRE_HOURS;
+  runtime_llm: OPENROUTER_API_KEY;
+}

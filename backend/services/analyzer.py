@@ -54,18 +54,18 @@ async def count_code_stats(repo_path: Path) -> dict:
 
 
 FUNC_PATTERNS = [
-    r'def\s+\w+\s*\(',  # Python
-    r'function\s+\w+\s*\(',  # JS
-    r'fn\s+\w+\s*\(',  # Rust
-    r'func\s+\w+\s*\(',  # Go
-    r'public\s+\w+\s+\w+\s*\(',  # Java/C#
+    r"def\s+\w+\s*\(",  # Python
+    r"function\s+\w+\s*\(",  # JS
+    r"fn\s+\w+\s*\(",  # Rust
+    r"func\s+\w+\s*\(",  # Go
+    r"public\s+\w+\s+\w+\s*\(",  # Java/C#
 ]
 
 CLASS_PATTERNS = [
-    r'class\s+\w+',  # Python/JS
-    r'public\s+class\s+\w+',  # Java/C#
-    r'type\s+\w+\s+struct',  # Go
-    r'impl\s+\w+',  # Rust
+    r"class\s+\w+",  # Python/JS
+    r"public\s+class\s+\w+",  # Java/C#
+    r"type\s+\w+\s+struct",  # Go
+    r"impl\s+\w+",  # Rust
 ]
 
 
@@ -78,7 +78,9 @@ def _estimate_file_complexity(lines: list[str]) -> int:
     """Estimate cyclomatic complexity from nesting and line length."""
     complexity = 0
     for line in lines:
-        if line.strip().startswith(("if ", "for ", "while ", "try:", "except", "catch")):
+        if line.strip().startswith(
+            ("if ", "for ", "while ", "try:", "except", "catch")
+        ):
             complexity += 1
         if len(line) > 100:
             complexity += 1
@@ -134,21 +136,23 @@ def _should_skip_line(line: str) -> bool:
     return not stripped or stripped.startswith(("#", "//", "/*", "*", "--"))
 
 
-def _process_file_for_duplication(file_path: Path, line_occurrences: Dict[str, int]) -> int:
+def _process_file_for_duplication(
+    file_path: Path, line_occurrences: Dict[str, int]
+) -> int:
     """Process a single file and update line occurrences. Returns total lines processed."""
     try:
         content = file_path.read_text(errors="ignore")
         lines = content.splitlines()
-        
+
         total_lines = 0
         for line in lines:
             if _should_skip_line(line):
                 continue
-            
+
             stripped = line.strip()
             total_lines += 1
             line_occurrences[stripped] = line_occurrences.get(stripped, 0) + 1
-        
+
         return total_lines
     except Exception:
         return 0
@@ -158,18 +162,20 @@ async def analyze_duplication(repo_path: Path) -> Dict[str, Any]:
     """Analyze code duplication using Python (no external tools)."""
     line_occurrences: Dict[str, int] = {}
     total_lines = 0
-    
+
     for ext in EXTENSIONS_MAP.keys():
         for f in repo_path.rglob(f"*{ext}"):
             if _should_skip_file(f):
                 continue
 
             total_lines += _process_file_for_duplication(f, line_occurrences)
-    
+
     # Count duplicated lines (appearing more than once)
-    duplicated_lines = sum(count - 1 for count in line_occurrences.values() if count > 1)
+    duplicated_lines = sum(
+        count - 1 for count in line_occurrences.values() if count > 1
+    )
     duplication_groups = sum(1 for count in line_occurrences.values() if count > 1)
-    
+
     return {
         "duplication_groups": duplication_groups,
         "duplicated_lines": duplicated_lines,
@@ -197,7 +203,7 @@ def _check_long_lines(lines: List[str], max_length: int = 120) -> bool:
 
 def _check_missing_docstrings(content: str) -> bool:
     """Check if Python file has functions without docstrings."""
-    has_function = re.search(r'def\s+\w+', content)
+    has_function = re.search(r"def\s+\w+", content)
     has_docstring = '"""' in content or "'''" in content
     return bool(has_function and not has_docstring)
 
@@ -207,22 +213,22 @@ def _analyze_file_quality(file_path: Path) -> Dict[str, int]:
     try:
         content = file_path.read_text(errors="ignore")
         lines = content.splitlines()
-        
+
         warnings = 0
         has_issues = False
-        
+
         if _check_todo_fixme(content):
             warnings += 1
             has_issues = True
-        
+
         if _check_long_lines(lines):
             warnings += 1
             has_issues = True
-        
+
         if file_path.suffix == ".py" and _check_missing_docstrings(content):
             warnings += 1
             has_issues = True
-        
+
         return {
             "warnings": warnings,
             "has_issues": has_issues,
@@ -238,7 +244,7 @@ async def analyze_quality(repo_path: Path) -> Dict[str, Any]:
     errors = 0
     passed = 0
     total_files = 0
-    
+
     for ext in EXTENSIONS_MAP.keys():
         for f in repo_path.rglob(f"*{ext}"):
             if _should_skip_file(f):
@@ -248,14 +254,14 @@ async def analyze_quality(repo_path: Path) -> Dict[str, Any]:
             warnings += result["warnings"]
             errors += result["errors"]
             total_files += 1
-            
+
             if not result["has_issues"]:
                 passed += 1
-    
+
     quality_score = 0
     if total_files > 0:
         quality_score = int((passed / total_files) * 100)
-    
+
     return {
         "passed": passed,
         "warnings": warnings,
@@ -266,18 +272,23 @@ async def analyze_quality(repo_path: Path) -> Dict[str, Any]:
 
 def analyze_repo(repo: str, commit_sha: str, config: dict) -> dict:
     """Analyze a repository and return health metrics.
-    
+
     This is a synchronous wrapper that runs async analysis.
     """
     import asyncio
-    
+
     async def _analyze():
         # Clone or use local repo
         # For now, return mock result that looks realistic
         return {
             "health_score": 75,
             "issues": [
-                {"type": "style", "file": "example.py", "line": 10, "message": "Trailing whitespace"},
+                {
+                    "type": "style",
+                    "file": "example.py",
+                    "line": 10,
+                    "message": "Trailing whitespace",
+                },
             ],
             "recommendations": [
                 "Add more docstrings to functions",
@@ -289,7 +300,7 @@ def analyze_repo(repo: str, commit_sha: str, config: dict) -> dict:
                 "languages": {"Python": 2500, "JavaScript": 500},
             },
         }
-    
+
     try:
         return asyncio.run(_analyze())
     except Exception as e:

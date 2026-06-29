@@ -1,4 +1,5 @@
 """Audit App - Code quality analysis for Semcod."""
+
 from typing import Dict, Any
 
 from apps.base import AppBase, AppContext, AppResult
@@ -37,7 +38,9 @@ class AuditApp(AppBase):
             metrics={
                 "grade": grade,
                 "issues_count": len(issues),
-                "complexity_violations": sum(1 for i in issues if i["type"] == "complexity"),
+                "complexity_violations": sum(
+                    1 for i in issues if i["type"] == "complexity"
+                ),
                 "duplications": sum(1 for i in issues if i["type"] == "duplication"),
             },
         )
@@ -48,25 +51,31 @@ class AuditApp(AppBase):
         diff_lower = diff.lower()
 
         if "complex" in diff_lower:
-            issues.append({
-                "type": "complexity",
-                "severity": "medium",
-                "message": "High cyclomatic complexity detected",
-            })
+            issues.append(
+                {
+                    "type": "complexity",
+                    "severity": "medium",
+                    "message": "High cyclomatic complexity detected",
+                }
+            )
 
         if "duplicate" in diff_lower:
-            issues.append({
-                "type": "duplication",
-                "severity": "high",
-                "message": "Code duplication detected",
-            })
+            issues.append(
+                {
+                    "type": "duplication",
+                    "severity": "high",
+                    "message": "Code duplication detected",
+                }
+            )
 
         if "TODO" in diff:
-            issues.append({
-                "type": "todo",
-                "severity": "low",
-                "message": "TODO comments found",
-            })
+            issues.append(
+                {
+                    "type": "todo",
+                    "severity": "low",
+                    "message": "TODO comments found",
+                }
+            )
 
         return issues
 

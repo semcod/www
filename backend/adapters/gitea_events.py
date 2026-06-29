@@ -1,4 +1,5 @@
 """Gitea event parsing utilities."""
+
 from typing import Dict, Optional
 
 from events.models import Event, EventType, ProviderType

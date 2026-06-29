@@ -13,7 +13,27 @@
         pg-migrate pg-validate pg-reset pg-shell \
         e2e-mock e2e-gitea e2e-github e2e-github-write e2e-github-full e2e-github-apply \
         e2e-browser e2e-browser-gitea e2e-all \
-        backend frontend install clean logs ps
+        backend frontend install clean logs ps \
+        redeploy-status redeploy-dry redeploy-plan redeploy-detect redeploy-vps redeploy-local
+
+# ── Deploy (redeploy) ──────────────────────────────────────────
+redeploy-status:  ## Show deployment manifest + spec summary
+	redeploy status
+
+redeploy-dry:     ## Dry-run VPS deployment (no changes)
+	redeploy run --dry-run
+
+redeploy-plan:    ## Generate migration-plan.yaml (plan only)
+	redeploy run --plan-only --plan-out migration-plan.yaml
+
+redeploy-detect:  ## Probe live infra → infra.yaml (requires SSH access)
+	redeploy run --detect --plan-only
+
+redeploy-vps:     ## Full VPS deployment (detect → plan → apply)
+	redeploy run
+
+redeploy-local:   ## Local docker-compose refresh
+	redeploy run migration-local.yaml
 
 # ── Help ────────────────────────────────────────────────────────
 help:

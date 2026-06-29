@@ -1,4 +1,5 @@
 """Audit App - Event hooks for PR comments."""
+
 from apps.base import AppContext, AppResult
 
 
@@ -15,6 +16,7 @@ def on_pr_comment(event, context: AppContext) -> AppResult:
     if "@semcod audit" in comment:
         # Trigger full audit
         from .pipeline import AuditApp
+
         app = AuditApp()
         return app.run_pipeline(context)
 

@@ -67,6 +67,7 @@ SAMPLE_PROJECTS = [
     },
 ]
 
+
 def get_sample_projects():
     """Return list of sample projects for scanning."""
     return SAMPLE_PROJECTS

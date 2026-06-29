@@ -17,9 +17,12 @@ redsl = RedslClient()
 
 # ─── Pydantic Models ──────────────────────────────────────────────────────────
 
+
 class AnalyzeRequest(BaseModel):
     project_path: str = Field(..., description="Absolute path to the project directory")
-    project_toon: Optional[str] = Field(None, description="Optional project_toon YAML content")
+    project_toon: Optional[str] = Field(
+        None, description="Optional project_toon YAML content"
+    )
 
 
 class RefactorRequest(BaseModel):
@@ -37,6 +40,7 @@ class AutoPrRequest(BaseModel):
 
 # ─── Engine status ────────────────────────────────────────────────────────────
 
+
 @router.get("/status")
 async def get_status():
     """Check if reDSL engine is available."""
@@ -46,12 +50,15 @@ async def get_status():
 
 # ─── Analyze ──────────────────────────────────────────────────────────────────
 
+
 @router.post("/analyze")
 async def analyze(body: AnalyzeRequest, bg: BackgroundTasks):
     """Run reDSL analysis on a project."""
     available = await redsl.health()
     if not available:
-        raise HTTPException(503, "reDSL engine is not available. Start it with: docker-compose up agent")
+        raise HTTPException(
+            503, "reDSL engine is not available. Start it with: docker-compose up agent"
+        )
     try:
         result = await redsl.analyze(body.project_path, body.project_toon)
         return {"status": "analyzed", "result": result}
@@ -61,6 +68,7 @@ async def analyze(body: AnalyzeRequest, bg: BackgroundTasks):
 
 
 # ─── Health Score ─────────────────────────────────────────────────────────────
+
 
 @router.post("/health")
 async def get_health(body: AnalyzeRequest):
@@ -78,6 +86,7 @@ async def get_health(body: AnalyzeRequest):
 
 # ─── Refactor ─────────────────────────────────────────────────────────────────
 
+
 @router.post("/refactor")
 async def run_refactor(body: RefactorRequest, bg: BackgroundTasks):
     """Run reDSL refactoring on a project."""
@@ -91,13 +100,17 @@ async def run_refactor(body: RefactorRequest, bg: BackgroundTasks):
             dry_run=body.dry_run,
             fmt="json",
         )
-        return {"status": "refactored" if not body.dry_run else "preview", "result": result}
+        return {
+            "status": "refactored" if not body.dry_run else "preview",
+            "result": result,
+        }
     except Exception as exc:
         logger.error("reDSL refactor failed: %s", exc)
         raise HTTPException(500, f"Refactor failed: {exc}")
 
 
 # ─── Decide (dry-run decisions) ───────────────────────────────────────────────
+
 
 @router.post("/decide")
 async def run_decide(body: AnalyzeRequest):
@@ -114,6 +127,7 @@ async def run_decide(body: AnalyzeRequest):
 
 
 # ─── Batch Hybrid ────────────────────────────────────────────────────────────
+
 
 @router.post("/batch-hybrid")
 async def run_batch_hybrid(project_path: str, max_changes: int = 30):
@@ -132,9 +146,13 @@ async def run_batch_hybrid(project_path: str, max_changes: int = 30):
 # ─── Health Badge (SVG) ──────────────────────────────────────────────────────
 
 _GRADE_COLORS = {
-    "A+": "brightgreen", "A": "green",
-    "B+": "yellowgreen", "B": "yellow",
-    "C": "orange", "D": "red", "F": "red",
+    "A+": "brightgreen",
+    "A": "green",
+    "B+": "yellowgreen",
+    "B": "yellow",
+    "C": "orange",
+    "D": "red",
+    "F": "red",
 }
 
 
@@ -146,6 +164,7 @@ async def health_badge(owner: str, repo: str):
     # Try to get cached health from scans DB
     try:
         from services.scan_service import get_repo_scans
+
         scans = get_repo_scans(full_repo, limit=1)
         if scans:
             score = scans[-1].get("health_score", 0)
@@ -162,8 +181,9 @@ async def health_badge(owner: str, repo: str):
     value_text = f"{grade}" if score is None else f"{grade} ({score})"
 
     svg = _make_badge_svg(label_text, value_text, color)
-    return Response(content=svg, media_type="image/svg+xml",
-                    headers={"Cache-Control": "no-cache"})
+    return Response(
+        content=svg, media_type="image/svg+xml", headers={"Cache-Control": "no-cache"}
+    )
 
 
 def _score_to_grade(score: int) -> str:

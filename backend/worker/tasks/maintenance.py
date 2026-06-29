@@ -1,13 +1,15 @@
 """Maintenance Celery tasks - health checks and notifications."""
+
 from typing import Dict, Any, Optional
 
 try:
     from celery import shared_task
     from celery.exceptions import MaxRetriesExceededError
+
     _CELERY_AVAILABLE = True
 except ImportError:
     _CELERY_AVAILABLE = False
-    from .._celery_stub import shared_task, MaxRetriesExceededError  # type: ignore[assignment]
+    from .._celery_stub import shared_task  # type: ignore[assignment]
 
 
 @shared_task
@@ -52,7 +54,6 @@ def check_score_and_notify(
     """
     Check if score improved after auto-fix and send notifications.
     """
-    from services.autofix import AutoFixService
 
     delta = new_score - previous_score
 
@@ -68,6 +69,7 @@ def check_score_and_notify(
     if notification_webhook and delta < 0:
         # Score regressed - alert
         import httpx
+
         httpx.post(
             notification_webhook,
             json={

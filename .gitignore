@@ -1,3 +1,4 @@
+.code2llm_cache
 test-results
 playwright-report
 *.db

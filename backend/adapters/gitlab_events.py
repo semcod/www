@@ -33,10 +33,12 @@ def parse_gitlab_event(payload: Dict) -> Optional[Event]:
         provider=ProviderType.GITLAB,
         repo=repo,
         pr_id=mr_id,
-        branch=mr_data.get("source_branch") or payload.get("ref", "").replace("refs/heads/", ""),
+        branch=mr_data.get("source_branch")
+        or payload.get("ref", "").replace("refs/heads/", ""),
         base_branch=mr_data.get("target_branch"),
         diff_url=mr_data.get("url"),
-        commit_sha=mr_data.get("last_commit", {}).get("id") or payload.get("checkout_sha"),
+        commit_sha=mr_data.get("last_commit", {}).get("id")
+        or payload.get("checkout_sha"),
         commits=commits,
         author=author,
         author_id=author_id,

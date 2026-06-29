@@ -1,0 +1,10 @@
+# redeploy project manifest — semcod/www
+# Run `redeploy run` (no args) to deploy using these defaults.
+# Edit `host` to set the target VPS before deploying.
+spec: migration.yaml
+local_spec: migration-local.yaml
+host: local          # change to: root@VPS_IP
+app: semcod
+domain: semcod.com
+ssh_port: 22
+env_file: .env

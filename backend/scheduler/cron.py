@@ -11,7 +11,10 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 from scheduler.scan_job import run_scheduled_scan
-from worker.tasks.redsl import task_redsl_scheduled_quality_check, task_redsl_scheduled_auto_refactor
+from worker.tasks.redsl import (
+    task_redsl_scheduled_quality_check,
+    task_redsl_scheduled_auto_refactor,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +46,9 @@ def start_scheduler() -> None:
             id="redsl:auto_refactor",
             replace_existing=True,
         )
-        logger.info("APScheduler started (reDSL jobs: quality_check hourly, auto_refactor weekly)")
+        logger.info(
+            "APScheduler started (reDSL jobs: quality_check hourly, auto_refactor weekly)"
+        )
 
 
 def stop_scheduler() -> None:
@@ -54,11 +59,16 @@ def stop_scheduler() -> None:
 
 # ─── Pydantic models ───────────────────────────────────────────────────────────
 
+
 class ScheduleCreate(BaseModel):
     repo: str = Field(..., description="owner/repo")
-    interval_hours: float = Field(1.0, ge=0.1, le=168, description="Scan interval in hours")
+    interval_hours: float = Field(
+        1.0, ge=0.1, le=168, description="Scan interval in hours"
+    )
     token: str = Field("", description="GitHub token (empty = public repo)")
-    webhook_url: str | None = Field(None, description="Slack/Discord webhook for degradation alerts")
+    webhook_url: str | None = Field(
+        None, description="Slack/Discord webhook for degradation alerts"
+    )
 
 
 class ScheduleOut(BaseModel):
@@ -70,6 +80,7 @@ class ScheduleOut(BaseModel):
 
 
 # ─── Internal helpers ──────────────────────────────────────────────────────────
+
 
 def _job_id(repo: str) -> str:
     return f"scan:{repo.replace('/', ':')}"
@@ -110,13 +121,16 @@ def _run_redsl_auto_refactor_sync() -> None:
 
 # ─── API endpoints ─────────────────────────────────────────────────────────────
 
+
 @router.post("", response_model=ScheduleOut, status_code=201)
 async def create_schedule(body: ScheduleCreate) -> ScheduleOut:
     """Register a new periodic scan for a repository."""
     job_id = _job_id(body.repo)
 
     if _scheduler.get_job(job_id):
-        raise HTTPException(409, f"Schedule already exists for {body.repo}. Use PATCH to update.")
+        raise HTTPException(
+            409, f"Schedule already exists for {body.repo}. Use PATCH to update."
+        )
 
     _scheduler.add_job(
         _run_scan_sync,
@@ -149,13 +163,15 @@ async def list_schedules() -> List[ScheduleOut]:
     """List all active scan schedules."""
     result = []
     for repo, meta in _schedules.items():
-        result.append(ScheduleOut(
-            repo=repo,
-            interval_hours=meta["interval_hours"],
-            next_run=_next_run_iso(_job_id(repo)),
-            created_at=meta["created_at"],
-            webhook_url=meta.get("webhook_url"),
-        ))
+        result.append(
+            ScheduleOut(
+                repo=repo,
+                interval_hours=meta["interval_hours"],
+                next_run=_next_run_iso(_job_id(repo)),
+                created_at=meta["created_at"],
+                webhook_url=meta.get("webhook_url"),
+            )
+        )
     return result
 
 
@@ -184,7 +200,9 @@ async def update_schedule(owner: str, repo: str, body: ScheduleCreate) -> Schedu
     if not _scheduler.get_job(job_id):
         raise HTTPException(404, f"No schedule found for {full_repo}")
 
-    _scheduler.reschedule_job(job_id, trigger=IntervalTrigger(hours=body.interval_hours))
+    _scheduler.reschedule_job(
+        job_id, trigger=IntervalTrigger(hours=body.interval_hours)
+    )
     _schedules[full_repo]["interval_hours"] = body.interval_hours
     _schedules[full_repo]["webhook_url"] = body.webhook_url
 

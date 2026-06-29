@@ -1,4 +1,5 @@
 """Marketplace deploy endpoints - auto-fix and deployment."""
+
 from fastapi import APIRouter, Depends, HTTPException
 
 from routers.auth import get_current_user
@@ -9,12 +10,19 @@ router = APIRouter(tags=["marketplace"])
 
 def _get_user_token(user: dict) -> str:
     """Get git provider token from user."""
-    return user.get("github_token") or user.get("gitlab_token") or user.get("gitea_token")
+    return (
+        user.get("github_token") or user.get("gitlab_token") or user.get("gitea_token")
+    )
 
 
 def _get_provider_user_id(user: dict) -> str:
     """Get provider user ID from user."""
-    return str(user.get("github_id") or user.get("gitlab_id") or user.get("gitea_id") or user.get("id"))
+    return str(
+        user.get("github_id")
+        or user.get("gitlab_id")
+        or user.get("gitea_id")
+        or user.get("id")
+    )
 
 
 def _check_billing_limit(tenant_id: int, usage_tracker, event_type) -> tuple[bool, str]:
@@ -39,11 +47,13 @@ def _record_billing_usage(tenant_id: int, usage_tracker, event_type, metadata: d
         print(f"[autofix] Failed to record usage: {e}")
 
 
-async def _handle_mirror_if_requested(request: AutoFixRequest, user: dict) -> str | None:
+async def _handle_mirror_if_requested(
+    request: AutoFixRequest, user: dict
+) -> str | None:
     """Handle mirror to Gitea if requested."""
     if not request.mirror_to_gitea or not request.gitea_target_repo:
         return None
-    
+
     try:
         from services.mirror import MirrorService, MirrorConfig
 
@@ -77,6 +87,7 @@ async def trigger_auto_fix(
     """Trigger auto-fix PR generation for a repository."""
     from database import get_or_create_tenant
     from services.billing import get_usage_tracker, BillingEventType
+
     token = _get_user_token(user)
     if not token:
         raise HTTPException(401, "Git provider token required")
@@ -91,7 +102,9 @@ async def trigger_auto_fix(
 
     # Check billing
     usage_tracker = get_usage_tracker()
-    can_execute, reason = _check_billing_limit(tenant["id"], usage_tracker, BillingEventType.AUTOFIX_RUN)
+    can_execute, reason = _check_billing_limit(
+        tenant["id"], usage_tracker, BillingEventType.AUTOFIX_RUN
+    )
 
     if not can_execute:
         raise HTTPException(402, reason)
@@ -109,6 +122,7 @@ async def trigger_auto_fix(
 
     # Queue task
     from worker.tasks import create_auto_fix_pr
+
     task = create_auto_fix_pr.delay(
         repo=request.repo,
         base_branch=request.base_branch,

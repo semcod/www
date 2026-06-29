@@ -7,8 +7,10 @@ from store import audit_results, badge_cache, scan_history
 
 router = APIRouter()
 
+
 def _utc_now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
+
 
 def _summarize_scan(scan: dict) -> dict:
     return {
@@ -20,6 +22,7 @@ def _summarize_scan(scan: dict) -> dict:
         "scanned_at": scan["completed"],
         "badge_url": scan.get("badge_url", ""),
     }
+
 
 def _build_metrics_summary(scans: list[dict]) -> dict:
     if not scans:
@@ -55,12 +58,14 @@ def _build_metrics_summary(scans: list[dict]) -> dict:
         "platform_distribution": platform_distribution,
     }
 
+
 def _get_scans_list() -> tuple[str, dict]:
     scans = get_recent_scans(50)
     return "application/json", {
         "scans": [_summarize_scan(scan) for scan in scans],
         "total_available": get_total_scan_count(),
     }
+
 
 def _get_scan_detail(audit_id: str) -> tuple[str, dict]:
     scan = audit_results.get(audit_id)
@@ -73,6 +78,7 @@ def _get_scan_detail(audit_id: str) -> tuple[str, dict]:
         raise HTTPException(404, f"Scan not found: {audit_id}")
     return "application/json", scan
 
+
 def _get_metrics_summary() -> tuple[str, dict]:
     scans = get_recent_scans(1000)
     return "application/json", {
@@ -82,6 +88,7 @@ def _get_metrics_summary() -> tuple[str, dict]:
         },
         "summary": _build_metrics_summary(scans),
     }
+
 
 def _get_badge_status(repo_slug: str) -> tuple[str, dict]:
     repo = repo_slug.replace("-", "/", 1)
@@ -125,6 +132,7 @@ async def mcp_list_resources() -> list[MCPResource]:
             mime_type="application/json",
         ),
     ]
+
 
 @router.get("/content")
 async def mcp_get_resource(uri: str) -> MCPResourceResponse:

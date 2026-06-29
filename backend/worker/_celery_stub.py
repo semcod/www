@@ -27,8 +27,10 @@ class _StubTask:
 
 def shared_task(fn=None, *, bind=False, max_retries=3, **_kwargs):  # type: ignore[misc]
     """Drop-in replacement for celery.shared_task with no broker dependency."""
+
     def decorator(f):
         return _StubTask(f, bind=bind)
+
     if fn is not None:
         return decorator(fn)
     return decorator

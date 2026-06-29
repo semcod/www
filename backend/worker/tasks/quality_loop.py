@@ -6,6 +6,7 @@ from typing import Any, Dict
 
 try:
     from celery import shared_task
+
     _CELERY_AVAILABLE = True
 except ImportError:
     _CELERY_AVAILABLE = False
@@ -32,7 +33,6 @@ def task_on_push_quality_loop(
     2. Save health snapshot
     3. If health < threshold → create ticket + refactor + PR
     """
-    import asyncio
 
     loop = _get_loop()
     try:
@@ -86,7 +86,9 @@ async def _run_quality_loop(
 
     # 6. Create auto-ticket
     ticket_id = _create_quality_ticket(repo, health)
-    logger.info("quality_loop: %s health=%d — created ticket %s", repo, score, ticket_id)
+    logger.info(
+        "quality_loop: %s health=%d — created ticket %s", repo, score, ticket_id
+    )
 
     # 7. Run reDSL cycle (analyze + apply refactoring)
     try:
@@ -123,8 +125,14 @@ async def _run_quality_loop(
     pr_url = None
     if token:
         pr_url = await _create_quality_pr(
-            repo, project_path, token, provider,
-            ticket_id, files_modified, score, grade,
+            repo,
+            project_path,
+            token,
+            provider,
+            ticket_id,
+            files_modified,
+            score,
+            grade,
         )
 
     _update_ticket_status(
@@ -150,9 +158,11 @@ async def _run_quality_loop(
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
 
+
 def _get_loop():
     """Get or create an asyncio event loop."""
     import asyncio
+
     try:
         loop = asyncio.get_event_loop()
         if loop.is_closed():
@@ -181,12 +191,15 @@ def _save_health_snapshot(repo: str, health: dict, commit_sha: str) -> None:
         }
         save_scan(scan_entry)
 
-        save_badge_cache(repo, {
-            "score": health.get("score", 0),
-            "grade": health.get("grade", "?"),
-            "updated": now,
-            "weekly_issues": None,
-        })
+        save_badge_cache(
+            repo,
+            {
+                "score": health.get("score", 0),
+                "grade": health.get("grade", "?"),
+                "updated": now,
+                "weekly_issues": None,
+            },
+        )
     except Exception as exc:
         logger.warning("Failed to save health snapshot for %s: %s", repo, exc)
 
@@ -195,6 +208,7 @@ def _check_health_drop(repo: str, current_score: int) -> None:
     """Alert if health dropped ≥5 points vs previous scan."""
     try:
         from db_module.wrappers import get_repo_scans
+
         scans = get_repo_scans(repo, limit=2)
         if len(scans) < 2:
             return
@@ -203,7 +217,10 @@ def _check_health_drop(repo: str, current_score: int) -> None:
         if delta <= -5:
             logger.warning(
                 "Health drop for %s: %d → %d (%+d)",
-                repo, prev_score, current_score, delta,
+                repo,
+                prev_score,
+                current_score,
+                delta,
             )
     except Exception as exc:
         logger.warning("Failed to check health drop for %s: %s", repo, exc)
@@ -213,6 +230,7 @@ def _create_quality_ticket(repo: str, health: dict) -> str:
     """Create an auto-generated quality ticket. Returns ticket_id."""
     try:
         from db_module.tickets_orm import create_ticket
+
         score = health.get("score", 0)
         grade = health.get("grade", "?")
         priority = "high" if score < 50 else "medium"
@@ -234,11 +252,14 @@ def _create_quality_ticket(repo: str, health: dict) -> str:
         return "unknown"
 
 
-def _update_ticket_status(ticket_id: str, status: str, pr_url: str | None = None) -> None:
+def _update_ticket_status(
+    ticket_id: str, status: str, pr_url: str | None = None
+) -> None:
     """Update ticket status."""
     try:
         from db_module.tickets_orm import update_ticket
         from db_session import SessionLocal
+
         updates = {"status": status}
         if pr_url:
             updates["pr_url"] = pr_url
@@ -256,6 +277,7 @@ def _update_ticket_error(ticket_id: str, error: str) -> None:
     try:
         from db_module.tickets_orm import mark_ticket_error
         from db_session import SessionLocal
+
         db = SessionLocal()
         try:
             mark_ticket_error(db, ticket_id, error)
@@ -278,6 +300,7 @@ async def _create_quality_pr(
     """Create a PR from reDSL refactoring results. Returns PR URL or None."""
     try:
         from worker.tasks.autopr import create_auto_pr
+
         branch = f"semcod-quality-{ticket_id[:8]}-{datetime.now(timezone.utc).strftime('%Y%m%d')}"
 
         patches = []
@@ -313,6 +336,7 @@ def _update_badge_cache(repo: str, health: dict) -> None:
     """Update in-memory badge cache."""
     try:
         from store import badge_cache
+
         badge_cache[repo] = {
             "score": health.get("score", 0),
             "grade": health.get("grade", "?"),

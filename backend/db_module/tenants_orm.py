@@ -1,4 +1,5 @@
 """Tenant database operations using SQLAlchemy ORM."""
+
 from datetime import datetime, timezone
 from typing import Dict, Optional
 
@@ -25,7 +26,7 @@ def get_or_create_tenant(
         )
         .first()
     )
-    
+
     if tenant:
         return {
             "id": tenant.id,
@@ -43,7 +44,7 @@ def get_or_create_tenant(
             "updated_at": tenant.updated_at.isoformat() if tenant.updated_at else None,
             "is_new": False,
         }
-    
+
     # Create new tenant
     now = datetime.now(timezone.utc)
     tenant = Tenant(
@@ -59,7 +60,7 @@ def get_or_create_tenant(
     db.add(tenant)
     db.commit()
     db.refresh(tenant)
-    
+
     return {
         "id": tenant.id,
         "provider": tenant.provider,
@@ -111,11 +112,11 @@ def update_tenant_plan(
     tenant = db.query(Tenant).filter(Tenant.id == tenant_id).first()
     if not tenant:
         return None
-    
+
     tenant.plan = plan
     tenant.billing_customer_id = billing_customer_id
     tenant.billing_subscription_id = billing_subscription_id
     tenant.updated_at = datetime.now(timezone.utc)
-    
+
     db.commit()
     return get_tenant_by_id(db, tenant_id)

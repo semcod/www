@@ -1,4 +1,5 @@
 """Base class for all Semcod marketplace apps."""
+
 from abc import ABC, abstractmethod
 from typing import Dict, Any, List, Optional
 from dataclasses import dataclass
@@ -7,6 +8,7 @@ from dataclasses import dataclass
 @dataclass
 class AppResult:
     """Standard result format for all apps."""
+
     status: str  # success, warning, error, skipped
     score: Optional[int] = None  # 0-100 health score
     issues: List[Dict[str, Any]] = None
@@ -31,6 +33,7 @@ class AppResult:
 @dataclass
 class AppContext:
     """Context passed to apps during execution."""
+
     repo: str
     event_type: str
     provider: str

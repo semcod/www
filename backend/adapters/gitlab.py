@@ -1,11 +1,10 @@
 """GitLab adapter - implementation of GitProvider for GitLab."""
-import base64
+
 from typing import Dict, List, Optional
 
 import httpx
 from fastapi import HTTPException
 
-from events.models import Event, EventType, ProviderType
 from .base import GitProvider
 
 
@@ -46,7 +45,9 @@ class GitLabAdapter(GitProvider):
             raise HTTPException(500, f"Failed to comment: {resp.text}")
         return resp.json().get("web_url", "")
 
-    async def update_pr_description(self, repo: str, pr_id: int, description: str) -> bool:
+    async def update_pr_description(
+        self, repo: str, pr_id: int, description: str
+    ) -> bool:
         """Update MR description."""
         project = self._get_project_path(repo)
         url = f"{self.api_base}/projects/{project}/merge_requests/{pr_id}"
@@ -84,7 +85,9 @@ class GitLabAdapter(GitProvider):
             raise HTTPException(500, f"Failed to create MR: {resp.text}")
         return resp.json().get("web_url", "")
 
-    async def close_pr(self, repo: str, pr_id: int, comment: Optional[str] = None) -> bool:
+    async def close_pr(
+        self, repo: str, pr_id: int, comment: Optional[str] = None
+    ) -> bool:
         """Close a MR with optional comment."""
         if comment:
             await self.comment_on_pr(repo, pr_id, comment)
@@ -213,7 +216,9 @@ class GitLabAdapter(GitProvider):
         if resp.status_code == 404:
             raise HTTPException(404, f"MR !{pr_id} not found in {repo}")
         if resp.status_code != 200:
-            raise HTTPException(422, f"Cannot get diff: {resp.status_code} - {resp.text}")
+            raise HTTPException(
+                422, f"Cannot get diff: {resp.status_code} - {resp.text}"
+            )
 
         data = resp.json()
         changes = data.get("changes", [])
@@ -249,12 +254,16 @@ class GitLabAdapter(GitProvider):
         return [
             {
                 "filename": c.get("new_path"),
-                "status": "modified" if c.get("old_path") == c.get("new_path") else "renamed",
+                "status": "modified"
+                if c.get("old_path") == c.get("new_path")
+                else "renamed",
                 "additions": c.get("additions", 0),
                 "deletions": c.get("deletions", 0),
                 "changes": c.get("additions", 0) + c.get("deletions", 0),
                 "patch": c.get("diff", ""),
-                "previous_filename": c.get("old_path") if c.get("old_path") != c.get("new_path") else None,
+                "previous_filename": c.get("old_path")
+                if c.get("old_path") != c.get("new_path")
+                else None,
             }
             for c in changes
         ]
@@ -346,7 +355,9 @@ class GitLabAdapter(GitProvider):
                 json={
                     "state": state,
                     "name": name,
-                    "description": output.get("title", "Semcod check") if output else "Semcod",
+                    "description": output.get("title", "Semcod check")
+                    if output
+                    else "Semcod",
                 },
             )
         if resp.status_code != 201:
@@ -367,7 +378,9 @@ class GitLabAdapter(GitProvider):
 
     # ─── Webhook Verification ───────────────────────────────────────────────────
 
-    def verify_webhook_signature(self, body: bytes, signature: str, secret: str) -> bool:
+    def verify_webhook_signature(
+        self, body: bytes, signature: str, secret: str
+    ) -> bool:
         """Verify GitLab webhook signature (X-Gitlab-Token or HMAC)."""
         # GitLab uses simple token or JWT, simplified here
         import hmac
@@ -375,5 +388,3 @@ class GitLabAdapter(GitProvider):
 
         expected = hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
         return hmac.compare_digest(signature, expected)
-
-

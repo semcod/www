@@ -1,5 +1,4 @@
 """SQLAlchemy session and engine configuration."""
-from os import getenv
 
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session, sessionmaker
@@ -39,6 +38,7 @@ def get_db() -> Session:
 def init_db():
     """Initialize database with all tables."""
     from db_models import Base
+
     if not _is_pg:
         Base.metadata.create_all(bind=engine)
     _run_alembic_migrations()
@@ -50,11 +50,13 @@ def _run_alembic_migrations():
     try:
         from alembic.config import Config
         from alembic import command
+
         cfg = Config("alembic.ini")
         cfg.set_main_option("sqlalchemy.url", db_url)
         command.upgrade(cfg, "head")
     except Exception as e:
         import logging
+
         logging.getLogger(__name__).debug("Alembic migration skipped: %s", e)
 
 

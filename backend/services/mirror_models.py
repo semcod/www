@@ -1,4 +1,5 @@
 """Mirror service models."""
+
 from dataclasses import dataclass
 from typing import Optional
 
@@ -6,6 +7,7 @@ from typing import Optional
 @dataclass
 class MirrorConfig:
     """Configuration for repo mirror."""
+
     source_repo: str  # owner/repo
     source_provider: str  # github, gitlab
     target_repo: str  # owner/repo in Gitea
@@ -19,6 +21,7 @@ class MirrorConfig:
 @dataclass
 class MirrorStatus:
     """Status of mirror operation."""
+
     mirror_id: str
     status: str  # success, failed, in_progress
     last_sync: Optional[str] = None

@@ -9,17 +9,21 @@ from store import audit_results
 
 router = APIRouter()
 
+
 def _utc_now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
+
 def _build_audit_id(value: str, now_iso: str) -> str:
     return hashlib.sha256(f"{value}-{now_iso}".encode()).hexdigest()[:12]
+
 
 def _required_argument(arguments: dict, name: str) -> str:
     value = arguments.get(name)
     if not value:
         raise HTTPException(400, f"{name} is required")
     return value
+
 
 def _parse_public_repo(repo_url: str) -> tuple[str, str] | None:
     match = (
@@ -30,6 +34,7 @@ def _parse_public_repo(repo_url: str) -> tuple[str, str] | None:
     if not match:
         return None
     return match.group(1), match.group(2)
+
 
 def _normalize_repo(repo: str) -> str:
     if ":" in repo:
@@ -52,6 +57,7 @@ def _invoke_start_audit(arguments: dict) -> dict:
         "message": f"Audit started for {repo}. Use get_scan_status to check progress.",
     }
 
+
 def _invoke_get_status(arguments: dict) -> dict:
     audit_id = _required_argument(arguments, "audit_id")
     result = audit_results.get(audit_id)
@@ -61,6 +67,7 @@ def _invoke_get_status(arguments: dict) -> dict:
         "audit_id": audit_id,
         **result,
     }
+
 
 def _invoke_get_metrics(arguments: dict) -> dict:
     repo = _normalize_repo(_required_argument(arguments, "repo"))
@@ -84,6 +91,7 @@ def _invoke_get_metrics(arguments: dict) -> dict:
             },
         },
     }
+
 
 def _invoke_analyze_public(arguments: dict) -> dict:
     repo_url = _required_argument(arguments, "repo_url")
@@ -181,6 +189,7 @@ async def mcp_list_tools() -> list[MCPTool]:
         ),
     ]
 
+
 @router.post("/invoke")
 async def mcp_invoke_tool(request: MCPToolRequest) -> dict:
     """Invoke an MCP tool with the provided arguments."""
@@ -190,9 +199,9 @@ async def mcp_invoke_tool(request: MCPToolRequest) -> dict:
         "get_repository_metrics": _invoke_get_metrics,
         "analyze_public_repo": _invoke_analyze_public,
     }
-    
+
     handler = handlers.get(request.name)
     if not handler:
         raise HTTPException(400, f"Unknown tool: {request.name}")
-    
+
     return handler(request.arguments)

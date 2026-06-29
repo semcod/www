@@ -1,5 +1,17 @@
 # Semcod
 
+## AI Cost Tracking
+
+![AI Cost](https://img.shields.io/badge/AI%20Cost-$23.14-orange) ![AI Model](https://img.shields.io/badge/AI%20Model-openrouter%2Fqwen%2Fqwen3-coder-next-lightgrey)
+
+This project uses AI-generated code. Total cost: **$23.1413** with **44** AI commits.
+
+Generated on 2026-06-29 using [openrouter/qwen/qwen3-coder-next](https://openrouter.ai/models/openrouter/qwen/qwen3-coder-next)
+
+---
+
+
+
 **One-click Audit · PR Comment Bot · Code Health Badge · MCP Integration · Marketplace Auto-Fix**
 
 Semcod to zautomatyzowana platforma CI/CD jakości kodu. Umożliwia deweloperom ciągły audyt repozytoriów, automatyczne komentarze w PR, oraz generowanie auto-fix Pull Requestów przez AI (reDSL). 
@@ -73,7 +85,7 @@ Ten projekt służy jako **kompletna platforma SaaS do analizy jakości kodu** z
 - 🐳 **Docker Ready** - Complete containerization with mock GitHub
 - 🧪 **Comprehensive Testing** - Unit, integration, and E2E tests (95 Playwright tests)
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
+![Version](https://img.shields.io/badge/version-0.1.13-blue) ![Python](https://img.shields.io/badge/python-3.9+-blue) ![License](https://img.shields.io/badge/license-Apache--2.0-green)
 ![OAuth](https://img.shields.io/badge/OAuth-GitHub-green) ![Mock](https://img.shields.io/badge/Mock-Enabled-orange)
 
 ```
@@ -475,3 +487,20 @@ npm run build
 ## Licencja
 
 Apache-2.0
+
+<!-- taskill:status:start -->
+
+## Status
+
+_Last updated by [taskill](https://github.com/oqlos/taskill) at 2026-04-25 13:49 UTC_
+
+| Metric | Value |
+|---|---|
+| HEAD | `daf768a` |
+| Coverage | — |
+| Failing tests | — |
+| Commits in last cycle | 50 |
+
+> Large refactor plus new quick-ticket and reDSL features: integrated a /cycle API for real file modifications, enhanced quick-ticket with apply/--auto modes and a helper script, plus cycle-test examples and documentation/packaging fixes.
+
+<!-- taskill:status:end -->

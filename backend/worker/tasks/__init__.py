@@ -1,4 +1,5 @@
 """Celery tasks package - re-exports all task modules."""
+
 from .scan import (
     run_audit,
     process_pr_event,

@@ -86,6 +86,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Quadlet deployment docs link in README
 - Full env vars table in README
 
+- feat: integrate reDSL /cycle API — real file modifications via single endpoint
+- feat: quick-ticket: --apply uses run_cycle for real code changes (not plan-only)
+- feat: quick-ticket: --auto mode — auto-generate ticket from code analysis + docs
+- feat: add quick-ticket.sh and fix refactor result parsing
+- feat: add cycle-test examples for full ticket→reDSL→PR validation
+- fix: quick-ticket quality-focused — no dummy files, real code quality tickets
+- fix: ignore large generated files and fix package discovery
+- docs: update docs and add markdown output from tests
+
+## [0.1.13] - 2026-06-29
+
+### Docs
+- Update CHANGELOG.md
+- Update README.md
+- Update TODO.md
+
+### Other
+- Update .gitignore
+- Update .nojekyll
+- Update .taskill/state.json
+- Update Makefile
+- Update Taskfile.yml
+- Update VERSION
+- Update app.doql.css
+- Update app.doql.less
+- Update backend/adapters/__init__.py
+- Update backend/adapters/base.py
+- ... and 98 more files
+
+## [0.1.12] - 2026-06-29
+
+### Docs
+- Update CHANGELOG.md
+- Update README.md
+- Update TODO.md
+
+### Other
+- Update .gitignore
+- Update .nojekyll
+- Update .taskill/state.json
+- Update Makefile
+- Update Taskfile.yml
+- Update VERSION
+- Update app.doql.css
+- Update app.doql.less
+- Update backend/adapters/__init__.py
+- Update backend/adapters/base.py
+- ... and 97 more files
+
 ## [0.1.10] - 2026-04-10
 
 ### Docs

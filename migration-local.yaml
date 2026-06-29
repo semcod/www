@@ -1,0 +1,24 @@
+name: semcod-www-local-refresh
+description: "Lokalny redeploy semcod/www — rebuild + restart Docker Compose (dev)"
+
+source:
+  strategy: docker_full
+  host: local
+  app: semcod
+  compose_files:
+    - docker-compose.yml
+
+target:
+  strategy: docker_full
+  host: local
+  app: semcod
+  version: "0.1.10"
+  remote_dir: "."
+  compose_files:
+    - docker-compose.yml
+  env_file: .env
+  verify_url: http://localhost:9000/api/health
+
+notes:
+  - "Dev refresh na nvidia. Użyj migration.yaml dla deployu na VPS produkcyjny."
+  - "Użyj: redeploy run migration-local.yaml --dry-run"

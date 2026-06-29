@@ -1,4 +1,5 @@
 """Marketplace API router - mounts all marketplace sub-routers."""
+
 from fastapi import APIRouter
 
 from .browse import router as browse_router

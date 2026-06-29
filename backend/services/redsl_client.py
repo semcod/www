@@ -16,7 +16,9 @@ class RedslClient:
     def __init__(self, base_url: str = REDLS_URL):
         self.base_url = base_url.rstrip("/")
 
-    async def analyze(self, project_path: str, project_toon: str | None = None) -> dict[str, Any]:
+    async def analyze(
+        self, project_path: str, project_toon: str | None = None
+    ) -> dict[str, Any]:
         """Analyze a project — returns metrics and alerts."""
         payload: dict[str, Any] = {"project_dir": project_path}
         if project_toon:
@@ -57,7 +59,9 @@ class RedslClient:
             resp.raise_for_status()
             return resp.json()
 
-    async def batch_hybrid(self, semcod_root: str, max_changes: int = 30) -> dict[str, Any]:
+    async def batch_hybrid(
+        self, semcod_root: str, max_changes: int = 30
+    ) -> dict[str, Any]:
         """Hybrid quality refactoring (no LLM needed)."""
         async with httpx.AsyncClient(timeout=180) as client:
             resp = await client.post(

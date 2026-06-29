@@ -1,4 +1,5 @@
 """Repository database operations using SQLAlchemy ORM."""
+
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
 
@@ -30,7 +31,7 @@ def get_or_create_repository(
         )
         .first()
     )
-    
+
     if repo:
         return {
             "id": repo.id,
@@ -49,7 +50,7 @@ def get_or_create_repository(
             "updated_at": repo.updated_at.isoformat() if repo.updated_at else None,
             "is_new": False,
         }
-    
+
     # Create new repository
     now = datetime.now(timezone.utc)
     repo = Repository(
@@ -69,7 +70,7 @@ def get_or_create_repository(
     db.add(repo)
     db.commit()
     db.refresh(repo)
-    
+
     return {
         "id": repo.id,
         "tenant_id": repo.tenant_id,
@@ -97,7 +98,7 @@ def get_tenant_repositories(db: Session, tenant_id: int) -> List[Dict]:
         .order_by(Repository.updated_at.desc())
         .all()
     )
-    
+
     return [
         {
             "id": repo.id,
@@ -132,10 +133,10 @@ def get_repository_by_full_name(
         )
         .first()
     )
-    
+
     if not repo:
         return None
-    
+
     return {
         "id": repo.id,
         "tenant_id": repo.tenant_id,

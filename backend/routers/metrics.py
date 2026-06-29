@@ -2,8 +2,7 @@
 
 from fastapi import APIRouter, HTTPException, Response
 from fastapi.responses import FileResponse
-from config import PUBLIC_URL
-from typing import List, Dict, Optional
+from typing import Dict
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -21,7 +20,7 @@ async def get_standard_metrics(limit: int = 10) -> Dict:
     """
     Get standardized metrics for recent scans.
     This endpoint provides a consistent format for remote clients.
-    
+
     Response format:
     {
         "meta": {
@@ -52,7 +51,7 @@ async def get_standard_metrics(limit: int = 10) -> Dict:
     try:
         scans = get_recent_scans(limit)
         total = get_total_scan_count()
-        
+
         formatted_scans = []
         for scan in scans:
             # Determine platform from repo URL pattern
@@ -61,7 +60,7 @@ async def get_standard_metrics(limit: int = 10) -> Dict:
                 platform = "gitlab"
             elif "bitbucket" in scan["repo"].lower():
                 platform = "bitbucket"
-            
+
             formatted_scan = {
                 "repository": scan["repo"],
                 "platform": platform,
@@ -72,12 +71,20 @@ async def get_standard_metrics(limit: int = 10) -> Dict:
                     "lines_of_code": scan["stats"].get("total_lines", 0),
                     "languages": scan["stats"].get("languages", {}),
                     "complexity": {
-                        "avg_cyclomatic": scan["stats"].get("complexity", {}).get("cc_avg", 0),
-                        "functions": scan["stats"].get("complexity", {}).get("functions", 0),
+                        "avg_cyclomatic": scan["stats"]
+                        .get("complexity", {})
+                        .get("cc_avg", 0),
+                        "functions": scan["stats"]
+                        .get("complexity", {})
+                        .get("functions", 0),
                     },
                     "duplication": {
-                        "groups": scan["stats"].get("duplication", {}).get("duplication_groups", 0),
-                        "recoverable_lines": scan["stats"].get("duplication", {}).get("recoverable_lines", 0),
+                        "groups": scan["stats"]
+                        .get("duplication", {})
+                        .get("duplication_groups", 0),
+                        "recoverable_lines": scan["stats"]
+                        .get("duplication", {})
+                        .get("recoverable_lines", 0),
                     },
                     "quality": {
                         "passed": scan["stats"].get("quality", {}).get("passed", 0),
@@ -89,7 +96,7 @@ async def get_standard_metrics(limit: int = 10) -> Dict:
                 "badge_url": scan.get("badge_url", ""),
             }
             formatted_scans.append(formatted_scan)
-        
+
         return {
             "meta": {
                 "generated_at": _utc_now_iso(),
@@ -110,7 +117,7 @@ async def get_metrics_summary() -> Dict:
     """
     try:
         scans = get_recent_scans(1000)
-        
+
         if not scans:
             return {
                 "meta": {
@@ -125,18 +132,18 @@ async def get_metrics_summary() -> Dict:
                     "platform_distribution": {},
                 },
             }
-        
+
         total_health = sum(s["health_score"] for s in scans)
         avg_health = total_health / len(scans)
-        
+
         grade_dist = {}
         for scan in scans:
             grade = scan["grade"]
             grade_dist[grade] = grade_dist.get(grade, 0) + 1
-        
+
         total_files = sum(s["stats"].get("total_files", 0) for s in scans)
         total_lines = sum(s["stats"].get("total_lines", 0) for s in scans)
-        
+
         platform_dist = {"github": 0, "gitlab": 0, "bitbucket": 0}
         for scan in scans:
             if "gitlab" in scan["repo"].lower():
@@ -145,7 +152,7 @@ async def get_metrics_summary() -> Dict:
                 platform_dist["bitbucket"] += 1
             else:
                 platform_dist["github"] += 1
-        
+
         return {
             "meta": {
                 "generated_at": _utc_now_iso(),
@@ -176,17 +183,17 @@ async def get_repository_metrics(repo_path: str) -> Dict:
         else:
             platform = "github"
             repo = repo_path
-        
+
         # Get all scans and filter for this repo
         scans = get_recent_scans(1000)
         repo_scans = [s for s in scans if s["repo"] == repo]
-        
+
         if not repo_scans:
             raise HTTPException(404, f"No scans found for repository: {repo}")
-        
+
         # Return the most recent scan
         latest_scan = repo_scans[0]
-        
+
         return {
             "meta": {
                 "generated_at": _utc_now_iso(),
@@ -216,14 +223,12 @@ async def get_repository_metrics(repo_path: str) -> Dict:
 async def download_project_prompt():
     """Download the project prompt.txt file for LLM analysis."""
     prompt_path = Path(__file__).parent.parent.parent / "project" / "prompt.txt"
-    
+
     if not prompt_path.exists():
         raise HTTPException(404, "Project prompt file not found")
-    
+
     return FileResponse(
-        prompt_path,
-        media_type="text/plain",
-        filename="semcod-project-prompt.txt"
+        prompt_path, media_type="text/plain", filename="semcod-project-prompt.txt"
     )
 
 
@@ -231,13 +236,13 @@ async def download_project_prompt():
 async def download_project_prompt_markdown():
     """Download the project prompt as markdown format."""
     prompt_path = Path(__file__).parent.parent.parent / "project" / "prompt.txt"
-    
+
     if not prompt_path.exists():
         raise HTTPException(404, "Project prompt file not found")
-    
-    with open(prompt_path, 'r') as f:
+
+    with open(prompt_path, "r") as f:
         content = f.read()
-    
+
     # Convert to markdown format
     markdown_content = f"""# Semcod Project Analysis Prompt
 
@@ -247,11 +252,11 @@ async def download_project_prompt_markdown():
 
 *Generated by Semcod - Code Health Analysis Tool*
 """
-    
+
     return Response(
         content=markdown_content,
         media_type="text/markdown",
         headers={
             "Content-Disposition": "attachment; filename=semcod-project-prompt.md"
-        }
+        },
     )

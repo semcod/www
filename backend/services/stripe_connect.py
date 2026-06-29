@@ -1,4 +1,5 @@
 """Stripe Connect — revenue share payouts to marketplace publishers."""
+
 import logging
 from typing import Dict, Optional
 
@@ -52,7 +53,9 @@ def get_account_status(account_id: str) -> Dict:
     }
 
 
-def transfer_revenue(amount_cents: int, account_id: str, metadata: Optional[Dict] = None) -> Dict:
+def transfer_revenue(
+    amount_cents: int, account_id: str, metadata: Optional[Dict] = None
+) -> Dict:
     """Transfer publisher share (70%) to their Connect account."""
     _stripe()
     share = int(amount_cents * REVENUE_SHARE_RATE)

@@ -26,9 +26,10 @@ async def github_webhook(request: Request):
     body = await request.body()
     signature = request.headers.get("X-Hub-Signature-256", "")
     if GITHUB_WEBHOOK_SECRET:
-        expected = "sha256=" + hmac.new(
-            GITHUB_WEBHOOK_SECRET.encode(), body, hashlib.sha256
-        ).hexdigest()
+        expected = (
+            "sha256="
+            + hmac.new(GITHUB_WEBHOOK_SECRET.encode(), body, hashlib.sha256).hexdigest()
+        )
         if not hmac.compare_digest(signature, expected):
             raise HTTPException(401, "Invalid signature")
 
@@ -112,7 +113,13 @@ async def _handle_pr_event(payload: dict):
         )
 
         grade = analysis["grade"]
-        state = "success" if grade in ("A+", "A", "B+") else "failure" if grade in ("D", "F") else "pending"
+        state = (
+            "success"
+            if grade in ("A+", "A", "B+")
+            else "failure"
+            if grade in ("D", "F")
+            else "pending"
+        )
         await client.post(
             f"https://api.github.com/repos/{repo_full}/statuses/{head_sha}",
             json={
@@ -130,8 +137,13 @@ async def _handle_pr_event(payload: dict):
     print(f"[pr-bot] Commented on {repo_full}#{pr_number}: {grade} → {report_url}")
 
 
-def _score_analysis(files_count: int, has_tests: bool, total_changes: int,
-                    large_files: list, risky_files: list) -> int:
+def _score_analysis(
+    files_count: int,
+    has_tests: bool,
+    total_changes: int,
+    large_files: list,
+    risky_files: list,
+) -> int:
     """Compute PR quality score from aggregated signals."""
     score = 85
     if not has_tests and total_changes > 50:
@@ -174,8 +186,13 @@ def _analyze_pr_files(files: list[dict]) -> dict:
         if any(p in filename.lower() for p in risky_patterns):
             risky_files.append(filename)
 
-    score = _score_analysis(len(files), has_tests, total_additions + total_deletions,
-                            large_files, risky_files)
+    score = _score_analysis(
+        len(files),
+        has_tests,
+        total_additions + total_deletions,
+        large_files,
+        risky_files,
+    )
     return {
         "score": score,
         "grade": score_to_grade(score),
@@ -200,7 +217,10 @@ def _build_pr_summary(analysis: dict) -> list[str]:
         summary.append(f"{len(analysis['large_files'])} large file(s) flagged")
     if analysis["risky_files"]:
         summary.append(f"{len(analysis['risky_files'])} risky file(s) need review")
-    if not analysis["has_tests"] and (analysis["additions"] + analysis["deletions"]) > 50:
+    if (
+        not analysis["has_tests"]
+        and (analysis["additions"] + analysis["deletions"]) > 50
+    ):
         summary.append("consider adding tests for this change set")
 
     return summary
@@ -211,7 +231,15 @@ def _build_pr_comment(analysis: dict, repo: str, sha: str, report_url: str) -> s
     grade = analysis["grade"]
     score = analysis["score"]
 
-    emoji = {"A+": "🟢", "A": "🟢", "B+": "🟡", "B": "🟡", "C": "🟠", "D": "🔴", "F": "🔴"}
+    emoji = {
+        "A+": "🟢",
+        "A": "🟢",
+        "B+": "🟡",
+        "B": "🟡",
+        "C": "🟠",
+        "D": "🔴",
+        "F": "🔴",
+    }
     grade_emoji = emoji.get(grade, "⚪")
 
     lines = [
@@ -243,15 +271,19 @@ def _build_pr_comment(analysis: dict, repo: str, sha: str, report_url: str) -> s
 
     if not analysis["has_tests"] and analysis["additions"] > 50:
         lines.append("")
-        lines.append("> 💡 **Sugestia:** Ten PR dodaje znaczącą ilość kodu bez testów. "
-                     "Rozważ dodanie testów jednostkowych.")
+        lines.append(
+            "> 💡 **Sugestia:** Ten PR dodaje znaczącą ilość kodu bez testów. "
+            "Rozważ dodanie testów jednostkowych."
+        )
 
-    lines.extend([
-        "",
-        "---",
-        f"<sub>🔬 [Semcod]({APP_URL}) · audit: `{sha[:7]}` · "
-        f"[full report]({report_url}) · "
-        f"[Get this for your repo (free)]({APP_URL})</sub>",
-    ])
+    lines.extend(
+        [
+            "",
+            "---",
+            f"<sub>🔬 [Semcod]({APP_URL}) · audit: `{sha[:7]}` · "
+            f"[full report]({report_url}) · "
+            f"[Get this for your repo (free)]({APP_URL})</sub>",
+        ]
+    )
 
     return "\n".join(lines)
