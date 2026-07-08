@@ -231,4 +231,5 @@ __marimo__/
 # Generated code2llm output files
 code2llm_output/
 **/code2llm_output/
-code2llm_output
+code2llm_output.github/
+.taskill/
