@@ -1,5 +1,9 @@
 {
-  "dependencies": {
-    "axios": "^1.15.0"
-  }
+  "name": "semcod-projects-landing",
+  "version": "1.0.0",
+  "description": "Landing page dla projektów Semcod Engine z codziennym cache z GitHub API",
+  "main": "index.html",
+  "scripts": { "dev": "npx -y serve . -l 8892", "update-cache": "python3 scripts/update_github_cache.py" },
+  "author": "Semcod Engine Team",
+  "license": "MIT"
 }

@@ -1,0 +1,16 @@
+Metadata-Version: 2.4
+Name: semcod
+Version: 0.1.10
+Requires-Python: >=3.8
+Requires-Dist: fastapi>=0.110.0
+Requires-Dist: httpx>=0.27.0
+Requires-Dist: PyJWT>=2.8.0
+Requires-Dist: goal>=2.1.0
+Requires-Dist: costs>=0.1.20
+Requires-Dist: pfix>=0.1.60
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.23.0; extra == "dev"
+Requires-Dist: goal>=2.1.0; extra == "dev"
+Requires-Dist: costs>=0.1.20; extra == "dev"
+Requires-Dist: pfix>=0.1.60; extra == "dev"
