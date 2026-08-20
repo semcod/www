@@ -1,1 +1,0 @@
-export { GradeCircle } from "../GradeCircle";

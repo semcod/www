@@ -1,1 +1,0 @@
-export { LanguageBar } from "../LanguageBar";

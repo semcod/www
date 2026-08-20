@@ -12,27 +12,73 @@ error_reporting(E_ALL & ~E_NOTICE);
 // Status Cache TTL: 24 Godziny (86400 sekund)
 define('CACHE_TTL', 86400);
 
-$baseGithubDir = dirname(__DIR__); // /home/tom/github
 $currentDir = __DIR__;
-$currentOrgName = basename(dirname($currentDir));
+$parentDirName = basename(dirname($currentDir));
+$grandParentDir = dirname(dirname($currentDir));
+$baseGithubDir = is_dir($grandParentDir) ? $grandParentDir : dirname(__DIR__);
 
-// Pobierz parametry z URL
+$invalidOrgs = ['www', 'work', '_actions', '_temp', '_PipelineMapping'];
+
+// 1. Pobierz org z URL jeśli podano
 $selectedOrg = isset($_GET['org']) ? preg_replace('/[^a-zA-Z0-9_-]/', '', $_GET['org']) : '';
-if (!$selectedOrg || !is_dir($baseGithubDir . '/' . $selectedOrg)) {
-    // Sprawdź czy bieżący katalog rodzica to organizacja
-    if (basename($currentDir) === 'www' && is_dir(dirname($currentDir))) {
-        $selectedOrg = basename(dirname($currentDir));
-    } else {
-        $selectedOrg = 'wellmanifest'; // Domyślna organizacja
+
+// 2. Jeśli brak, sprawdź zmienną środowiskową GITHUB_REPOSITORY z GitHub Actions
+if (!$selectedOrg || in_array($selectedOrg, $invalidOrgs)) {
+    $ghRepoEnv = getenv('GITHUB_REPOSITORY');
+    if ($ghRepoEnv && strpos($ghRepoEnv, '/') !== false) {
+        $parts = explode('/', $ghRepoEnv);
+        if (!empty($parts[0]) && !in_array($parts[0], $invalidOrgs)) {
+            $selectedOrg = $parts[0];
+        }
     }
 }
 
-$orgPath = $baseGithubDir . '/' . $selectedOrg;
+// 3. Jeśli nadal brak, sprawdź URL git remote origin
+if (!$selectedOrg || in_array($selectedOrg, $invalidOrgs)) {
+    $gitRemote = @shell_exec('git remote get-url origin 2>/dev/null');
+    if ($gitRemote && preg_match('/[:\/]([a-zA-Z0-9_-]+)\/([a-zA-Z0-9_-]+)(\.git)?/', trim($gitRemote), $matches)) {
+        if (!empty($matches[1]) && !in_array($matches[1], $invalidOrgs)) {
+            $selectedOrg = $matches[1];
+        }
+    }
+}
+
+// 4. Jeśli nadal brak, sprawdź katalog nadrzędny
+if (!$selectedOrg || in_array($selectedOrg, $invalidOrgs)) {
+    $dirParts = array_filter(explode('/', str_replace('\\', '/', $currentDir)));
+    foreach (array_reverse($dirParts) as $part) {
+        if (!in_array($part, $invalidOrgs) && strpos($part, '_') !== 0 && strpos($part, '.') !== 0) {
+            $selectedOrg = $part;
+            break;
+        }
+    }
+}
+
+if (!$selectedOrg || in_array($selectedOrg, $invalidOrgs)) {
+    $selectedOrg = 'wellmanifest'; // Domyślna organizacja
+}
+
+if ($selectedOrg === $parentDirName) {
+    $orgPath = dirname($currentDir);
+} else {
+    $orgPath = $baseGithubDir . '/' . $selectedOrg;
+}
 if (!is_dir($orgPath)) {
     $orgPath = $currentDir;
 }
 
 $cacheFile = $currentDir . '/cache_' . $selectedOrg . '.json';
+
+// --- PLESK / CLI DAILY STATIC EXPORT MODE ---
+$isCli = (php_sapi_name() === 'cli');
+$isExport = $isCli || (isset($_GET['export']) && $_GET['export'] == '1') || (isset($argv[1]) && in_array($argv[1], ['--export', 'export', '-e', 'build']));
+
+if ($isExport) {
+    if (file_exists($cacheFile)) {
+        @unlink($cacheFile);
+    }
+    ob_start();
+}
 
 // --- API HANDLING ---
 if (isset($_GET['api'])) {
@@ -47,6 +93,70 @@ if (isset($_GET['api'])) {
     }
 }
 
+function httpGetJson($url) {
+    $token = getenv('GITHUB_TOKEN');
+    $userAgent = 'WebOrg-PHP-AutoDiscovery/1.0';
+
+    if (function_exists('curl_init')) {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_USERAGENT, $userAgent);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+        $headers = [];
+        if ($token) {
+            $headers[] = "Authorization: token {$token}";
+        }
+        if (!empty($headers)) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        }
+        $res = curl_exec($ch);
+        curl_close($ch);
+        if ($res) {
+            $data = json_decode($res, true);
+            if (is_array($data)) return $data;
+        }
+    }
+
+    $headerStr = "User-Agent: {$userAgent}\r\n";
+    if ($token) {
+        $headerStr .= "Authorization: token {$token}\r\n";
+    }
+    $opts = [
+        "http" => [
+            "method" => "GET",
+            "header" => $headerStr,
+            "ignore_errors" => true,
+            "timeout" => 15
+        ],
+        "ssl" => [
+            "verify_peer" => false,
+            "verify_peer_name" => false
+        ]
+    ];
+    $context = stream_context_create($opts);
+    $json = @file_get_contents($url, false, $context);
+    if ($json) {
+        $data = json_decode($json, true);
+        if (is_array($data)) return $data;
+    }
+    return null;
+}
+
+function fetchGitHubOrgRepos($orgName) {
+    $data = httpGetJson("https://api.github.com/orgs/{$orgName}/repos?per_page=100");
+    if (is_array($data) && !isset($data['message']) && count($data) > 1) {
+        return $data;
+    }
+    $dataUser = httpGetJson("https://api.github.com/users/{$orgName}/repos?per_page=100");
+    if (is_array($dataUser) && !isset($dataUser['message']) && count($dataUser) > 0) {
+        return $dataUser;
+    }
+    return is_array($data) && !isset($data['message']) ? $data : [];
+}
+
 // --- FUNKCJA AUTOMATYCZNEGO ODKRYWANIA REPOZYTORIÓW I CACHE ---
 function getOrGenerateProjectsCache($orgName, $orgPath, $cacheFile) {
     if (file_exists($cacheFile)) {
@@ -54,7 +164,7 @@ function getOrGenerateProjectsCache($orgName, $orgPath, $cacheFile) {
         if ($age < CACHE_TTL) {
             $json = file_get_contents($cacheFile);
             $data = json_decode($json, true);
-            if ($data && isset($data['projects'])) {
+            if ($data && isset($data['projects']) && count($data['projects']) > 0) {
                 return $data;
             }
         }
@@ -73,53 +183,106 @@ function getOrGenerateProjectsCache($orgName, $orgPath, $cacheFile) {
     }
 
     $projects = [];
-    foreach ($subdirs as $projId) {
-        $projPath = $orgPath . '/' . $projId;
-        $readmeFile = $projPath . '/README.md';
-        $readmeContent = file_exists($readmeFile) ? file_get_contents($readmeFile) : '';
 
-        // Parsowanie nagłówka i opisu
-        $lines = array_filter(array_map('trim', explode("\n", $readmeContent)));
-        $title = !empty($lines) ? trim(str_replace('#', '', reset($lines))) : $projId;
-        
-        $desc = '';
-        foreach (array_slice($lines, 1, 6) as $l) {
-            if (strpos($l, '#') !== 0 && strpos($l, '![') !== 0 && strlen($l) > 10) {
-                $desc = $l;
-                break;
+    // Pobierz prawdziwe statystyki z GitHub REST API
+    $ghStatsMap = [];
+    $apiRepos = fetchGitHubOrgRepos($orgName);
+    foreach ($apiRepos as $repo) {
+        if (!empty($repo['name'])) {
+            $ghStatsMap[$repo['name']] = [
+                'stars' => $repo['stargazers_count'] ?? 0,
+                'forks' => $repo['forks_count'] ?? 0,
+                'issues' => $repo['open_issues_count'] ?? 0,
+                'language' => $repo['language'] ?? 'Python',
+                'description' => $repo['description'] ?? '',
+                'html_url' => $repo['html_url'] ?? "https://github.com/$orgName/{$repo['name']}"
+            ];
+        }
+    }
+
+    if (!empty($subdirs)) {
+        foreach ($subdirs as $projId) {
+            $projPath = $orgPath . '/' . $projId;
+            $readmeFile = $projPath . '/README.md';
+            $readmeContent = file_exists($readmeFile) ? file_get_contents($readmeFile) : '';
+
+            $lines = array_filter(array_map('trim', explode("\n", $readmeContent)));
+            $title = !empty($lines) ? trim(str_replace('#', '', reset($lines))) : $projId;
+            
+            $desc = '';
+            foreach (array_slice($lines, 1, 6) as $l) {
+                if (strpos($l, '#') !== 0 && strpos($l, '![') !== 0 && strlen($l) > 10) {
+                    $desc = $l;
+                    break;
+                }
             }
-        }
-        if (!$desc) {
-            $desc = "Moduł $projId — komponent wykonawczy i automatyzacyjny w ekosystemie $orgName.";
-        }
+            if (!$desc) {
+                $desc = "Moduł $projId — komponent wykonawczy i automatyzacyjny w ekosystemie $orgName.";
+            }
 
-        // Generowanie tagów
-        $tags = [$orgName, 'module'];
-        if (preg_match('/(connector|adapter|link)/i', $projId)) $tags[] = 'connector';
-        if (preg_match('/(nlp|llm|ai|agent)/i', $projId)) $tags[] = 'ai';
-        if (preg_match('/(dsl|grammar|schema|parser)/i', $projId)) $tags[] = 'dsl';
-        if (preg_match('/(uri|url|route)/i', $projId)) $tags[] = 'uri';
-        if (preg_match('/(stream|event|queue)/i', $projId)) $tags[] = 'stream';
-        if (preg_match('/(lifecycle|state)/i', $projId)) $tags[] = 'lifecycle';
-        if (preg_match('/(sec|auth|guard|identity)/i', $projId)) $tags[] = 'security';
+            $tags = [$orgName, 'module'];
+            if (preg_match('/(connector|adapter|link)/i', $projId)) $tags[] = 'connector';
+            if (preg_match('/(nlp|llm|ai|agent)/i', $projId)) $tags[] = 'ai';
+            if (preg_match('/(dsl|grammar|schema|parser)/i', $projId)) $tags[] = 'dsl';
+            if (preg_match('/(uri|url|route)/i', $projId)) $tags[] = 'uri';
+            if (preg_match('/(stream|event|queue)/i', $projId)) $tags[] = 'stream';
+            if (preg_match('/(lifecycle|state)/i', $projId)) $tags[] = 'lifecycle';
+            if (preg_match('/(sec|auth|guard|identity)/i', $projId)) $tags[] = 'security';
 
-        $projects[$projId] = [
-            'id' => $projId,
-            'name' => (strlen($title) < 45) ? $title : $projId,
-            'task' => $desc,
-            'category' => 'Moduły & Usługi',
-            'tags' => array_values(array_unique($tags)),
-            'status' => 'Aktywny Moduł',
-            'stars' => (strlen($projId) * 11 + 7) % 120 + 15,
-            'forks' => (strlen($projId) * 3 + 2) % 25 + 2,
-            'issues' => strlen($projId) % 4,
-            'language' => preg_match('/(py|nlp|ai)/i', $projId) ? 'Python' : (preg_match('/(ts|js|web)/i', $projId) ? 'TypeScript' : 'Python'),
-            'owner' => $orgName,
-            'readme' => $readmeContent,
-            'github_url' => "https://github me/$orgName/$projId",
-            'dependencies' => [],
-            'used_by' => []
-        ];
+            $ghData = $ghStatsMap[$projId] ?? [];
+            $realStars = $ghData['stars'] ?? 0;
+            $realForks = $ghData['forks'] ?? 0;
+            $realIssues = $ghData['issues'] ?? 0;
+            $realLang = $ghData['language'] ?? (preg_match('/(ts|js|web)/i', $projId) ? 'TypeScript' : 'Python');
+
+            $projects[$projId] = [
+                'id' => $projId,
+                'name' => (strlen($title) < 45) ? $title : $projId,
+                'task' => $desc,
+                'category' => 'Moduły & Usługi',
+                'tags' => array_values(array_unique($tags)),
+                'status' => 'Aktywny Moduł',
+                'stars' => $realStars,
+                'forks' => $realForks,
+                'issues' => $realIssues,
+                'language' => $realLang,
+                'owner' => $orgName,
+                'readme' => $readmeContent,
+                'github_url' => "https://github.com/$orgName/$projId",
+                'dependencies' => [],
+                'used_by' => []
+            ];
+        }
+    } else {
+        // Fallback do GitHub REST API jeśli brak lokalnych subkatalogów
+        foreach ($apiRepos as $repo) {
+            $projId = $repo['name'] ?? '';
+            if (!$projId || $projId === 'www') continue;
+
+            $desc = $repo['description'] ?? "Moduł $projId w ekosystemie $orgName.";
+            $tags = [$orgName, 'module'];
+            if (preg_match('/(connector|adapter|link)/i', $projId)) $tags[] = 'connector';
+            if (preg_match('/(nlp|llm|ai|agent)/i', $projId)) $tags[] = 'ai';
+            if (preg_match('/(dsl|grammar|schema|parser)/i', $projId)) $tags[] = 'dsl';
+
+            $projects[$projId] = [
+                'id' => $projId,
+                'name' => $projId,
+                'task' => $desc,
+                'category' => 'Moduły & Usługi',
+                'tags' => array_values(array_unique($tags)),
+                'status' => 'Aktywny Moduł',
+                'stars' => $repo['stargazers_count'] ?? 0,
+                'forks' => $repo['forks_count'] ?? 0,
+                'issues' => $repo['open_issues_count'] ?? 0,
+                'language' => $repo['language'] ?? 'Python',
+                'owner' => $orgName,
+                'readme' => "# $projId\n\n$desc\n\n[Kod na GitHub]({$repo['html_url']})",
+                'github_url' => $repo['html_url'] ?? "https://github.com/$orgName/$projId",
+                'dependencies' => [],
+                'used_by' => []
+            ];
+        }
     }
 
     // Wykrywanie relacji zależności
@@ -159,14 +322,15 @@ function getOrGenerateProjectsCache($orgName, $orgPath, $cacheFile) {
 
 $cacheData = getOrGenerateProjectsCache($selectedOrg, $orgPath, $cacheFile);
 
-// Pobierz listę wszystkich dostępnych organizacji na serwerze
-$allAvailableOrgs = [];
-if (is_dir($baseGithubDir)) {
-    foreach (scandir($baseGithubDir) as $d) {
-        if ($d !== '.' && $d !== '..' && strpos($d, '.') !== 0 && is_dir($baseGithubDir . '/' . $d)) {
-            $allAvailableOrgs[] = $d;
-        }
-    }
+// Zawsze udostępniaj pełną listę zdefiniowanych, aktywnych serwisów WWW
+$allAvailableOrgs = [
+    'autogrammar', 'bioxfoundry', 'digitaltwin-run', 'emllm', 'fin-officer',
+    'founder-pl', 'oqlos', 'semcod', 'stream-ware', 'tom-sapletta-com',
+    'urirun-connectors', 'wellmanifest', 'wronai'
+];
+
+if (!in_array($selectedOrg, $allAvailableOrgs) && !in_array($selectedOrg, $invalidOrgs)) {
+    $allAvailableOrgs[] = $selectedOrg;
 }
 sort($allAvailableOrgs);
 ?>
@@ -637,3 +801,17 @@ sort($allAvailableOrgs);
   </script>
 </body>
 </html>
+<?php
+if ($isExport) {
+    $htmlOutput = ob_get_clean();
+    $exportHtmlFile = $currentDir . '/index.html';
+    file_put_contents($exportHtmlFile, $htmlOutput);
+    if ($isCli) {
+        echo "[Plesk Daily Export] Wygenerowano plik statyczny index.html dla organizacji '{$selectedOrg}' (" . round(strlen($htmlOutput) / 1024) . " KB)\n";
+        exit(0);
+    } else {
+        echo $htmlOutput;
+        exit(0);
+    }
+}
+?>

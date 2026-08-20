@@ -1,3 +1,6 @@
-# 🌐 Semcod Engine — Landing Page (`www`)
+# semcod — Projects Hub (Single-File index.php Engine)
 
-Official landing page and interactive projects dashboard for **semcod**.
+Pure single-file PHP landing page and ecosystem dependency hub for .
+
+## Quickstart
+

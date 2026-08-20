@@ -1,9 +1,0 @@
-repos:
-  - repo: local
-    hooks:
-      - id: quality-gate
-        name: Quality Gate
-        entry: python backend/quality_gate.py
-        language: system
-        pass_filenames: false
-        always_run: true
