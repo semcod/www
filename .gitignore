@@ -1,3 +1,7 @@
+.env
+.env.*
+!.env.example
+!**/.env.example
 cache_*.json
 .DS_Store
 *.log
